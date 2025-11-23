@@ -329,6 +329,13 @@ $(document).ready(function() {
         processing: true,
         serverSide: true,
         ajax: '{{ route("customer_get_data") }}',
+        // Scroll settings
+        scrollX: true,
+        scrollY: "400px",
+        scrollCollapse: true,
+        // Responsive settings
+        responsive: true,
+        autoWidth: false,
         columns: [
             { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false },
             { data: 'kode', name: 'kode' },

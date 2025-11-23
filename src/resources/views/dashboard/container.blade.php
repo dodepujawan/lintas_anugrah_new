@@ -51,6 +51,7 @@ $(document).ready(function() {
     }
 // ========================= End Of Register Customer ======================================
 // ####################### End Of NAVBAR ROOM ###########################################
+
 // +++++++++++++++++++++++++++++++ SIDEBAR ROOM +++++++++++++++++++++++++++++++++++++++++
 // ========================= List Register ======================================
     $(document).on('click', '#sidebar_list_user', function(e) {
@@ -90,6 +91,25 @@ $(document).ready(function() {
         });
     }
 // ========================= End Of New Register ======================================
+// ========================= New Kendaraan ======================================
+    $(document).on('click', '#sidebar_new_kendaraan', function(e) {
+        e.preventDefault();
+        loadNewKendaraanForm();
+    });
+
+    function loadNewKendaraanForm() {
+        $.ajax({
+            url: '{{ route('kendaraan.index') }}', // Route to load the form
+            type: 'GET',
+            success: function(response) {
+                $('.master-page').html(response);
+            },
+            error: function() {
+                $('.master-page').html('<p>Error loading form.</p>');
+            }
+        });
+    }
+// ========================= End Of New Kendaraan ======================================
 // +++++++++++++++++++++++++++ End Of SIDEBAR ROOM ++++++++++++++++++++++++++++++++++++++
 });
 </script>

@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\KendaraanController;
 
 Route::get('/', function () {
     return redirect()->route('login');
@@ -43,6 +44,14 @@ Route::prefix('customer')->group(function () {
     Route::post('/destroy/{id}', [CustomerController::class, 'customer_destroy'])->name('customer_destroy');
 });
 
+Route::prefix('kendaraan')->group(function () {
+    Route::get('/', [KendaraanController::class, 'index'])->name('kendaraan.index');
+    Route::post('/store', [KendaraanController::class, 'store'])->name('kendaraan.store');
+    Route::get('/data', [KendaraanController::class, 'data'])->name('kendaraan.data');
+    Route::get('/edit/{id}', [KendaraanController::class, 'edit'])->name('kendaraan.edit');
+    Route::post('/update/{id}', [KendaraanController::class, 'update'])->name('kendaraan.update');
+    Route::post('/delete/{id}', [KendaraanController::class, 'destroy'])->name('kendaraan.destroy');
+});
 
 
 // Route::prefix('register')->group(function () {

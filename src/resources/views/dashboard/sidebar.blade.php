@@ -43,7 +43,7 @@
                     <span class="menu-text">Add New User</span>
                     </a>
                 </li>
-                <li class="menu-item">
+                {{-- <li class="menu-item">
                     <a href="#" class="menu-link">
                     <span class="menu-text">User Roles</span>
                     </a>
@@ -52,7 +52,7 @@
                     <a href="#" class="menu-link">
                     <span class="menu-text">Permissions</span>
                     </a>
-                </li>
+                </li> --}}
                 </ul>
             </li>
 
@@ -66,6 +66,21 @@
                 <li class="menu-item">
                     <a href="#" class="menu-link" id="sidebar_register_customer">
                     <span class="menu-text">Customer</span>
+                    </a>
+                </li>
+                </ul>
+            </li>
+
+            <li class="menu-item">
+                <a class="menu-link" data-bs-toggle="collapse" href="#kendaraanMenu" role="button" aria-expanded="false">
+                <i class="menu-icon bx bx-car"></i>
+                <span class="menu-text">Kendaraan</span>
+                <i class="menu-arrow bx bx-chevron-right"></i>
+                </a>
+                <ul class="sub-menu collapse" id="kendaraanMenu">
+                <li class="menu-item">
+                    <a href="#" class="menu-link" id="sidebar_new_kendaraan">
+                    <span class="menu-text">Kendaraan</span>
                     </a>
                 </li>
                 </ul>
