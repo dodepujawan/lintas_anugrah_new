@@ -73,4 +73,27 @@ class DriverController extends Controller
         Driver::destroy($id);
         return response()->json(['success' => 'Data berhasil dihapus!']);
     }
+
+    // Fungsi Calback id_user
+    public function driver_kode() {
+        $role = 'DRV'; // Default prefix untuk customer
+
+        $lastUser = DB::table('driver')
+            ->where('kode', 'LIKE', $role . '%')
+            ->orderBy('kode', 'desc')
+            ->first();
+
+        if ($lastUser) {
+            // Ambil angka dari kode terakhir, contoh: CST000001 -> 000001 -> 1
+            $lastNumber = (int) substr($lastUser->kode, strlen($role));
+            $newNumber = $lastNumber + 1;
+        } else {
+            $newNumber = 1;
+        }
+
+        // Format: CST + 6 digit angka (contoh: CST000001, CST000002, dst)
+        $newKode = $role . str_pad($newNumber, 5, '0', STR_PAD_LEFT);
+
+        return response()->json(['kode' => $newKode]);
+    }
 }

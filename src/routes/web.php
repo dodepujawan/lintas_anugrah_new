@@ -43,6 +43,9 @@ Route::prefix('customer')->group(function () {
     Route::get('/show/{id}', [CustomerController::class, 'customer_show'])->name('customer_show');
     Route::post('/update/{id}', [CustomerController::class, 'customer_update'])->name('customer_update');
     Route::post('/destroy/{id}', [CustomerController::class, 'customer_destroy'])->name('customer_destroy');
+
+    // Callback
+    Route::get('/customer_kode', [CustomerController::class, 'customer_kode'])->name('customer_kode');
 });
 
 Route::prefix('kendaraan')->group(function () {
@@ -52,6 +55,8 @@ Route::prefix('kendaraan')->group(function () {
     Route::get('/edit/{id}', [KendaraanController::class, 'edit'])->name('kendaraan.edit');
     Route::post('/update/{id}', [KendaraanController::class, 'update'])->name('kendaraan.update');
     Route::post('/delete/{id}', [KendaraanController::class, 'destroy'])->name('kendaraan.destroy');
+    // Callback
+    Route::get('/kendaraan_kode', [KendaraanController::class, 'kendaraan_kode'])->name('kendaraan_kode');
 });
 
 Route::prefix('driver')->group(function () {

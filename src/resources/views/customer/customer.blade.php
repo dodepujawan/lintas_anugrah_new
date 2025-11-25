@@ -51,8 +51,8 @@
                             <h5 class="mb-3">DATA CUSTOMER</h5>
                             <div class="row">
                                 <div class="col-md-6 mb-3">
-                                    <label for="kode" class="form-label">KODE <span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control enter-next" id="kode" name="kode" required data-next="nama">
+                                    <label for="kode" class="form-label">KODE <span class="text-danger">*</span><small class="text-muted">(Di-generate otomatis oleh sistem, mohon cek kembali !)</small></label>
+                                    <input type="text" class="form-control enter-next" id="kode" name="kode" required data-next="nama" readonly>
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label for="nama" class="form-label">NAMA <span class="text-danger">*</span></label>
@@ -357,11 +357,26 @@ $(document).ready(function() {
         $('#customer-form').attr('data-method', 'store');
         $('#customer-modal').modal('show');
         $('#form-errors').addClass('d-none');
+        // panggil fungsi load kode customer
+        load_kode_customer()
         // panggil fungsi next click
         initializeEnterNext();
         // Focus ke field pertama saat modal dibuka
         $('#kode').focus();
     });
+
+    function load_kode_customer() {
+        $.ajax({
+            url: '{{ route('customer_kode') }}', // Route to load the form
+            type: 'GET',
+            success: function(response) {
+                $('#kode').val(response.kode);
+            },
+            error: function() {
+                $('#kode').val('<p>Error loading form.</p>');
+            }
+        });
+    }
     // ================================= End Of Add button click  =================================
     // ===================================== Edit button click =====================================
     $(document).on('click', '.edit-btn-customer', function() {
@@ -482,7 +497,7 @@ $(document).ready(function() {
                 if (response.status === 'success') {
                     $('#customer-modal').modal('hide');
                     table.ajax.reload();
-                    alert('Data berhasil disimpan');
+                    Swal.fire('Sukses!', response.success, 'success');
                 }
             },
             error: function(xhr) {
@@ -504,23 +519,54 @@ $(document).ready(function() {
     // ================================= Delete button click =================================
     $(document).on('click', '.delete-btn-customer', function() {
         var id = $(this).data('id');
+        var csrfToken = $('meta[name="csrf-token"]').attr('content');
 
-        if (confirm('Apakah Anda yakin ingin menghapus data ini?')) {
-            $.ajax({
-                url: '{{ route("customer_destroy", ["id" => ":id"]) }}'.replace(':id', id),
-                type: 'POST',
-                success: function(response) {
-                    if (response.status === 'success') {
-                        table.ajax.reload();
-                        alert('Data berhasil dihapus');
+        Swal.fire({
+            title: 'Apakah Anda yakin?',
+            text: "Data yang dihapus tidak dapat dikembalikan!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Ya, Hapus!',
+            cancelButtonText: 'Batal',
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: '{{ route("customer_destroy", ["id" => ":id"]) }}'.replace(':id', id),
+                    type: 'POST',
+                    data: {
+                        _token: csrfToken
+                    },
+                    success: function(response) {
+                        if (response.status === 'success') {
+                            table.ajax.reload();
+
+                            Swal.fire({
+                                title: 'Terhapus!',
+                                text: response.message || 'Data berhasil dihapus',
+                                icon: 'success',
+                                confirmButtonColor: '#3085d6',
+                                confirmButtonText: 'OK'
+                            });
+                        }
+                    },
+                    error: function(xhr) {
+                        let errorMessage = xhr.responseJSON?.message || 'Terjadi kesalahan saat menghapus data';
+
+                        Swal.fire({
+                            title: 'Error!',
+                            text: errorMessage,
+                            icon: 'error',
+                            confirmButtonColor: '#d33',
+                            confirmButtonText: 'OK'
+                        });
                     }
-                },
-                error: function(xhr) {
-                    alert('Terjadi kesalahan: ' + (xhr.responseJSON?.message || 'Server error'));
-                }
-            });
-        }
-    });
+                });
+            }
+        });
+});
     // ============================== End Of Delete button click =================================
     // ================================= Close modal handler =================================
     $('#customer-modal').on('hidden.bs.modal', function () {

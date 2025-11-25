@@ -45,7 +45,7 @@
                     <div class="col-md-6">
                         <div class="mb-3">
                             <label for="kode" class="form-label">Kode</label>
-                            <input type="text" class="form-control" id="kode" name="kode" required>
+                            <input type="text" class="form-control" id="kode" name="kode" required readonly>
                         </div>
                         <div class="mb-3">
                             <label for="nama" class="form-label">Nama</label>
@@ -140,6 +140,19 @@ $(document).ready(function() {
         $("#tableKendaraan").hide();
         $("#formKendaraan").show();
         resetForm();
+        load_kode_kendaraan();
+        function load_kode_kendaraan() {
+            $.ajax({
+                url: '{{ route('kendaraan_kode') }}', // Route to load the form
+                type: 'GET',
+                success: function(response) {
+                    $('#kode').val(response.kode);
+                },
+                error: function() {
+                    $('#kode').val('<p>Error loading form.</p>');
+                }
+            });
+        }
     });
     $("#list_kendaraan").click( function(e) {
         e.preventDefault();

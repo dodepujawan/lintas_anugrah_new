@@ -3,8 +3,8 @@
 <div class="main-master">
     <div class="master-page">
         <h1>Main Page</h1>
-        <h2>Aneka Plastik</h2>
-        <div>Toko Online Aneka Plastik</div>
+        <h2>Lintas Anugrah</h2>
+        <div>Expedisi</div>
     </div>
 </div>
 @endsection

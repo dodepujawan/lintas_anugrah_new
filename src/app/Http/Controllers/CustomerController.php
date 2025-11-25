@@ -6,6 +6,7 @@ use App\Models\Mcustomer;
 use Illuminate\Http\Request;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\DB;
 
 class CustomerController extends Controller
 {
@@ -39,7 +40,6 @@ class CustomerController extends Controller
 
     public function customer_store(Request $request){
         $validator = Validator::make($request->all(), [
-            'kode' => 'required|unique:Mcustomer,kode',
             'nama' => 'required'
         ]);
 
@@ -52,7 +52,15 @@ class CustomerController extends Controller
         }
 
         try {
-            $customer = Mcustomer::create($request->all());
+            // Generate kode
+            $kode = $this->customer_kode_store();
+
+            // Merge kode ke data request
+            $data = $request->all();
+            $data['kode'] = $kode;
+
+            // Tetap bisa pakai create dengan all data
+            $customer = Mcustomer::create($data);
 
             return response()->json([
                 'status' => 'success',
@@ -146,6 +154,60 @@ class CustomerController extends Controller
                 'status' => 'error',
                 'message' => 'Terjadi kesalahan: ' . $e->getMessage()
             ], 500);
+        }
+    }
+
+    // Fungsi Calback id_user
+    public function customer_kode() {
+        $role = 'CST'; // Default prefix untuk customer
+
+        $lastUser = DB::table('mcustomer')
+            ->where('kode', 'LIKE', $role . '%')
+            ->orderBy('kode', 'desc')
+            ->first();
+
+        if ($lastUser) {
+            // Ambil angka dari kode terakhir, contoh: CST000001 -> 000001 -> 1
+            $lastNumber = (int) substr($lastUser->kode, strlen($role));
+            $newNumber = $lastNumber + 1;
+        } else {
+            $newNumber = 1;
+        }
+
+        // Format: CST + 6 digit angka (contoh: CST000001, CST000002, dst)
+        $newKode = $role . str_pad($newNumber, 6, '0', STR_PAD_LEFT);
+
+        return response()->json(['kode' => $newKode]);
+    }
+
+    // Fungsi Calback private
+    private function customer_kode_store() {
+        $role = 'CST';
+
+        DB::beginTransaction();
+
+        try {
+            $lastUser = DB::table('mcustomer')
+                ->where('kode', 'LIKE', $role . '%')
+                ->lockForUpdate() // 🔒 Lock table untuk prevent race condition
+                ->orderBy('kode', 'desc')
+                ->first();
+
+            if ($lastUser) {
+                $lastNumber = (int) substr($lastUser->kode, strlen($role));
+                $newNumber = $lastNumber + 1;
+            } else {
+                $newNumber = 1;
+            }
+
+            $newKode = $role . str_pad($newNumber, 6, '0', STR_PAD_LEFT);
+
+            DB::commit();
+            return $newKode;
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            throw $e;
         }
     }
 }
