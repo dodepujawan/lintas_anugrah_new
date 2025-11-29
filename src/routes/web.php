@@ -6,6 +6,8 @@ use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\KendaraanController;
 use App\Http\Controllers\DriverController;
+use App\Http\Controllers\PricesController;
+use App\Http\Controllers\RuteController;
 
 Route::get('/', function () {
     return redirect()->route('login');
@@ -68,6 +70,20 @@ Route::prefix('driver')->group(function () {
     Route::post('/destroy/{id}', [DriverController::class, 'destroy'])->name('driver.destroy');
     // Callback
     Route::get('/driver_kode', [DriverController::class, 'driver_kode'])->name('driver_kode');
+});
+
+Route::prefix('price-expedition')->group(function() {
+    Route::get('/', [PricesController::class, 'index'])->name('price-expedition.index');
+    Route::get('/data', [PricesController::class, 'getData'])->name('price-expedition.data');
+    Route::post('/', [PricesController::class, 'store'])->name('price-expedition.store');
+    Route::get('/{id}', [PricesController::class, 'show'])->name('price-expedition.show');
+    Route::put('/{id}', [PricesController::class, 'update'])->name('price-expedition.update');
+    Route::delete('/{id}', [PricesController::class, 'destroy'])->name('price-expedition.destroy');
+});
+
+Route::prefix('rute')->group(function() {
+    Route::get('/data', [RuteController::class, 'getData'])->name('rute.data');
+    Route::post('/', [RuteController::class, 'store'])->name('rute.store');
 });
 
 

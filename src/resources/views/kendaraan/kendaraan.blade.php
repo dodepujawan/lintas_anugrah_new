@@ -103,7 +103,7 @@
                 <div class="row">
                     <div class="col-md-6">
                         <div class="mb-3">
-                            <label for="kode" class="form-label">Kode</label>
+                            <label for="kode" class="form-label">Kode <span class="text-danger">*</span><small class="text-muted">(Di-generate otomatis oleh sistem, mohon cek kembali !)</small></label>
                             <input type="text" class="form-control" id="kode" name="kode" required readonly>
                         </div>
                         <div class="mb-3">
@@ -153,7 +153,7 @@
                 </div>
 
                 <button type="submit" class="btn btn-primary">Simpan</button>
-                <button type="button" class="btn btn-secondary" onclick="resetForm()">Batal</button>
+                {{-- <button type="button" class="btn btn-secondary" onclick="resetForm()">Batal</button> --}}
             </form>
         </div>
     </div>
@@ -199,6 +199,7 @@ $(document).ready(function() {
         $("#tableKendaraan").hide();
         $("#formKendaraan").show();
         resetForm();
+        $('#nama').focus();
         load_kode_kendaraan();
         function load_kode_kendaraan() {
             $.ajax({

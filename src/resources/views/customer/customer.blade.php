@@ -416,12 +416,14 @@ $(document).ready(function() {
         $('#customer-form').attr('data-method', 'store');
         $('#customer-modal').modal('show');
         $('#form-errors').addClass('d-none');
+        // Focus ke field pertama saat modal dibuka
+        $('#customer-modal').on('shown.bs.modal', function () {
+            $('#nama').focus();
+        });
         // panggil fungsi load kode customer
         load_kode_customer()
         // panggil fungsi next click
         initializeEnterNext();
-        // Focus ke field pertama saat modal dibuka
-        $('#kode').focus();
     });
 
     function load_kode_customer() {

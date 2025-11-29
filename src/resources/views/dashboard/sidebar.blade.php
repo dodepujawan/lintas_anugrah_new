@@ -73,6 +73,21 @@
             </li>
 
             <li class="menu-item">
+                <a class="menu-link" data-bs-toggle="collapse" href="#priceMenu" role="button" aria-expanded="false">
+                <i class="menu-icon bx bx-user-pin"></i>
+                <span class="menu-text">Price</span>
+                <i class="menu-arrow bx bx-chevron-right"></i>
+                </a>
+                <ul class="sub-menu collapse" id="priceMenu">
+                <li class="menu-item">
+                    <a href="#" class="menu-link" id="sidebar_new_prices">
+                    <span class="menu-text">Price</span>
+                    </a>
+                </li>
+                </ul>
+            </li>
+
+            <li class="menu-item">
                 <a class="menu-link" data-bs-toggle="collapse" href="#userMenu" role="button" aria-expanded="false">
                 <i class="menu-icon bx bx-user"></i>
                 <span class="menu-text">User Management</span>

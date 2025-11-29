@@ -129,6 +129,25 @@ $(document).ready(function() {
         });
     }
 // ========================= End Of New Driver ======================================
+// ========================= New Driver ======================================
+    $(document).on('click', '#sidebar_new_prices', function(e) {
+        e.preventDefault();
+        loadNewPriceForm();
+    });
+
+    function loadNewPriceForm() {
+        $.ajax({
+            url: '{{ route('price-expedition.index') }}', // Route to load the form
+            type: 'GET',
+            success: function(response) {
+                $('.master-page').html(response);
+            },
+            error: function() {
+                $('.master-page').html('<p>Error loading form.</p>');
+            }
+        });
+    }
+// ========================= End Of New Driver ======================================
 // +++++++++++++++++++++++++++ End Of SIDEBAR ROOM ++++++++++++++++++++++++++++++++++++++
 });
 </script>

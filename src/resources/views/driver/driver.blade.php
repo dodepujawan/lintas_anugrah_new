@@ -103,7 +103,7 @@
                 <div class="row">
                     <div class="col-md-6">
                         <div class="mb-3">
-                            <label for="kode" class="form-label">Kode <span class="text-danger">*</span></label>
+                            <label for="kode" class="form-label">Kode <span class="text-danger">*</span><small class="text-muted">(Di-generate otomatis oleh sistem, mohon cek kembali !)</small></label>
                             <input type="text" class="form-control" id="kode" name="kode" required maxlength="20" readonly>
                             <div class="form-text text-muted">Kode unik driver (maksimal 20 karakter)</div>
                         </div>
@@ -134,7 +134,7 @@
                 </div>
 
                 <button type="submit" class="btn btn-primary" id="submitBtn">Simpan</button>
-                <button type="button" class="btn btn-secondary" onclick="resetForm()">Batal</button>
+                {{-- <button type="button" class="btn btn-secondary" onclick="resetForm()">Batal</button> --}}
             </form>
         </div>
     </div>
