@@ -10,7 +10,7 @@ class Rute extends Model
     use HasFactory;
 
     protected $table = 'rute';
-    protected $primaryKey = 'ID';
+    protected $primaryKey = 'id';
     public $timestamps = true; // true untuk menggunakan created_at & updated_at
 
     protected $fillable = [

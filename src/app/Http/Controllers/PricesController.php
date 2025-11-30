@@ -13,22 +13,21 @@ class PricesController extends Controller
         return view('prices.prices');
     }
 
-    public function getData(Request $request)
-    {
+    public function getData(Request $request){
         if ($request->ajax()) {
             $data = Prices::select('ID', 'KETERANGAN', 'DARI', 'SAMPAI', 'RUTE', 'HARGA', 'HV', 'HKG', 'HBOK', 'JENIS', 'created_at');
 
             return DataTables::of($data)
                 ->addIndexColumn()
                 ->addColumn('action', function($row){
-                    $btn = '
-                        <button onclick="editData('.$row->ID.')" class="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 mr-2">
-                            <i class="fas fa-edit mr-1"></i>Edit
-                        </button>
-                        <button onclick="deleteData('.$row->ID.')" class="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700">
-                            <i class="fas fa-trash mr-1"></i>Hapus
-                        </button>
-                    ';
+                    // Cek jika user bukan admin, kembalikan tanda '-'
+                    if (!Auth::check() || Auth::user()->roles != 'admin') {
+                        return '-';
+                    }
+
+                    $btn = '<div class="btn-group"> <button onclick="editData('.$row->ID.')"  class="btn btn-sm btn-warning edit edit-driver"><i class="bx bx-edit"></i></button>
+                    <button onclick="deleteData('.$row->ID.')" class="btn btn-sm btn-danger delete delete-driver"><i class="bx bx-trash"></i></button>
+                    </div>';
                     return $btn;
                 })
                 ->editColumn('HARGA', function($row){
@@ -45,31 +44,34 @@ class PricesController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'KETERANGAN' => 'required|string|max:50',
-            'DARI' => 'required|numeric',
-            'SAMPAI' => 'required|numeric',
-            'RUTE' => 'required|string|max:30',
-            'HARGA' => 'required|numeric',
-            'JENIS' => 'required|string|max:1',
+            'keterangan_price' => 'required|string|max:50',
+            'dari_price' => 'required|numeric',
+            'dari_price' => 'required|numeric',
+            'rute_price' => 'required|string|max:30',
+            'harga_price' => 'required|numeric',
+            'jenis_val' => 'required|string|max:1',
         ]);
 
-        // Generate RUTE lengkap
-        $ruteLengkap = $request->RUTE;
+        // Generate KODE
+        $lastCode = Prices::orderBy('ID', 'desc')->value('KODE');
+        $number = $lastCode ? (int) substr($lastCode, 3) + 1 : 1;
+        $kode = 'PRC' . str_pad($number, 6, '0', STR_PAD_LEFT);
 
         $Prices = Prices::create([
-            'KETERANGAN' => $request->KETERANGAN,
-            'DARI' => $request->DARI,
-            'SAMPAI' => $request->SAMPAI,
-            'RUTE' => $ruteLengkap,
-            'HARGA' => $request->HARGA,
+            'KODE' => $kode,
+            'KETERANGAN' => $request->keterangan_price,
+            'DARI' => $request->dari_price,
+            'SAMPAI' => $request->sampai_price,
+            'RUTE' => $request->rute_price,
+            'HARGA' => $request->harga_price,
             'HV' => 0,
             'HKG' => 0,
             'HBOK' => 0,
-            'JENIS' => $request->JENIS,
-            'USER' => Auth::check() ? Auth::user()->name : 'System',
-            'USEREDIT' => Auth::check() ? Auth::user()->name : 'System',
-            'KUNCI' => uniqid(),
-            'HG' => $request->HG ?? 0,
+            'JENIS' => $request->jenis_val,
+            'USER' => Auth::check() ? Auth::user()->user_id : 'System',
+            'USEREDIT' => Auth::check() ? Auth::user()->user_id : 'System',
+            'KUNCI' => $request->keterangan_price . $request->jenis_val . $request->dari_price . $request->sampai_price,
+            'HG' => 0,
         ]);
 
         return response()->json([
@@ -88,34 +90,29 @@ class PricesController extends Controller
     public function update(Request $request, $id)
     {
         $request->validate([
-            'KETERANGAN' => 'required|string|max:50',
-            'DARI' => 'required|numeric',
-            'SAMPAI' => 'required|numeric',
-            'RUTE' => 'required|string|max:30',
-            'HARGA' => 'required|numeric',
-            'JENIS' => 'required|string|max:1',
+            'keterangan_price' => 'required|string|max:50',
+            'dari_price' => 'required|numeric',
+            'dari_price' => 'required|numeric',
+            'rute_price' => 'required|string|max:30',
+            'harga_price' => 'required|numeric',
+            'jenis_val' => 'required|string|max:1',
         ]);
 
         $Prices = Prices::findOrFail($id);
 
-        // Extract tujuan dari RUTE (remove "DPS-")
-        $tujuan = $request->RUTE;
-        if (strpos($tujuan, 'DPS-') === 0) {
-            $tujuan = substr($tujuan, 4);
-        }
-
         $Prices->update([
-            'KETERANGAN' => $request->KETERANGAN,
-            'DARI' => $request->DARI,
-            'SAMPAI' => $request->SAMPAI,
-            'RUTE' => 'DPS-' . $tujuan,
-            'HARGA' => $request->HARGA,
-            'HV' => $request->HV ?? 0,
-            'HKG' => $request->HKG ?? 0,
-            'HBOK' => $request->HBOK ?? 0,
-            'JENIS' => $request->JENIS,
-            'USEREDIT' => Auth::check() ? Auth::user()->name : 'System',
-            'HG' => $request->HG ?? 0,
+            'KETERANGAN' => $request->keterangan_price,
+            'DARI' => $request->dari_price,
+            'SAMPAI' => $request->sampai_price,
+            'RUTE' => $request->rute_price,
+            'HARGA' => $request->harga_price,
+            'HV' => 0,
+            'HKG' => 0,
+            'HBOK' => 0,
+            'JENIS' => $request->jenis_val,
+            'USEREDIT' => Auth::check() ? Auth::user()->user_id : 'System',
+            'KUNCI' => $request->keterangan_price . $request->jenis_val . $request->dari_price . $request->sampai_price,
+            'HG' => 0,
         ]);
 
         return response()->json([

@@ -75,15 +75,18 @@ Route::prefix('driver')->group(function () {
 Route::prefix('price-expedition')->group(function() {
     Route::get('/', [PricesController::class, 'index'])->name('price-expedition.index');
     Route::get('/data', [PricesController::class, 'getData'])->name('price-expedition.data');
-    Route::post('/', [PricesController::class, 'store'])->name('price-expedition.store');
-    Route::get('/{id}', [PricesController::class, 'show'])->name('price-expedition.show');
-    Route::put('/{id}', [PricesController::class, 'update'])->name('price-expedition.update');
-    Route::delete('/{id}', [PricesController::class, 'destroy'])->name('price-expedition.destroy');
+    Route::post('/store', [PricesController::class, 'store'])->name('price-expedition.store');
+    Route::get('/show/{id}', [PricesController::class, 'show'])->name('price-expedition.show');
+    Route::post('/update/{id}', [PricesController::class, 'update'])->name('price-expedition.update');
+    Route::post('/destroy/{id}', [PricesController::class, 'destroy'])->name('price-expedition.destroy');
 });
 
 Route::prefix('rute')->group(function() {
     Route::get('/data', [RuteController::class, 'getData'])->name('rute.data');
-    Route::post('/', [RuteController::class, 'store'])->name('rute.store');
+    Route::post('/store', [RuteController::class, 'store'])->name('rute.store');
+    Route::get('/show/{id}', [RuteController::class, 'show'])->name('rute.show');
+    Route::post('/update/{id}', [RuteController::class, 'update'])->name('rute.update');
+    Route::post('/destroy/{id}', [RuteController::class, 'destroy'])->name('rute.destroy');
 });
 
 
