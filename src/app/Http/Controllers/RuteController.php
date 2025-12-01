@@ -23,7 +23,6 @@ class RuteController extends Controller
                      <div class="d-flex gap-1">
                         <button onclick="pickDataRute('.$row->id.', \''.$row->RUTE.'\')" class="btn btn-primary btn-sm me-1">Pilih</button>
                         <button onclick="editDataRute('.$row->id.')" class="btn btn-warning btn-sm py-0 px-2">Edit</button>
-                        <button onclick="deleteDataRute('.$row->id.')" class="btn btn-danger btn-sm py-0 px-2">Hapus</button>
                     </div>
                 ';
                 return $btn;
@@ -86,13 +85,14 @@ class RuteController extends Controller
         }
 
         $rute->update([
-            'RUTE' => $request->RUTE
+            'RUTE' => $request->newRute
         ]);
 
         return response()->json([
             'success' => true,
             'message' => 'Rute berhasil diupdate',
-            'data' => $rute
+            'data' => $rute,
+            'id' => $rute->id
         ]);
     }
 
@@ -115,3 +115,6 @@ class RuteController extends Controller
         ]);
     }
 }
+
+// delete rute
+// <button onclick="deleteDataRute('.$row->id.')" class="btn btn-danger btn-sm py-0 px-2">Hapus</button>

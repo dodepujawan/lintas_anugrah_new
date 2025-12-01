@@ -1,15 +1,51 @@
+<style>
+    /* Styling Header */
+    .card-price {
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        margin-bottom: 20px;
+        padding: 20px;
+    }
+
+    .card-price-header {
+        border-bottom: 2px solid #007bff;
+        padding-bottom: 10px;
+        margin-bottom: 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .card-price-header h5 {
+        color: #007bff;
+        margin: 0;
+    }
+
+    /* Untuk mobile */
+    @media (max-width: 576px) {
+        .card-price-header {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .card-price-header > div:last-child {
+            align-self: flex-end;
+        }
+    }
+    /* untuk table delete rute agar sweet alert diatas modal rute */
+    .high-z-index {
+        z-index: 99999 !important;
+    }
+</style>
 <div class="container-fluid py-4">
-    <!-- Header -->
-    <div class="card shadow-sm mb-4">
-        <div class="card-body">
-            <h1 class="h2 text-dark mb-3">FORM PRICE EXPEDISI</h1>
-            <!-- Tombol Tambah Data -->
-        </div>
-    </div>
+    <h2>PRICE EXPEDISI</h2>
 
     <!-- Tabel Data -->
-    <div class="card shadow-sm" id="master_table_price">
-        <div class="card-header bg-white">
+    <div class="card shadow-sm card-price" id="master_table_price">
+        <div class="card-header card-price-header bg-white">
             <div>
                 <h2 class="h5 mb-0 text-dark">Data Price Expedition</h2>
             </div>
@@ -30,6 +66,7 @@
                             <th>SAMPAI</th>
                             <th>RUTE</th>
                             <th>HARGA</th>
+                            <th>JENIS</th>
                             <th width="15%">AKSI</th>
                         </tr>
                     </thead>
@@ -55,7 +92,7 @@
                             <label class="form-label fw-semibold">RUTE</label>
                             <div class="d-flex align-items-center gap-2">
                                 <input type="hidden" name="rute_val_price" id="rute_val_price">
-                                <input class="form-control" type="text" name="rute_price" id="rute_price" required>
+                                <input class="form-control" type="text" name="rute_price" id="rute_price" placeholder="Tekan Pilih !!!" required readonly>
                                 <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#ruteModal">
                                     <i class="fas fa-plus"></i> Pilih
                                 </button>
@@ -174,7 +211,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <input type="text" id="add_rute_flag">
+                <input type="hidden" id="add_rute_flag">
                 <form id="ruteForm">
                     @csrf
                     <div class="mb-3">
@@ -206,13 +243,23 @@ $(document).ready(function() {
         ajax: "{{ route('price-expedition.data') }}",
         columns: [
             { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false },
-            { data: 'KETERANGAN', name: 'KETERANGAN' },
-            { data: 'DARI', name: 'DARI' },
-            { data: 'SAMPAI', name: 'SAMPAI' },
-            { data: 'RUTE', name: 'RUTE' },
-            { data: 'HARGA', name: 'HARGA' },
+
+            { data: 'KETERANGAN', name: 'prices.KETERANGAN' },
+
+            { data: 'DARI', name: 'prices.DARI' },
+            { data: 'SAMPAI', name: 'prices.SAMPAI' },
+
+            // ini ambil alias "RUTE" dari SELECT
+            { data: 'RUTE', name: 'rute.RUTE' },
+
+            { data: 'HARGA', name: 'prices.HARGA' },
+
+            // JENIS: tetap pakai nama asli tabel
+            { data: 'JENIS', name: 'prices.JENIS' },
+
             { data: 'action', name: 'action', orderable: false, searchable: false }
         ],
+
         language: {
             search: "Cari:",
             lengthMenu: "Tampil _MENU_ data",
@@ -236,7 +283,7 @@ $(document).ready(function() {
         $('#formContainer').hide();
         resetForm();
         $('#master_table_price').show();
-        table.ajax.reload();
+        $('#priceTable').DataTable().ajax.reload();
     });
     // ===================== End Of Toggle form show/hide ===============================
     // ============================ Reset form ========================================
@@ -276,13 +323,15 @@ $(document).ready(function() {
             url: url,
             method: 'POST',
             data: formData,
+            processData: false,   // WAJIB
+            contentType: false,   // WAJIB
             success: function(response) {
                 if (response.success) {
                     Swal.fire('Sukses!', response.message, 'success');
                     $('#formContainer').hide();
                     resetForm();
                     $('#master_table_price').show();
-                    table.ajax.reload();
+                    $('#priceTable').DataTable().ajax.reload();
                 }
             },
             error: function(xhr) {
@@ -303,26 +352,61 @@ $(document).ready(function() {
         });
     });
     // ========================= End Of Form submission ==================================
-    // ============================== Edit data ============================================
+
+    // ============================ Rute Table ===================================
+     $('#ruteTable').DataTable({
+        processing: true,
+        serverSide: true,
+        ajax: '{{ route("rute.data") }}',
+        columns: [
+            { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false },
+            { data: 'RUTE', name: 'RUTE' },
+            { data: 'created_at', name: 'created_at' },
+            { data: 'action', name: 'action', orderable: false, searchable: false, width: '20%'}
+        ]
+    });
+    // ============================ End Of Rute Table ===================================
+    // ============================ Tambah Rute Click ===================================
+    $("#tambah_rute").on('click', function(){
+        // Tutup modal pertama dengan method Bootstrap
+        $('#ruteModal').modal('hide');
+
+        // Buka modal kedua dengan method Bootstrap
+        $('#addRuteModal').modal('show');
+        $('#add_rute_flag').val('');
+        $('#newRute').val('');
+    });
+    // ========================= End Of Tambah Rute Click ================================
+});
+
+     // ============================== Edit data ============================================
     function editData(id) {
         $.ajax({
             url: '{{ route("price-expedition.show", ["id" => ":id"]) }}'.replace(':id', id),
             method: 'GET',
             success: function(response) {
+
                 $('#master_table_price').hide();
-                $('#formContainer').toggle();
-                $('#priceId').val(response.ID);
-                $('#keterangan_price').val(response.KETERANGAN);
-                $('#dari_price').val(response.DARI);
-                $('#sampai_price').val(response.SAMPAI);
-                $('#rute_price').val(response.RUTE);
-                $('#harga_price').val(response.HARGA);
-                // Set radio button dan toggle fields
-                $('input[name="JENIS"][value="' + response.JENIS + '"]').prop('checked', true);
-                toggleJenisFields(response.JENIS);
+                $('#formContainer').show();
+
+                $('#priceId').val(response.id);
+                $('#keterangan_price').val(response.keterangan);
+                $('#dari_price').val(response.dari);
+                $('#sampai_price').val(response.sampai);
+
+                // rute id (angka)
+                $('#rute_val_price').val(response.rute_id);
+
+                // nama rute (teks)
+                $('#rute_price').val(response.rute_nama);
+
+                $('#harga_price').val(response.harga);
+
+                // radio JENIS (1 = eceran, 2 = booking)
+                $('input[name="JENIS"][value="' + response.jenis + '"]').prop('checked', true);
+                toggleJenisFields(response.jenis);
 
                 $('#submitBtn').text('Update');
-                $('#formContainer').show();
             }
         });
     }
@@ -355,31 +439,6 @@ $(document).ready(function() {
         });
     }
     // ============================ End Of Delete data ===================================
-    // ============================ Rute Table ===================================
-     $('#ruteTable').DataTable({
-        processing: true,
-        serverSide: true,
-        ajax: '{{ route("rute.data") }}',
-        columns: [
-            { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false },
-            { data: 'RUTE', name: 'RUTE' },
-            { data: 'created_at', name: 'created_at' },
-            { data: 'action', name: 'action', orderable: false, searchable: false, width: '20%'}
-        ]
-    });
-    // ============================ End Of Rute Table ===================================
-    // ============================ Tambah Rute Click ===================================
-    $("#tambah_rute").on('click', function(){
-        // Tutup modal pertama dengan method Bootstrap
-        $('#ruteModal').modal('hide');
-
-        // Buka modal kedua dengan method Bootstrap
-        $('#addRuteModal').modal('show');
-        $('#add_rute_flag').val('');
-        $('#newRute').val('');
-    });
-    // ========================= End Of Tambah Rute Click ================================
-});
 
    function saveRute() {
         var formData = $('#ruteForm').serialize();
@@ -420,11 +479,48 @@ $(document).ready(function() {
             type: 'GET',
             success: function(response) {
                 $('#addRuteModal').modal('show');
-                $('#newRute').val('response.data.RUTE');
-                $('#add_rute_flag').val('response.data.id');
+                $('#newRute').val(response.data.RUTE);
+                $('#add_rute_flag').val(response.data.id);
             },
             error: function(xhr) {
                 alert('Terjadi kesalahan saat memuat data');
+            }
+        });
+    }
+
+    function deleteDataRute(id) {
+        Swal.fire({
+            title: 'Apakah Anda yakin?',
+            text: "Data akan dihapus permanen!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Ya, hapus!',
+            cancelButtonText: 'Batal',
+            customClass: {
+                container: 'high-z-index'
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: '{{ route("rute.destroy", ["id" => ":id"]) }}'.replace(':id', id),
+                    type: 'POST',
+                    data: {
+                        _token: "{{ csrf_token() }}"
+                    },
+                    success: function(response) {
+                        Swal.fire({
+                            title: 'Terhapus!',
+                            text: response.success,
+                            icon: 'success',
+                            customClass: {
+                                container: 'high-z-index'  // atau class custom Anda
+                            }
+                        });
+                         $('#ruteTable').DataTable().ajax.reload();
+                    }
+                });
             }
         });
     }

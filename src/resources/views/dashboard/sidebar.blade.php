@@ -74,7 +74,7 @@
 
             <li class="menu-item">
                 <a class="menu-link" data-bs-toggle="collapse" href="#priceMenu" role="button" aria-expanded="false">
-                <i class="menu-icon bx bx-user-pin"></i>
+                <i class="menu-icon bx bx-purchase-tag"></i>
                 <span class="menu-text">Price</span>
                 <i class="menu-arrow bx bx-chevron-right"></i>
                 </a>
