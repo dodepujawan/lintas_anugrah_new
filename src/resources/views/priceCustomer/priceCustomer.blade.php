@@ -35,6 +35,20 @@
         }
     }
 
+    /* Keterangan Customer */
+    #customerInfo {
+    background: #f1faff;
+    border-left: 5px solid #0d6efd;
+    border-radius: 6px;
+    }
+    #customerInfo span {
+        font-size: 15px;
+        color: #333;
+    }
+    #customerInfo strong {
+        color: #0d6efd;
+    }
+
     .table th {
         background-color: #f8f9fa;
         font-weight: 600;
@@ -87,12 +101,40 @@
 
                     {{-- View Table Detail Cust --}}
                     <div id="priceCusTableDetMaster" style="display:none;">
-                        <div id="customerInfo" class="alert alert-info" style="display:none;">
-                            <strong>Customer:</strong> <span id="custName"></span>
-                            (<span id="custKode"></span>)
+                        <div id="customerInfo" class="card shadow-sm p-3" style="display:none;">
+                            <h5 class="mb-3">
+                                <i class="bx bx-user"></i> Informasi Customer
+                            </h5>
+                            <div class="row">
+                                <div class="col-6 mb-2">
+                                    <strong>Nama Customer:</strong><br>
+                                    <span id="custName"></span>
+                                </div>
+                                <div class="col-6 mb-2">
+                                    <strong>Kode Customer:</strong><br>
+                                    <span id="custKode"></span>
+                                </div>
+                                <div class="col-6 mb-2">
+                                    <strong>Jenis Usaha:</strong><br>
+                                    <span id="jenisUsaha"></span>
+                                </div>
+                                <div class="col-6 mb-2">
+                                    <strong>Nama Pemilik:</strong><br>
+                                    <span id="pemilikNama"></span>
+                                </div>
+                                <div class="col-12">
+                                    <strong>Alamat:</strong><br>
+                                    <span id="alamat"></span>
+                                </div>
+                            </div>
                         </div>
                         <div class="card mt-3">
                             <div class="card-body">
+                                <div class="d-flex justify-content-end">
+                                    <button class="btn btn-primary" id="add_rute_customer">
+                                        + Tambah Harga Rute
+                                    </button>
+                                </div>
                                 <div class="table-responsive">
                                     <table id="priceCusTableDet" class="table table-striped table-bordered w-100">
                                         <thead class="table-dark">
@@ -113,8 +155,153 @@
                             </div>
                         </div>
                     </div>
-
                 </div>
+                <!-- Form Add Customer Price -->
+                <div id="formCusContainer" class="card bg-light mb-3" style="display: none;">
+                    <div class="card-body">
+                        <form id="priceFormCus">
+                            @csrf
+                            <input type="hidden" id="priceCusId" name="id">
+
+                            <div class="row g-4">
+                                <!-- Kolom Kiri -->
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label fw-semibold">RUTE</label>
+                                        <div class="d-flex align-items-center gap-2">
+                                            <input type="hidden" name="rute_val_pricecus" id="rute_val_pricecus">
+                                            <input class="form-control" type="text" name="rute_pricecus" id="rute_pricecus" placeholder="Tekan Pilih !!!" required readonly>
+                                            <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#ruteCusModal">
+                                                <i class="fas fa-plus"></i> Pilih
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label class="form-label fw-semibold">DARI - SAMPAI (Kg)</label>
+                                        <div class="d-flex align-items-center gap-2">
+                                            <input type="number" id="dari_pricecus" name="dari_pricecus"
+                                                    class="form-control" placeholder="0" required>
+                                            <span class="fw-semibold">-</span>
+                                            <input type="number" id="sampai_pricecus" name="sampai_pricecus"
+                                                    class="form-control" placeholder="0" required>
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label class="form-label fw-semibold">JENIS</label>
+                                        <div class="d-flex gap-4 align-items-center">
+                                            <div class="form-check" style="margin-bottom: 0;">
+                                                <input class="form-check-input" type="radio" name="JENIS" value="E" id="jenisEcerancus" required checked>
+                                                <label class="form-check-label" for="jenisEcerancus">
+                                                    Eceran
+                                                </label>
+                                            </div>
+                                            <div class="form-check" style="margin-bottom: 0;">
+                                                <input class="form-check-input" type="radio" name="JENIS" value="B" id="jenisBokingcus" required>
+                                                <label class="form-check-label" for="jenisBokingcus">
+                                                    Boking
+                                                </label>
+                                            </div>
+                                            <div style="flex: 0 0 150px;">
+                                                <input type="number" id="jenis_valcus" name="jenis_valcus" class="form-control" placeholder="" value="1" readonly>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Kolom Kanan -->
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label fw-semibold">Nama Item</label>
+                                        <input type="text" id="keterangan_pricecus" name="keterangan_pricecus"
+                                                class="form-control" placeholder="Contoh: EC > 40 KG" required>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label class="form-label fw-semibold">HARGA (KG)</label>
+                                        <input type="number" id="harga_pricecus" name="harga_pricecus"
+                                                class="form-control" placeholder="0" required>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="d-flex justify-content-end gap-2 mt-4 pt-3 border-top">
+                                <button type="button" id="cancelBtnCus"
+                                        class="btn btn-secondary">
+                                    Batal
+                                </button>
+                                <button type="submit" id="submitBtnCus"
+                                        class="btn btn-primary">
+                                    Simpan
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<!-- Modal Tabel Rute -->
+<!-- Modal -->
+<div class="modal fade" id="ruteCusModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Data Rute</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h2 class="h5 mb-0 text-dark">Data Rute</h2>
+                    <button class="btn btn-primary btn-sm" id="tambah_rute_cus">
+                        <i class="fas fa-plus me-1"></i>Tambah Rute
+                    </button>
+                </div>
+                <div class="table-responsive">
+                    <table id="ruteCusTable" class="table table-striped table-bordered table-hover w-100">
+                        <thead class="table-dark">
+                            <tr>
+                                <th width="5%">No</th>
+                                <th>RUTE</th>
+                                <th>Tanggal Dibuat</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Data akan di-load oleh DataTables -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Tambah Rute -->
+<div class="modal fade" id="addRuteCusModal" tabindex="-1" aria-labelledby="addRuteCusModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addRuteCusModalLabel">Tambah Rute Baru</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="add_rute_cus_flag">
+                <form id="ruteForm">
+                    @csrf
+                    <div class="mb-3">
+                        <label for="newCusRute" class="form-label">Nama Rute</label>
+                        <input type="text" class="form-control" id="newCusRute" name="newCusRute" placeholder="Contoh: DIY - DPS" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                <button type="button" class="btn btn-primary" onclick="saveRute()">Simpan</button>
             </div>
         </div>
     </div>
@@ -178,7 +365,9 @@ $(document).ready(function() {
                     $("#customerInfo").show();
                     $("#custName").text(json.customer_nama);
                     $("#custKode").text(json.customer_kode);
-
+                    $("#jenisUsaha").text(json.jenis_usaha ?? '-');
+                    $("#alamat").text(json.alamat ?? '-');
+                    $("#pemilikNama").text(json.pemilik_nama ?? '-');
                     return json.data;
                 }
             },
@@ -248,6 +437,47 @@ $(document).ready(function() {
         });
     });
     // ========================= End Of Update Row Cust =====================================
+    // ================================ Tambah Price Cust ========================================
+    $('#add_rute_customer').on('click', function(){
+        $('#formCusContainer').show();
+        resetFormCus();
+        $('#priceCusTableDetMaster').hide();
+    });
+    // ================================ Tambah Price Cust ========================================
+    // ============================ Tambah Rute Click ===================================
+    $("#tambah_rute_cus").on('click', function(){
+        // Tutup modal pertama dengan method Bootstrap
+        $('#ruteCusModal').modal('hide');
 
+        // Buka modal kedua dengan method Bootstrap
+        $('#addRuteCusModal').modal('show');
+        $('#add_rute_cus_flag').val('');
+        $('#newCusRute').val('');
+    });
+    // ========================= End Of Tambah Rute Click ================================
+    // ============================ Rute Table ===================================
+     $('#ruteCusTable').DataTable({
+        processing: true,
+        serverSide: true,
+        ajax: '{{ route("rute.data") }}',
+        columns: [
+            { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false },
+            { data: 'RUTE', name: 'RUTE' },
+            { data: 'created_at', name: 'created_at' },
+            { data: 'action', name: 'action', orderable: false, searchable: false, width: '20%'}
+        ]
+    });
+    // ============================ End Of Rute Table ===================================
+    // ============================ Reset form ========================================
+    function resetFormCus() {
+        $('#priceFormCus')[0].reset();
+        $('#priceCusId').val('');
+        $('#submitBtnCus').text('Simpan');
+        $('#jenis_valcus').val(1);
+        // Clear validation errors
+        $('.is-invalid').removeClass('is-invalid');
+        $('.invalid-feedback').remove();
+    }
+    // ======================== End Of Reset form ======================================
 });
 </script>

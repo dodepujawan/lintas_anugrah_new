@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('pricecus', function (Blueprint $table) {
             $table->id('id');
-            $table->string('KODECUS', 20)->unique();
-            $table->string('KODE', 20)->unique(); // Kolom baru untuk kode unik
+            $table->string('KODECUS', 20);
+            $table->string('KODE', 20); // Kolom baru untuk kode unik
             $table->string('KETERANGAN', 50); // ganti char jadi string
             $table->decimal('DARI', 10, 0)->default(0);
             $table->decimal('SAMPAI', 10, 0)->default(0);

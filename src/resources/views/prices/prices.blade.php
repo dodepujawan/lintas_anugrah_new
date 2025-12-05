@@ -292,7 +292,6 @@ $(document).ready(function() {
         $('#priceId').val('');
         $('#submitBtn').text('Simpan');
         $('#jenis_val').val(1);
-        $('#bokingFields').hide();
         // Clear validation errors
         $('.is-invalid').removeClass('is-invalid');
         $('.invalid-feedback').remove();
@@ -352,7 +351,6 @@ $(document).ready(function() {
         });
     });
     // ========================= End Of Form submission ==================================
-
     // ============================ Rute Table ===================================
      $('#ruteTable').DataTable({
         processing: true,

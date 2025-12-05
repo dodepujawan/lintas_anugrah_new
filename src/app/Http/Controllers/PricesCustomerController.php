@@ -121,6 +121,9 @@ class PricesCustomerController extends Controller
             ->with([
                 'customer_kode' => $customer->kode,
                 'customer_nama' => $customer->nama,
+                'jenis_usaha' => $customer->jenis_usaha,
+                'alamat' => $customer->alamat,
+                'pemilik_nama' => $customer->pemilik_nama,
             ])
             ->addColumn('jenis_text', function($row) {
                 return $row->JENIS == 1 ? 'Eceran' : 'Booking';
