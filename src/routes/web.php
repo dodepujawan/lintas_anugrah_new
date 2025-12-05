@@ -95,6 +95,7 @@ Route::prefix('price-customer')->group(function() {
     Route::get('/data', [PricesCustomerController::class, 'getData'])->name('price-customer.data');
     Route::get('/price/{kodecus}', [PricesCustomerController::class, 'getPrice'])->name('price-customer.price');
     Route::post('/update-row', [PricesCustomerController::class, 'saveCustomerRow'])->name('price-customer.update-row');
+    Route::post('/store', [PricesCustomerController::class, 'store'])->name('price-customer.store');
 });
 
 // Route::prefix('register')->group(function () {

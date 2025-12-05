@@ -162,7 +162,15 @@
                         <form id="priceFormCus">
                             @csrf
                             <input type="hidden" id="priceCusId" name="id">
-
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold">Customer</label>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <input type="hidden" name="kode_val_pricecus" id="kode_val_pricecus">
+                                        <input class="form-control" type="text" name="name_pricecus" id="name_pricecus" readonly>
+                                    </div>
+                                </div>
+                            </div>
                             <div class="row g-4">
                                 <!-- Kolom Kiri -->
                                 <div class="col-md-6">
@@ -291,7 +299,7 @@
             </div>
             <div class="modal-body">
                 <input type="hidden" id="add_rute_cus_flag">
-                <form id="ruteForm">
+                <form id="ruteFormCus">
                     @csrf
                     <div class="mb-3">
                         <label for="newCusRute" class="form-label">Nama Rute</label>
@@ -301,7 +309,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                <button type="button" class="btn btn-primary" onclick="saveRute()">Simpan</button>
+                <button type="button" class="btn btn-primary" onclick="saveRuteCus()">Simpan</button>
             </div>
         </div>
     </div>
@@ -376,7 +384,7 @@ $(document).ready(function() {
                 { data: 'KETERANGAN' },
                 { data: 'DARI' },
                 { data: 'SAMPAI' },
-                { data: 'RUTE' },
+                { data: 'nama_rute' },
                 { data: 'harga_html', orderable: false, searchable: false },
                 { data: 'jenis_text' },
                 { data: 'aksi', orderable: false, searchable: false }
@@ -442,6 +450,8 @@ $(document).ready(function() {
         $('#formCusContainer').show();
         resetFormCus();
         $('#priceCusTableDetMaster').hide();
+        $("#name_pricecus").val($("#custName").text());
+        $("#kode_val_pricecus").val($("#custKode").text());
     });
     // ================================ Tambah Price Cust ========================================
     // ============================ Tambah Rute Click ===================================
@@ -468,6 +478,46 @@ $(document).ready(function() {
         ]
     });
     // ============================ End Of Rute Table ===================================
+    // =========================== Form Prices submission ====================================
+    $('#priceFormCus').submit(function(e) {
+        e.preventDefault();
+
+        var formData = new FormData(this);
+        // var url = $('#priceId').val() ? '{{ route("price-expedition.update", ["id" => ":id"]) }}'.replace(':id', $('#priceId').val()) : '{{ route("price-expedition.store") }}';
+
+        $.ajax({
+            url: '{{ route("price-customer.store") }}',
+            method: 'POST',
+            data: formData,
+            processData: false,   // WAJIB
+            contentType: false,   // WAJIB
+            success: function(response) {
+                if (response.success) {
+                    Swal.fire('Sukses!', response.message, 'success');
+                    resetFormCus();
+                    $('#formCusContainer').hide();
+                    $('#priceCusTableDetMaster').show();
+                    $('#priceCusTableDet').DataTable().ajax.reload();
+                }
+            },
+            error: function(xhr) {
+                var errors = xhr.responseJSON.errors;
+                if (errors) {
+                    // Clear previous errors
+                    $('.is-invalid').removeClass('is-invalid');
+                    $('.invalid-feedback').remove();
+
+                    // Display new errors
+                    $.each(errors, function(field, messages) {
+                        var input = $('[name="' + field + '"]');
+                        input.addClass('is-invalid');
+                        input.after('<div class="invalid-feedback">' + messages[0] + '</div>');
+                    });
+                }
+            }
+        });
+    });
+    // ========================= End Of Form Prices submission ==================================
     // ============================ Reset form ========================================
     function resetFormCus() {
         $('#priceFormCus')[0].reset();
@@ -479,5 +529,55 @@ $(document).ready(function() {
         $('.invalid-feedback').remove();
     }
     // ======================== End Of Reset form ======================================
+    // ======================== Submit Rute form ======================================
+    $('#ruteFormCus').on('submit', function(e) {
+        e.preventDefault();
+        var newRute = $('#newCusRute').val();
+        console.log('new rute: ' + newRute); // harus mengandung newRute=
+
+        var url = $('#add_rute_cus_flag').val()
+            ? '{{ route("rute.update", ["id" => ":id"]) }}'.replace(':id', $('#add_rute_cus_flag').val())
+            : '{{ route("rute.store") }}';
+
+        $.ajax({
+            url: url,
+            method: 'POST',
+            data: {newRute: newRute},
+            success: function(response) {
+                // Tutup modal
+                $('#addRuteCusModal').modal('hide');
+                $('#rute_val_pricecus').val(response.id);
+                $('#rute_pricecus').val(response.data.RUTE);
+                Swal.fire('Sukses!', response.data.RUTE, 'success');
+            },
+            error: function(xhr) {
+                console.log(xhr.responseJSON);
+            }
+        });
+    });
+    // ======================== End Of Submit Rute form ======================================
 });
+
+function pickDataRute(id, ruteText) {
+    $('#ruteCusModal').modal('hide');
+    $('#rute_val_pricecus').val(id);
+    $('#rute_pricecus').val(ruteText);
+}
+
+function editDataRute(id) {
+    $('#addRuteCusModal').modal('hide');
+    $.ajax({
+        url: '{{ route("rute.show", ["id" => ":id"]) }}'.replace(':id', id),
+        type: 'GET',
+        success: function(response) {
+            $('#addRuteCusModal').modal('show');
+            $('#newCusRute').val(response.data.RUTE);
+            $('#add_rute_cus_flag').val(response.data.id);
+        },
+        error: function(xhr) {
+            alert('Terjadi kesalahan saat memuat data');
+        }
+    });
+}
+
 </script>

@@ -311,7 +311,7 @@ $(document).ready(function() {
         }
     }
     // ============================ End of Reset form ====================================
-    // =========================== Form submission ====================================
+    // =========================== Form Prices submission ====================================
     $('#priceForm').submit(function(e) {
         e.preventDefault();
 
@@ -350,7 +350,7 @@ $(document).ready(function() {
             }
         });
     });
-    // ========================= End Of Form submission ==================================
+    // ========================= End Of Form Prices submission ==================================
     // ============================ Rute Table ===================================
      $('#ruteTable').DataTable({
         processing: true,
@@ -377,7 +377,7 @@ $(document).ready(function() {
     // ========================= End Of Tambah Rute Click ================================
 });
 
-     // ============================== Edit data ============================================
+     // ============================== Edit data Price ============================================
     function editData(id) {
         $.ajax({
             url: '{{ route("price-expedition.show", ["id" => ":id"]) }}'.replace(':id', id),
@@ -408,8 +408,8 @@ $(document).ready(function() {
             }
         });
     }
-    // ========================= End Of Edit data =======================================
-    // ================================ Delete data =====================================
+    // ========================= End Of Edit data Price =======================================
+    // ================================ Delete data Price =====================================
     function deleteData(id) {
         Swal.fire({
             title: 'Apakah Anda yakin?',
@@ -436,7 +436,7 @@ $(document).ready(function() {
             }
         });
     }
-    // ============================ End Of Delete data ===================================
+    // ============================ End Of Delete data Price ===================================
 
    function saveRute() {
         var formData = $('#ruteForm').serialize();

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 use App\Models\Prices;
+use App\Models\Pricecushis;
 use Illuminate\Http\Request;
 use DataTables;
 use Illuminate\Support\Facades\Auth;
@@ -68,7 +69,7 @@ class PricesController extends Controller
         $request->validate([
             'keterangan_price' => 'required|string|max:50',
             'dari_price' => 'required|numeric',
-            'dari_price' => 'required|numeric',
+            'sampai_price' => 'required|numeric',
             'rute_price' => 'required|string|max:30',
             'harga_price' => 'required|numeric',
             'jenis_val' => 'required|string|max:1',
@@ -132,21 +133,48 @@ class PricesController extends Controller
         ]);
     }
 
-    public function update(Request $request, $id)
-    {
+    public function update(Request $request, $id){
         $request->validate([
             'keterangan_price' => 'required|string|max:50',
             'dari_price' => 'required|numeric',
-            'dari_price' => 'required|numeric',
+            'sampai_price' => 'required|numeric',
             'rute_price' => 'required|string|max:30',
             'harga_price' => 'required|numeric',
             'jenis_val' => 'required|string|max:1',
             'rute_val_price' => 'required'
         ]);
 
-        $Prices = Prices::findOrFail($id);
+        // AMBIL DATA LAMA
+        $old = Prices::findOrFail($id);
 
-        $Prices->update([
+        /**
+         * 1️⃣ SIMPAN KE TABLE HISTORY / PRICECUS
+         *
+         * Hanya contoh: jika kamu memakai tabel pricecus
+         * sesuaikan field-nya dengan tabelmu
+         */
+        Pricecushis::create([
+            'KODE'        => $old->KODE,              // kode lama PRCxxxx
+            'KETERANGAN'  => $old->KETERANGAN,
+            'DARI'        => $old->DARI,
+            'SAMPAI'      => $old->SAMPAI,
+            'RUTE'        => $old->RUTE,
+            'HARGA'       => $old->HARGA,
+            'HV'          => $old->HV,
+            'HKG'         => $old->HKG,
+            'HBOK'        => $old->HBOK,
+            'JENIS'       => $old->JENIS,
+            'USER'        => $old->USER,
+            'USEREDIT'    => $old->USEREDIT,
+            'KUNCI'       => $old->KUNCI,
+            'HG'          => $old->HG,
+        ]);
+
+
+        /**
+         * 2️⃣ UPDATE DATA BARU DI TABLE PRICES
+         */
+        $old->update([
             'KETERANGAN' => $request->keterangan_price,
             'DARI' => $request->dari_price,
             'SAMPAI' => $request->sampai_price,
@@ -161,10 +189,11 @@ class PricesController extends Controller
             'HG' => 0,
         ]);
 
+
         return response()->json([
             'success' => true,
-            'message' => 'Data berhasil diupdate',
-            'data' => $Prices
+            'message' => 'Data berhasil diupdate dan history tersimpan',
+            'data' => $old
         ]);
     }
 
