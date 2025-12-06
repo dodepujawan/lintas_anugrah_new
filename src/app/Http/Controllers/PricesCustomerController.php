@@ -166,6 +166,80 @@ class PricesCustomerController extends Controller
             ->make(true);
     }
 
+    public function saveCustomerRow(Request $request){
+        $request->validate([
+            'kode' => 'required|string',
+            'harga' => 'required|numeric',
+            'kodecus' => 'required|string',
+        ]);
+
+        $kode = $request->kode;
+        $hargaBaru = $request->harga;
+        $kodecus = $request->kodecus;
+
+        // 1. Cek apakah kode sudah ada di pricecus
+        $existing = Pricecus::where('KODE', $kode)
+                            ->where('KODECUS', $kodecus)
+                            ->first();
+
+        if ($existing) {
+            // -------------------------
+            //   UPDATE HARGA SAJA
+            // -------------------------
+            $existing->update([
+                'HARGA' => $hargaBaru,
+                'USEREDIT' => Auth::check() ? Auth::user()->user_id : 'System',
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Harga berhasil diupdate untuk customer ini'
+            ]);
+        }
+
+        // -------------------------
+        //   INSERT BARU
+        // -------------------------
+
+        // Ambil data dari harga umum
+        $price = Prices::where('KODE', $kode)->first();
+
+        if (!$price) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Kode harga tidak ditemukan di tabel Prices'
+            ]);
+        }
+
+        // Buat insert ke pricecus
+        Pricecus::create([
+            'KODECUS' => $kodecus,
+            'KODE' => $price->KODE,
+            'KETERANGAN' => $price->KETERANGAN,
+            'DARI' => $price->DARI,
+            'SAMPAI' => $price->SAMPAI,
+            'RUTE' => $price->RUTE,
+
+            // Harga khusus customer
+            'HARGA' => $hargaBaru,
+
+            'HV' => $price->HV,
+            'HKG' => $price->HKG,
+            'HBOK' => $price->HBOK,
+            'JENIS' => $price->JENIS,
+            'KUNCI' => $price->KUNCI,
+            'HG' => $price->HG,
+
+            'USER' => Auth::check() ? Auth::user()->user_id : 'System',
+            'USEREDIT' => Auth::check() ? Auth::user()->user_id : 'System',
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Harga khusus customer berhasil ditambahkan'
+        ]);
+    }
+
     public function store(Request $request)
     {
         $request->validate([

@@ -309,7 +309,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                <button type="button" class="btn btn-primary" onclick="saveRuteCus()">Simpan</button>
+                <button type="button" class="btn btn-primary" id="ruteFormCusBtn">Simpan</button>
             </div>
         </div>
     </div>
@@ -334,7 +334,7 @@ $(document).ready(function() {
         scrollCollapse: true,
         // Responsive settings
         responsive: true,
-        autoWidth: false,
+        autoWidth: true,
         columns: [
             { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false },
             { data: 'kode', name: 'kode' },
@@ -530,7 +530,7 @@ $(document).ready(function() {
     }
     // ======================== End Of Reset form ======================================
     // ======================== Submit Rute form ======================================
-    $('#ruteFormCus').on('submit', function(e) {
+    $('#ruteFormCusBtn').on('click', function(e) {
         e.preventDefault();
         var newRute = $('#newCusRute').val();
         console.log('new rute: ' + newRute); // harus mengandung newRute=
@@ -565,7 +565,7 @@ function pickDataRute(id, ruteText) {
 }
 
 function editDataRute(id) {
-    $('#addRuteCusModal').modal('hide');
+    $('#ruteCusModal').modal('hide');
     $.ajax({
         url: '{{ route("rute.show", ["id" => ":id"]) }}'.replace(':id', id),
         type: 'GET',
