@@ -20,8 +20,8 @@ return new class extends Migration
             $table->string('ITEM', 100);
             $table->decimal('HARGA', 10, 0)->default(0);
             $table->string('USER', 50);
-            $table->string('USEREDIT', 50);
-            $table->string('KUNCI', 100);
+            $table->string('USEREDIT', 50)->nullable();
+            $table->string('KUNCI', 100)->nullable();
             $table->timestamps();
         });
     }

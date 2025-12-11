@@ -16,7 +16,8 @@ class KendaraanController extends Controller
 
     public function data()
     {
-        $kendaraan = Kendaraan::select('*');
+        $kendaraan = Kendaraan::select('*')
+        ->orderBy('id', 'desc');;
 
         return DataTables::of($kendaraan)
             ->addIndexColumn()
@@ -158,5 +159,23 @@ class KendaraanController extends Controller
             DB::rollBack();
             throw $e;
         }
+    }
+
+    public function dataModel()
+    {
+        $kendaraan = Kendaraan::select('*')
+        ->orderBy('id', 'desc');;
+
+        return DataTables::of($kendaraan)
+            ->addIndexColumn()
+            ->addColumn('action', function($kendaraan) {
+                return '
+                <div class="btn-group">
+                    <button class="btn btn-sm btn-primary edit" data-id="'.$kendaraan->id.'" id="pickKendaraanDingin"><i class="bx bx-check"></i></button>
+                </div>
+                ';
+            })
+            ->rawColumns(['action'])
+            ->make(true);
     }
 }

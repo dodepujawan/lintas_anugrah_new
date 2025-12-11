@@ -61,6 +61,7 @@ Route::prefix('kendaraan')->group(function () {
     Route::post('/delete/{id}', [KendaraanController::class, 'destroy'])->name('kendaraan.destroy');
     // Callback
     Route::get('/kendaraan_kode', [KendaraanController::class, 'kendaraan_kode'])->name('kendaraan_kode');
+    Route::get('/data-model', [KendaraanController::class, 'dataModel'])->name('kendaraan.datamodel');
 });
 
 Route::prefix('driver')->group(function () {
@@ -102,10 +103,10 @@ Route::prefix('price-customer')->group(function() {
 Route::prefix('price-rent')->group(function() {
     Route::get('/', [PricedinginController::class, 'index'])->name('price-rent.index');
     Route::get('/data', [PricedinginController::class, 'getData'])->name('price-rent.data');
-    // Route::post('/store', [PricesController::class, 'store'])->name('price-expedition.store');
-    // Route::get('/show/{id}', [PricesController::class, 'show'])->name('price-expedition.show');
-    // Route::post('/update/{id}', [PricesController::class, 'update'])->name('price-expedition.update');
-    // Route::post('/destroy/{id}', [PricesController::class, 'destroy'])->name('price-expedition.destroy');
+    Route::post('/store', [PricedinginController::class, 'store'])->name('price-rent.store');
+    Route::get('/show/{id}', [PricedinginController::class, 'show'])->name('price-rent.show');
+    Route::post('/update/{id}', [PricedinginController::class, 'update'])->name('price-rent.update');
+    Route::post('/destroy/{id}', [PricedinginController::class, 'destroy'])->name('price-rent.destroy');
 });
 // Route::prefix('register')->group(function () {
 //     Route::get('/users', UsersPage::class)->name('users.page');

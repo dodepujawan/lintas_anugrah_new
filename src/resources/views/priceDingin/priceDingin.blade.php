@@ -125,22 +125,38 @@
 
         <form id="pricedinginForm">
             @csrf
-            <input type="hidden" id="pricePendinginId" name="id">
+            <input type="hidden" id="pricePendinginId" name="pricePendinginId">
 
             <div class="row g-4">
                 <!-- Kolom Kiri -->
                 <div class="col-md-6">
                     <div class="mb-3">
-                        <label class="form-label fw-semibold">JENIS <span class="text-danger">*</span></label>
+                        <label class="form-label fw-semibold">Kendaraan <span class="text-danger">*</span></label>
                         <div class="input-group">
-                            <input type="text" id="jenis_pricedingin" name="jenis_pricedingin"
+                            <input type="text" id="kode_pricedingin" name="kode_pricedingin"
                                 class="form-control" placeholder="Silahkan Tekan Pilih" readonly required>
-                            <button type="button" class="btn btn-outline-primary" id="btnPilihJenis">
+                            <button type="button" class="btn btn-outline-primary" id="btnPilihJenis" data-bs-toggle="modal" data-bs-target="#kendaraanDinginModal">
                                 <i class="bi bi-search me-1"></i> Pilih
                             </button>
                         </div>
                     </div>
 
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">PLAT <span class="text-danger">*</span></label>
+                        <input type="text" id="plat_pricedingin" name="plat_pricedingin"
+                               class="form-control" required readonly>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">JENIS MOBIL<span class="text-danger">*</span></label>
+                        <input type="text" id="jenis_pricedingin" name="jenis_pricedingin"
+                               class="form-control" required readonly>
+                    </div>
+
+                </div>
+
+                <!-- Kolom Kanan -->
+                <div class="col-md-6">
                     <div class="mb-3">
                         <label class="form-label fw-semibold">PERIODE <span class="text-danger">*</span></label>
                         <input type="text" id="periode_pricedingin" name="periode_pricedingin"
@@ -148,25 +164,9 @@
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label fw-semibold">PLAT <span class="text-danger">*</span></label>
-                        <input type="text" id="plat_pricedingin" name="periode_pricedingin"
-                               class="form-control" required>
-                    </div>
-                </div>
-
-                <!-- Kolom Kanan -->
-                <div class="col-md-6">
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold">KODE MOBIL<span class="text-danger">*</span></label>
-                        <input type="text" id="kode_pricedingin" name="kode_pricedingin"
-                               class="form-control" placeholder="Contoh: BRG001"
-                               maxlength="20" required>
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold">ITEM <span class="text-danger">*</span></label>
+                        <label class="form-label fw-semibold">NAMA ITEM <span class="text-danger">*</span></label>
                         <input type="text" id="item_pricedingin" name="item_pricedingin"
-                               class="form-control" required>
+                               class="form-control" required  readonly>
                     </div>
 
                     <div class="mb-3">
@@ -193,78 +193,34 @@
         </form>
     </div>
 
-    <!-- Modal Detail -->
-    <div class="modal fade" id="detailModal" tabindex="-1" aria-hidden="true">
+    <!-- Modal Tabel Rute -->
+    <div class="modal fade" id="kendaraanDinginModal" tabindex="-1">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Detail Price Dingin</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <h5 class="modal-title">Data Kendaraan</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <table class="table table-borderless">
-                                <tr>
-                                    <th width="40%">TANGGAL:</th>
-                                    <td id="detailTanggal"></td>
-                                </tr>
-                                <tr>
-                                    <th>KODE:</th>
-                                    <td id="detailKode"></td>
-                                </tr>
-                                <tr>
-                                    <th>PERIODE:</th>
-                                    <td id="detailPeriode"></td>
-                                </tr>
-                                <tr>
-                                    <th>PLAT:</th>
-                                    <td id="detailPlat"></td>
-                                </tr>
-                            </table>
-                        </div>
-                        <div class="col-md-6">
-                            <table class="table table-borderless">
-                                <tr>
-                                    <th width="40%">JENIS:</th>
-                                    <td id="detailJenis"></td>
-                                </tr>
-                                <tr>
-                                    <th>ITEM:</th>
-                                    <td id="detailItem"></td>
-                                </tr>
-                                <tr>
-                                    <th>HARGA:</th>
-                                    <td id="detailHarga"></td>
-                                </tr>
-                                <tr>
-                                    <th>USER:</th>
-                                    <td id="detailUser"></td>
-                                </tr>
-                            </table>
-                        </div>
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h2 class="h5 mb-0 text-dark">Data Kendaraan</h2>
                     </div>
-                    <div class="row mt-3">
-                        <div class="col-12">
-                            <table class="table table-borderless">
+                    <div class="table-responsive">
+                        <table id="kendaraanDinginTable" class="table table-striped table-bordered table-hover w-100">
+                            <thead class="table-dark">
                                 <tr>
-                                    <th width="15%">USER EDIT:</th>
-                                    <td id="detailUserEdit"></td>
+                                    <th width="5%">No</th>
+                                    <th>Nama</th>
+                                    <th>Plat</th>
+                                    <th>Jenis</th>
+                                    <th>Aksi</th>
                                 </tr>
-                                <tr>
-                                    <th>DIBUAT:</th>
-                                    <td id="detailCreatedAt"></td>
-                                </tr>
-                                <tr>
-                                    <th>DIUPDATE:</th>
-                                    <td id="detailUpdatedAt"></td>
-                                </tr>
-                            </table>
-                        </div>
+                            </thead>
+                            <tbody>
+                                <!-- Data akan di-load oleh DataTables -->
+                            </tbody>
+                        </table>
                     </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
                 </div>
             </div>
         </div>
@@ -316,7 +272,7 @@ $(document).ready(function(){
         $('#master_table_price_dingin').hide();
     });
     $('#cancelDinginBtn').click(function() {
-        $('#formContainer').hide();
+        $('#formDinginContainer').hide();
         resetFormDingin();
         $('#master_table_price_dingin').show();
         $('#pricedinginTable').DataTable().ajax.reload();
@@ -332,5 +288,178 @@ $(document).ready(function(){
         $('.invalid-feedback').remove();
     }
     // ======================== End Of Reset form ======================================
+    // ============================ Kendaraan Table ===================================
+     $('#kendaraanDinginTable').DataTable({
+        processing: true,
+        serverSide: true,
+        ajax: '{{ route("kendaraan.datamodel") }}',
+        columns: [
+            { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false },
+            { data: 'nama', name: 'nama' },
+            { data: 'plat', name: 'plat' },
+            { data: 'jenis', name: 'jenis' },
+            { data: 'action', name: 'action', orderable: false, searchable: false, width: '20%'}
+        ]
+    });
+    // ============================ End Of Kendaraan Table ===================================
+    // =============================== Pick Kendaraan =======================================
+    $(document).on('click', '#pickKendaraanDingin', function() {
+        var id = $(this).data('id');
+        $("#kendaraanDinginModal").hide();
+
+        $.get("{{ route('kendaraan.edit', ':id') }}".replace(':id', id), function(data) {
+            // console.log("aba" + data.id + data.kode + data.nama);
+            $('#kendaraanDinginModal').modal('hide');
+            $('#kode_pricedingin').val(data.kode);
+            $('#jenis_pricedingin').val(data.nama);
+            $('#plat_pricedingin').val(data.plat);
+            $('#item_pricedingin').val(data.plat +' '+ data.jenis);
+        });
+    });
+    // ============================ End Of Pick Kendaraan ===================================
+    // =================== Event listener field periode_pricedingin ==============================
+    $('#periode_pricedingin').on('input', function() {
+        var plat = $('#plat_pricedingin').val() || '';
+        var jenis = $('#jenis_pricedingin').val() || '';
+        var periode = $(this).val() || '';
+
+        // Gabungkan semua nilai
+        $('#item_pricedingin').val(plat + ' ' + jenis + ' ' + periode);
+    });
+    // =============== End Of Event listener field periode_pricedingin ===========================
+    // ============================ Submit form pricedingin ======================================
+    $('#pricedinginForm').on('submit', function(e) {
+        e.preventDefault();
+
+        // Menyiapkan data form
+        var formData = {
+            'KODE': $('#kode_pricedingin').val(),
+            'PERIODE': $('#periode_pricedingin').val(),
+            'PLAT': $('#plat_pricedingin').val(),
+            'ITEM': $('#item_pricedingin').val(),
+            'HARGA': $('#harga_pricedingin').val(),
+            'USER': '{{ Auth::user()->user_id ?? "SYSTEM" }}', // Ganti sesuai kebutuhan
+            // USEREDIT dan KUNCI akan diisi nanti saat edit
+        };
+
+        var url = $('#pricePendinginId').val() ? '{{ route("price-rent.update", ["id" => ":id"]) }}'.replace(':id', $('#pricePendinginId').val()) : '{{ route("price-rent.store") }}';
+
+        // AJAX request
+        $.ajax({
+            url: url,
+            type: 'POST',
+            data: formData,
+            success: function(response) {
+                // Tampilkan notifikasi sukses
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil!',
+                    text: 'Data berhasil disimpan!',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+                resetFormDingin();
+                $('#formDinginContainer').hide();
+                $('#master_table_price_dingin').show();
+                $('#pricedinginTable').DataTable().ajax.reload();
+            },
+            error: function(xhr) {
+
+                // Tampilkan error
+                var errors = xhr.responseJSON?.errors;
+                var errorMessage = 'Terjadi kesalahan saat menyimpan data.';
+
+                if (errors) {
+                    errorMessage = '';
+                    $.each(errors, function(key, value) {
+                        errorMessage += value[0] + '\n';
+                    });
+                }
+
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Gagal!',
+                    text: errorMessage,
+                    confirmButtonText: 'OK'
+                });
+            }
+        });
+    });
+    // ======================= End Of Submit form pricedingin ===================================
 });
+// ======================= show form pricedingin ===================================
+    function editDataDingin(id) {
+        $.get("{{ route('price-rent.show', ':id') }}".replace(':id', id), function(response) {
+
+            if (!response.success) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Gagal',
+                    text: 'Data tidak ditemukan!'
+                });
+                return;
+            }
+
+            let d = response.data;
+
+            // Isi form
+            $('#kode_pricedingin').val(d.KODE);
+            $('#periode_pricedingin').val(d.PERIODE);
+            $('#plat_pricedingin').val(d.PLAT);
+            $('#item_pricedingin').val(d.ITEM);
+            $('#harga_pricedingin').val(d.HARGA);
+            $('#jenis_pricedingin').val(response.jenis_pricedingin);
+            // Set hidden ID
+            $('#pricePendinginId').val(d.id);
+
+            $('#formDinginContainer').toggle();
+            $('#master_table_price_dingin').hide();
+        })
+        .fail(function() {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Gagal mengambil data dari server.'
+            });
+        });
+    }
+    // ======================= end of show form pricedingin ===================================
+    // ======================= delete pricedingin ===================================
+    function deleteDataDingin(id) {
+        Swal.fire({
+            title: 'Apakah Anda yakin?',
+            text: "Data akan dihapus permanen!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Ya, hapus!',
+            cancelButtonText: 'Batal',
+            customClass: {
+                container: 'high-z-index'
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: '{{ route("price-rent.destroy", ["id" => ":id"]) }}'.replace(':id', id),
+                    type: 'POST',
+                    data: {
+                        _token: "{{ csrf_token() }}"
+                    },
+                    success: function(response) {
+                        Swal.fire({
+                            title: 'Terhapus!',
+                            text: response.success,
+                            icon: 'success',
+                            customClass: {
+                                container: 'high-z-index'  // atau class custom Anda
+                            }
+                        });
+                        $('#pricedinginTable').DataTable().ajax.reload();
+                    }
+                });
+            }
+        });
+    }
+    // ===================== end of delete pricedingin ================================
 </script>

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 use App\Models\Pricedingin;
+use App\Models\Kendaraan;
 use Illuminate\Http\Request;
 use DataTables;
 use Illuminate\Support\Facades\Auth;
@@ -59,4 +60,112 @@ class PricedinginController extends Controller
                 ->make(true);
         }
     }
+
+    public function store(Request $request){
+        $validated = $request->validate([
+            'KODE' => 'required|string|max:50',
+            'PERIODE' => 'required|string|max:50',
+            'PLAT' => 'required|string|max:20',
+            'ITEM' => 'required|string|max:255',
+            'HARGA' => 'required|integer|min:0',
+            'USER' => 'required|string|max:100',
+        ]);
+
+        // Ambil data kendaraan
+        $kode = $request->input('KODE');
+        $kendaraan = Kendaraan::where('kode', $kode)->first();
+
+        // Kalau kendaraan ada, tambahkan kolom jenis ke validated
+        if ($kendaraan) {
+            $validated['JENIS'] = $kendaraan->jenis;
+        } else {
+            // Optional: kalau mau error kalau kendaraan tidak ditemukan
+            return response()->json([
+                'success' => false,
+                'message' => 'Kendaraan tidak ditemukan',
+            ], 404);
+        }
+
+        // Simpan
+        $pricedingin = Pricedingin::create($validated);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Data berhasil disimpan',
+            'data' => $pricedingin
+        ]);
+    }
+
+    public function show($id){
+        $data = Pricedingin::find($id);
+
+        if (!$data) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Data tidak ditemukan'
+            ], 404);
+        }
+
+        // Ambil relasi dari kendaraan berdasarkan KODE
+        $kendaraan = Kendaraan::where('kode', $data->KODE)->first();
+
+        // Ambil nama kendaraan atau kosong jika tidak ada
+        $jenis = $kendaraan->nama ?? null;
+
+        return response()->json([
+            'success' => true,
+            'data' => $data,
+            'jenis_pricedingin' => $jenis
+        ]);
+    }
+
+    public function update(Request $request, $id){
+        $pricedingin = Pricedingin::findOrFail($id);
+
+        $validated = $request->validate([
+            'KODE' => 'required|string|max:50',
+            'PERIODE' => 'required|string|max:50',
+            'PLAT' => 'required|string|max:20',
+            'ITEM' => 'required|string|max:255',
+            'HARGA' => 'required|integer|min:0',
+        ]);
+
+        $validated['USEREDIT'] = Auth::user()->user_id; // Atau ganti dengan user yang login
+        // Ambil data kendaraan
+        $kode = $request->input('KODE');
+        $kendaraan = Kendaraan::where('kode', $kode)->first();
+
+        // Kalau kendaraan ada, tambahkan kolom jenis ke validated
+        if ($kendaraan) {
+            $validated['JENIS'] = $kendaraan->jenis;
+        } else {
+            // Optional: kalau mau error kalau kendaraan tidak ditemukan
+            return response()->json([
+                'success' => false,
+                'message' => 'Kendaraan tidak ditemukan',
+            ], 404);
+        }
+
+        $pricedingin->update($validated);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Data berhasil diperbarui',
+            'data' => $pricedingin
+        ]);
+    }
+
+    public function destroy($id)
+    {
+        $Prices = Pricedingin::findOrFail($id);
+        $Prices->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Data berhasil dihapus'
+        ]);
+    }
 }
+
+
+// Extra note untuk store be careful ada perbedaan jenis dan nama kendaraan karna mengikuti tampilan form desktop juga databasenya yang desktop
