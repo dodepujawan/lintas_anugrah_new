@@ -99,6 +99,7 @@
                         <tr>
                             <th width="5%">No</th>
                             <th width="10%">KODE</th>
+                            <th width="10%">Kendaraan</th>
                             <th>ITEM</th>
                             <th width="10%">PERIODE</th>
                             <th width="10%">PLAT</th>
@@ -241,8 +242,8 @@ $(document).ready(function(){
         ajax: "{{ route('price-rent.data') }}",
         columns: [
             { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false },
-
-            { data: 'KODE', name: 'KODE' },
+            { data: 'KODEDGN', name: 'KODEDGN' },
+            { data: 'nama_kendaraan', name: 'kendaraan.nama' },
             { data: 'ITEM', name: 'ITEM' },
             { data: 'PERIODE', name: 'PERIODE' },
             { data: 'PLAT', name: 'PLAT' },
@@ -354,7 +355,7 @@ $(document).ready(function(){
                 Swal.fire({
                     icon: 'success',
                     title: 'Berhasil!',
-                    text: 'Data berhasil disimpan!',
+                    text: 'Kode ID :' + response.data.KODEDGN,
                     timer: 2000,
                     showConfirmButton: false
                 });

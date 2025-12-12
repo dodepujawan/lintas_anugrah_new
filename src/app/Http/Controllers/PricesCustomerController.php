@@ -12,7 +12,6 @@ use App\Models\Pricecushis;
 use App\Models\Prices;
 use App\Models\Mcustomer;
 
-
 class PricesCustomerController extends Controller
 {
     public function index(){

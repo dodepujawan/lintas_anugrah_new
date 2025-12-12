@@ -10,6 +10,7 @@ use App\Http\Controllers\PricesController;
 use App\Http\Controllers\RuteController;
 use App\Http\Controllers\PricesCustomerController;
 use App\Http\Controllers\PricedinginController;
+use App\Http\Controllers\PricedinginCustomerController;
 
 Route::get('/', function () {
     return redirect()->route('login');
@@ -107,6 +108,14 @@ Route::prefix('price-rent')->group(function() {
     Route::get('/show/{id}', [PricedinginController::class, 'show'])->name('price-rent.show');
     Route::post('/update/{id}', [PricedinginController::class, 'update'])->name('price-rent.update');
     Route::post('/destroy/{id}', [PricedinginController::class, 'destroy'])->name('price-rent.destroy');
+});
+
+Route::prefix('price-dingin-customer')->group(function() {
+    Route::get('/', [PricedinginCustomerController::class, 'index'])->name('price-rentcus.index');
+    Route::get('/data', [PricedinginCustomerController::class, 'getData'])->name('price-rentcus.data');
+    Route::get('/price/{kodecus}', [PricedinginCustomerController::class, 'getPrice'])->name('price-rentcus.price');
+    Route::post('/update-row', [PricedinginCustomerController::class, 'saveCustomerRow'])->name('price-rentcus.update-row');
+    Route::post('/store', [PricedinginCustomerController::class, 'store'])->name('price-rentcus.store');
 });
 // Route::prefix('register')->group(function () {
 //     Route::get('/users', UsersPage::class)->name('users.page');

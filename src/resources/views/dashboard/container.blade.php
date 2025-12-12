@@ -167,7 +167,7 @@ $(document).ready(function() {
         });
     }
 // ========================= End Of New Prices Customer ======================================
-// ========================= New Prices ======================================
+// ========================= New Price Dingin ======================================
     $(document).on('click', '#sidebar_new_rent', function(e) {
         e.preventDefault();
         loadNewRentForm();
@@ -185,7 +185,26 @@ $(document).ready(function() {
             }
         });
     }
-// ========================= End Of New Prices ======================================
+// ========================= End Of New Price Dingin ======================================
+// ========================= New Price Dingin ======================================
+    $(document).on('click', '#sidebar_rent_customer', function(e) {
+        e.preventDefault();
+        loadNewRentCusForm();
+    });
+
+    function loadNewRentCusForm() {
+        $.ajax({
+            url: '{{ route('price-rentcus.index') }}', // Route to load the form
+            type: 'GET',
+            success: function(response) {
+                $('.master-page').html(response);
+            },
+            error: function() {
+                $('.master-page').html('<p>Error loading form.</p>');
+            }
+        });
+    }
+// ========================= End Of New Price Dingin ======================================
 // +++++++++++++++++++++++++++ End Of SIDEBAR ROOM ++++++++++++++++++++++++++++++++++++++
 });
 </script>

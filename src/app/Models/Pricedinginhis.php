@@ -5,11 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Pricedingin extends Model
+class Pricedinginhis extends Model
 {
     use HasFactory;
 
-    protected $table = 'pricedingin';
+    protected $table = 'pricedinginhis';
     protected $primaryKey = 'id';
     public $timestamps = true; // true untuk menggunakan created_at & updated_at
 

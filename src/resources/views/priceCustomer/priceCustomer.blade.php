@@ -327,7 +327,7 @@ $(document).ready(function() {
     var table = $('#priceCusTable').DataTable({
         processing: true,
         serverSide: true,
-        ajax: '{{ route("price-customer.data") }}',
+        ajax: '{{ route("price-rentcus.data") }}',
         // Scroll settings
         scrollX: true,
         scrollY: "400px",
@@ -453,7 +453,15 @@ $(document).ready(function() {
         $("#name_pricecus").val($("#custName").text());
         $("#kode_val_pricecus").val($("#custKode").text());
     });
-    // ================================ Tambah Price Cust ========================================
+    // ================================ End Of Tambah Price Cust ========================================
+    // ================================ Cancel Price Cust ========================================
+    $('#cancelBtnCus').on('click', function(){
+        resetFormCus();
+        $('#formCusContainer').hide();
+        $('#priceCusTableDetMaster').show();
+        $('#priceCusTableDet').DataTable().ajax.reload();
+    });
+    // ================================ End Of Cancel Price Cust ========================================
     // ============================ Tambah Rute Click ===================================
     $("#tambah_rute_cus").on('click', function(){
         // Tutup modal pertama dengan method Bootstrap

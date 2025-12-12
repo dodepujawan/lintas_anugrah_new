@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use DataTables;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-
+use Carbon\Carbon;
 
 class PricedinginController extends Controller
 {
@@ -18,10 +18,11 @@ class PricedinginController extends Controller
 
     public function getData(Request $request){
         if ($request->ajax()) {
-
             $data = DB::table('pricedingin')
+                ->leftJoin('kendaraan', 'pricedingin.KODE', '=', 'kendaraan.kode')
                 ->select(
                     'pricedingin.id',
+                    'pricedingin.KODEDGN',
                     'pricedingin.KODE',
                     'pricedingin.PERIODE',
                     'pricedingin.PLAT',
@@ -29,7 +30,10 @@ class PricedinginController extends Controller
                     'pricedingin.ITEM',
                     'pricedingin.HARGA',
                     'pricedingin.KUNCI',
-                    'pricedingin.created_at'
+                    // Format tanggal tanpa jam: dd-mm-yyyy
+                    DB::raw("DATE_FORMAT(pricedingin.created_at, '%d-%m-%Y') as created_at"),
+                    // Ambil nama dari tabel kendaraan
+                    'kendaraan.nama as nama_kendaraan'
                 );
             $data->orderBy('pricedingin.created_at', 'desc');
             return DataTables::of($data)
@@ -85,6 +89,12 @@ class PricedinginController extends Controller
                 'message' => 'Kendaraan tidak ditemukan',
             ], 404);
         }
+
+        // Generate KODE
+        $lastCode = Pricedingin::orderBy('id', 'desc')->value('KODEDGN');
+        $number = $lastCode ? (int) substr($lastCode, 3) + 1 : 1;
+        $kodedgn = 'PRD' . str_pad($number, 7, '0', STR_PAD_LEFT);
+        $validated['KODEDGN'] = $kodedgn;
 
         // Simpan
         $pricedingin = Pricedingin::create($validated);

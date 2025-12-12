@@ -5,15 +5,16 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Pricedingin extends Model
+class Pricedingincus extends Model
 {
     use HasFactory;
 
-    protected $table = 'pricedingin';
+    protected $table = 'pricedingincus';
     protected $primaryKey = 'id';
     public $timestamps = true; // true untuk menggunakan created_at & updated_at
 
     protected $fillable = [
+        'KODECUS',
         'KODEDGN',
         'KODE',
         'PERIODE',
