@@ -327,7 +327,7 @@ $(document).ready(function() {
     var table = $('#priceCusTable').DataTable({
         processing: true,
         serverSide: true,
-        ajax: '{{ route("price-rentcus.data") }}',
+        ajax: '{{ route("price-customer.data") }}',
         // Scroll settings
         scrollX: true,
         scrollY: "400px",

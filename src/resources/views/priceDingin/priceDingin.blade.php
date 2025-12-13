@@ -306,11 +306,11 @@ $(document).ready(function(){
     // =============================== Pick Kendaraan =======================================
     $(document).on('click', '#pickKendaraanDingin', function() {
         var id = $(this).data('id');
-        $("#kendaraanDinginModal").hide();
+        // $("#kendaraanDinginModal").hide();
+        $('#kendaraanDinginModal').modal('hide');
 
         $.get("{{ route('kendaraan.edit', ':id') }}".replace(':id', id), function(data) {
             // console.log("aba" + data.id + data.kode + data.nama);
-            $('#kendaraanDinginModal').modal('hide');
             $('#kode_pricedingin').val(data.kode);
             $('#jenis_pricedingin').val(data.nama);
             $('#plat_pricedingin').val(data.plat);
@@ -319,13 +319,12 @@ $(document).ready(function(){
     });
     // ============================ End Of Pick Kendaraan ===================================
     // =================== Event listener field periode_pricedingin ==============================
-    $('#periode_pricedingin').on('input', function() {
-        var plat = $('#plat_pricedingin').val() || '';
-        var jenis = $('#jenis_pricedingin').val() || '';
-        var periode = $(this).val() || '';
+    $('#periode_pricedingin').on('input', function () {
+        let periode = $(this).val() || '';
+        let item = $('#item_pricedingin').val() || '';
 
-        // Gabungkan semua nilai
-        $('#item_pricedingin').val(plat + ' ' + jenis + ' ' + periode);
+        item = item.replace(/\s\d+$/, ''); // hapus periode lama
+        $('#item_pricedingin').val(item + ' ' + periode);
     });
     // =============== End Of Event listener field periode_pricedingin ===========================
     // ============================ Submit form pricedingin ======================================
