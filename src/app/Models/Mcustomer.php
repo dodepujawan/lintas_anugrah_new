@@ -4,57 +4,30 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Mcustomer extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory;
 
-    protected $table = 'Mcustomer';
+    protected $table = 'mcustomer';
 
     protected $fillable = [
-        'kode',
-        'nama',
-        'jenis_usaha',
-        'alamat',
-        'desa',
-        'kecamatan',
-        'kabupaten',
-        'kota',
-        'telepon',
-        'fax',
-        'kontak',
-        'email',
-        'npwp',
-        'top_kredit',
-        'purchasing_nama',
-        'purchasing_email',
-        'purchasing_extensi_hp',
-        'data_pajak_nama',
-        'data_pajak_npwp',
-        'data_pajak_alamat',
-        'data_pajak_alamat2',
-        'pemilik_nama',
-        'pemilik_no_ktp_sim',
-        'pemilik_tempat_lahir',
-        'pemilik_tgl_lahir',
-        'pemilik_alamat_rumah',
-        'pemilik_desa',
-        'pemilik_kecamatan',
-        'pemilik_kabupaten',
-        'pemilik_telepon',
-        'pemilik_fax',
-        'pemilik_email',
-        'pemilik_npwp',
-        'pemilik_agama',
-        'kontak_lain_nama',
-        'kontak_lain_telepon',
-        'accounting_nama',
-        'accounting_email',
-        'accounting_extensi_hp',
+        'CUSTOMER', 'kode_cus', 'NAMACUST', 'ALAMAT1', 'ALAMAT2', 'KOTA',
+        'TELEPON', 'FAX', 'EMAIL', 'KONTAK', 'NPWP',
+        'AREA', 'SUBAREA', 'TYPECUST', 'KOLEKTOR', 'SETATUS',
+        'SALDO', 'RETURAN', 'TOPKREDIT', 'MAXKREDIT',
+        'DISC1', 'DISC2', 'DISC3', 'DISC_REG', 'DISC_CASH',
+        'TGL_UPDATE', 'USERID',
+        'desa', 'camat', 'kabupaten',
+        'namapur', 'em_pur', 'hp_pur',
+        'nama_sto', 'em_sto', 'hp_sto',
+        'nama_p', 'ktp_p', 'tempat_l', 'tgll_p', 'alamat_p', 'desa_p', 'camat_p', 'kab_p', 'tlp_p', 'fax_p', 'email_p', 'npwp_p', 'agama_p',
+        'kontak_l', 'tlp_kl',
+        'nama_ac', 'em_ac', 'hp_ac',
+        'NM_PAJAK', 'AL_PAJAK', 'AL_PAJAK2', 'NP_PAJAK',
+        'DC'
     ];
-
     protected $casts = [
-        'pemilik_tgl_lahir' => 'date',
+        'TGL_UPDATE' => 'date',
     ];
 }

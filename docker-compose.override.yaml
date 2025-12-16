@@ -11,3 +11,10 @@ services:
     ports:
       - "8080:81"   # GUI NPM local (akses http://127.0.0.1:8080)
     restart: "no"        # ⬅️ di lokal: biar gak auto hidup terus
+  # ❌ Matikan MySQL di LOCAL
+  db:
+    image: alpine:3.20
+    command: ["sh", "-c", "exit 0"]
+    ports: []
+    volumes: []
+

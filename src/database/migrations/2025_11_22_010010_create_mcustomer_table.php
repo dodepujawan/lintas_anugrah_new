@@ -12,62 +12,103 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('mcustomer', function (Blueprint $table) {
-             $table->id();
+        $table->charset = 'latin1';
+        $table->collation = 'latin1_general_ci';
 
-            // DATA CUSTOMER
-            $table->string('kode')->unique();
-            $table->string('nama');
-            $table->string('jenis_usaha')->nullable();
-            $table->text('alamat')->nullable();
-            $table->string('desa')->nullable();
-            $table->string('kecamatan')->nullable();
-            $table->string('kabupaten')->nullable();
-            $table->string('kota')->nullable();
-            $table->string('telepon')->nullable();
-            $table->string('fax')->nullable();
-            $table->string('kontak')->nullable();
-            $table->string('email')->nullable();
-            $table->string('npwp')->nullable();
-            $table->string('top_kredit')->nullable();
+        // PRIMARY KEY BARU LARAVEL
+        $table->bigIncrements('id');
 
-            // PURCHASING
-            $table->string('purchasing_nama')->nullable();
-            $table->string('purchasing_email')->nullable();
-            $table->string('purchasing_extensi_hp')->nullable();
+        // PRIMARY KEY LAMA FOXPRO
+        $table->string('CUSTOMER', 30);
+        $table->string('kode_cus', 30)->unique(); // alias modern
 
-            // DATA PAJAK
-            $table->string('data_pajak_nama')->nullable();
-            $table->string('data_pajak_npwp')->nullable();
-            $table->text('data_pajak_alamat')->nullable();
-            $table->text('data_pajak_alamat2')->nullable();
+        // DATA UTAMA
+        $table->string('NAMACUST', 100)->default('');
+        $table->string('ALAMAT1', 200)->default('');
+        $table->string('ALAMAT2', 200)->default('');
+        $table->string('KOTA', 100)->default('');
+        $table->string('TELEPON', 100)->default('');
+        $table->string('FAX', 100)->default('');
+        $table->string('EMAIL', 100)->default('');
+        $table->string('KONTAK', 100)->default('');
+        $table->string('NPWP', 100)->default('');
 
-            // INFO PEMILIK
-            $table->string('pemilik_nama')->nullable();
-            $table->string('pemilik_no_ktp_sim')->nullable();
-            $table->string('pemilik_tempat_lahir')->nullable();
-            $table->date('pemilik_tgl_lahir')->nullable();
-            $table->text('pemilik_alamat_rumah')->nullable();
-            $table->string('pemilik_desa')->nullable();
-            $table->string('pemilik_kecamatan')->nullable();
-            $table->string('pemilik_kabupaten')->nullable();
-            $table->string('pemilik_telepon')->nullable();
-            $table->string('pemilik_fax')->nullable();
-            $table->string('pemilik_email')->nullable();
-            $table->string('pemilik_npwp')->nullable();
-            $table->string('pemilik_agama')->nullable();
+        // WILAYAH & STATUS
+        $table->string('AREA', 6)->default('');
+        $table->string('SUBAREA', 6)->default('');
+        $table->string('TYPECUST', 6)->default('');
+        $table->string('KOLEKTOR', 6)->default('');
+        $table->char('SETATUS', 1)->default('');
 
-            // KONTAK SELAIN PEMILIK
-            $table->string('kontak_lain_nama')->nullable();
-            $table->string('kontak_lain_telepon')->nullable();
+        // KEUANGAN
+        $table->decimal('SALDO', 10, 0)->default(0);
+        $table->decimal('RETURAN', 10, 0)->default(0);
+        $table->decimal('TOPKREDIT', 10, 0)->default(0);
+        $table->decimal('MAXKREDIT', 10, 0)->default(0);
 
-            // ACCOUNTING
-            $table->string('accounting_nama')->nullable();
-            $table->string('accounting_email')->nullable();
-            $table->string('accounting_extensi_hp')->nullable();
+        // DISKON
+        $table->decimal('DISC1', 10, 2)->default(0);
+        $table->decimal('DISC2', 10, 2)->default(0);
+        $table->decimal('DISC3', 10, 2)->default(0);
+        $table->decimal('DISC_REG', 10, 2)->default(0);
+        $table->decimal('DISC_CASH', 10, 0)->default(0);
 
-            $table->timestamps();
-            $table->softDeletes();
-        });
+        // INFO UPDATE
+        $table->date('TGL_UPDATE')->nullable();
+        $table->string('USERID', 20)->default('');
+
+        // DESA
+        $table->string('desa', 100)->default('');
+        $table->string('camat', 100)->default('');
+        $table->string('kabupaten', 100)->default('');
+
+        // PURCHASING
+        $table->string('namapur', 100)->default('');
+        $table->string('em_pur', 100)->default('');
+        $table->string('hp_pur', 100)->default('');
+
+        // STO (tambahan dari schema FoxPro)
+        $table->string('nama_sto', 100)->default('');
+        $table->string('em_sto', 100)->default('');
+        $table->string('hp_sto', 100)->default('');
+
+        // PEMILIK
+        $table->string('nama_p', 100)->default('');
+        $table->string('ktp_p', 100)->default('');
+        $table->string('tempat_l', 100)->default('');
+        $table->date('tgll_p')->nullable();
+        $table->string('alamat_p', 100)->default('');
+        $table->string('desa_p', 100)->default('');
+        $table->string('camat_p', 100)->default('');
+        $table->string('kab_p', 100)->default('');
+        $table->string('tlp_p', 100)->default('');
+        $table->string('fax_p', 100)->default('');
+        $table->string('email_p', 100)->default('');
+        $table->string('npwp_p', 100)->default('');
+        $table->string('agama_p', 100)->default('');
+
+        // KONTAK LAIN
+        $table->string('kontak_l', 100)->default('');
+        $table->string('tlp_kl', 100)->default('');
+
+        // ACCOUNTING
+        $table->string('nama_ac', 100)->default('');
+        $table->string('em_ac', 100)->default('');
+        $table->string('hp_ac', 100)->default('');
+
+        // PAJAK
+        $table->string('NM_PAJAK', 100)->default('');
+        $table->string('AL_PAJAK', 500)->default('');
+        $table->string('AL_PAJAK2', 500)->default('');
+        $table->string('NP_PAJAK', 100)->default('');
+
+        // DC
+        $table->double('DC', 10, 0)->default(0);
+
+        // Timestamp Laravel optional
+        $table->nullableTimestamps();
+    });
+
     }
 
     /**

@@ -75,7 +75,7 @@
                                     <th>No</th>
                                     <th>Kode</th>
                                     <th>Nama</th>
-                                    <th>Jenis Usaha</th>
+                                    <th>Alamat</th>
                                     <th>Telepon</th>
                                     <th>Email</th>
                                     <th>Aksi</th>
@@ -388,21 +388,19 @@ $(document).ready(function() {
         processing: true,
         serverSide: true,
         ajax: '{{ route("customer_get_data") }}',
-        // Scroll settings
         scrollX: true,
         scrollY: "400px",
         scrollCollapse: true,
-        // Responsive settings
         responsive: true,
-        autoWidth: false,
+        autoWidth: true,
         columns: [
-            { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false },
-            { data: 'kode', name: 'kode' },
-            { data: 'nama', name: 'nama' },
-            { data: 'jenis_usaha', name: 'jenis_usaha' },
-            { data: 'telepon', name: 'telepon' },
-            { data: 'email', name: 'email' },
-            { data: 'action', name: 'action', orderable: false, searchable: false }
+            { data: 'DT_RowIndex', orderable: false, searchable: false },
+            { data: 'kode_cus', name: 'kode_cus' },
+            { data: 'NAMACUST', name: 'NAMACUST' },
+            { data: 'ALAMAT1', name: 'ALAMAT1' },
+            { data: 'TELEPON', name: 'TELEPON' },
+            { data: 'EMAIL', name: 'EMAIL' },
+            { data: 'action', orderable: false, searchable: false }
         ]
     });
 
@@ -443,37 +441,84 @@ $(document).ready(function() {
     $(document).on('click', '.edit-btn-customer', function() {
         var id = $(this).data('id');
         $('#modal-title').text('Edit Customer');
-        $('#customer-form').attr('data-method', 'update');
-        $('#customer-form').attr('data-id', id);
+        $('#customer-form').attr('data-method', 'update').attr('data-id', id);
         $('#form-errors').addClass('d-none');
-        // panggil fungsi next click
+
         initializeEnterNext();
-        // Focus ke field pertama saat modal dibuka
         $('#kode').focus();
 
-        // Load data via AJAX
         $.ajax({
             url: '{{ route("customer_show", ["id" => ":id"]) }}'.replace(':id', id),
             type: 'GET',
             success: function(response) {
                 if (response.status === 'success') {
                     var customer = response.data;
-                    // Populate form fields
-                    Object.keys(customer).forEach(function(key) {
-                        // console.log('Field:', key, 'Value:', customer[key]);
-                        if ($('#' + key).length) {
-                            let value = customer[key];
-                            if ($('#' + key).attr('type') === 'date' && value) {
+
+                    // Mapping input jika nama input berbeda dari DB
+                    var fieldMap = {
+                        'kode_cus': 'kode',
+                        'CUSTOMER': 'jenis_usaha',
+                        'NAMACUST': 'nama',
+                        'ALAMAT1': 'alamat',
+                        'KOTA': 'kota',
+                        'TELEPON': 'telepon',
+                        'FAX': 'fax',
+                        'EMAIL': 'email',
+                        'KONTAK': 'kontak',
+                        'NPWP': 'npwp',
+                        'TOPKREDIT': 'top_kredit',
+
+                        'desa': 'desa',
+                        'camat': 'kecamatan',
+                        'kabupaten': 'kabupaten',
+
+                        'namapur': 'purchasing_nama',
+                        'em_pur': 'purchasing_email',
+                        'hp_pur': 'purchasing_extensi_hp',
+
+                        'NM_PAJAK': 'data_pajak_nama',
+                        'NP_PAJAK': 'data_pajak_npwp',
+                        'AL_PAJAK': 'data_pajak_alamat',
+                        'AL_PAJAK2': 'data_pajak_alamat2',
+
+                        'nama_p': 'pemilik_nama',
+                        'ktp_p': 'pemilik_no_ktp_sim',
+                        'tempat_l': 'pemilik_tempat_lahir',
+                        'tgll_p': 'pemilik_tgl_lahir',
+                        'alamat_p': 'pemilik_alamat_rumah',
+                        'desa_p': 'pemilik_desa',
+                        'camat_p': 'pemilik_kecamatan',
+                        'kab_p': 'pemilik_kabupaten',
+                        'tlp_p': 'pemilik_telepon',
+                        'fax_p': 'pemilik_fax',
+                        'email_p': 'pemilik_email',
+                        'npwp_p': 'pemilik_npwp',
+                        'agama_p': 'pemilik_agama',
+
+                        'kontak_l': 'kontak_lain_nama',
+                        'tlp_kl': 'kontak_lain_telepon',
+
+                        'nama_ac': 'accounting_nama',
+                        'em_ac': 'accounting_email',
+                        'hp_ac': 'accounting_extensi_hp',
+                    };
+
+                    Object.keys(fieldMap).forEach(function(dbField) {
+                        var inputId = fieldMap[dbField];
+                        if ($('#' + inputId).length) {
+                            let value = customer[dbField] ?? '';
+                            if ($('#' + inputId).attr('type') === 'date' && value) {
                                 value = value.split('T')[0];
                             }
-                            $('#' + key).val(value); // <--- di sini
+                            $('#' + inputId).val(value);
                         }
                     });
+
                     $('#customer-modal').modal('show');
                 }
             },
             error: function(xhr) {
-                alert('Terjadi kesalahan saat memuat data');
+                Swal.fire('Error', 'Terjadi kesalahan saat memuat data', 'error');
             }
         });
     });
@@ -571,7 +616,9 @@ $(document).ready(function() {
                     errorHtml += '</ul>';
                     $('#form-errors').html(errorHtml).removeClass('d-none');
                 } else {
-                    alert('Terjadi kesalahan: ' + (xhr.responseJSON?.message || 'Server error'));
+                    alert('mohon lenngkapi data dengan data yang sesuai !');
+                    console.log('Terjadi kesalahan: ' + (xhr.responseJSON?.message || 'Server error'));
+                    // alert('Terjadi kesalahan: ' + (xhr.responseJSON?.message || 'Server error'));
                 }
             }
         });
