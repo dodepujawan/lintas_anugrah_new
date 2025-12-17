@@ -162,15 +162,15 @@ $(document).ready(function() {
         autoWidth: false,
         columns: [
             {data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false},
-            {data: 'kode', name: 'kode'},
-            {data: 'nama', name: 'nama'},
-            {data: 'alamat', name: 'alamat',
+            {data: 'KODE', name: 'KODE'},
+            {data: 'NAMA', name: 'NAMA'},
+            {data: 'ALAMAT', name: 'ALAMAT',
                 render: function(data) {
                     return data && data.length > 30 ? data.substr(0, 30) + '...' : data;
                 }
             },
-            {data: 'phone', name: 'phone'},
-            {data: 'mulai_kerja', name: 'mulai_kerja',
+            {data: 'PHONE', name: 'PHONE'},
+            {data: 'MULAI', name: 'MULAI',
                 render: function(data) {
                     return data ? new Date(data).toLocaleDateString('id-ID') : '-';
                 }
@@ -314,13 +314,13 @@ $(document).ready(function() {
             type: 'GET',
             success: function(data) {
                 $('#id_flag').val(data.id);
-                $('#kode').val(data.kode);
-                $('#nama').val(data.nama);
-                $('#alamat').val(data.alamat);
-                $('#phone').val(data.phone);
+                $('#kode').val(data.KODE);
+                $('#nama').val(data.NAMA);
+                $('#alamat').val(data.ALAMAT);
+                $('#phone').val(data.PHONE);
                 // Format tanggal dari 2025-11-23T00:00:00.000000Z ke 2025-11-23
-                if (data.mulai_kerja) {
-                    var tanggal = new Date(data.mulai_kerja);
+                if (data.MULAI) {
+                    var tanggal = new Date(data.MULAI);
                     var formattedDate = tanggal.toISOString().split('T')[0];
                     $('#mulai_kerja').val(formattedDate);
                 } else {

@@ -12,17 +12,27 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('kendaraan', function (Blueprint $table) {
-            $table->id(); // Kolom id auto increment
-            $table->char('kode', 20)->nullable(); // Kode diganti jadi 20
-            $table->string('nama', 100);
-            $table->char('plat', 50);
-            $table->char('jenis', 50);
-            $table->char('fno_prk_b', 20); // Diubah dari 5 menjadi 20
-            $table->char('fno_prk_p', 20); // Diubah dari 5 menjadi 20
-            $table->char('fno_prk_s', 20); // Diubah dari 5 menjadi 20
-            $table->char('fno_prk_o', 20); // Diubah dari 5 menjadi 20
-            $table->char('fno_prk_m', 20); // Diubah dari 5 menjadi 20
-            $table->timestamps(); // created_at dan updated_at
+            // Laravel standard
+            $table->id();
+
+            // FoxPro legacy columns (UPPERCASE)
+            $table->char('KODE', 20)->nullable();
+            $table->string('NAMA', 100)->default('');
+            $table->char('PLAT', 50);
+            $table->char('JENIS', 50);
+
+            $table->char('FNO_PRK_B', 20);
+            $table->char('FNO_PRK_P', 20);
+            $table->char('FNO_PRK_S', 20);
+            $table->char('FNO_PRK_O', 20);
+            $table->char('FNO_PRK_M', 20);
+
+            // Laravel timestamps (nullable, lowercase)
+            $table->nullableTimestamps();
+
+            // FoxPro compatibility
+            $table->charset = 'latin1';
+            $table->collation = 'latin1_general_ci';
         });
     }
 

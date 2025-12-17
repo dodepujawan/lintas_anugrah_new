@@ -9,14 +9,14 @@ class Driver extends Model
     protected $table = 'driver';
 
     protected $fillable = [
-        'kode',
-        'nama',
-        'alamat',
-        'phone',
-        'mulai_kerja'
+        'KODE',
+        'NAMA',
+        'ALAMAT',
+        'PHONE',
+        'MULAI',
     ];
 
     protected $casts = [
-        'mulai_kerja' => 'date'
+        'MULAI' => 'date'
     ];
 }

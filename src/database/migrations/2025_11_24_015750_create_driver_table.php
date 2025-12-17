@@ -12,13 +12,22 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('driver', function (Blueprint $table) {
+            // Laravel standard
             $table->id();
-            $table->string('kode')->unique(); // KODE driver (unik)
-            $table->string('nama'); // NAMA driver
-            $table->text('alamat')->nullable(); // ALAMAT (opsional)
-            $table->string('phone')->nullable(); // PHONE (opsional)
-            $table->date('mulai_kerja')->nullable(); // MULAI KERJA (tanggal)
-            $table->timestamps(); // created_at dan updated_at
+
+            // FoxPro legacy columns (UPPERCASE)
+            $table->char('KODE', 3)->nullable();
+            $table->string('NAMA', 100)->default('');
+            $table->char('ALAMAT', 100);
+            $table->char('PHONE', 50);
+            $table->date('MULAI');
+
+            // Laravel timestamps (nullable, lowercase)
+            $table->nullableTimestamps();
+
+            // FoxPro compatibility
+            $table->charset = 'latin1';
+            $table->collation = 'latin1_general_ci';
         });
     }
 

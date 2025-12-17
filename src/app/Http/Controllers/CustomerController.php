@@ -124,35 +124,74 @@ class CustomerController extends Controller
     }
 
     public function customer_show($id){
-        $customer = Mcustomer::find($id);
+        $c = Mcustomer::find($id);
 
-        if (!$customer) {
+        if (!$c) {
             return response()->json([
                 'status' => 'error',
                 'message' => 'Data tidak ditemukan'
             ], 404);
         }
 
-        // Format tanggal
-        // $pemilik_tgl_lahir = $customer->tgll_p ? $customer->tgll_p->format('Y-m-d') : null;
-
-        // Mapping ke nama field frontend
         $data = [
-            'kode' => $customer->kode_cus,
-            'nama' => $customer->NAMACUST,
-            'jenis_usaha' => $customer->CUSTOMER ?? '-',
-            'telepon' => $customer->TELEPON,
-            'email' => $customer->EMAIL,
+            // ================= DATA CUSTOMER =================
+            'kode'         => $c->kode_cus,
+            'nama'         => $c->NAMACUST,
+            'jenis_usaha'  => $c->CUSTOMER,
+            'alamat'       => trim($c->ALAMAT1 . ' ' . $c->ALAMAT2),
+            'kota'         => $c->KOTA,
+            'telepon'      => $c->TELEPON,
+            'fax'          => $c->FAX,
+            'email'        => $c->EMAIL,
+            'kontak'       => $c->KONTAK,
+            'npwp'         => $c->NPWP,
+            'top_kredit'   => $c->TOPKREDIT,
 
-            // Info pemilik
-            'pemilik_nama' => $customer->nama_p,
-            'pemilik_no_ktp_sim' => $customer->ktp_p,
-            'pemilik_email' => $customer->email_p,
+            'desa'         => $c->desa,
+            'kecamatan'    => $c->camat,
+            'kabupaten'    => $c->kabupaten,
+
+            // ================= PURCHASING =================
+            'purchasing_nama'        => $c->namapur,
+            'purchasing_email'       => $c->em_pur,
+            'purchasing_extensi_hp'  => $c->hp_pur,
+
+            // ================= DATA PAJAK =================
+            'data_pajak_nama'    => $c->NM_PAJAK,
+            'data_pajak_npwp'    => $c->NP_PAJAK,
+            'data_pajak_alamat'  => $c->AL_PAJAK,
+            'data_pajak_alamat2' => $c->AL_PAJAK2,
+
+            // ================= PEMILIK =================
+            'pemilik_nama'          => $c->nama_p,
+            'pemilik_no_ktp_sim'    => $c->ktp_p,
+            'pemilik_tempat_lahir'  => $c->tempat_l,
+            'pemilik_tgl_lahir'     => $c->tgll_p
+                ? date('Y-m-d', strtotime($c->tgll_p))
+                : null,
+            'pemilik_alamat_rumah'  => $c->alamat_p,
+            'pemilik_desa'          => $c->desa_p,
+            'pemilik_kecamatan'     => $c->camat_p,
+            'pemilik_kabupaten'     => $c->kab_p,
+            'pemilik_telepon'       => $c->tlp_p,
+            'pemilik_fax'           => $c->fax_p,
+            'pemilik_email'         => $c->email_p,
+            'pemilik_npwp'          => $c->npwp_p,
+            'pemilik_agama'         => $c->agama_p,
+
+            // ================= KONTAK LAIN =================
+            'kontak_lain_nama'    => $c->kontak_l,
+            'kontak_lain_telepon' => $c->tlp_kl,
+
+            // ================= ACCOUNTING =================
+            'accounting_nama'        => $c->nama_ac,
+            'accounting_email'       => $c->em_ac,
+            'accounting_extensi_hp'  => $c->hp_ac,
         ];
 
         return response()->json([
             'status' => 'success',
-            'data' => $data
+            'data'   => $data
         ]);
     }
 

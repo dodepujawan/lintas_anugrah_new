@@ -12,9 +12,13 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('rute', function (Blueprint $table) {
-            $table->id();
-            $table->string('RUTE', 50);
-            $table->timestamps();
+            $table->id(); // id auto increment (Laravel side)
+
+            $table->char('RUTE', 50)
+                ->charset('latin1')
+                ->collation('latin1_general_ci');
+
+            $table->nullableTimestamps(); // created_at & updated_at NULLABLE
         });
     }
 

@@ -33,8 +33,7 @@ class KendaraanController extends Controller
             ->make(true);
     }
 
-    public function store(Request $request)
-    {
+    public function store(Request $request){
         $request->validate([
             'nama' => 'required|max:100',
             'plat' => 'required|max:50',
@@ -50,21 +49,29 @@ class KendaraanController extends Controller
             // Generate kode
             $kode = $this->kendaraan_kode_store();
 
-            // Merge kode ke data request
-            $data = $request->all();
-            $data['kode'] = $kode;
+            // Mapping request (lowercase) -> DB (UPPERCASE)
+            $data = [
+                'KODE'       => $kode,
+                'NAMA'       => $request->nama,
+                'PLAT'       => $request->plat,
+                'JENIS'      => $request->jenis,
+                'FNO_PRK_B'  => $request->fno_prk_b,
+                'FNO_PRK_P'  => $request->fno_prk_p,
+                'FNO_PRK_S'  => $request->fno_prk_s,
+                'FNO_PRK_O'  => $request->fno_prk_o,
+                'FNO_PRK_M'  => $request->fno_prk_m,
+            ];
 
-            // Tetap bisa pakai create dengan all data
             $kendaraan = Kendaraan::create($data);
 
             return response()->json([
-                'status' => 'success',
+                'status'  => 'success',
                 'message' => 'Data kendaraan berhasil disimpan',
-                'data' => $kendaraan
+                'data'    => $kendaraan
             ]);
         } catch (\Exception $e) {
             return response()->json([
-                'status' => 'error',
+                'status'  => 'error',
                 'message' => 'Terjadi kesalahan: ' . $e->getMessage()
             ], 500);
         }
@@ -76,10 +83,9 @@ class KendaraanController extends Controller
         return response()->json($kendaraan);
     }
 
-    public function update(Request $request, $id)
-    {
+    public function update(Request $request, $id){
         $request->validate([
-            'kode' => 'required|max:20|unique:kendaraan,kode,'.$id,
+            'kode' => 'required|max:20|unique:kendaraan,KODE,' . $id,
             'nama' => 'required|max:100',
             'plat' => 'required|max:50',
             'jenis' => 'required|max:50',
@@ -89,13 +95,32 @@ class KendaraanController extends Controller
             'fno_prk_o' => 'required|max:20',
             'fno_prk_m' => 'required|max:20',
         ]);
+
         try {
             $kendaraan = Kendaraan::findOrFail($id);
-            $kendaraan->update($request->all());
-            return response()->json(['success' => 'Data berhasil diupdate!']);
+
+            // Mapping lowercase request -> UPPERCASE DB
+            $data = [
+                'KODE'       => $request->kode,
+                'NAMA'       => $request->nama,
+                'PLAT'       => $request->plat,
+                'JENIS'      => $request->jenis,
+                'FNO_PRK_B'  => $request->fno_prk_b,
+                'FNO_PRK_P'  => $request->fno_prk_p,
+                'FNO_PRK_S'  => $request->fno_prk_s,
+                'FNO_PRK_O'  => $request->fno_prk_o,
+                'FNO_PRK_M'  => $request->fno_prk_m,
+            ];
+
+            $kendaraan->update($data);
+
+            return response()->json([
+                'status'  => 'success',
+                'message' => 'Data berhasil diupdate'
+            ]);
         } catch (\Exception $e) {
             return response()->json([
-                'status' => 'error',
+                'status'  => 'error',
                 'message' => 'Terjadi kesalahan: ' . $e->getMessage()
             ], 500);
         }
@@ -112,13 +137,13 @@ class KendaraanController extends Controller
         $role = 'LML'; // Default prefix untuk customer
 
         $lastUser = DB::table('kendaraan')
-            ->where('kode', 'LIKE', $role . '%')
-            ->orderBy('kode', 'desc')
+            ->where('KODE', 'LIKE', $role . '%')
+            ->orderBy('KODE', 'desc')
             ->first();
 
         if ($lastUser) {
             // Ambil angka dari kode terakhir, contoh: CST000001 -> 000001 -> 1
-            $lastNumber = (int) substr($lastUser->kode, strlen($role));
+            $lastNumber = (int) substr($lastUser->KODE, strlen($role));
             $newNumber = $lastNumber + 1;
         } else {
             $newNumber = 1;
@@ -138,13 +163,13 @@ class KendaraanController extends Controller
 
         try {
             $lastUser = DB::table('kendaraan')
-                ->where('kode', 'LIKE', $role . '%')
+                ->where('KODE', 'LIKE', $role . '%')
                 ->lockForUpdate() // 🔒 Lock table untuk prevent race condition
-                ->orderBy('kode', 'desc')
+                ->orderBy('KODE', 'desc')
                 ->first();
 
             if ($lastUser) {
-                $lastNumber = (int) substr($lastUser->kode, strlen($role));
+                $lastNumber = (int) substr($lastUser->KODE, strlen($role));
                 $newNumber = $lastNumber + 1;
             } else {
                 $newNumber = 1;

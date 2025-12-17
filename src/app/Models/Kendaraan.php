@@ -9,14 +9,14 @@ class Kendaraan extends Model
     protected $table = 'kendaraan';
 
     protected $fillable = [
-        'kode',
-        'nama',
-        'plat',
-        'jenis',
-        'fno_prk_b',
-        'fno_prk_p',
-        'fno_prk_s',
-        'fno_prk_o',
-        'fno_prk_m'
+        'KODE',
+        'NAMA',
+        'PLAT',
+        'JENIS',
+        'FNO_PRK_B',
+        'FNO_PRK_P',
+        'FNO_PRK_S',
+        'FNO_PRK_O',
+        'FNO_PRK_M',
     ];
 }

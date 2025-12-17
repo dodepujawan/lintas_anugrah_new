@@ -552,6 +552,7 @@ $(document).ready(function() {
             method: 'POST',
             data: {newRute: newRute},
             success: function(response) {
+                $('#ruteCusTable').DataTable().ajax.reload();
                 // Tutup modal
                 $('#addRuteCusModal').modal('hide');
                 $('#rute_val_pricecus').val(response.id);

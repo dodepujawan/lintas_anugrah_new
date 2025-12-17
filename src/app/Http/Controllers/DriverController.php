@@ -32,35 +32,40 @@ class DriverController extends Controller
             ->make(true);
     }
 
-    public function store(Request $request)
-    {
+    public function store(Request $request){
         $request->validate([
-            'kode' => 'required|max:20|unique:driver,kode',
-            'nama' => 'required|max:100',
-            'alamat' => 'required|max:200', // Biasanya alamat lebih panjang
-            'phone' => 'required|min:5|numeric', // numeric bukan number
+            // unique harus pakai kolom DB (UPPERCASE)
+            'kode'        => 'required|unique:driver,KODE',
+            'nama'        => 'required|max:100',
+            'alamat'      => 'required|max:100',
+            'phone'       => 'required|min:5',
             'mulai_kerja' => 'required|date',
         ]);
 
         try {
-            // Generate kode
+            // Generate kode driver
             $kode = $this->driver_kode_store();
 
-            // Merge kode ke data request
-            $data = $request->all();
-            $data['kode'] = $kode;
+            // Mapping request (lowercase) -> DB (UPPERCASE)
+            $data = [
+                'KODE'   => $kode,
+                'NAMA'   => $request->nama,
+                'ALAMAT' => $request->alamat,
+                'PHONE'  => $request->phone,
+                // nama field beda: mulai_kerja -> MULAI
+                'MULAI'  => $request->mulai_kerja,
+            ];
 
-            // Tetap bisa pakai create dengan all data
             $driver = Driver::create($data);
 
             return response()->json([
-                'status' => 'success',
+                'status'  => 'success',
                 'message' => 'Data driver berhasil disimpan',
-                'data' => $driver
+                'data'    => $driver
             ]);
         } catch (\Exception $e) {
             return response()->json([
-                'status' => 'error',
+                'status'  => 'error',
                 'message' => 'Terjadi kesalahan: ' . $e->getMessage()
             ], 500);
         }
@@ -75,7 +80,7 @@ class DriverController extends Controller
     public function update(Request $request, $id)
     {
         $request->validate([
-            'kode' => 'required|max:20|unique:driver,kode,'.$id,
+            'kode' => 'required|unique:driver,KODE,'.$id,
             'nama' => 'required|max:100',
             'alamat' => 'required|max:200', // Biasanya alamat lebih panjang
             'phone' => 'required|min:5|numeric', // numeric bukan number
@@ -83,7 +88,14 @@ class DriverController extends Controller
         ]);
 
         $driver = Driver::findOrFail($id);
-        $driver->update($request->all());
+        $data = [
+                'NAMA'   => $request->nama,
+                'ALAMAT' => $request->alamat,
+                'PHONE'  => $request->phone,
+                // nama field beda: mulai_kerja -> MULAI
+                'MULAI'  => $request->mulai_kerja,
+            ];
+        $driver->update($data);
 
         return response()->json(['success' => 'Data berhasil diupdate!']);
     }
@@ -95,56 +107,80 @@ class DriverController extends Controller
     }
 
     // Fungsi Calback id_user
-    public function driver_kode() {
-        $role = 'DRV'; // Default prefix untuk customer
+    public function driver_kode(){
+        $lastKode = Driver::orderByRaw('CAST(KODE AS UNSIGNED) DESC')
+            ->value('KODE');
 
-        $lastUser = DB::table('driver')
-            ->where('kode', 'LIKE', $role . '%')
-            ->orderBy('kode', 'desc')
-            ->first();
+        $next = ((int) $lastKode) + 1;
 
-        if ($lastUser) {
-            // Ambil angka dari kode terakhir, contoh: CST000001 -> 000001 -> 1
-            $lastNumber = (int) substr($lastUser->kode, strlen($role));
-            $newNumber = $lastNumber + 1;
-        } else {
-            $newNumber = 1;
-        }
+        $newKode = str_pad($next, 2, '0', STR_PAD_LEFT);
 
-        // Format: CST + 6 digit angka (contoh: CST000001, CST000002, dst)
-        $newKode = $role . str_pad($newNumber, 5, '0', STR_PAD_LEFT);
-
-        return response()->json(['kode' => $newKode]);
+        return response()->json([
+            'kode' => $newKode
+        ]);
     }
 
-    // Fungsi Calback private
-    private function driver_kode_store() {
-        $role = 'DRV';
+    private function driver_kode_store(){
+        $lastKode = Driver::lockForUpdate()
+            ->orderByRaw('CAST(KODE AS UNSIGNED) DESC')
+            ->value('KODE');
 
-        DB::beginTransaction();
+        $next = ((int) $lastKode) + 1;
 
-        try {
-            $lastUser = DB::table('driver')
-                ->where('kode', 'LIKE', $role . '%')
-                ->lockForUpdate() // 🔒 Lock table untuk prevent race condition
-                ->orderBy('kode', 'desc')
-                ->first();
-
-            if ($lastUser) {
-                $lastNumber = (int) substr($lastUser->kode, strlen($role));
-                $newNumber = $lastNumber + 1;
-            } else {
-                $newNumber = 1;
-            }
-
-            $newKode = $role . str_pad($newNumber, 5, '0', STR_PAD_LEFT);
-
-            DB::commit();
-            return $newKode;
-
-        } catch (\Exception $e) {
-            DB::rollBack();
-            throw $e;
-        }
+        // padding hanya untuk < 10
+        return str_pad($next, 2, '0', STR_PAD_LEFT);
     }
 }
+
+// public function driver_kode() {
+    //     $role = 'DRV'; // Default prefix untuk customer
+
+    //     $lastUser = DB::table('driver')
+    //         ->where('KODE', 'LIKE', $role . '%')
+    //         ->orderBy('KODE', 'desc')
+    //         ->first();
+
+    //     if ($lastUser) {
+    //         // Ambil angka dari kode terakhir, contoh: CST000001 -> 000001 -> 1
+    //         $lastNumber = (int) substr($lastUser->KODE, strlen($role));
+    //         $newNumber = $lastNumber + 1;
+    //     } else {
+    //         $newNumber = 1;
+    //     }
+
+    //     // Format: CST + 6 digit angka (contoh: CST000001, CST000002, dst)
+    //     $newKode = $role . str_pad($newNumber, 5, '0', STR_PAD_LEFT);
+
+    //     return response()->json(['kode' => $newKode]);
+    // }
+
+    // Fungsi Calback private
+    // private function driver_kode_store() {
+    //     $role = 'DRV';
+
+    //     DB::beginTransaction();
+
+    //     try {
+    //         $lastUser = DB::table('driver')
+    //             ->where('KODE', 'LIKE', $role . '%')
+    //             ->lockForUpdate() // 🔒 Lock table untuk prevent race condition
+    //             ->orderBy('KODE', 'desc')
+    //             ->first();
+
+    //         if ($lastUser) {
+    //             $lastNumber = (int) substr($lastUser->KODE, strlen($role));
+    //             $newNumber = $lastNumber + 1;
+    //         } else {
+    //             $newNumber = 1;
+    //         }
+
+    //         $newKode = $role . str_pad($newNumber, 5, '0', STR_PAD_LEFT);
+
+    //         DB::commit();
+    //         return $newKode;
+
+    //     } catch (\Exception $e) {
+    //         DB::rollBack();
+    //         throw $e;
+    //     }
+    // }

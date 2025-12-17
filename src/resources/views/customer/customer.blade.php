@@ -452,65 +452,12 @@ $(document).ready(function() {
             type: 'GET',
             success: function(response) {
                 if (response.status === 'success') {
-                    var customer = response.data;
+                    let customer = response.data;
 
-                    // Mapping input jika nama input berbeda dari DB
-                    var fieldMap = {
-                        'kode_cus': 'kode',
-                        'CUSTOMER': 'jenis_usaha',
-                        'NAMACUST': 'nama',
-                        'ALAMAT1': 'alamat',
-                        'KOTA': 'kota',
-                        'TELEPON': 'telepon',
-                        'FAX': 'fax',
-                        'EMAIL': 'email',
-                        'KONTAK': 'kontak',
-                        'NPWP': 'npwp',
-                        'TOPKREDIT': 'top_kredit',
-
-                        'desa': 'desa',
-                        'camat': 'kecamatan',
-                        'kabupaten': 'kabupaten',
-
-                        'namapur': 'purchasing_nama',
-                        'em_pur': 'purchasing_email',
-                        'hp_pur': 'purchasing_extensi_hp',
-
-                        'NM_PAJAK': 'data_pajak_nama',
-                        'NP_PAJAK': 'data_pajak_npwp',
-                        'AL_PAJAK': 'data_pajak_alamat',
-                        'AL_PAJAK2': 'data_pajak_alamat2',
-
-                        'nama_p': 'pemilik_nama',
-                        'ktp_p': 'pemilik_no_ktp_sim',
-                        'tempat_l': 'pemilik_tempat_lahir',
-                        'tgll_p': 'pemilik_tgl_lahir',
-                        'alamat_p': 'pemilik_alamat_rumah',
-                        'desa_p': 'pemilik_desa',
-                        'camat_p': 'pemilik_kecamatan',
-                        'kab_p': 'pemilik_kabupaten',
-                        'tlp_p': 'pemilik_telepon',
-                        'fax_p': 'pemilik_fax',
-                        'email_p': 'pemilik_email',
-                        'npwp_p': 'pemilik_npwp',
-                        'agama_p': 'pemilik_agama',
-
-                        'kontak_l': 'kontak_lain_nama',
-                        'tlp_kl': 'kontak_lain_telepon',
-
-                        'nama_ac': 'accounting_nama',
-                        'em_ac': 'accounting_email',
-                        'hp_ac': 'accounting_extensi_hp',
-                    };
-
-                    Object.keys(fieldMap).forEach(function(dbField) {
-                        var inputId = fieldMap[dbField];
-                        if ($('#' + inputId).length) {
-                            let value = customer[dbField] ?? '';
-                            if ($('#' + inputId).attr('type') === 'date' && value) {
-                                value = value.split('T')[0];
-                            }
-                            $('#' + inputId).val(value);
+                    $.each(customer, function(key, value) {
+                        let el = $('#' + key);
+                        if (el.length) {
+                            el.val(value ?? '');
                         }
                     });
 

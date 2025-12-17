@@ -451,6 +451,7 @@ $(document).ready(function() {
             method: 'POST',
             data: formData,
             success: function(response) {
+                $('#ruteTable').DataTable().ajax.reload();
                 // Tutup modal
                 $('#addRuteModal').modal('hide');
                 $('#rute_val_price').val(response.id);

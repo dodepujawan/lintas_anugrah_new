@@ -177,18 +177,18 @@ $(document).ready(function() {
         scrollCollapse: true,
         // Responsive settings
         responsive: true,
-        autoWidth: false,
+        autoWidth: true,
         columns: [
             {data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false},
-            {data: 'kode', name: 'kode'},
-            {data: 'nama', name: 'nama'},
-            {data: 'plat', name: 'plat'},
-            {data: 'jenis', name: 'jenis'},
-            {data: 'fno_prk_b', name: 'fno_prk_b'},
-            {data: 'fno_prk_p', name: 'fno_prk_p'},
-            {data: 'fno_prk_s', name: 'fno_prk_s'},
-            {data: 'fno_prk_o', name: 'fno_prk_o'},
-            {data: 'fno_prk_m', name: 'fno_prk_m'},
+            {data: 'KODE', name: 'KODE'},
+            {data: 'NAMA', name: 'NAMA'},
+            {data: 'PLAT', name: 'PLAT'},
+            {data: 'JENIS', name: 'JENIS'},
+            {data: 'FNO_PRK_B', name: 'FNO_PRK_B'},
+            {data: 'FNO_PRK_P', name: 'FNO_PRK_P'},
+            {data: 'FNO_PRK_S', name: 'FNO_PRK_S'},
+            {data: 'FNO_PRK_O', name: 'FNO_PRK_O'},
+            {data: 'FNO_PRK_M', name: 'FNO_PRK_M'},
             {data: 'action', name: 'action', orderable: false, searchable: false}
         ]
     });
@@ -281,15 +281,15 @@ $(document).ready(function() {
         $.get("{{ route('kendaraan.edit', ':id') }}".replace(':id', id), function(data) {
             console.log("aba" + data.id + data.kode + data.nama);
             $('#id_flag').val(data.id);
-            $('#kode').val(data.kode);
-            $('#nama').val(data.nama);
-            $('#plat').val(data.plat);
-            $('#jenis').val(data.jenis);
-            $('#fno_prk_b').val(data.fno_prk_b);
-            $('#fno_prk_p').val(data.fno_prk_p);
-            $('#fno_prk_s').val(data.fno_prk_s);
-            $('#fno_prk_o').val(data.fno_prk_o);
-            $('#fno_prk_m').val(data.fno_prk_m);
+            $('#kode').val(data.KODE);
+            $('#nama').val(data.NAMA);
+            $('#plat').val(data.PLAT);
+            $('#jenis').val(data.JENIS);
+            $('#fno_prk_b').val(data.FNO_PRK_B);
+            $('#fno_prk_p').val(data.FNO_PRK_P);
+            $('#fno_prk_s').val(data.FNO_PRK_S);
+            $('#fno_prk_o').val(data.FNO_PRK_O);
+            $('#fno_prk_m').val(data.FNO_PRK_M);
 
             $('html, body').animate({
                 scrollTop: $(".card-kendaraan-header").offset().top
@@ -313,7 +313,7 @@ $(document).ready(function() {
         }).then((result) => {
             if (result.isConfirmed) {
                 $.ajax({
-                    url: "{{ url('kendaraan') }}/" + id,
+                    url: "{{ route('kendaraan.destroy', ':id') }}".replace(':id', id),
                     type: 'POST',
                     data: {
                         _token: "{{ csrf_token() }}"
