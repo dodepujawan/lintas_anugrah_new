@@ -244,10 +244,12 @@ $(document).ready(function() {
     // ============================== Submit Form ============================
     $('#kendaraanForm').on('submit', function(e) {
         e.preventDefault();
+        $('#loading_modal').modal('show');
 
         var formData = new FormData(this);
         var url = $('#id_flag').val() ? "{{ route('kendaraan.update', ':id') }}".replace(':id', $('#id_flag').val()): "{{ route('kendaraan.store') }}";
 
+        setTimeout(function () {
         $.ajax({
             url: url,
             type: 'POST',
@@ -255,6 +257,7 @@ $(document).ready(function() {
             processData: false,
             contentType: false,
             success: function(response) {
+                $('#loading_modal').modal('hide');
                 Swal.fire('Sukses!', response.success, 'success');
                 resetForm();
                 $("#tableKendaraan").show();
@@ -262,6 +265,7 @@ $(document).ready(function() {
                 table.ajax.reload();
             },
             error: function(xhr) {
+                $('#loading_modal').modal('hide');
                 var errors = xhr.responseJSON.errors;
                 var errorMessage = '';
                 $.each(errors, function(key, value) {
@@ -270,6 +274,7 @@ $(document).ready(function() {
                 Swal.fire('Error!', errorMessage, 'error');
             }
         });
+        }, 500);
     });
     // ============================ ENd Of Submit Form ===============================
     // Edit Data
@@ -312,6 +317,8 @@ $(document).ready(function() {
             cancelButtonText: 'Batal'
         }).then((result) => {
             if (result.isConfirmed) {
+                $('#loading_modal').modal('show');
+                setTimeout(function () {
                 $.ajax({
                     url: "{{ route('kendaraan.destroy', ':id') }}".replace(':id', id),
                     type: 'POST',
@@ -319,10 +326,12 @@ $(document).ready(function() {
                         _token: "{{ csrf_token() }}"
                     },
                     success: function(response) {
+                        $('#loading_modal').modal('hide');
                         Swal.fire('Terhapus!', response.success, 'success');
                         table.ajax.reload();
                     }
                 });
+                }, 500);
             }
         });
     });

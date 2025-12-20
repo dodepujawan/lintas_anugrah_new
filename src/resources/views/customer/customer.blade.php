@@ -528,6 +528,7 @@ $(document).ready(function() {
     // ===================================== Form submit ======================================
     $('#customer-form').submit(function(e) {
         e.preventDefault();
+        $('#loading_modal').modal('show');
         var formData = $(this).serialize();
         var method = $(this).attr('data-method');
         var id = $(this).attr('data-id');
@@ -542,12 +543,14 @@ $(document).ready(function() {
             httpMethod = 'POST';
         }
 
+        setTimeout(function () {
         $.ajax({
             url: url,
             type: 'POST',
             data: formData,
             success: function(response) {
                 if (response.status === 'success') {
+                    $('#loading_modal').modal('hide');
                     $('#customer-modal').modal('hide');
                     table.ajax.reload();
                     Swal.fire('Sukses!', response.success, 'success');
@@ -555,6 +558,7 @@ $(document).ready(function() {
             },
             error: function(xhr) {
                 if (xhr.status === 422) {
+                    $('#loading_modal').modal('hide');
                     var errors = xhr.responseJSON.errors;
                     var errorHtml = '<ul>';
                     $.each(errors, function(key, value) {
@@ -563,12 +567,14 @@ $(document).ready(function() {
                     errorHtml += '</ul>';
                     $('#form-errors').html(errorHtml).removeClass('d-none');
                 } else {
+                    $('#loading_modal').modal('hide');
                     alert('mohon lenngkapi data dengan data yang sesuai !');
                     console.log('Terjadi kesalahan: ' + (xhr.responseJSON?.message || 'Server error'));
                     // alert('Terjadi kesalahan: ' + (xhr.responseJSON?.message || 'Server error'));
                 }
             }
         });
+        }, 500);
     });
     // ================================= End Of Form submit ===================================
     // ================================= Delete button click =================================
@@ -588,6 +594,8 @@ $(document).ready(function() {
             reverseButtons: true
         }).then((result) => {
             if (result.isConfirmed) {
+                $('#loading_modal').modal('show');
+                setTimeout(function () {
                 $.ajax({
                     url: '{{ route("customer_destroy", ["id" => ":id"]) }}'.replace(':id', id),
                     type: 'POST',
@@ -596,6 +604,7 @@ $(document).ready(function() {
                     },
                     success: function(response) {
                         if (response.status === 'success') {
+                            $('#loading_modal').modal('hide');
                             table.ajax.reload();
 
                             Swal.fire({
@@ -608,6 +617,7 @@ $(document).ready(function() {
                         }
                     },
                     error: function(xhr) {
+                        $('#loading_modal').modal('hide');
                         let errorMessage = xhr.responseJSON?.message || 'Terjadi kesalahan saat menghapus data';
 
                         Swal.fire({
@@ -619,6 +629,7 @@ $(document).ready(function() {
                         });
                     }
                 });
+                }, 500);
             }
         });
 });

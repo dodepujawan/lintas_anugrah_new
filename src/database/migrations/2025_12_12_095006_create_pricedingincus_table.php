@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('KODECUS', 20);
             $table->string('KODEDGN', 20);
+            $table->date('TANGGAL')->nullable();
             $table->string('KODE', 20);
             $table->string('PERIODE', 50);
             $table->string('PLAT', 50);
@@ -24,7 +25,13 @@ return new class extends Migration
             $table->string('USER', 50);
             $table->string('USEREDIT', 50)->nullable();
             $table->string('KUNCI', 100)->nullable();
-            $table->timestamps();
+
+            // Laravel timestamps (nullable, lowercase)
+            $table->nullableTimestamps();
+
+            // FoxPro compatibility
+            $table->charset = 'latin1';
+            $table->collation = 'latin1_general_ci';
         });
     }
 

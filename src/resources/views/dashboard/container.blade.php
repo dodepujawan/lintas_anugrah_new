@@ -7,6 +7,25 @@
         <div>Expedisi</div>
     </div>
 </div>
+
+{{-- Download Loading Modal --}}
+<div class="modal fade" id="loading_modal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content">
+            <div class="modal-body text-center p-5">
+                <!-- Gambar loading -->
+                {{-- <img src="{{ asset('assets/gambar/loading3.gif') }}" alt="Loading..." class="img-fluid mb-3" style="width: 80px; height: 80px;"> --}}
+                <h5 class="fw-bold text-dark mb-2">Memproses Data...</h5>
+                <p class="text-muted small mb-0">Harap tunggu sebentar</p>
+                <div class="spinner-border text-primary mt-3" role="status" style="width: 2rem; height: 2rem;">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{{-- End Of Download Loading Modal --}}
+
 @endsection
 @section('footer')
 <script>

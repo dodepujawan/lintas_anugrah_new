@@ -249,14 +249,16 @@ $(document).ready(function() {
     // ============================== Submit Form ============================
     $('#driverForm').on('submit', function(e) {
         e.preventDefault();
+        $('#loading_modal').modal('show');
 
         var formData = new FormData(this);
         var isEdit = $('#id_flag').val() !== '';
         var url = isEdit ? "{{ route('driver.update', ':id') }}".replace(':id', $('#id_flag').val()) : "{{ route('driver.store') }}";
 
         // Show loading state
-        $('#submitBtn').prop('disabled', true).html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Menyimpan...');
+        // $('#submitBtn').prop('disabled', true).html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Menyimpan...');
 
+        setTimeout(function () {
         $.ajax({
             url: url,
             type: 'POST',
@@ -264,6 +266,7 @@ $(document).ready(function() {
             processData: false,
             contentType: false,
             success: function(response) {
+                $('#loading_modal').modal('hide');
                 Swal.fire({
                     icon: 'success',
                     title: 'Sukses!',
@@ -278,6 +281,7 @@ $(document).ready(function() {
                 table.ajax.reload();
             },
             error: function(xhr) {
+                $('#loading_modal').modal('hide');
                 var errors = xhr.responseJSON.errors;
                 var errorMessage = 'Terjadi kesalahan!';
 
@@ -294,10 +298,11 @@ $(document).ready(function() {
                     html: errorMessage
                 });
             },
-            complete: function() {
-                $('#submitBtn').prop('disabled', false).text('Simpan');
-            }
+            // complete: function() {
+            //     $('#submitBtn').prop('disabled', false).text('Simpan');
+            // }
         });
+        }, 500);
     });
     // ============================ End Of Submit Form ===============================
 
@@ -354,6 +359,8 @@ $(document).ready(function() {
             reverseButtons: true
         }).then((result) => {
             if (result.isConfirmed) {
+                $('#loading_modal').modal('show');
+                setTimeout(function () {
                 $.ajax({
                     url: "{{ route('driver.destroy', ':id') }}".replace(':id', id),
                     type: 'POST',
@@ -361,6 +368,7 @@ $(document).ready(function() {
                         _token: "{{ csrf_token() }}",
                     },
                     success: function(response) {
+                        $('#loading_modal').modal('hide');
                         Swal.fire({
                             icon: 'success',
                             title: 'Terhapus!',
@@ -371,9 +379,11 @@ $(document).ready(function() {
                         table.ajax.reload();
                     },
                     error: function() {
+                        $('#loading_modal').modal('hide');
                         Swal.fire('Error!', 'Gagal menghapus data driver', 'error');
                     }
                 });
+                }, 500);
             }
         });
     });

@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id('id');
             $table->string('KODECUS', 20);
             $table->string('KODE', 20); // Kolom baru untuk kode unik
+            $table->date('TANGGAL')->nullable();
             $table->string('KETERANGAN', 50); // ganti char jadi string
             $table->decimal('DARI', 10, 0)->default(0);
             $table->decimal('SAMPAI', 10, 0)->default(0);
@@ -28,7 +29,13 @@ return new class extends Migration
             $table->string('KUNCI', 100); // ganti char jadi string
             $table->decimal('HG', 1, 0);
             $table->string('JENIS', 1); // ganti char jadi string
-            $table->timestamps(); // created_at dan updated_at otomatis
+
+            // Laravel timestamps (nullable, lowercase)
+            $table->nullableTimestamps();
+
+            // FoxPro compatibility
+            $table->charset = 'latin1';
+            $table->collation = 'latin1_general_ci';
         });
     }
 

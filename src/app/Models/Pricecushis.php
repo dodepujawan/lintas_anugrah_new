@@ -15,6 +15,7 @@ class Pricecushis extends Model
 
     protected $fillable = [
         'KODE',
+        'TANGGAL',
         'KETERANGAN',
         'DARI',
         'SAMPAI',
@@ -32,6 +33,7 @@ class Pricecushis extends Model
     ];
 
     protected $casts = [
+        'TANGGAL' => 'TANGGAL',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];

@@ -15,6 +15,7 @@ class Pricedinginhis extends Model
 
     protected $fillable = [
         'KODEDGN',
+        'TANGGAL',
         'KODE',
         'PERIODE',
         'PLAT',
@@ -28,6 +29,7 @@ class Pricedinginhis extends Model
     ];
 
     protected $casts = [
+        'TANGGAL' => 'TANGGAL',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];
