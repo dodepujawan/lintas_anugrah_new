@@ -11,6 +11,7 @@ use App\Http\Controllers\RuteController;
 use App\Http\Controllers\PricesCustomerController;
 use App\Http\Controllers\PricedinginController;
 use App\Http\Controllers\PricedinginCustomerController;
+use App\Http\Controllers\ExpedisiController;
 
 Route::get('/', function () {
     return redirect()->route('login');
@@ -116,6 +117,15 @@ Route::prefix('price-dingin-customer')->group(function() {
     Route::get('/price/{kodecus}', [PricedinginCustomerController::class, 'getPrice'])->name('price-rentcus.price');
     Route::post('/update-row', [PricedinginCustomerController::class, 'saveCustomerRow'])->name('price-rentcus.update-row');
     Route::post('/store', [PricedinginCustomerController::class, 'store'])->name('price-rentcus.store');
+});
+
+Route::prefix('expedisi')->group(function() {
+    Route::get('/', [ExpedisiController::class, 'index'])->name('expedisi.index');
+    // Route::get('/data', [PricedinginController::class, 'getData'])->name('price-rent.data');
+    // Route::post('/store', [PricedinginController::class, 'store'])->name('price-rent.store');
+    // Route::get('/show/{id}', [PricedinginController::class, 'show'])->name('price-rent.show');
+    // Route::post('/update/{id}', [PricedinginController::class, 'update'])->name('price-rent.update');
+    // Route::post('/destroy/{id}', [PricedinginController::class, 'destroy'])->name('price-rent.destroy');
 });
 // Route::prefix('register')->group(function () {
 //     Route::get('/users', UsersPage::class)->name('users.page');

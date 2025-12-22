@@ -23,5 +23,14 @@ class UserSeeder extends Seeder
                 'roles'    => 'admin',
             ]
         );
+        User::updateOrCreate(
+            ['email' => 'kantorutama@gmail.com'], // unique key
+            [
+                'name'     => 'Kantor Utama',
+                'user_id'  => 'AD0002',
+                'password' => Hash::make('admin123'),
+                'roles'    => 'admin',
+            ]
+        );
     }
 }

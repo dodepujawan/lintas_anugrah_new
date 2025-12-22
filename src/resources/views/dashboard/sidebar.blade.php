@@ -106,6 +106,29 @@
             </li>
 
             <li class="menu-item">
+                <a class="menu-link" data-bs-toggle="collapse" href="#penjualanMenu" role="button" aria-expanded="false">
+                <i class="menu-icon bx bx-cart"></i>
+                <span class="menu-text">Penjualan</span>
+                <i class="menu-arrow bx bx-chevron-right"></i>
+                </a>
+                <ul class="sub-menu collapse" id="penjualanMenu">
+                <li class="menu-item">
+                    <a href="#" class="menu-link" id="sidebar_new_expedisi">
+                    <span class="menu-text">Ekspedisi</span>
+                    </a>
+                </li>
+                   <li class="menu-item">
+                        <div class="dropdown-divider my-2"></div>
+                    </li>
+                {{-- <li class="menu-item">
+                    <a href="#" class="menu-link" id="sidebar_new_rent">
+                    <span class="menu-text">Rent</span>
+                    </a>
+                </li> --}}
+                </ul>
+            </li>
+
+            <li class="menu-item">
                 <a class="menu-link" data-bs-toggle="collapse" href="#userMenu" role="button" aria-expanded="false">
                 <i class="menu-icon bx bx-user"></i>
                 <span class="menu-text">User Management</span>

@@ -224,6 +224,25 @@ $(document).ready(function() {
         });
     }
 // ========================= End Of New Price Dingin ======================================
+// ========================= New Price Dingin ======================================
+    $(document).on('click', '#sidebar_new_expedisi', function(e) {
+        e.preventDefault();
+        loadNewExpedisiForm();
+    });
+
+    function loadNewExpedisiForm() {
+        $.ajax({
+            url: '{{ route('expedisi.index') }}', // Route to load the form
+            type: 'GET',
+            success: function(response) {
+                $('.master-page').html(response);
+            },
+            error: function() {
+                $('.master-page').html('<p>Error loading form.</p>');
+            }
+        });
+    }
+// ========================= End Of New Price Dingin ======================================
 // +++++++++++++++++++++++++++ End Of SIDEBAR ROOM ++++++++++++++++++++++++++++++++++++++
 });
 </script>
