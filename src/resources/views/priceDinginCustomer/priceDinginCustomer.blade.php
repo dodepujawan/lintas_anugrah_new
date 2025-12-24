@@ -301,11 +301,11 @@ $(document).ready(function() {
         autoWidth: true,
         columns: [
             { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false },
-            { data: 'kode', name: 'kode' },
-            { data: 'nama', name: 'nama' },
-            { data: 'jenis_usaha', name: 'jenis_usaha' },
-            { data: 'telepon', name: 'telepon' },
-            { data: 'email', name: 'email' },
+            { data: 'kode_cus', name: 'kode_cus' },
+            { data: 'NAMACUST', name: 'NAMACUST' },
+            { data: 'TYPECUST', name: 'TYPECUST' },
+            { data: 'TELEPON', name: 'TELEPON' },
+            { data: 'EMAIL', name: 'EMAIL' },
             { data: 'action', name: 'action', orderable: false, searchable: false }
         ]
     });
@@ -440,9 +440,9 @@ $(document).ready(function() {
         ajax: '{{ route("kendaraan.datamodel") }}',
         columns: [
             { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false },
-            { data: 'nama', name: 'nama' },
-            { data: 'plat', name: 'plat' },
-            { data: 'jenis', name: 'jenis' },
+            { data: 'NAMA', name: 'NAMA' },
+            { data: 'PLAT', name: 'PLAT' },
+            { data: 'JENIS', name: 'JENIS' },
             { data: 'action', name: 'action', orderable: false, searchable: false, width: '20%'}
         ]
     });
@@ -455,10 +455,10 @@ $(document).ready(function() {
         $.get("{{ route('kendaraan.edit', ':id') }}".replace(':id', id), function(data) {
             // console.log("aba" + data.id + data.kode + data.nama);
             // $('#kendaraanDinginCustomerModal').modal('hide');
-            $('#kode_pricedingin_cus').val(data.kode);
-            $('#jenis_pricedingin_cus').val(data.nama);
-            $('#plat_pricedingin_cus').val(data.plat);
-            $('#item_pricedingin_cus').val(data.plat +' '+ data.jenis);
+            $('#kode_pricedingin_cus').val(data.KODE);
+            $('#jenis_pricedingin_cus').val(data.NAMA);
+            $('#plat_pricedingin_cus').val(data.PLAT);
+            $('#item_pricedingin_cus').val(data.PLAT +' '+ data.JENIS);
         });
     });
     // ============================ End Of Pick Kendaraan ===================================

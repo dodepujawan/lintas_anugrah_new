@@ -121,7 +121,7 @@ Route::prefix('price-dingin-customer')->group(function() {
 
 Route::prefix('expedisi')->group(function() {
     Route::get('/', [ExpedisiController::class, 'index'])->name('expedisi.index');
-    // Route::get('/data', [PricedinginController::class, 'getData'])->name('price-rent.data');
+    Route::get('/data', [ExpedisiController::class, 'getDataCustomer'])->name('expedisi-cus.data');
     // Route::post('/store', [PricedinginController::class, 'store'])->name('price-rent.store');
     // Route::get('/show/{id}', [PricedinginController::class, 'show'])->name('price-rent.show');
     // Route::post('/update/{id}', [PricedinginController::class, 'update'])->name('price-rent.update');

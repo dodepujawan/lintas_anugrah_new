@@ -112,15 +112,17 @@
             <div class="col-md-6 mt-2">
                 <label class="form-label">CUSTOMER</label>
                 <div class="input-group input-group-sm">
+                    <input type="hidden" name="customer_expedisi_id" id="customer_expedisi_id">
                     <input type="text" class="form-control" id="customer_expedisi" name="customer_expedisi">
-                    <button class="btn btn-outline-secondary"><i class="bx bx-search"></i></button>
+                    <button class="btn btn-outline-secondary" id="customer_expedisi_btn"><i class="bx bx-search"></i></button>
                 </div>
             </div>
             <div class="col-md-6 mt-2">
                 <label class="form-label">ITEM</label>
                 <div class="input-group input-group-sm">
+                    <input type="text" name="item_expedisi_id" id="item_expedisi_id">
                     <input type="text" class="form-control" id="item_expedisi" name="item_expedisi">
-                    <button class="btn btn-outline-secondary"><i class="bx bx-search"></i></button>
+                    <button class="btn btn-outline-secondary" id="item_expedisi_btn"><i class="bx bx-search"></i></button>
                 </div>
             </div>
         </div>
@@ -280,6 +282,22 @@
         </div>
     </div>
 
+    <!-- Action Buttons -->
+    <div class="card-expedisi">
+        <div class="row g-2">
+            <div class="col-md-3 col-sm-6">
+                <button class="btn btn-info btn-action w-100" id="buttonSimpan">
+                    <i class='bx bx-save me-1'></i>SIMPAN [F3]
+                </button>
+            </div>
+            <div class="col-md-3 col-sm-6">
+                <button class="btn btn-danger btn-action w-100" id="buttonClear">
+                    <i class='bx bx-trash me-1'></i>Clear [F6]
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Tabel Data SJ -->
     <div class="card-expedisi">
         <div class="card-expedisi-header">
@@ -399,3 +417,83 @@
         </div>
     </div>
 </div>
+
+{{-- Modal Customer --}}
+<div class="modal fade" id="customerModalExp" tabindex="-1">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Data Pelanggan</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="table-responsive">
+                <table class="table table-bordered table-striped w-100" id="modalCusExpTable">
+                    <thead>
+                    <tr>
+                        <th>No</th>
+                        <th>Kode</th>
+                        <th>Nama</th>
+                        <th>Jenis Usaha</th>
+                        <th>Telepon</th>
+                        <th>Email</th>
+                        <th>Aksi</th>
+                    </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+$(document).ready(function() {
+    // ================================= Pilih Customer =====================================
+    $('#customer_expedisi_btn').click(function() {
+        $('#customerModalExp').modal('show');
+        // hancurkan datatable jika sudah pernah dipakai
+        if ($.fn.DataTable.isDataTable('#modalCusExpTable')) {
+            $('#modalCusExpTable').DataTable().destroy();
+        }
+        var table = $('#modalCusExpTable').DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: '{{ route("expedisi-cus.data") }}',
+            // Scroll settings
+            scrollX: true,
+            scrollY: "400px",
+            scrollCollapse: true,
+            // Responsive settings
+            responsive: true,
+            autoWidth: true,
+            columns: [
+                { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false },
+                { data: 'kode_cus', name: 'kode_cus' },
+                { data: 'NAMACUST', name: 'NAMACUST' },
+                { data: 'TYPECUST', name: 'TYPECUST' },
+                { data: 'TELEPON', name: 'TELEPON' },
+                { data: 'EMAIL', name: 'EMAIL' },
+                { data: 'action', name: 'action', orderable: false, searchable: false }
+            ]
+        });
+
+        // Initialize tooltips
+        $('[data-bs-toggle="tooltip"]').tooltip();
+    })
+
+    // ### Select Button
+    $(document).on('click', '.view-btn-customer-expedisi', function() {
+        var kodeCus = $(this).data('id');
+        var namaCus = $(this).data('name');
+
+        // Mengisi nilai ke elemen yang dituju
+        $('#customer_expedisi_id').val(kodeCus);
+        $('#customer_expedisi').val(namaCus); // Kosongkan dulu
+
+        // Tutup modal
+        $('#customerModalExp').modal('hide');
+    });
+    // ============================== End Of Pilih Customer ==================================
+});
+</script>

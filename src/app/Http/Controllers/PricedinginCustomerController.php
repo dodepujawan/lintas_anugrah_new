@@ -20,14 +20,14 @@ class PricedinginCustomerController extends Controller
     }
 
     public function getData(){
-        $customers = Mcustomer::select(['id', 'kode', 'nama', 'jenis_usaha', 'telepon', 'email', 'created_at']);
+        $customers = Mcustomer::select(['id', 'kode_cus', 'NAMACUST', 'TYPECUST', 'TELEPON', 'EMAIL', 'created_at']);
 
         return DataTables::of($customers)
             ->addIndexColumn()
             ->addColumn('action', function($customer) {
                 return '
                     <div class="btn-group">
-                        <button class="btn btn-sm btn-info view-btn-customer-price-dingin" data-id="'.$customer->kode.'" data-bs-toggle="tooltip" title="View">
+                        <button class="btn btn-sm btn-info view-btn-customer-price-dingin" data-id="'.$customer->kode_cus.'" data-bs-toggle="tooltip" title="View">
                             <i class="bx bx-show"></i>
                         </button>
                     </div>
@@ -40,16 +40,16 @@ class PricedinginCustomerController extends Controller
     public function getPrice(Request $request, $kodecus){
         // Ambil data customer
         $customer = DB::table('mcustomer as c')
-            ->where('c.kode', $kodecus)
+            ->where('c.kode_cus', $kodecus)
             ->first();
 
         // Siapkan metadata customer
         $customerData = [
-            'customer_kode' => $customer->kode ?? null,
-            'customer_nama' => $customer->nama ?? null,
-            'jenis_usaha'   => $customer->jenis_usaha ?? null,
-            'alamat'        => $customer->alamat ?? null,
-            'pemilik_nama'  => $customer->pemilik_nama ?? null,
+            'customer_kode' => $customer->kode_cus ?? null,
+            'customer_nama' => $customer->NAMACUST ?? null,
+            'jenis_usaha'   => $customer->TYPECUST ?? null,
+            'alamat'        => $customer->ALAMAT1 ?? null,
+            'pemilik_nama'  => $customer->nama_p ?? null,
         ];
 
         // Jika customer tidak ditemukan → return kosong tapi metadata tetap ada
@@ -68,8 +68,8 @@ class PricedinginCustomerController extends Controller
         // ============================================================
 
         $pricedingincus = DB::table('pricedingincus as pc')
-            ->leftJoin('kendaraan as k', 'pc.KODE', '=', 'k.kode')
-            ->select('pc.*', 'k.nama as nama_kendaraan')
+            ->leftJoin('kendaraan as k', 'pc.KODE', '=', 'k.KODE')
+            ->select('pc.*', 'k.NAMA as nama_kendaraan')
             ->where('pc.KODECUS', $kodecus)
             ->get();
 
@@ -94,8 +94,8 @@ class PricedinginCustomerController extends Controller
             if (in_array($kd, $usedCodes)) continue;
 
             $his = DB::table('pricedinginhis as ph')
-                ->leftJoin('kendaraan as k', 'ph.KODE', '=', 'k.kode')
-                ->select('ph.*', 'k.nama as nama_kendaraan')
+                ->leftJoin('kendaraan as k', 'ph.KODE', '=', 'k.KODE')
+                ->select('ph.*', 'k.NAMA as nama_kendaraan')
                 ->where('ph.KODE', $kd)
                 ->where('ph.created_at', '>=', $customerCreatedAt)
                 ->orderBy('ph.created_at', 'asc')
@@ -120,8 +120,8 @@ class PricedinginCustomerController extends Controller
             if (in_array($kd, $usedCodes)) continue;
 
             $default = DB::table('pricedingin as p')
-                ->leftJoin('kendaraan as k', 'p.KODE', '=', 'k.kode')
-                ->select('p.*', 'k.nama as nama_kendaraan')
+                ->leftJoin('kendaraan as k', 'p.KODE', '=', 'k.KODE')
+                ->select('p.*', 'k.NAMA as nama_kendaraan')
                 ->where('p.KODE', $kd)
                 ->first();
 
@@ -245,11 +245,11 @@ class PricedinginCustomerController extends Controller
 
         // Ambil data kendaraan
         $kode = $request->input('KODE');
-        $kendaraan = Kendaraan::where('kode', $kode)->first();
+        $kendaraan = Kendaraan::where('KODE', $kode)->first();
 
         // Kalau kendaraan ada, tambahkan kolom jenis ke validated
         if ($kendaraan) {
-            $validated['JENIS'] = $kendaraan->jenis;
+            $validated['JENIS'] = $kendaraan->JENIS;
         } else {
             // Optional: kalau mau error kalau kendaraan tidak ditemukan
             return response()->json([

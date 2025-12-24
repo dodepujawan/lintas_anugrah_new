@@ -19,14 +19,14 @@ class PricesCustomerController extends Controller
     }
 
     public function getData(){
-        $customers = Mcustomer::select(['id', 'kode', 'nama', 'jenis_usaha', 'telepon', 'email', 'created_at']);
+        $customers = Mcustomer::select(['id', 'kode_cus', 'NAMACUST', 'TYPECUST', 'TELEPON', 'EMAIL', 'created_at']);
 
         return DataTables::of($customers)
             ->addIndexColumn()
             ->addColumn('action', function($customer) {
                 return '
                     <div class="btn-group">
-                        <button class="btn btn-sm btn-info view-btn-customer-price" id="show_price_cus" data-id="'.$customer->kode.'" data-bs-toggle="tooltip" title="View">
+                        <button class="btn btn-sm btn-info view-btn-customer-price" id="show_price_cus" data-id="'.$customer->kode_cus.'" data-bs-toggle="tooltip" title="View">
                             <i class="bx bx-show"></i>
                         </button>
                     </div>
@@ -39,16 +39,16 @@ class PricesCustomerController extends Controller
     public function getPrice(Request $request, $kodecus){
         // Ambil data customer
         $customer = DB::table('mcustomer as c')
-            ->where('c.kode', $kodecus)
+            ->where('c.kode_cus', $kodecus)
             ->first();
 
         // Siapkan metadata customer
         $customerData = [
-            'customer_kode' => $customer->kode ?? null,
-            'customer_nama' => $customer->nama ?? null,
-            'jenis_usaha'   => $customer->jenis_usaha ?? null,
-            'alamat'        => $customer->alamat ?? null,
-            'pemilik_nama'  => $customer->pemilik_nama ?? null,
+            'customer_kode' => $customer->kode_cus ?? null,
+            'customer_nama' => $customer->NAMACUST ?? null,
+            'jenis_usaha'   => $customer->TYPECUST ?? null,
+            'alamat'        => $customer->ALAMAT1 ?? null,
+            'pemilik_nama'  => $customer->nama_p ?? null,
         ];
 
         // Jika customer tidak ditemukan → return kosong tapi metadata tetap ada

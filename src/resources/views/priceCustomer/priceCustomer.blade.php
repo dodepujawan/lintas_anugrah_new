@@ -337,11 +337,11 @@ $(document).ready(function() {
         autoWidth: true,
         columns: [
             { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false },
-            { data: 'kode', name: 'kode' },
-            { data: 'nama', name: 'nama' },
-            { data: 'jenis_usaha', name: 'jenis_usaha' },
-            { data: 'telepon', name: 'telepon' },
-            { data: 'email', name: 'email' },
+            { data: 'kode_cus', name: 'kode_cus' },
+            { data: 'NAMACUST', name: 'NAMACUST' },
+            { data: 'TYPECUST', name: 'TYPECUST' },
+            { data: 'TELEPON', name: 'TELEPON' },
+            { data: 'EMAIL', name: 'EMAIL' },
             { data: 'action', name: 'action', orderable: false, searchable: false }
         ]
     });
