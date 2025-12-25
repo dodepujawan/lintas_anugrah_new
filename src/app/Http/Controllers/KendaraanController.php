@@ -196,7 +196,7 @@ class KendaraanController extends Controller
             ->addColumn('action', function($kendaraan) {
                 return '
                 <div class="btn-group">
-                    <button class="btn btn-sm btn-primary edit" data-id="'.$kendaraan->id.'" id="pickKendaraanDingin"><i class="bx bx-check"></i></button>
+                    <button class="btn btn-sm btn-primary edit pickKendaraanModel" data-id="'.$kendaraan->id.'" id="pickKendaraanDingin"><i class="bx bx-check"></i></button>
                 </div>
                 ';
             })

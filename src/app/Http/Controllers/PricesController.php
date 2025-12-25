@@ -19,13 +19,12 @@ class PricesController extends Controller
         if ($request->ajax()) {
 
             $data = DB::table('prices')
-                ->leftJoin('rute', 'prices.RUTE', '=', 'rute.id')
                 ->select(
                     'prices.id',
                     'prices.KETERANGAN',
                     'prices.DARI',
                     'prices.SAMPAI',
-                    'rute.RUTE as RUTE',
+                    'prices.RUTE',
                     'prices.HARGA',
                     'prices.JENIS',
                     'prices.created_at'
@@ -73,7 +72,7 @@ class PricesController extends Controller
             'rute_price' => 'required|string|max:30',
             'harga_price' => 'required|numeric',
             'jenis_val' => 'required|string|max:1',
-            'rute_val_price' => 'required'
+            'rute_price' => 'required'
         ]);
 
         // Generate KODE
@@ -86,7 +85,7 @@ class PricesController extends Controller
             'KETERANGAN' => $request->keterangan_price,
             'DARI' => $request->dari_price,
             'SAMPAI' => $request->sampai_price,
-            'RUTE' => $request->rute_val_price,
+            'RUTE' => $request->rute_price,
             'HARGA' => $request->harga_price,
             'HV' => 0,
             'HKG' => 0,
@@ -178,7 +177,7 @@ class PricesController extends Controller
             'KETERANGAN' => $request->keterangan_price,
             'DARI' => $request->dari_price,
             'SAMPAI' => $request->sampai_price,
-            'RUTE' => $request->rute_val_price,
+            'RUTE' => $request->rute_price,
             'HARGA' => $request->harga_price,
             'HV' => 0,
             'HKG' => 0,

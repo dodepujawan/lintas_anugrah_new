@@ -100,6 +100,7 @@ Route::prefix('price-customer')->group(function() {
     Route::get('/price/{kodecus}', [PricesCustomerController::class, 'getPrice'])->name('price-customer.price');
     Route::post('/update-row', [PricesCustomerController::class, 'saveCustomerRow'])->name('price-customer.update-row');
     Route::post('/store', [PricesCustomerController::class, 'store'])->name('price-customer.store');
+    Route::get('/price/modal/{kodecus}', [PricesCustomerController::class, 'getPriceModal'])->name('price-customer-modal.price');
 });
 
 Route::prefix('price-rent')->group(function() {

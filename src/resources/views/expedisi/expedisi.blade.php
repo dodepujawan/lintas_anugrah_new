@@ -113,15 +113,15 @@
                 <label class="form-label">CUSTOMER</label>
                 <div class="input-group input-group-sm">
                     <input type="hidden" name="customer_expedisi_id" id="customer_expedisi_id">
-                    <input type="text" class="form-control" id="customer_expedisi" name="customer_expedisi">
+                    <input type="text" class="form-control" id="customer_expedisi" name="customer_expedisi" readonly>
                     <button class="btn btn-outline-secondary" id="customer_expedisi_btn"><i class="bx bx-search"></i></button>
                 </div>
             </div>
             <div class="col-md-6 mt-2">
                 <label class="form-label">ITEM</label>
                 <div class="input-group input-group-sm">
-                    <input type="text" name="item_expedisi_id" id="item_expedisi_id">
-                    <input type="text" class="form-control" id="item_expedisi" name="item_expedisi">
+                    <input type="hidden" name="item_expedisi_id" id="item_expedisi_id">
+                    <input type="text" class="form-control" id="item_expedisi" name="item_expedisi" readonly>
                     <button class="btn btn-outline-secondary" id="item_expedisi_btn"><i class="bx bx-search"></i></button>
                 </div>
             </div>
@@ -137,8 +137,9 @@
             <div class="col-md-6">
                 <label class="form-label">KENDARAAN</label>
                 <div class="input-group input-group-sm">
+                    <input type="hidden" class="form-control" id="kendaraan_expedisi_id" name="kendaraan_expedisi_id">
                     <input type="text" class="form-control" id="kendaraan_expedisi" name="kendaraan_expedisi">
-                    <button class="btn btn-outline-secondary"><i class="bx bx-search"></i></button>
+                    <button class="btn btn-outline-secondary" id="kendaraan_expedisi_btn"><i class="bx bx-search"></i></button>
                 </div>
             </div>
             <div class="col-md-3">
@@ -154,15 +155,17 @@
             <div class="col-md-6">
                 <label class="form-label">DRIVER I</label>
                 <div class="input-group input-group-sm">
+                    <input type="text" class="form-control" id="driver_1_expedisi_id" name="driver_1_expedisi_id">
                     <input type="text" class="form-control" id="driver_1_expedisi" name="driver_1_expedisi">
-                    <button class="btn btn-outline-secondary"><i class="bx bx-search"></i></button>
+                    <button class="btn btn-outline-secondary" id="driver_1_expedisi_btn" data-id="1"><i class="bx bx-search"></i></button>
                 </div>
             </div>
             <div class="col-md-6">
                 <label class="form-label">DRIVER II</label>
                 <div class="input-group input-group-sm">
+                    <input type="text" class="form-control" id="driver_2_expedisi_id" name="driver_2_expedisi_id">
                     <input type="text" class="form-control" id="driver_2_expedisi" name="driver_2_expedisi">
-                    <button class="btn btn-outline-secondary"><i class="bx bx-search"></i></button>
+                    <button class="btn btn-outline-secondary" id="driver_2_expedisi_btn" data-id="2"><i class="bx bx-search"></i></button>
                 </div>
             </div>
         </div>
@@ -201,7 +204,8 @@
         <div class="row">
             <div class="col-md-3">
                 <label class="form-label">RUTE</label>
-                <select class="form-select form-select-sm" id="rute_expedisi" name="rute_expedisi"></select>
+                <input type="text" class="form-control form-control-sm" id="rute_expedisi" name="rute_expedisi">
+                {{-- <select class="form-select form-select-sm" id="rute_expedisi" name="rute_expedisi"></select> --}}
             </div>
             <div class="col-md-2">
                 <label class="form-label">JUMLAH</label>
@@ -209,7 +213,7 @@
             </div>
             <div class="col-md-2">
                 <label class="form-label">HARGA @</label>
-                <input type="number" class="form-control form-control-sm" id="harga_expedisi" name="harga_expedisi">
+                <input type="text" class="form-control form-control-sm" id="harga_expedisi" name="harga_expedisi">
             </div>
             <div class="col-md-2">
                 <label class="form-label">DISC %</label>
@@ -447,10 +451,84 @@
         </div>
     </div>
 </div>
+{{-- Modal Item --}}
+<div class="modal fade" id="itemModalExp" tabindex="-1">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Data Item</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div>
+                    <h3 id="custNameExp"></h3>
+                    <h3 id="custKodeExp"></h3>
+                </div>
+                <div class="table-responsive">
+                <table class="table table-bordered table-striped w-100" id="modalItemExpTable">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>No</th>
+                            <th>NAMA ITEM</th>
+                            <th>DARI</th>
+                            <th>SAMPAI</th>
+                            <th>RUTE</th>
+                            <th>HARGA</th>
+                            <th>JENIS</th>
+                            <th>AKSI</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{{-- Modal Kendaraan --}}
+<div class="modal fade" id="kendaraanModalExp" tabindex="-1">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Data Kendaraan</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="table-responsive">
+                <table class="table table-bordered table-striped w-100" id="modalKendaraanExpTable">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>No</th>
+                            <th>Kode</th>
+                            <th>Nama</th>
+                            <th>Plat</th>
+                            <th>Jenis</th>
+                            <th>FNO PRK B</th>
+                            <th>FNO PRK P</th>
+                            <th>FNO PRK S</th>
+                            <th>FNO PRK O</th>
+                            <th>FNO PRK M</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 <script>
 $(document).ready(function() {
+    // Set CSRF token in AJAX setup
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }
+    });
     // ================================= Pilih Customer =====================================
-    $('#customer_expedisi_btn').click(function() {
+    $('#customer_expedisi_btn').click(function(e) {
+        e.preventDefault();
         $('#customerModalExp').modal('show');
         // hancurkan datatable jika sudah pernah dipakai
         if ($.fn.DataTable.isDataTable('#modalCusExpTable')) {
@@ -483,17 +561,137 @@ $(document).ready(function() {
     })
 
     // ### Select Button
-    $(document).on('click', '.view-btn-customer-expedisi', function() {
+    $(document).on('click', '.view-btn-customer-expedisi', function(e) {
+        e.preventDefault();
         var kodeCus = $(this).data('id');
         var namaCus = $(this).data('name');
 
         // Mengisi nilai ke elemen yang dituju
         $('#customer_expedisi_id').val(kodeCus);
-        $('#customer_expedisi').val(namaCus); // Kosongkan dulu
+        $('#customer_expedisi').val(namaCus);
+        // Kosongkan dulu item
+        $('#item_expedisi_id').val('');
+        $('#item_expedisi').val('');
 
         // Tutup modal
         $('#customerModalExp').modal('hide');
     });
     // ============================== End Of Pilih Customer ==================================
+    // =================================== Pilih Item =====================================
+    $(document).on('click', '#item_expedisi_btn', function(e) {
+        var expedisiId = $('#customer_expedisi_id').val();
+
+        if (!expedisiId || expedisiId.trim() === '') {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Warning',
+                text: 'Silahkan Pilih Customer!',
+                confirmButtonColor: '#3085d6'
+            });
+            e.preventDefault();
+            return false;
+        }
+
+        $('#itemModalExp').modal('show');
+
+        // hancurkan datatable jika sudah pernah dipakai
+        if ($.fn.DataTable.isDataTable('#modalItemExpTable')) {
+            $('#modalItemExpTable').DataTable().destroy();
+        }
+
+        // rebuild datatable
+        $('#modalItemExpTable').DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: {
+                url: "{{ route('price-customer-modal.price', ':kode') }}".replace(':kode', expedisiId),
+                dataSrc: function (json) {
+                    // SET INFO CUSTOMER DI ATAS TABEL
+                    $("#custNameExp").text(json.customer_nama);
+                    $("#custKodeExp").text(json.customer_kode);
+                    return json.data;
+                }
+            },
+            columns: [
+                { data: 'DT_RowIndex', name: 'DT_RowIndex' },
+                { data: 'KETERANGAN' },
+                { data: 'DARI' },
+                { data: 'SAMPAI' },
+                { data: 'nama_rute' },
+                { data: 'harga_html', orderable: false, searchable: false },
+                { data: 'jenis_text' },
+                { data: 'aksi', orderable: false, searchable: false }
+            ]
+        });
+    });
+    // ### Select Button
+    $(document).on('click', '.pick-price-exp', function(e) {
+        e.preventDefault();
+        var kodeCus = $(this).data('id');
+        // Ambil KETERANGAN dari kolom di baris yang sama
+        var row = $(this).closest('tr');
+        var keterangan = row.find('td:eq(1)').text();
+        var rute = row.find('td:eq(4)').text();
+        var harga = row.find('td:eq(5)').text().trim();
+
+        // Mengisi nilai ke elemen yang dituju
+        $('#item_expedisi_id').val(kodeCus);
+        $('#item_expedisi').val(keterangan);
+        $('#rute_expedisi').val(rute);
+        $('#harga_expedisi').val(harga);
+
+        // Tutup modal
+        $('#itemModalExp').modal('hide');
+    });
+    // =============================== End Of Pilih Item ==================================
+    // =================================== Pilih Kendaraan =====================================
+    $(document).on('click', '#kendaraan_expedisi_btn', function(e) {
+
+        $('#kendaraanModalExp').modal('show');
+
+        // hancurkan datatable jika sudah pernah dipakai
+        if ($.fn.DataTable.isDataTable('#modalKendaraanExpTable')) {
+            $('#modalKendaraanExpTable').DataTable().destroy();
+        }
+
+        // rebuild datatable
+        $('#modalKendaraanExpTable').DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: {
+                url: "{{ route('kendaraan.datamodel') }}",
+            },
+            columns: [
+                {data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false},
+                {data: 'KODE', name: 'KODE'},
+                {data: 'NAMA', name: 'NAMA'},
+                {data: 'PLAT', name: 'PLAT'},
+                {data: 'JENIS', name: 'JENIS'},
+                {data: 'FNO_PRK_B', name: 'FNO_PRK_B'},
+                {data: 'FNO_PRK_P', name: 'FNO_PRK_P'},
+                {data: 'FNO_PRK_S', name: 'FNO_PRK_S'},
+                {data: 'FNO_PRK_O', name: 'FNO_PRK_O'},
+                {data: 'FNO_PRK_M', name: 'FNO_PRK_M'},
+                {data: 'action', name: 'action', orderable: false, searchable: false}
+            ]
+        });
+    });
+    // ### Select Button
+    $(document).on('click', '.pickKendaraanModel', function(e) {
+        e.preventDefault();
+        var kodeKendaraan = $(this).data('id');
+        // Ambil KETERANGAN dari kolom di baris yang sama
+        var row = $(this).closest('tr');
+        var keterangan = row.find('td:eq(1)').text();
+        var nama = row.find('td:eq(2)').text();
+
+        // Mengisi nilai ke elemen yang dituju
+        $('#kendaraan_expedisi_id').val(keterangan);
+        $('#kendaraan_expedisi').val(nama);
+
+        // Tutup modal
+        $('#kendaraanModalExp').modal('hide');
+    });
+    // =============================== End Of Pilih Kendaraan ==================================
 });
 </script>

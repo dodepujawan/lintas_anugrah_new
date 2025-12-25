@@ -67,8 +67,7 @@ class PricesCustomerController extends Controller
         // ============================================================
 
         $pricecus = DB::table('pricecus as pc')
-            ->leftJoin('rute as r', 'pc.RUTE', '=', 'r.id')
-            ->select('pc.*', 'r.RUTE as nama_rute')
+            ->select('pc.*', 'pc.RUTE as nama_rute')
             ->where('pc.KODECUS', $kodecus)
             ->get();
 
@@ -93,8 +92,7 @@ class PricesCustomerController extends Controller
             if (in_array($kd, $usedCodes)) continue;
 
             $his = DB::table('pricecushis as ph')
-                ->leftJoin('rute as r', 'ph.RUTE', '=', 'r.id')
-                ->select('ph.*', 'r.RUTE as nama_rute')
+                ->select('ph.*', 'ph.RUTE as nama_rute')
                 ->where('ph.KODE', $kd)
                 ->where('ph.created_at', '>=', $customerCreatedAt)
                 ->orderBy('ph.created_at', 'asc')
@@ -119,8 +117,7 @@ class PricesCustomerController extends Controller
             if (in_array($kd, $usedCodes)) continue;
 
             $default = DB::table('prices as p')
-                ->leftJoin('rute as r', 'p.RUTE', '=', 'r.id')
-                ->select('p.*', 'r.RUTE as nama_rute')
+                ->select('p.*', 'p.RUTE as nama_rute')
                 ->where('p.KODE', $kd)
                 ->first();
 
@@ -266,7 +263,7 @@ class PricesCustomerController extends Controller
             'KETERANGAN' => $request->keterangan_pricecus,
             'DARI' => $request->dari_pricecus,
             'SAMPAI' => $request->sampai_pricecus,
-            'RUTE' => $request->rute_val_pricecus,
+            'RUTE' => $request->rute_pricecus,
             'HARGA' => $request->harga_pricecus,
             'HV' => 0,
             'HKG' => 0,
@@ -283,6 +280,131 @@ class PricesCustomerController extends Controller
             'message' => 'Data berhasil disimpan',
             'data' => $Prices
         ]);
+    }
+
+    public function getPriceModal(Request $request, $kodecus){
+        // Ambil data customer
+        $customer = DB::table('mcustomer as c')
+            ->where('c.kode_cus', $kodecus)
+            ->first();
+
+        // Siapkan metadata customer
+        $customerData = [
+            'customer_kode' => $customer->kode_cus ?? null,
+            'customer_nama' => $customer->NAMACUST ?? null,
+            'jenis_usaha'   => $customer->TYPECUST ?? null,
+            'alamat'        => $customer->ALAMAT1 ?? null,
+            'pemilik_nama'  => $customer->nama_p ?? null,
+        ];
+
+        // Jika customer tidak ditemukan → return kosong tapi metadata tetap ada
+        if (!$customer) {
+            return DataTables::of(collect([]))
+                ->with($customerData)
+                ->make(true);
+        }
+
+        $customerCreatedAt = $customer->created_at;
+        $final = collect();
+
+
+        // ============================================================
+        // 1️⃣ PRIORITAS PRICECUS (punya KODECUS asli)
+        // ============================================================
+
+        $pricecus = DB::table('pricecus as pc')
+            ->select('pc.*', 'pc.RUTE as nama_rute')
+            ->where('pc.KODECUS', $kodecus)
+            ->get();
+
+        foreach ($pricecus as $pc) {
+            $pc->source = 'pricecus';
+            // pc sudah punya KODECUS bawaan → aman
+            $final->push($pc);
+        }
+
+        $usedCodes = $pricecus->pluck('KODE')->toArray();
+
+
+
+        // ============================================================
+        // 2️⃣ PRIORITAS PRICECUSHIS (HARUS ditambah KODECUS)
+        // ============================================================
+
+        $allCodes = DB::table('prices')->pluck('KODE')->unique();
+
+        foreach ($allCodes as $kd) {
+
+            if (in_array($kd, $usedCodes)) continue;
+
+            $his = DB::table('pricecushis as ph')
+                ->select('ph.*', 'ph.RUTE as nama_rute')
+                ->where('ph.KODE', $kd)
+                ->where('ph.created_at', '>=', $customerCreatedAt)
+                ->orderBy('ph.created_at', 'asc')
+                ->first();
+
+            if ($his) {
+                $his->source = 'pricecushis';
+                $his->KODECUS = $kodecus; // FIX WAJIB
+                $final->push($his);
+                $usedCodes[] = $kd;
+            }
+        }
+
+
+
+        // ============================================================
+        // 3️⃣ DEFAULT PRICES (HARUS ditambah KODECUS)
+        // ============================================================
+
+        foreach ($allCodes as $kd) {
+
+            if (in_array($kd, $usedCodes)) continue;
+
+            $default = DB::table('prices as p')
+                ->select('p.*', 'p.RUTE as nama_rute')
+                ->where('p.KODE', $kd)
+                ->first();
+
+            if ($default) {
+                $default->source = 'prices';
+                $default->KODECUS = $kodecus; // FIX WAJIB
+                $final->push($default);
+                $usedCodes[] = $kd;
+            }
+        }
+
+
+
+        // ============================================================
+        // RETURN KE DATATABLES
+        // ============================================================
+
+        return DataTables::of($final)
+            ->addIndexColumn()
+            ->with($customerData)
+            ->addColumn('jenis_text', function ($row) {
+                return $row->JENIS == 1 ? 'Eceran' : 'Booking';
+            })
+            ->addColumn('harga_html', function ($row) {
+                return '<span
+                    data-original="'.$row->HARGA.'"
+                    data-kode="'.$row->KODE.'"
+                    data-kodecus="'.$row->KODECUS.'"
+                    style="padding:6px; border-radius:4px;">
+                    '.$row->HARGA.'</span>';
+            })
+            ->addColumn('aksi', function ($row) {
+                return '<button class="btn btn-success btn-sm pick-price-exp"
+                    data-id="'.$row->id.'"
+                    data-kode="'.$row->KODE.'"
+                    data-source="'.$row->source.'"
+                    data-original="'.$row->HARGA.'">
+                    <i class="bx bx-check"></i></button>';
+            })
+            ->rawColumns(['harga_html', 'aksi'])
+            ->make(true);
     }
 
 }
