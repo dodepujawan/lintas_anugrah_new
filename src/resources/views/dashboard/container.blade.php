@@ -25,6 +25,34 @@
     </div>
 </div>
 {{-- End Of Download Loading Modal --}}
+{{-- Modal Update Pajak --}}
+<div class="modal fade" id="pajakModal" tabindex="-1" aria-labelledby="pajakModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <form id="pajakForm">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="pajakModalLabel">Update Pajak</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="modal-ppn" class="form-label">Nilai PPN (%)</label>
+                        <input type="number" step="0.01" class="form-control" id="modal-ppn" name="ppn" required>
+                        <div class="form-text">Masukkan nilai PPN dalam persen (contoh: 11.0 untuk 11%)</div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <input type="hidden" name="id" id="modal-id">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-primary" id="submit_pajak">Update</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{{-- End Of Modal Update Pajak --}}
 
 @endsection
 @section('footer')
@@ -243,6 +271,53 @@ $(document).ready(function() {
         });
     }
 // ========================= End Of New Price Dingin ======================================
+// ========================= Update Pajak ======================================
+    $(document).on('click', '#sidebar_extra_pajak', function(e) {
+        e.preventDefault();
+        loadDataPajak();
+        function loadDataPajak(){
+            $.ajax({
+                url: '{{ route('get_pajak') }}',
+                type: 'GET',
+                success: function(response) {
+                    let nilai_ppn = response.data.ppn;
+                    $('#modal-ppn').val(nilai_ppn);
+                },
+                error: function() {
+                    $('#modal-ppn').val('Error Loading');
+                }
+            });
+        }
+        $('#pajakModal').modal('show');
+    });
+    // ### Submit Pajak ###
+    $('#submit_pajak').on('click', function (e) {
+    e.preventDefault();
+    let ppn_pajak = $('#modal-ppn').val();
+        $.ajax({
+            url: '{{ route('update_pajak') }}', // Ganti sesuai route di Laravel kamu
+            type: 'POST',
+            data: {
+                _token: $('meta[name="csrf-token"]').attr('content'), // CSRF token
+                ppn: ppn_pajak
+            },
+            success: function (response) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Sukses!',
+                    text: response.message || 'PPN berhasil disimpan!',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+                $('#pajakModal').modal('hide');
+            },
+            error: function (xhr) {
+                console.error('Gagal:', xhr.responseText);
+                alert('Gagal menyimpan PPN');
+            }
+        });
+    });
+// ========================= End Of Update Pajak ======================================
 // +++++++++++++++++++++++++++ End Of SIDEBAR ROOM ++++++++++++++++++++++++++++++++++++++
 });
 </script>

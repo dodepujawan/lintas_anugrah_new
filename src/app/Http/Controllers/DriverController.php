@@ -130,6 +130,23 @@ class DriverController extends Controller
         // padding hanya untuk < 10
         return str_pad($next, 2, '0', STR_PAD_LEFT);
     }
+
+    public function dataModal()
+    {
+        $driver = Driver::select('*');
+
+        return DataTables::of($driver)
+            ->addIndexColumn()
+            ->addColumn('action', function($driver) {
+                return '
+                <div class="btn-group">
+                    <button class="btn btn-sm btn-warning edit pickDriverModal" data-id="'.$driver->id.'"><i class="bx bx-check"></i></button>
+                </div>
+                ';
+            })
+            ->rawColumns(['action'])
+            ->make(true);
+    }
 }
 
 // public function driver_kode() {

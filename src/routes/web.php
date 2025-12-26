@@ -12,6 +12,7 @@ use App\Http\Controllers\PricesCustomerController;
 use App\Http\Controllers\PricedinginController;
 use App\Http\Controllers\PricedinginCustomerController;
 use App\Http\Controllers\ExpedisiController;
+use App\Http\Controllers\PajakController;
 
 Route::get('/', function () {
     return redirect()->route('login');
@@ -75,6 +76,7 @@ Route::prefix('driver')->group(function () {
     Route::post('/destroy/{id}', [DriverController::class, 'destroy'])->name('driver.destroy');
     // Callback
     Route::get('/driver_kode', [DriverController::class, 'driver_kode'])->name('driver_kode');
+    Route::get('/data/model', [DriverController::class, 'dataModal'])->name('driver-modal.data');
 });
 
 Route::prefix('price-expedition')->group(function() {
@@ -127,6 +129,11 @@ Route::prefix('expedisi')->group(function() {
     // Route::get('/show/{id}', [PricedinginController::class, 'show'])->name('price-rent.show');
     // Route::post('/update/{id}', [PricedinginController::class, 'update'])->name('price-rent.update');
     // Route::post('/destroy/{id}', [PricedinginController::class, 'destroy'])->name('price-rent.destroy');
+});
+
+Route::prefix('pajak')->middleware('auth')->group(function () {
+    Route::get('/get-pajak', [PajakController::class, 'get_pajak'])->name('get_pajak');
+    Route::post('/edit/show', [PajakController::class, 'update_pajak'])->name('update_pajak');
 });
 // Route::prefix('register')->group(function () {
 //     Route::get('/users', UsersPage::class)->name('users.page');

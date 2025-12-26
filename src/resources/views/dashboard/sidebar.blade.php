@@ -157,6 +157,21 @@
                 </li> --}}
                 </ul>
             </li>
+
+            <li class="menu-item">
+                <a class="menu-link" data-bs-toggle="collapse" href="#extraMenu" role="button" aria-expanded="false">
+                <i class="menu-icon bx-slider-alt"></i>
+                <span class="menu-text">Extra</span>
+                <i class="menu-arrow bx bx-chevron-right"></i>
+                </a>
+                <ul class="sub-menu collapse" id="extraMenu">
+                <li class="menu-item">
+                    <a href="#" class="menu-link" id="sidebar_extra_pajak">
+                    <span class="menu-text">Pajak</span>
+                    </a>
+                </li>
+                </ul>
+            </li>
             {{-- Extra Spasi --}}
             <li><br></li>
             {{-- End Of Extra Spasi --}}

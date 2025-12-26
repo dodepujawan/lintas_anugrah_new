@@ -155,16 +155,16 @@
             <div class="col-md-6">
                 <label class="form-label">DRIVER I</label>
                 <div class="input-group input-group-sm">
-                    <input type="text" class="form-control" id="driver_1_expedisi_id" name="driver_1_expedisi_id">
-                    <input type="text" class="form-control" id="driver_1_expedisi" name="driver_1_expedisi">
+                    <input type="hidden" class="form-control" id="driver_1_expedisi_id" name="driver_1_expedisi_id">
+                    <input type="text" class="form-control" id="driver_1_expedisi" name="driver_1_expedisi" readonly>
                     <button class="btn btn-outline-secondary" id="driver_1_expedisi_btn" data-id="1"><i class="bx bx-search"></i></button>
                 </div>
             </div>
             <div class="col-md-6">
                 <label class="form-label">DRIVER II</label>
                 <div class="input-group input-group-sm">
-                    <input type="text" class="form-control" id="driver_2_expedisi_id" name="driver_2_expedisi_id">
-                    <input type="text" class="form-control" id="driver_2_expedisi" name="driver_2_expedisi">
+                    <input type="hidden" class="form-control" id="driver_2_expedisi_id" name="driver_2_expedisi_id">
+                    <input type="text" class="form-control" id="driver_2_expedisi" name="driver_2_expedisi" readonly>
                     <button class="btn btn-outline-secondary" id="driver_2_expedisi_btn" data-id="2"><i class="bx bx-search"></i></button>
                 </div>
             </div>
@@ -518,6 +518,35 @@
         </div>
     </div>
 </div>
+{{-- Modal Driver --}}
+<div class="modal fade" id="driverModalExp" tabindex="-1">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Data Driver</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="table-responsive">
+                <table class="table table-bordered table-striped w-100" id="modalDriverExpTable">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>No</th>
+                            <th>Kode</th>
+                            <th>Nama</th>
+                            <th>Alamat</th>
+                            <th>Phone</th>
+                            <th>Mulai Kerja</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 <script>
 $(document).ready(function() {
     // Set CSRF token in AJAX setup
@@ -693,5 +722,113 @@ $(document).ready(function() {
         $('#kendaraanModalExp').modal('hide');
     });
     // =============================== End Of Pilih Kendaraan ==================================
+    // =================================== Pilih Driver =====================================
+    $(document).on('click', '#driver_1_expedisi_btn, #driver_2_expedisi_btn', function(e) {
+        e.preventDefault();
+        var kodeKen = $(this).data('id');
+        // Simpan kodeKen ke modal sebagai data atribut
+        $('#driverModalExp').data('kode-ken', kodeKen);
+        $('#driverModalExp').modal('show');
+
+        // hancurkan datatable jika sudah pernah dipakai
+        if ($.fn.DataTable.isDataTable('#modalDriverExpTable')) {
+            $('#modalDriverExpTable').DataTable().destroy();
+        }
+
+        // rebuild datatable
+        $('#modalDriverExpTable').DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: {
+                url: "{{ route('driver-modal.data') }}",
+            },
+            columns: [
+                {data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false},
+                {data: 'KODE', name: 'KODE'},
+                {data: 'NAMA', name: 'NAMA'},
+                {data: 'ALAMAT', name: 'ALAMAT',
+                    render: function(data) {
+                        return data && data.length > 30 ? data.substr(0, 30) + '...' : data;
+                    }
+                },
+                {data: 'PHONE', name: 'PHONE'},
+                {data: 'MULAI', name: 'MULAI',
+                    render: function(data) {
+                        return data ? new Date(data).toLocaleDateString('id-ID') : '-';
+                    }
+                },
+                {data: 'action', name: 'action', orderable: false, searchable: false}
+            ],
+        });
+    });
+    // ### Select Button
+    $(document).on('click', '.pickDriverModal', function(e) {
+        e.preventDefault();
+        alert('njah');
+        // Simpan kodeKen ke modal sebagai data atribut
+        var kodeKen = $('#driverModalExp').data('kode-ken');
+        console.log('njah :' + kodeKen);
+        var kodeDriver = $(this).data('id');
+        // Ambil KETERANGAN dari kolom di baris yang sama
+        var row = $(this).closest('tr');
+        var nama = row.find('td:eq(2)').text();
+
+        // Cek kodeKen untuk menentukan field mana yang diisi
+        if (kodeKen == 1) {
+            $('#driver_1_expedisi_id').val(kodeDriver);
+            $('#driver_1_expedisi').val(nama);
+        } else if (kodeKen == 2) {
+            $('#driver_2_expedisi_id').val(kodeDriver);
+            $('#driver_2_expedisi').val(nama);
+        }
+
+        // Tutup modal
+        $('#driverModalExp').modal('hide');
+    });
+    // =============================== End Of Pilih Driver ==================================
+    // =================== Pajak PPN ==========================
+    loadInputPajak();
+    function loadInputPajak(){
+        $.ajax({
+            url: '{{ route('get_pajak') }}',
+            type: 'GET',
+            success: function(response) {
+                let nilai_ppn = response.data.ppn;
+                $('#ppn_expedisi').val(nilai_ppn);
+            },
+            error: function() {
+                $('#ppn_expedisi').val('Error Loading');
+            }
+        });
+    }
+    // =================== End Of Pajak PPN ==========================
+    // ======================== Hitung Total =============================
+    function hitungExpedisi() {
+        let jumlah = parseFloat($('#jumlah_expedisi').val()) || 0;
+        let harga  = parseFloat($('#harga_expedisi').val()) || 0;
+        let disc   = parseFloat($('#disc_expedisi').val()) || 0;
+        let ppnPersen = parseFloat($('#ppn_expedisi').val()) || 0; // 11 (tetap)
+
+        // SUB TOTAL
+        let subTotal = jumlah * harga;
+
+        // DPP (setelah diskon)
+        let nilaiDisc = subTotal * (disc / 100);
+        let dpp = subTotal - nilaiDisc;
+
+        // PPN (dipakai INTERNAL, tidak ditampilkan)
+        let ppn = dpp * (ppnPersen / 100);
+
+        // GRAND TOTAL
+        let grandTotal = dpp + ppn;
+
+        // TAMPILKAN (HANYA YANG PERLU)
+        $('#sub_total_expedisi').val(subTotal.toLocaleString('id-ID'));
+        $('#dpp_expedisi').val(dpp.toLocaleString('id-ID'));
+        $('#grand_total_expedisi').val(grandTotal.toLocaleString('id-ID'));
+    }
+    // Trigger otomatis
+    $('#jumlah_expedisi, #harga_expedisi, #disc_expedisi').on('keyup change', hitungExpedisi);
+    // ===================== End Of Hitung Total =============================
 });
 </script>
