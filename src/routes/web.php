@@ -124,11 +124,12 @@ Route::prefix('price-dingin-customer')->group(function() {
 
 Route::prefix('expedisi')->group(function() {
     Route::get('/', [ExpedisiController::class, 'index'])->name('expedisi.index');
-    Route::get('/data', [ExpedisiController::class, 'getDataCustomer'])->name('expedisi-cus.data');
+    Route::get('/data/cus', [ExpedisiController::class, 'getDataCustomer'])->name('expedisi-cus.data');
     Route::post('/store', [ExpedisiController::class, 'store'])->name('expedisi.store');
+    Route::get('/data', [ExpedisiController::class, 'getData'])->name('expedisi.data');
     // Route::get('/show/{id}', [PricedinginController::class, 'show'])->name('price-rent.show');
     // Route::post('/update/{id}', [PricedinginController::class, 'update'])->name('price-rent.update');
-    // Route::post('/destroy/{id}', [PricedinginController::class, 'destroy'])->name('price-rent.destroy');
+    Route::post('/destroy/{id}', [ExpedisiController::class, 'destroy'])->name('expedisi.destroy');
 });
 
 Route::prefix('pajak')->middleware('auth')->group(function () {
