@@ -138,7 +138,7 @@
                 <label class="form-label">KENDARAAN</label>
                 <div class="input-group input-group-sm">
                     <input type="hidden" class="form-control" id="kendaraan_expedisi_id" name="kendaraan_expedisi_id">
-                    <input type="text" class="form-control" id="kendaraan_expedisi" name="kendaraan_expedisi">
+                    <input type="text" class="form-control" id="kendaraan_expedisi" name="kendaraan_expedisi" readonly>
                     <button class="btn btn-outline-secondary" id="kendaraan_expedisi_btn"><i class="bx bx-search"></i></button>
                 </div>
             </div>
@@ -290,12 +290,12 @@
     <div class="card-expedisi">
         <div class="row g-2">
             <div class="col-md-3 col-sm-6">
-                <button class="btn btn-info btn-action w-100" id="buttonSimpan">
+                <button class="btn btn-info btn-action w-100" id="buttonSimpanExp">
                     <i class='bx bx-save me-1'></i>SIMPAN [F3]
                 </button>
             </div>
             <div class="col-md-3 col-sm-6">
-                <button class="btn btn-danger btn-action w-100" id="buttonClear">
+                <button class="btn btn-danger btn-action w-100" id="buttonClearExp">
                     <i class='bx bx-trash me-1'></i>Clear [F6]
                 </button>
             </div>
@@ -555,6 +555,8 @@ $(document).ready(function() {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
         }
     });
+    // Set default TGL MUAT
+    $('#tgl_muat_expedisi').val(new Date().toISOString().split('T')[0]);
     // ================================= Pilih Customer =====================================
     $('#customer_expedisi_btn').click(function(e) {
         e.preventDefault();
@@ -764,10 +766,8 @@ $(document).ready(function() {
     // ### Select Button
     $(document).on('click', '.pickDriverModal', function(e) {
         e.preventDefault();
-        alert('njah');
         // Simpan kodeKen ke modal sebagai data atribut
         var kodeKen = $('#driverModalExp').data('kode-ken');
-        console.log('njah :' + kodeKen);
         var kodeDriver = $(this).data('id');
         // Ambil KETERANGAN dari kolom di baris yang sama
         var row = $(this).closest('tr');
@@ -802,33 +802,276 @@ $(document).ready(function() {
         });
     }
     // =================== End Of Pajak PPN ==========================
-    // ======================== Hitung Total =============================
-    function hitungExpedisi() {
-        let jumlah = parseFloat($('#jumlah_expedisi').val()) || 0;
-        let harga  = parseFloat($('#harga_expedisi').val()) || 0;
-        let disc   = parseFloat($('#disc_expedisi').val()) || 0;
-        let ppnPersen = parseFloat($('#ppn_expedisi').val()) || 0; // 11 (tetap)
+    // ============================ Submit Data Form =================================
+    // Hitung otomatis
+    $('#jumlah_expedisi, #harga_expedisi, #disc_expedisi, #del_charge_expedisi').on('input', function() {
+        calculateTotal();
+    });
 
-        // SUB TOTAL
-        let subTotal = jumlah * harga;
+    // Auto Del Charge
+    $('#auto_dc_expedisi').click(function(e) {
+        e.preventDefault();
+        const jumlah = parseNumber($('#jumlah_expedisi').val()) || 0;
+        const harga = parseNumber($('#harga_expedisi').val()) || 0;
+        const autoDC = (jumlah * harga) * 0.05; // 5% dari total
+        $('#del_charge_expedisi').val(Math.round(autoDC));
+        calculateTotal();
+    });
 
-        // DPP (setelah diskon)
-        let nilaiDisc = subTotal * (disc / 100);
-        let dpp = subTotal - nilaiDisc;
+    // Tombol Simpan
+    $('#buttonSimpanExp').click(function(e) {
+        e.preventDefault();
 
-        // PPN (dipakai INTERNAL, tidak ditampilkan)
-        let ppn = dpp * (ppnPersen / 100);
+        // Validasi form
+        if (!validateForm()) {
+            return;
+        }
+        $('#loading_modal').modal('show');
+        $('#loading_modal').on('shown.bs.modal', function () {
+            // Jalankan setelah modal benar2 muncul
+            submitForm();
+        });
+    });
 
-        // GRAND TOTAL
-        let grandTotal = dpp + ppn;
+    function validateForm() {
+        let isValid = true;
+        const errors = [];
 
-        // TAMPILKAN (HANYA YANG PERLU)
-        $('#sub_total_expedisi').val(subTotal.toLocaleString('id-ID'));
-        $('#dpp_expedisi').val(dpp.toLocaleString('id-ID'));
-        $('#grand_total_expedisi').val(grandTotal.toLocaleString('id-ID'));
+        // Validasi required fields
+        if (!$('#tgl_muat_expedisi').val()) {
+            errors.push('Tgl Muat harus diisi');
+            isValid = false;
+        }
+        if (!$('#customer_expedisi').val()) {
+            errors.push('Customer harus dipilih');
+            isValid = false;
+        }
+        if (!$('#rute_expedisi').val()) {
+            errors.push('Rute harus diisi');
+            isValid = false;
+        }
+        if (!$('#jumlah_expedisi').val() || parseNumber($('#jumlah_expedisi').val()) <= 0) {
+            errors.push('Jumlah harus diisi dan lebih dari 0');
+            isValid = false;
+        }
+
+        if (!isValid) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Validasi Gagal',
+                html: errors.join('<br>'),
+                confirmButtonText: 'OK'
+            });
+        }
+
+        return isValid;
     }
-    // Trigger otomatis
-    $('#jumlah_expedisi, #harga_expedisi, #disc_expedisi').on('keyup change', hitungExpedisi);
+
+    function submitForm() {
+
+        // Prepare data
+        const formData = {
+            // DOKUMEN
+            NOMUAT: $('#no_muat_expedisi').val(),
+            TGLMUAT: $('#tgl_muat_expedisi').val(),
+            NOJALAN: $('#nomor_perjalanan_expedisi').val(),
+            WILAYAH: $('#wilayah_expedisi').val(),
+            CUSTOMER: $('#customer_expedisi').val(),
+            customer_expedisi_id: $('#customer_expedisi_id').val(),
+            item_expedisi_id: $('#item_expedisi_id').val(),
+
+            // KENDARAAN & DRIVER
+            KENDARAAN: $('#kendaraan_expedisi').val(),
+            kendaraan_expedisi_id: $('#kendaraan_expedisi_id').val(),
+            NAMA_KENDARAAN: $('#kendaraan_expedisi').val(),
+            tglsj: $('#tgl_sj_expedisi').val(),
+            NOSJ: $('#no_sj_expedisi').val(),
+            DRIVER: $('#driver_1_expedisi').val(),
+            driver_1_expedisi_id: $('#driver_1_expedisi_id').val(),
+            NAMA_DRIVER: $('#driver_1_expedisi').val(),
+            DRIVER2: $('#driver_2_expedisi').val(),
+            driver_2_expedisi_id: $('#driver_2_expedisi_id').val(),
+            NAMA_DRIVER2: $('#driver_2_expedisi').val(),
+
+            // PENERIMA
+            P_PENERIMA: $('#penerima_expedisi').val(),
+            P_NAMA: $('#nama_penerima_expedisi').val(),
+            P_PHONE: $('#phone_penerima_expedisi').val(),
+            P_ALAMAT: $('#alamat_penerima_expedisi').val(),
+
+            // DETAIL & PERHITUNGAN
+            rute: $('#rute_expedisi').val(),
+            JUMLAH: parseNumber($('#jumlah_expedisi').val()) || 0,
+            UNIT: 'KG', // Default KG, bisa diganti sesuai kebutuhan
+            HARGA: parseNumber($('#harga_expedisi').val()) || 0,
+            hargaaw: parseNumber($('#harga_expedisi').val()) || 0,
+            DISC: parseFloat($('#disc_expedisi').val()) || 0,
+            DC: parseNumber($('#del_charge_expedisi').val()) || 0,
+            DCAW: parseNumber($('#del_charge_expedisi').val()) || 0,
+
+            // Hitung otomatis
+            NDISC: parseNumber($('#sub_total_expedisi').val()) * (parseFloat($('#disc_expedisi').val()) / 100) || 0,
+            NDISCAW: parseNumber($('#sub_total_expedisi').val()) * (parseFloat($('#disc_expedisi').val()) / 100) || 0,
+            TOTAL: parseNumber($('#dpp_expedisi').val()) || 0,
+            PPN: parseFloat($('#ppn_expedisi').val()), // Default 11%
+            GRAND: parseNumber($('#grand_total_expedisi').val()) || 0,
+
+            // STATUS & DEFAULT VALUES
+            JENISHRG: '1', // Default jenis harga
+            JENIS: 'EKS', // Ekspedisi
+            STS: 'INVOICE',
+            SIMPAN: 'N',
+            READY: 'Y',
+            CLOSSING: 'N',
+            KETERANGAN: 'EXP ' + ($('#item_expedisi').val() || '') + ' ' + ($('#customer_expedisi').val() || '') + ' KE ' + ($('#penerima_expedisi').val() || ''),
+
+            // User info (bisa dari session)
+            user: 'USER' + new Date().toLocaleDateString('id-ID'),
+            // _token: $('meta[name="csrf-token"]').attr('content') // CSRF token untuk Laravel
+        };
+
+        // console.log('Data yang dikirim:', formData); // Untuk debugging
+
+        // AJAX Request
+        $.ajax({
+            url: "{{ route('expedisi.store') }}", // Ganti dengan route Laravel Anda
+            type: 'POST',
+            data: formData,
+            dataType: 'json',
+            success: function(response) {
+                $('#loading_modal').modal('hide');
+                if (response.success) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil Disimpan',
+                    html: `
+                        <div class="text-start">
+                            <p><strong>NO MUAT:</strong> ${response.data.NOMUAT}</p>
+                            <p><strong>NO SJ:</strong> ${response.data.NOSJ || '-'}</p>
+                            <p><strong>TOTAL:</strong> Rp ${response.data.GRAND}</p>
+                        </div>
+                    `,
+                    confirmButtonText: 'OK',
+                    confirmButtonColor: '#3085d6',
+                    showCancelButton: false,
+                    focusConfirm: true
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        resetForm();
+                    }
+                });
+            } else {
+                    $('#loading_modal').modal('hide');
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Gagal!',
+                        text: response.message,
+                        confirmButtonText: 'OK'
+                    });
+                }
+            },
+            error: function(xhr) {
+                $('#loading_modal').modal('hide');
+
+                let errorMessage = 'Terjadi kesalahan pada server';
+                if (xhr.responseJSON && xhr.responseJSON.message) {
+                    errorMessage = xhr.responseJSON.message;
+                } else if (xhr.responseJSON && xhr.responseJSON.errors) {
+                    errorMessage = Object.values(xhr.responseJSON.errors).join('<br>');
+                }
+
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error!',
+                    html: errorMessage,
+                    confirmButtonText: 'OK'
+                });
+            }
+        });
+    }
+    // ======================== End Of Submit Data Form =============================
+    // ======================== Hitung Total =============================
+    // Fungsi untuk format number
+    function formatNumber(num) {
+        return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    }
+
+    function parseNumber(str) {
+        if (!str) return 0;
+        return parseFloat(str.toString().replace(/\./g, '').replace(',', '.'));
+    }
+
+    function calculateTotal() {
+        // Ambil nilai dari form
+        const jumlah = parseNumber($('#jumlah_expedisi').val()) || 0;
+        const harga = parseNumber($('#harga_expedisi').val()) || 0;
+        const discPercent = parseFloat($('#disc_expedisi').val()) || 0;
+        const delCharge = parseNumber($('#del_charge_expedisi').val()) || 0;
+        const ppnPercent = parseNumber($('#ppn_expedisi').val()) || 0;
+
+        // ===========================================
+        // PERHITUNGAN YANG BENAR:
+        // ===========================================
+
+        // 1. Sub total (sebelum diskon)
+        const subTotal = jumlah * harga;
+
+        // 2. Diskon dalam rupiah
+        const discAmount = subTotal * (discPercent / 100);
+
+        // 3. Total setelah diskon (DPP)
+        const dpp = subTotal - discAmount;
+
+        // 4. PPN langsung masuk ke grand total (tanpa tampilkan nominal)
+        const ppnAmount = dpp * (ppnPercent / 100);
+
+        // 5. Grand total (DPP + PPN + Del Charge)
+        const grandTotal = dpp + ppnAmount + delCharge;
+
+        // ===========================================
+        // TAMPILKAN HASIL:
+        // ===========================================
+        // Hanya tampilkan yang perlu
+        $('#sub_total_expedisi').val(formatNumber(Math.round(subTotal)));
+        $('#dpp_expedisi').val(formatNumber(Math.round(dpp)));
+        $('#grand_total_expedisi').val(formatNumber(Math.round(grandTotal)));
+    }
+
+    function resetForm() {
+        // Reset semua input kecuali nomor muat
+        $('input[type="text"], input[type="number"], textarea').not('#no_muat_expedisi').val('');
+        $('select').prop('selectedIndex', 0);
+        $('#tgl_muat_expedisi').val(new Date().toISOString().split('T')[0]);
+        $('#tgl_sj_expedisi').val('');
+        $('#sub_total_expedisi, #dpp_expedisi, #ppn_expedisi, #grand_total_expedisi').val('');
+        $('#wilayah_expedisi').val('denpasar');
+    }
+    // function hitungExpedisi() {
+    //     let jumlah = parseFloat($('#jumlah_expedisi').val()) || 0;
+    //     let harga  = parseFloat($('#harga_expedisi').val()) || 0;
+    //     let disc   = parseFloat($('#disc_expedisi').val()) || 0;
+    //     let ppnPersen = parseFloat($('#ppn_expedisi').val()) || 0; // 11 (tetap)
+
+    //     // SUB TOTAL
+    //     let subTotal = jumlah * harga;
+
+    //     // DPP (setelah diskon)
+    //     let nilaiDisc = subTotal * (disc / 100);
+    //     let dpp = subTotal - nilaiDisc;
+
+    //     // PPN (dipakai INTERNAL, tidak ditampilkan)
+    //     let ppn = dpp * (ppnPersen / 100);
+
+    //     // GRAND TOTAL
+    //     let grandTotal = dpp + ppn;
+
+    //     // TAMPILKAN (HANYA YANG PERLU)
+    //     $('#sub_total_expedisi').val(subTotal.toLocaleString('id-ID'));
+    //     $('#dpp_expedisi').val(dpp.toLocaleString('id-ID'));
+    //     $('#grand_total_expedisi').val(grandTotal.toLocaleString('id-ID'));
+    // }
+    // // Trigger otomatis
+    // $('#jumlah_expedisi, #harga_expedisi, #disc_expedisi').on('keyup change', hitungExpedisi);
     // ===================== End Of Hitung Total =============================
 });
 </script>
