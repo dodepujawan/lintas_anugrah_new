@@ -28,6 +28,7 @@ return new class extends Migration
             $table->char('KET_SJ', 100)->nullable();
             $table->date('TGLINVOICE')->nullable();
             $table->char('INVOICE', 20)->nullable();
+            $table->char('CUSTOMER_KODE', 20)->nullable();
             $table->char('CUSTOMER', 30)->nullable();
 
             // ======================
