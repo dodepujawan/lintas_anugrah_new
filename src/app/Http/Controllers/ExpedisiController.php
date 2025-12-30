@@ -163,7 +163,7 @@ class ExpedisiController extends Controller
                     'id' => $expedisi->id,
                     'NOMUAT' => $expedisi->NOMUAT,
                     'NOSJ' => $expedisi->NOSJ,
-                    'GRAND' => number_format($expedisi->GRAND, 0, ',', '.')
+                    'GRAND' => number_format($expedisi->GRAND, 0, ',', '.'),
                 ],
                 'nomuat' => $expedisi->NOMUAT // Kirim ke frontend untuk update field
             ]);

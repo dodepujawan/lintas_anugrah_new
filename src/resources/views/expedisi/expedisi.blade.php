@@ -337,7 +337,7 @@
         </div>
 
         <div class="table-responsive">
-            <table class="table table-bordered table-sm table-hover">
+            <table class="table table-bordered table-sm table-hover" id="tableProsesExpedisi">
                 <thead>
                     <tr>
                         <th width="30">NO</th>
@@ -350,54 +350,14 @@
                         <th width="80">JUMLAH</th>
                         <th width="80">UNIT</th>
                         <th width="100">HARGA</th>
+                        <th width="100">DISC</th>
+                        <th width="100">PPN</th>
+                        <th width="100">TOTAL</th>
                         <th width="80">AKSI</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td class="text-center">1</td>
-                        <td>SJ001</td>
-                        <td>22-12-2025</td>
-                        <td>P001</td>
-                        <td class="text-center">
-                            <span class="badge bg-success">Y</span>
-                        </td>
-                        <td class="text-end">50,000</td>
-                        <td>PG001</td>
-                        <td class="text-end">10</td>
-                        <td class="text-center">PCS</td>
-                        <td class="text-end">100,000</td>
-                        <td class="text-center">
-                            <button class="btn btn-sm btn-outline-primary btn-action">
-                                <i class='bx bx-edit'></i>
-                            </button>
-                            <button class="btn btn-sm btn-outline-danger btn-action">
-                                <i class='bx bx-trash'></i>
-                            </button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="text-center">2</td>
-                        <td>SJ002</td>
-                        <td>22-12-2025</td>
-                        <td>P002</td>
-                        <td class="text-center">
-                            <span class="badge bg-secondary">N</span>
-                        </td>
-                        <td class="text-end">25,000</td>
-                        <td>PG002</td>
-                        <td class="text-end">5</td>
-                        <td class="text-center">BOX</td>
-                        <td class="text-end">250,000</td>
-                        <td class="text-center">
-                            <button class="btn btn-sm btn-outline-primary btn-action">
-                                <i class='bx bx-edit'></i>
-                            </button>
-                            <button class="btn btn-sm btn-outline-danger btn-action">
-                                <i class='bx bx-trash'></i>
-                            </button>
-                        </td>
-                    </tr>
+
                 </tbody>
             </table>
         </div>
@@ -1005,7 +965,7 @@ $(document).ready(function() {
             return;
         }
         $('#loading_modal').modal('show');
-        $('#loading_modal').on('shown.bs.modal', function () {
+        $('#loading_modal').one('shown.bs.modal', function () {
             // Jalankan setelah modal benar2 muncul
             submitForm();
         });
@@ -1046,7 +1006,6 @@ $(document).ready(function() {
     }
 
     function submitForm() {
-
         // Prepare data
         const formData = {
             // DOKUMEN
@@ -1136,6 +1095,16 @@ $(document).ready(function() {
                     focusConfirm: true
                 }).then((result) => {
                     if (result.isConfirmed) {
+                        addRowExpedisi({
+                            NOSJ: response.data.NOSJ,
+                            tglsj: $('#tgl_sj_expedisi').val(),
+                            JUMLAH: formData.JUMLAH,
+                            HARGA: parseNumber(formData.HARGA),
+                            DC: parseNumber(formData.DC),
+                            NDISC: formData.DISC,
+                            PPN: formData.PPN,
+                            GRAND: parseNumber(formData.GRAND),
+                        });
                         resetFormExpedisi();
                     }
                 });
@@ -1177,7 +1146,7 @@ $(document).ready(function() {
 
         $('#muatModalExp').modal('hide');
         $('#loading_modal').modal('show');
-        $('#loading_modal').on('shown.bs.modal', function () {
+        $('#loading_modal').one('shown.bs.modal', function () {
             // Ambil data dari server berdasarkan id/nomuat
             $.ajax({
                 url: '{{ route('expedisi.show') }}', // Ganti dengan endpoint yang sesuai
@@ -1234,14 +1203,14 @@ $(document).ready(function() {
                         // Hitung total otomatis
                         calculateTotal();
 
-                        // Tampilkan pesan sukses
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Data Dimuat',
-                            text: 'Data muatan berhasil dimuat ke form',
-                            timer: 2000,
-                            showConfirmButton: false
-                        });
+                        // // Tampilkan pesan sukses
+                        // Swal.fire({
+                        //     icon: 'success',
+                        //     title: 'Data Dimuat',
+                        //     text: 'Data muatan berhasil dimuat ke form',
+                        //     timer: 2000,
+                        //     showConfirmButton: false
+                        // });
                     } else {
                         Swal.fire({
                             icon: 'error',
@@ -1265,6 +1234,11 @@ $(document).ready(function() {
         });
     });
     // ======================== End Of Show Detail =============================
+    // ======================== End Of Clear Form =============================
+    $('#buttonClearExp').click(function() {
+        resetFormExpedisi();
+    });
+    // ======================== End Of Clear Form =============================
     // ======================== Hitung Total =============================
     // Fungsi untuk format number
     function formatNumber(num) {
@@ -1337,18 +1311,81 @@ $(document).ready(function() {
     }
 
     function resetFormExpedisi() {
-        // Reset semua input kecuali nomor muat
-        $('input[type="text"], input[type="number"], textarea').not('#no_muat_expedisi').val('');
+        // Reset semua input text, number, textarea
+        $('input[type="text"], input[type="number"], textarea').val('');
+        // Reset select
         $('select').prop('selectedIndex', 0);
+        // Set default tanggal muat
         $('#tgl_muat_expedisi').val(new Date().toISOString().split('T')[0]);
+        // Field khusus
         $('#tgl_sj_expedisi').val('');
         $('#sub_total_expedisi, #dpp_expedisi, #ppn_expedisi, #grand_total_expedisi').val('');
         $('#wilayah_expedisi').val('denpasar');
-        // Set default TGL MUAT
-        $('#tgl_muat_expedisi').val(new Date().toISOString().split('T')[0]);
         setButtonToSaveMode();
         loadInputPajak();
     }
+
+    // fungsi merubah tabel menjadi
+    function nvl(val) {
+        return val ? val : 0;
+    }
+
+    function addRowExpedisi(data) {
+        let tbody = $('#tableProsesExpedisi tbody');
+        let nosjBaru = (data.NOSJ || '').toString().trim();
+
+        // Cek duplikat NOSJ
+        let sudahAda = false;
+        tbody.find('tr').each(function () {
+            let nosjTabel = $(this).find('td:eq(1)').text().trim(); // kolom NOSJ
+            if (nosjTabel === nosjBaru && nosjBaru !== '') {
+                sudahAda = true;
+                return false; // break loop
+            }
+        });
+
+        if (sudahAda) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Duplikat NO SJ',
+                text: `NO SJ ${nosjBaru} sudah ada di tabel`,
+                timer: 2000,
+                showConfirmButton: false
+            });
+            return;
+        }
+
+        let no = tbody.find('tr').length + 1;
+
+        let row = `
+            <tr>
+                <td class="text-center">${no}</td>
+                <td>${nosjBaru || '-'}</td>
+                <td>${data.tglsj || '-'}</td>
+
+                <td></td>
+                <td class="text-center"></td>
+                <td class="text-end">${nvl(data.DC)}</td>
+                <td></td>
+
+                <td class="text-end">${nvl(data.JUMLAH)}</td>
+                <td class="text-center">KG</td>
+                <td class="text-end">${nvl(data.HARGA)}</td>
+                <td class="text-end">${nvl(data.NDISC)}</td>
+                <td class="text-end">${nvl(data.PPN)}</td>
+                <td class="text-end">${nvl(data.GRAND)}</td>
+
+                <td class="text-center">
+                    <button class="btn btn-danger btn-sm btn-hapus-row">
+                        <i class="fa fa-trash"></i>
+                    </button>
+                </td>
+            </tr>
+        `;
+
+        tbody.append(row);
+    }
+
     // function hitungExpedisi() {
     //     let jumlah = parseFloat($('#jumlah_expedisi').val()) || 0;
     //     let harga  = parseFloat($('#harga_expedisi').val()) || 0;
