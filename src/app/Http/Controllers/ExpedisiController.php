@@ -67,7 +67,7 @@ class ExpedisiController extends Controller
             // GENERATE NOMUAT DENGAN LOCK
             // ======================
             $nomuat = $this->generateNomuatWithLock();
-
+            $nosurjal = $this->generateNoSuratJalan();
             // ======================
             // HITUNG TOTAL DARI REQUEST
             // ======================
@@ -99,7 +99,7 @@ class ExpedisiController extends Controller
                 'KENDARAAN' => $request->kendaraan_expedisi_id,
                 'NAMA_KENDARAAN' => $request->NAMA_KENDARAAN,
                 'tglsj' => $request->tglsj,
-                'NOSJ' => $request->NOSJ,
+                'NOSJ' => $nosurjal,
                 'DRIVER' => $request->driver_1_expedisi_id,
                 'NAMA_DRIVER' => $request->NAMA_DRIVER,
                 'DRIVER2' => $request->driver_2_expedisi_id,
@@ -542,5 +542,19 @@ class ExpedisiController extends Controller
         }
 
         return $prefix . str_pad($increment, 5, '0', STR_PAD_LEFT);
+    }
+
+    private function generateNoSuratJalan(){
+        // Ambil nomor terakhir dari database
+        $last = Expedisi::orderBy('NOSJ', 'desc')->first();
+
+        if ($last) {
+            $nextNumber = $last->NOSJ + 1;
+        } else {
+            $nextNumber = 1;
+        }
+
+        // Format 5 digit: 00001, 00002, dst
+        return str_pad($nextNumber, 5, '0', STR_PAD_LEFT);
     }
 }

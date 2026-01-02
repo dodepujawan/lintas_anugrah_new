@@ -99,7 +99,7 @@
             <div class="col-md-3">
                 <label class="form-label">NO MUAT</label>
                 <div class="input-group input-group-sm">
-                    <input type="text" class="form-control" id="no_muat_expedisi" name="no_muat_expedisi" readonly>
+                    <input type="text" class="form-control" id="no_muat_expedisi" name="no_muat_expedisi" readonly placeholder="Auto Generate/ click for update">
                     <button class="btn btn-outline-secondary" type="button" id="muat_expedisi_btn">
                         <i class="bx bx-search"></i>
                     </button>
@@ -149,7 +149,7 @@
                 <label class="form-label">ITEM</label>
                 <div class="input-group input-group-sm">
                     <input type="hidden" name="item_expedisi_id" id="item_expedisi_id">
-                    <input type="text" class="form-control" id="item_expedisi" name="item_expedisi" readonly>
+                    <input type="text" class="form-control" id="item_expedisi" name="item_expedisi" readonly placeholder="Pilih item...">
                     <button class="btn btn-outline-secondary" id="item_expedisi_btn"><i class="bx bx-search"></i></button>
                 </div>
             </div>
@@ -165,7 +165,7 @@
             <div class="col-md-6">
                 <label class="form-label">KENDARAAN</label>
                 <div class="input-group input-group-sm">
-                    <input type="hidden" class="form-control" id="kendaraan_expedisi_id" name="kendaraan_expedisi_id">
+                    <input type="hidden" class="form-control" id="kendaraan_expedisi_id" name="kendaraan_expedisi_id" placeholder="Pilih kendaraan...">
                     <input type="text" class="form-control" id="kendaraan_expedisi" name="kendaraan_expedisi" readonly>
                     <button class="btn btn-outline-secondary" id="kendaraan_expedisi_btn"><i class="bx bx-search"></i></button>
                 </div>
@@ -176,7 +176,7 @@
             </div>
             <div class="col-md-3">
                 <label class="form-label">NO SJ</label>
-                <input type="text" class="form-control form-control-sm" id="no_sj_expedisi" name="no_sj_expedisi">
+                <input type="text" class="form-control form-control-sm" id="no_sj_expedisi" name="no_sj_expedisi" placeholder="Auto Generate" Readonly>
             </div>
         </div>
         <div class="row mt-2">
@@ -184,7 +184,7 @@
                 <label class="form-label">DRIVER I</label>
                 <div class="input-group input-group-sm">
                     <input type="hidden" class="form-control" id="driver_1_expedisi_id" name="driver_1_expedisi_id">
-                    <input type="text" class="form-control" id="driver_1_expedisi" name="driver_1_expedisi" readonly>
+                    <input type="text" class="form-control" id="driver_1_expedisi" name="driver_1_expedisi" readonly placeholder="Pilih drver I">
                     <button class="btn btn-outline-secondary" id="driver_1_expedisi_btn" data-id="1"><i class="bx bx-search"></i></button>
                 </div>
             </div>
@@ -192,7 +192,7 @@
                 <label class="form-label">DRIVER II</label>
                 <div class="input-group input-group-sm">
                     <input type="hidden" class="form-control" id="driver_2_expedisi_id" name="driver_2_expedisi_id">
-                    <input type="text" class="form-control" id="driver_2_expedisi" name="driver_2_expedisi" readonly>
+                    <input type="text" class="form-control" id="driver_2_expedisi" name="driver_2_expedisi" readonly placeholder="Pilih driver II">
                     <button class="btn btn-outline-secondary" id="driver_2_expedisi_btn" data-id="2"><i class="bx bx-search"></i></button>
                 </div>
             </div>
@@ -365,7 +365,7 @@
 
     <!-- Action Buttons -->
     <div class="card-expedisi">
-        <div class="row g-2">
+        {{-- <div class="row g-2">
             <div class="col-md-3 col-sm-6">
                 <button class="btn btn-primary btn-action w-100">
                     <i class='bx bx-file me-1'></i>NEW [F1]
@@ -407,7 +407,7 @@
                 </button>
             </div>
         </div>
-    </div>
+    </div> --}}
 </div>
 
 {{-- Modal Muat Expedisi --}}
