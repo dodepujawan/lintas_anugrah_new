@@ -63,9 +63,9 @@
                 <div>
                     <h5>Daftar Driver</h5>
                 </div>
-                <div>
+                {{-- <div>
                     <button class="btn btn-primary" id="add_driver">+ Add Driver</button>
-                </div>
+                </div> --}}
             </div>
         <div class="card-driver-body">
             <table class="table table-bordered" id="driverTable">
@@ -195,28 +195,28 @@ $(document).ready(function() {
     // ======================== End Of Initialize DataTable ==========================
 
     // ================================== Form Show / Hide ===============================
-    $("#add_driver").click(function(e) {
-        e.preventDefault();
-        $("#tableDriver").hide();
-        $("#formDriver").show();
-        $("#formTitle").text("Form Tambah Driver");
-        $("#submitBtn").text("Simpan");
-        resetForm();
-        $('#nama').focus();
-        load_kode_driver();
-        function load_kode_driver() {
-            $.ajax({
-                url: '{{ route('driver_kode') }}', // Route to load the form
-                type: 'GET',
-                success: function(response) {
-                    $('#kode').val(response.kode);
-                },
-                error: function() {
-                    $('#kode').val('<p>Error loading form.</p>');
-                }
-            });
-        }
-    });
+    // $("#add_driver").click(function(e) {
+    //     e.preventDefault();
+    //     $("#tableDriver").hide();
+    //     $("#formDriver").show();
+    //     $("#formTitle").text("Form Tambah Driver");
+    //     $("#submitBtn").text("Simpan");
+    //     resetForm();
+    //     $('#nama').focus();
+    //     load_kode_driver();
+    //     function load_kode_driver() {
+    //         $.ajax({
+    //             url: '{{ route('driver_kode') }}', // Route to load the form
+    //             type: 'GET',
+    //             success: function(response) {
+    //                 $('#kode').val(response.kode);
+    //             },
+    //             error: function() {
+    //                 $('#kode').val('<p>Error loading form.</p>');
+    //             }
+    //         });
+    //     }
+    // });
 
     $("#list_driver").click(function(e) {
         e.preventDefault();

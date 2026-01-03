@@ -113,7 +113,7 @@ class DriverController extends Controller
 
         $next = ((int) $lastKode) + 1;
 
-        $newKode = str_pad($next, 2, '0', STR_PAD_LEFT);
+        $newKode = (string) $next;
 
         return response()->json([
             'kode' => $newKode
@@ -128,7 +128,7 @@ class DriverController extends Controller
         $next = ((int) $lastKode) + 1;
 
         // padding hanya untuk < 10
-        return str_pad($next, 2, '0', STR_PAD_LEFT);
+        return (string) $next;
     }
 
     public function dataModal()
@@ -140,7 +140,7 @@ class DriverController extends Controller
             ->addColumn('action', function($driver) {
                 return '
                 <div class="btn-group">
-                    <button class="btn btn-sm btn-warning edit pickDriverModal" data-id="'.$driver->id.'"><i class="bx bx-check"></i></button>
+                    <button class="btn btn-sm btn-warning edit pickDriverModal" data-id="'.$driver->KODE.'"><i class="bx bx-check"></i></button>
                 </div>
                 ';
             })

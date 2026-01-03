@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\Driver;
+use App\Models\Expedisi;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Yajra\DataTables\Facades\DataTables;
@@ -10,6 +12,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Session;
+use Carbon\Carbon;
 
 class RegisterController extends Controller
 {
@@ -38,6 +41,7 @@ class RegisterController extends Controller
                 'AD' => 'admin',
                 'ST' => 'staff',
                 'CS' => 'customer',
+                'DV' => 'driver',
             ];
 
             $role = $request->role;
@@ -60,6 +64,28 @@ class RegisterController extends Controller
                 'roles' => $roleName,
             ]);
 
+            // Jika role adalah driver (DV), simpan data ke tabel driver
+            if ($role === 'DV') {
+                // Import Carbon di atas class jika belum
+                $lastKode = Driver::lockForUpdate()
+                    ->orderByRaw('CAST(KODE AS UNSIGNED) DESC')
+                    ->value('KODE');
+
+                $next = ((int) $lastKode) + 1;
+
+                // SIMPAN ANGKA MURNI
+                $kodeDriver = (string) $next;
+
+                Driver::create([
+                    'user_id' => $userId,
+                    'KODE' => $kodeDriver,
+                    'NAMA' => $request->name,
+                    'ALAMAT' => '0',
+                    'PHONE' => '0',
+                    'MULAI' => Carbon::now(),
+                ]);
+            }
+
             DB::commit();
             $result['pesan'] = 'Register Berhasil. Akun Anda sudah Aktif.';
         } catch (\Illuminate\Validation\ValidationException $e) {
@@ -80,6 +106,7 @@ class RegisterController extends Controller
             return view('register.editregister', compact('user'));
     }
 
+    // UNTUK USER UPDATE SENDIRI
     public function updateregister(Request $request)
     {
         $result = [];
@@ -190,9 +217,10 @@ class RegisterController extends Controller
     public function update_list_register(Request $request){
         $result = [];
         DB::beginTransaction();
+
         try {
-            // Validate the request data
-            $validatedData = $request->validate([
+            // ================= VALIDASI =================
+            $request->validate([
                 'email' => 'required|email',
                 'name' => 'required|string|max:255',
                 'password' => 'nullable|string|min:8',
@@ -205,60 +233,159 @@ class RegisterController extends Controller
                 return response()->json(['pesan' => 'User not found.'], 404);
             }
 
-            // Update user details
+            // ================= UPDATE DATA DASAR =================
             $user->email = $request->email;
-            $user->name = $request->name;
+            $user->name  = $request->name;
+
             if ($request->password) {
                 $user->password = Hash::make($request->password);
             }
 
-            // Update roles
+            // ================= ROLE SETUP =================
             $roleMapping = [
                 'AD' => 'admin',
                 'ST' => 'staff',
                 'CS' => 'customer',
+                'DV' => 'driver',
             ];
 
-            $role = $request->roles_list_reg;
-            $roleName = $roleMapping[$role] ?? 'customer';
+            $roleLama = strtolower(trim($user->roles));
+            $roleCode = $request->roles_list_reg;
+            $roleBaru = $roleMapping[$roleCode] ?? 'customer';
 
-            // Cek apakah roles berbeda dari sebelumnya
-            if($user->roles != $roleName){
-                // Buat request untuk generate_user_id dengan role baru
-                $generateRequest = new Request(['role' => $role]);
+            // ================= BLOK DRIVER → NON DRIVER =================
+            $driverData = null;
+            if ($roleLama === 'driver' && $roleBaru !== 'driver') {
 
-                // Panggil metode generateUserId untuk mendapatkan user_id baru
-                $userIdResponse = $this->generate_user_id($generateRequest);
-                $userId = $userIdResponse->getData()->user_id;
+                $driverData = Driver::where('user_id', $user->user_id)->first();
 
-                // Update user_id dan roles
-                $user->user_id = $userId;
-                $user->roles = $roleName;
+                if ($driverData) {
+                    $kodeDriver = (int) $driverData->KODE;
+
+                    $dipakai = Expedisi::whereRaw('CAST(DRIVER AS UNSIGNED) = ?', [$kodeDriver])
+                        ->orWhereRaw('CAST(DRIVER2 AS UNSIGNED) = ?', [$kodeDriver])
+                        ->exists();
+
+                    // ❌ masih dipakai → TOLAK
+                    if ($dipakai) {
+                        DB::rollBack();
+                        return response()->json([
+                            'pesan' => 'Role driver masih aktif dan digunakan di data expedisi. Tidak dapat diubah.'
+                        ], 422);
+                    }
+                    // ✅ TIDAK dipakai → LANJUT (nanti dihapus)
+                }
+            }
+            // ================= UPDATE ROLE & USER_ID =================
+            if ($user->roles !== $roleBaru) {
+                $oldUserId = $user->user_id;
+                // generate user_id baru
+                $generateRequest = new Request(['role' => $roleCode]);
+                $userIdResponse  = $this->generate_user_id($generateRequest);
+                $newUserId       = $userIdResponse->getData()->user_id;
+
+                $user->user_id = $newUserId;
+                $user->roles   = $roleBaru;
+
+                // ============ DRIVER → NON DRIVER (HAPUS DATA DRIVER) ============
+                if ($roleLama === 'driver' && $roleBaru !== 'driver' && $driverData) {
+                    Driver::where('user_id', $oldUserId)->delete();
+                }
+
+                // ============ NON DRIVER → DRIVER (INSERT DRIVER) ============
+                if ($roleLama !== 'driver' && $roleBaru === 'driver') {
+
+                    // generate KODE driver (angka murni)
+                    $lastKode = Driver::lockForUpdate()
+                        ->orderByRaw('CAST(KODE AS UNSIGNED) DESC')
+                        ->value('KODE');
+
+                    $nextKode = $lastKode ? ((int) $lastKode) + 1 : 1;
+
+                    Driver::create([
+                        'user_id' => $newUserId,
+                        'KODE'    => (string) $nextKode,
+                        'NAMA'    => $request->name,
+                        'ALAMAT'  => '0',
+                        'PHONE'   => '0',
+                        'MULAI'   => Carbon::now(),
+                    ]);
+                }
             }
 
+            // ================= SAVE =================
             $user->save();
-
             DB::commit();
-            $result['pesan'] = 'Update Berhasil.';
-            $result['user_id_baru'] = $user->user_id; // Tambahkan user_id baru jika berubah (untuk keperluan debugu, kalo tidak perlu bisa dihapus)
+
+            return response()->json([
+                'pesan' => 'Update Berhasil.',
+                'user_id_baru' => $user->user_id
+            ]);
+
         } catch (\Illuminate\Validation\ValidationException $e) {
-            DB::rollback();
-            $result['pesan'] = 'Validation Error: ' . implode(', ', Arr::flatten($e->errors()));
+            DB::rollBack();
+            return response()->json([
+                'pesan' => 'Validation Error: ' . implode(', ', Arr::flatten($e->errors()))
+            ], 422);
+
         } catch (\Exception $e) {
-            DB::rollback();
-            $result['pesan'] = 'Error: ' . $e->getMessage();
+            DB::rollBack();
+            return response()->json([
+                'pesan' => 'Error: ' . $e->getMessage()
+            ], 500);
         }
-        return response()->json($result);
     }
 
-    public function delete_list_register($id){
-        $user = User::find($id);
+    public function delete_list_register($id)
+    {
+        DB::beginTransaction();
 
-        if ($user){
+        try {
+            $user = User::where('user_id', $id)->first();
+
+            if (!$user) {
+                return response()->json(['error' => 'User tidak ditemukan'], 404);
+            }
+
+            // ================= JIKA ROLE DRIVER =================
+            if (strtolower($user->roles) === 'driver') {
+
+                $driver = Driver::where('user_id', $user->user_id)->first();
+
+                if ($driver) {
+                    $kodeDriver = (int) $driver->KODE;
+
+                    $dipakai = Expedisi::whereRaw('CAST(DRIVER AS UNSIGNED) = ?', [$kodeDriver])
+                        ->orWhereRaw('CAST(DRIVER2 AS UNSIGNED) = ?', [$kodeDriver])
+                        ->exists();
+
+                    // ❌ DRIVER MASIH DIPAKAI
+                    if ($dipakai) {
+                        DB::rollBack();
+                        return response()->json([
+                            'error' => 'Driver masih digunakan di data expedisi. Tidak dapat dihapus.'
+                        ], 422);
+                    }
+
+                    // ✅ AMAN → HAPUS DATA DRIVER
+                    $driver->delete();
+                }
+            }
+
+            // ================= HAPUS USER =================
             $user->delete();
-            return response()->json(['success' => 'User berhasil dihapus']);
-        }else{
-            return response()->json(['error' => 'User tidak ditemukan'], 404);
+
+            DB::commit();
+
+            return response()->json([
+                'success' => 'User berhasil dihapus'
+            ]);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'error' => 'Terjadi kesalahan: ' . $e->getMessage()
+            ], 500);
         }
     }
 

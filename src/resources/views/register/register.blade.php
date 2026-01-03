@@ -50,6 +50,7 @@
                     <select name="role" id="role" class="form-select">
                         <option value="AD">Admin</option>
                         <option value="ST">Staff</option>
+                        <option value="DV">Driver</option>
                         <option value="CS">Customer</option>
                     </select>
                 </div>

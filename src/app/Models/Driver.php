@@ -14,6 +14,7 @@ class Driver extends Model
         'ALAMAT',
         'PHONE',
         'MULAI',
+        'user_id',
     ];
 
     protected $casts = [

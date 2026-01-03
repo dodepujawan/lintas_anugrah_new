@@ -81,6 +81,7 @@
                         <select name="roles_list_reg" id="roles_list_reg" class="form-control">
                             <option value="AD">Admin</option>
                             <option value="ST">Staff</option>
+                            <option value="DV">Driver</option>
                             <option value="CS">Customer</option>
                        </select>
                     </div>
@@ -118,7 +119,7 @@ $(document).ready(function() {
                 {
                     data: null,
                     render: function (data, type, row) {
-                        return '<button class="btn btn-primary btn-sm editBtn" data-id="' + row.id + '">' + '<i class="bx bx-edit"></i>' + '</button> ' + '<button class="btn btn-danger btn-sm deleteBtn" data-id="' + row.id + '">' + '<i class="bx bx-trash"></i>' + '</button>';
+                        return '<button class="btn btn-primary btn-sm editBtn" data-id="' + row.id + '">' + '<i class="bx bx-edit"></i>' + '</button> ' + '<button class="btn btn-danger btn-sm deleteBtn" data-id="' + row.user_id + '">' + '<i class="bx bx-trash"></i>' + '</button>';
                     }
                 }
             ],
@@ -178,6 +179,8 @@ $(document).ready(function() {
             $('#roles_list_reg').val("ST");
         }else if(hidden_role === 'customer'){
             $('#roles_list_reg').val("CS");
+        }else if(hidden_role === 'driver'){
+            $('#roles_list_reg').val("DV");
         }
     }
 
