@@ -114,7 +114,7 @@
             </div>
             <div class="col-md-3">
                 <label class="form-label">NOMOR PERJALANAN</label>
-                <input type="text" class="form-control form-control-sm" id="nomor_perjalanan_expedisi" name="nomor_perjalanan_expedisi">
+                <input type="text" class="form-control form-control-sm" id="nomor_perjalanan_expedisi" name="nomor_perjalanan_expedisi" placeholder="Auto Generate !" readonly>
             </div>
         </div>
         <div class="row">
@@ -600,6 +600,43 @@ $(document).ready(function() {
         }
     });
     resetFormExpedisi();
+    // ================================= driver Login =====================================
+    const userRole = "{{ auth()->user()->roles }}";
+    const userId = "{{ auth()->user()->user_id }}";
+    // console.log(userId);
+    if (userRole === 'driver') {
+        const driverDataUrlTemplate = "{{ route('driver-det.data', ['user_id' => ':user_id']) }}";
+        function getMyKodeDriver(userId) {
+            const url = driverDataUrlTemplate.replace(':user_id', userId);
+            return $.ajax({
+                url: url,
+                type: 'GET',
+                dataType: 'json'
+            });
+        }
+        getMyKodeDriver(userId)
+            .done(function (res) {
+                if (res.success) {
+                    $('#driver_1_expedisi_id').val(res.kode);
+                    $('#driver_1_expedisi').val(res.nama);
+                    $('#driver_1_expedisi_btn')
+                    .prop('disabled', true)
+                    .addClass('disabled');
+
+                    $('#jumlah_expedisi').prop('readonly', true);
+                    $('#harga_expedisi').prop('readonly', true);
+                    $('#disc_expedisi').prop('readonly', true);
+                    $('#del_charge_expedisi').prop('readonly', true);
+                    $('#auto_dc_expedisi').prop('disabled', true).addClass('disabled');
+                    $('#jumlah_expedisi').val(1);
+                }
+            })
+            .fail(function (xhr) {
+                console.error(xhr.responseText);
+                alert('Data driver tidak ditemukan');
+            });
+    }
+    // ============================ End Of driver Login ===================================
     // ================================= Pilih No Muat =====================================
     $('#muat_expedisi_btn').click(function(e) {
         e.preventDefault();
@@ -805,11 +842,12 @@ $(document).ready(function() {
         var harga = row.find('td:eq(5)').text().trim();
 
         // Mengisi nilai ke elemen yang dituju
+        $('#jumlah_expedisi').val(1);
         $('#item_expedisi_id').val(kodeCus);
         $('#item_expedisi').val(keterangan);
         $('#rute_expedisi').val(rute);
         $('#harga_expedisi').val(harga);
-
+        calculateTotal();
         // Tutup modal
         $('#itemModalExp').modal('hide');
     });

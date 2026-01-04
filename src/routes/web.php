@@ -77,6 +77,7 @@ Route::prefix('driver')->group(function () {
     // Callback
     Route::get('/driver_kode', [DriverController::class, 'driver_kode'])->name('driver_kode');
     Route::get('/data/model', [DriverController::class, 'dataModal'])->name('driver-modal.data');
+    Route::get('/data/driver/{user_id}', [DriverController::class, 'dataDriver'])->name('driver-det.data');
 });
 
 Route::prefix('price-expedition')->group(function() {

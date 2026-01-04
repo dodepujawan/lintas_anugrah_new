@@ -68,6 +68,7 @@ class ExpedisiController extends Controller
             // ======================
             $nomuat = $this->generateNomuatWithLock();
             $nosurjal = $this->generateNoSuratJalan();
+            $nojalan = $this->generateNoJalan();
             // ======================
             // HITUNG TOTAL DARI REQUEST
             // ======================
@@ -89,7 +90,7 @@ class ExpedisiController extends Controller
                 // IDENTITAS & DOKUMEN
                 'NOMUAT' => $nomuat,
                 'TGLMUAT' => $request->TGLMUAT,
-                'NOJALAN' => $request->NOJALAN,
+                'NOJALAN' => $nojalan,
                 'WILAYAH' => $request->WILAYAH ?? 'denpasar',
                 'CUSTOMER_KODE' => $request->customer_expedisi_id,
                 'CUSTOMER' => $request->CUSTOMER,
@@ -140,6 +141,7 @@ class ExpedisiController extends Controller
                 'KETERANGAN' => $request->KETERANGAN ?? 'EXPEDISI BARU',
 
                 // USER INFO
+                'user_id' => auth()->user()->user_id ?? 'SYSTEM',
                 'user' => auth()->user()->name ?? 'SYSTEM',
                 // 'USERINV' => auth()->user()->name ?? 'SYSTEM',
                 // 'USERKENDARAAN' => auth()->user()->name ?? 'SYSTEM',
@@ -205,6 +207,11 @@ class ExpedisiController extends Controller
             'STS',
             'created_at'
         ]);
+
+        // 🔐 FILTER ROLE DRIVER
+        if (auth()->user()->roles === 'driver') {
+            $expedisi->where('user_id', auth()->user()->user_id);
+        }
 
         // Filter tanggal mulai
         if ($request->has('tgl_mulai') && !empty($request->tgl_mulai)) {
@@ -547,6 +554,20 @@ class ExpedisiController extends Controller
     private function generateNoSuratJalan(){
         // Ambil nomor terakhir dari database
         $last = Expedisi::orderBy('NOSJ', 'desc')->first();
+
+        if ($last) {
+            $nextNumber = $last->NOSJ + 1;
+        } else {
+            $nextNumber = 1;
+        }
+
+        // Format 5 digit: 00001, 00002, dst
+        return str_pad($nextNumber, 5, '0', STR_PAD_LEFT);
+    }
+
+    private function generateNoJalan(){
+        // Ambil nomor terakhir dari database
+        $last = Expedisi::orderBy('NOJALAN', 'desc')->first();
 
         if ($last) {
             $nextNumber = $last->NOSJ + 1;

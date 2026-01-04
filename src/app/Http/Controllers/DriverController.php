@@ -147,6 +147,23 @@ class DriverController extends Controller
             ->rawColumns(['action'])
             ->make(true);
     }
+
+    public function dataDriver($user_id)
+    {
+        $driver = DB::table('driver')
+        ->where('user_id', $user_id)
+        ->first();
+
+        if (!$driver) {
+            return response()->json(['success' => false], 404);
+        }
+
+        return response()->json([
+            'success' => true,
+            'kode' => $driver->KODE,
+            'nama' => $driver->NAMA
+        ]);
+    }
 }
 
 // public function driver_kode() {
