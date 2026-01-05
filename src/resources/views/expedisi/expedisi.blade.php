@@ -331,7 +331,7 @@
     </div>
 
     <!-- Tabel Data SJ -->
-    <div class="card-expedisi">
+    <div class="card-expedisi tabel-surat-jalan">
         <div class="card-expedisi-header">
             <h5><i class='bx bx-table me-2'></i>DATA SURAT JALAN</h5>
         </div>
@@ -357,8 +357,14 @@
                     </tr>
                 </thead>
                 <tbody>
-
                 </tbody>
+                <tfoot>
+                    <tr>
+                        <th colspan="12" class="text-end">GRAND TOTAL</th>
+                        <th class="text-end" id="grandTotal">0</th>
+                        <th></th>
+                    </tr>
+                </tfoot>
             </table>
         </div>
     </div>
@@ -629,6 +635,7 @@ $(document).ready(function() {
                     $('#del_charge_expedisi').prop('readonly', true);
                     $('#auto_dc_expedisi').prop('disabled', true).addClass('disabled');
                     $('#jumlah_expedisi').val(1);
+                    $('.tabel-surat-jalan').hide();
                 }
             })
             .fail(function (xhr) {
@@ -1133,16 +1140,18 @@ $(document).ready(function() {
                     focusConfirm: true
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        addRowExpedisi({
-                            NOSJ: response.data.NOSJ,
-                            tglsj: $('#tgl_sj_expedisi').val(),
-                            JUMLAH: formData.JUMLAH,
-                            HARGA: parseNumber(formData.HARGA),
-                            DC: parseNumber(formData.DC),
-                            NDISC: formData.DISC,
-                            PPN: formData.PPN,
-                            GRAND: parseNumber(formData.GRAND),
-                        });
+                        if (userRole === 'admin') {
+                            addRowExpedisi({
+                                NOSJ: response.data.NOSJ,
+                                tglsj: $('#tgl_sj_expedisi').val(),
+                                JUMLAH: formData.JUMLAH,
+                                HARGA: parseNumber(formData.HARGA),
+                                DC: parseNumber(formData.DC),
+                                NDISC: formData.DISC,
+                                PPN: formData.PPN,
+                                GRAND: parseNumber(formData.GRAND),
+                            });
+                        }
                         resetFormExpedisi();
                     }
                 });
@@ -1411,17 +1420,39 @@ $(document).ready(function() {
                 <td class="text-end">${nvl(data.HARGA)}</td>
                 <td class="text-end">${nvl(data.NDISC)}</td>
                 <td class="text-end">${nvl(data.PPN)}</td>
-                <td class="text-end">${nvl(data.GRAND)}</td>
+                <td class="text-end">${formatNumber(nvl(data.GRAND))}</td>
 
                 <td class="text-center">
                     <button class="btn btn-danger btn-sm btn-hapus-row">
-                        <i class="fa fa-trash"></i>
+                        <i class="bx bx-trash"></i>
                     </button>
                 </td>
             </tr>
         `;
 
         tbody.append(row);
+        hitungGrandTotal();
+    }
+
+    // Hapus row saat tombol trash diklik
+    $(document).on('click', '.btn-hapus-row', function () {
+        let row = $(this).closest('tr');
+        row.remove();
+        $('#tableProsesExpedisi tbody tr').each(function (index) {
+            $(this).find('td:eq(0)').text(index + 1);
+        });
+        hitungGrandTotal();
+    });
+
+    function hitungGrandTotal() {
+        let total = 0;
+
+        $('#tableProsesExpedisi tbody tr').each(function () {
+            let nilai = $(this).find('td:eq(12)').text();
+            total += parseNumber(nilai) || 0;
+        });
+
+        $('#grandTotal').text(total.toLocaleString('id-ID'));
     }
 
     // function hitungExpedisi() {
