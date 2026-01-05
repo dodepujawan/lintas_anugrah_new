@@ -9,6 +9,7 @@ use App\Models\Expedisi;
 use App\Models\Mcustomer;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Log;
+use Mpdf\Mpdf;
 
 class ExpedisiController extends Controller
 {
@@ -577,5 +578,28 @@ class ExpedisiController extends Controller
 
         // Format 5 digit: 00001, 00002, dst
         return str_pad($nextNumber, 5, '0', STR_PAD_LEFT);
+    }
+
+    // Print PDF
+    public function printSuratJalan($id){
+        $expedisi = Expedisi::findOrFail($id);
+
+        $mpdf = new Mpdf([
+            'mode' => 'utf-8',
+            'format' => 'A4',
+            'margin_top' => 10,
+            'margin_bottom' => 10,
+            'margin_left' => 10,
+            'margin_right' => 10,
+        ]);
+
+        $html = view('expedisi.expedisi-surjal-pdf', compact('expedisi'))->render();
+
+        $mpdf->WriteHTML($html);
+
+        return response($mpdf->Output(
+            'Surat-Jalan-'.$expedisi->NOSJ.'.pdf',
+            'I'
+        ))->header('Content-Type', 'application/pdf');
     }
 }

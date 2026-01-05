@@ -131,6 +131,8 @@ Route::prefix('expedisi')->group(function() {
     Route::get('/show', [ExpedisiController::class, 'show'])->name('expedisi.show');
     Route::post('/update/{nomuat}', [ExpedisiController::class, 'update'])->name('expedisi.update');
     Route::post('/destroy/{id}', [ExpedisiController::class, 'destroy'])->name('expedisi.destroy');
+    // PDF
+    Route::get('/expedisi/{id}/print-surat-jalan', [ExpedisiController::class, 'printSuratJalan'])->name('expedisi.printSuratJalan');
 });
 
 Route::prefix('pajak')->middleware('auth')->group(function () {

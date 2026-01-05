@@ -327,6 +327,11 @@
                     <i class='bx bx-trash me-1'></i>Clear [F6]
                 </button>
             </div>
+            <div class="col-md-3 col-sm-6 d-none" id="divPrintSuratJalan">
+                <button class="btn btn-primary" id="btnPrintSuratJalan" data-id="">
+                    <i class="bx bx-printer"></i> Print Surat Jalan
+                </button>
+            </div>
         </div>
     </div>
 
@@ -1247,6 +1252,10 @@ $(document).ready(function() {
                         $('#disc_expedisi').val(parseFloat(data.disc_percent) || 0);
                         $('#del_charge_expedisi').val(data.del_charge || 0);
 
+                        // Button Print PDF
+                        $('#divPrintSuratJalan').removeClass('d-none');
+                        $('#btnPrintSuratJalan').attr('data-id',id);
+
                         // Hitung total otomatis
                         calculateTotal();
 
@@ -1281,6 +1290,14 @@ $(document).ready(function() {
         });
     });
     // ======================== End Of Show Detail =============================
+    // =========================== Print PDF ================================
+    $('#btnPrintSuratJalan').on('click', function () {
+        let id = $(this).data('id');
+        let url = "{{ route('expedisi.printSuratJalan', ':id') }}";
+        url = url.replace(':id', id);
+        window.open(url, '_blank');
+    });
+    // ======================== End Of Print PDF =============================
     // ======================== End Of Clear Form =============================
     $('#buttonClearExp').click(function() {
         resetFormExpedisi();
@@ -1355,6 +1372,7 @@ $(document).ready(function() {
             .data('mode', 'save')
             .data('id', '')
             .find('.badge').remove(); // Hapus badge jika ada
+            $('#divPrintSuratJalan').addClass('d-none');
     }
 
     function resetFormExpedisi() {
