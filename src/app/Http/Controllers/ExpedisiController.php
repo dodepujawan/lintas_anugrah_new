@@ -583,6 +583,14 @@ class ExpedisiController extends Controller
     // Print PDF
     public function printSuratJalan($id){
         $expedisi = Expedisi::findOrFail($id);
+        $user = auth()->user();
+
+        // 🔐 CEK AKSES
+        if ($user->roles !== 'admin') {
+            if ($expedisi->user_id !== $user->user_id) {
+                abort(403, 'Anda tidak berhak mencetak surat jalan ini');
+            }
+        }
 
         $mpdf = new Mpdf([
             'mode' => 'utf-8',
@@ -597,9 +605,11 @@ class ExpedisiController extends Controller
 
         $mpdf->WriteHTML($html);
 
-        return response($mpdf->Output(
-            'Surat-Jalan-'.$expedisi->NOSJ.'.pdf',
-            'I'
-        ))->header('Content-Type', 'application/pdf');
+        return response(
+            $mpdf->Output(
+                'Surat-Jalan-' . $expedisi->NOSJ . '.pdf',
+                'I'
+            )
+        )->header('Content-Type', 'application/pdf');
     }
 }

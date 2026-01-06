@@ -252,7 +252,7 @@ $(document).ready(function() {
         });
     }
 // ========================= End Of New Price Dingin ======================================
-// ========================= New Price Dingin ======================================
+// ========================= New Expedisi ======================================
     $(document).on('click', '#sidebar_new_expedisi', function(e) {
         e.preventDefault();
         loadNewExpedisiForm();
@@ -270,7 +270,26 @@ $(document).ready(function() {
             }
         });
     }
-// ========================= End Of New Price Dingin ======================================
+// ========================= End Of New Expedisi ======================================
+// ========================= New Rent Dingin ======================================
+    $(document).on('click', '#sidebar_new_rent_dingin', function(e) {
+        e.preventDefault();
+        loadNewRentDPendinginForm();
+    });
+
+    function loadNewRentDPendinginForm() {
+        $.ajax({
+            url: '{{ route('rentPendingin.index') }}', // Route to load the form
+            type: 'GET',
+            success: function(response) {
+                $('.master-page').html(response);
+            },
+            error: function() {
+                $('.master-page').html('<p>Error loading form.</p>');
+            }
+        });
+    }
+// ========================= End Of New Rent Dingin ======================================
 // ========================= Update Pajak ======================================
     $(document).on('click', '#sidebar_extra_pajak', function(e) {
         e.preventDefault();

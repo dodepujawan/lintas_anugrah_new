@@ -117,9 +117,14 @@
                     <span class="menu-text">Ekspedisi</span>
                     </a>
                 </li>
-                   <li class="menu-item">
-                        <div class="dropdown-divider my-2"></div>
-                    </li>
+                <li class="menu-item">
+                    <div class="dropdown-divider my-2"></div>
+                </li>
+                <li class="menu-item">
+                    <a href="#" class="menu-link" id="sidebar_new_rent_dingin">
+                    <span class="menu-text">Sewa Mobil Pendingin</span>
+                    </a>
+                </li>
                 {{-- <li class="menu-item">
                     <a href="#" class="menu-link" id="sidebar_new_rent">
                     <span class="menu-text">Rent</span>

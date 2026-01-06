@@ -114,7 +114,7 @@
             </div>
             <div class="col-md-3">
                 <label class="form-label">NOMOR PERJALANAN</label>
-                <input type="text" class="form-control form-control-sm" id="nomor_perjalanan_expedisi" name="nomor_perjalanan_expedisi" placeholder="Auto Generate !" readonly>
+                <input type="text" class="form-control form-control-sm" id="nomor_perjalanan_expedisi" name="nomor_perjalanan_expedisi" placeholder="Auto Generate" readonly>
             </div>
         </div>
         <div class="row">
@@ -166,7 +166,7 @@
                 <label class="form-label">KENDARAAN</label>
                 <div class="input-group input-group-sm">
                     <input type="hidden" class="form-control" id="kendaraan_expedisi_id" name="kendaraan_expedisi_id" placeholder="Pilih kendaraan...">
-                    <input type="text" class="form-control" id="kendaraan_expedisi" name="kendaraan_expedisi" readonly>
+                    <input type="text" class="form-control" id="kendaraan_expedisi" name="kendaraan_expedisi" placeholder="Pilih kendaraan..." readonly>
                     <button class="btn btn-outline-secondary" id="kendaraan_expedisi_btn"><i class="bx bx-search"></i></button>
                 </div>
             </div>

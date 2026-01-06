@@ -12,6 +12,7 @@ use App\Http\Controllers\PricesCustomerController;
 use App\Http\Controllers\PricedinginController;
 use App\Http\Controllers\PricedinginCustomerController;
 use App\Http\Controllers\ExpedisiController;
+use App\Http\Controllers\RentPendinginController;
 use App\Http\Controllers\PajakController;
 
 Route::get('/', function () {
@@ -133,6 +134,18 @@ Route::prefix('expedisi')->group(function() {
     Route::post('/destroy/{id}', [ExpedisiController::class, 'destroy'])->name('expedisi.destroy');
     // PDF
     Route::get('/expedisi/{id}/print-surat-jalan', [ExpedisiController::class, 'printSuratJalan'])->name('expedisi.printSuratJalan');
+});
+
+Route::prefix('rent-pendingin')->group(function() {
+    Route::get('/', [RentPendinginController::class, 'index'])->name('rentPendingin.index');
+    // Route::get('/data/cus', [ExpedisiController::class, 'getDataCustomer'])->name('expedisi-cus.data');
+    // Route::post('/store', [ExpedisiController::class, 'store'])->name('expedisi.store');
+    // Route::get('/data', [ExpedisiController::class, 'getData'])->name('expedisi.data');
+    // Route::get('/show', [ExpedisiController::class, 'show'])->name('expedisi.show');
+    // Route::post('/update/{nomuat}', [ExpedisiController::class, 'update'])->name('expedisi.update');
+    // Route::post('/destroy/{id}', [ExpedisiController::class, 'destroy'])->name('expedisi.destroy');
+    // // PDF
+    // Route::get('/expedisi/{id}/print-surat-jalan', [ExpedisiController::class, 'printSuratJalan'])->name('expedisi.printSuratJalan');
 });
 
 Route::prefix('pajak')->middleware('auth')->group(function () {
