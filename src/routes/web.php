@@ -140,10 +140,10 @@ Route::prefix('rent-pendingin')->group(function() {
     Route::get('/', [RentPendinginController::class, 'index'])->name('rentPendingin.index');
     // Route::get('/data/cus', [ExpedisiController::class, 'getDataCustomer'])->name('expedisi-cus.data');
     // Route::post('/store', [ExpedisiController::class, 'store'])->name('expedisi.store');
-    // Route::get('/data', [ExpedisiController::class, 'getData'])->name('expedisi.data');
+    Route::get('/data', [RentPendinginController::class, 'getData'])->name('rentPendingin.data');
     // Route::get('/show', [ExpedisiController::class, 'show'])->name('expedisi.show');
     // Route::post('/update/{nomuat}', [ExpedisiController::class, 'update'])->name('expedisi.update');
-    // Route::post('/destroy/{id}', [ExpedisiController::class, 'destroy'])->name('expedisi.destroy');
+    Route::post('/destroy/{id}', [RentPendinginController::class, 'destroy'])->name('rentPendingin.destroy');
     // // PDF
     // Route::get('/expedisi/{id}/print-surat-jalan', [ExpedisiController::class, 'printSuratJalan'])->name('expedisi.printSuratJalan');
 });

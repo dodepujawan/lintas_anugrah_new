@@ -207,7 +207,7 @@ class ExpedisiController extends Controller
             'NAMA_DRIVER',
             'STS',
             'created_at'
-        ]);
+        ])->where('JENIS', 'EKS');
 
         // 🔐 FILTER ROLE DRIVER
         if (auth()->user()->roles === 'driver') {

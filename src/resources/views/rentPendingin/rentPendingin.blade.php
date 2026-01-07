@@ -104,8 +104,44 @@
         padding: 10px;
         font-size: 0.8rem;
     }
+    /* === PERBAIKAN: CONTAINER LEBIH LEBAR === */
+    /* .container-fluid {
+            max-width: 1600px !important;
+            margin: 0 auto !important;
+            padding-left: 30px !important;
+            padding-right: 30px !important;
+            width: 100% !important;
+        } */
+
+        /* PERBAIKAN: Kolom lebih lebar */
+        /* .col-lg-12 {
+            width: 100% !important;
+            max-width: 100% !important;
+        } */
+
+        /* PERBAIKAN: Input group lebih proporsional */
+        /* .input-group-sm {
+            height: auto !important;
+        } */
+
+        /* PERBAIKAN: Badge lebih besar */
+        /* .badge {
+            font-size: 0.9rem !important;
+            padding: 6px 10px !important;
+        } */
+
+        /* PERBAIKAN: Textarea lebih tinggi */
+        /* textarea.form-control-sm {
+            min-height: 80px !important;
+        } */
+
+        /* PERBAIKAN: Hapus batasan width pada kolom */
+        /* .col-lg-10, .col-xl-9 {
+            max-width: 100% !important;
+            flex: 0 0 100% !important;
+        } */
 </style>
-<div class="container-fluid mt-3 mb-5">
+<div class="container-fluid mt-4 mb-5" >
     <div class="row justify-content-center">
         <div class="col-lg-10 col-xl-9">
             <!-- Header Form -->
@@ -122,14 +158,19 @@
 
                 <!-- Informasi Nomor Muat -->
                 <div class="row mb-4">
-                    <div class="col-md-8">
+                    <div class="col-md-6">
                         <div class="row align-items-center">
-                            <div class="col-md-3">
-                                <label class="form-label">NO.MUAT</label>
+                            <div class="col-md-6">
+                            <label class="form-label">NO.MUAT</label>
+                            <div class="input-group input-group-sm">
                                 <input type="text" id="no_muat_rent_dingin" name="no_muat_rent_dingin"
-                                        class="form-control form-control-sm" value="MU20260000023" readonly>
+                                        class="form-control form-control-sm" placeholder="Auto Generate/ click for update" readonly>
+                                <button class="btn btn-outline-primary border-start-0" id="no_muat_rent_dingin_btn" type="button">
+                                    <i class="bx bx-search"></i>
+                                </button>
                             </div>
-                            <div class="col-md-3">
+</div>
+                            <div class="col-md-6">
                                 <label class="form-label">WILAYAH NOSJ</label>
                                 <select id="wilayah_nosj_rent_dingin" name="wilayah_nosj_rent_dingin"
                                         class="form-select form-select-sm">
@@ -139,12 +180,12 @@
                                     <option>BANDUNG</option>
                                 </select>
                             </div>
-                            <div class="col-md-2">
+                            {{-- <div class="col-md-2">
                                 <button class="btn btn-sm btn-outline-primary btn-action mt-4">CARI</button>
-                            </div>
+                            </div> --}}
                         </div>
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-6">
                         <div class="row">
                             <div class="col-md-6">
                                 <label class="form-label">TANGGAL</label>
@@ -425,3 +466,164 @@
         </div>
     </div>
 </div>
+{{-- Modal Muat Expedisi --}}
+<div class="modal fade" id="muatModalRentDgn" tabindex="-1">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Data Rental Mobil Pendingin</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row mb-3">
+                    <div class="col-md-3">
+                        <label>Tanggal Mulai</label>
+                        <input type="date" class="form-control form-control-sm" id="filter_tgl_mulai_rentdgn">
+                    </div>
+                    <div class="col-md-3">
+                        <label>Tanggal Akhir</label>
+                        <input type="date" class="form-control form-control-sm" id="filter_tgl_akhir_rentdgn">
+                    </div>
+                    <div class="col-md-3">
+                        <label>Filter Data</label>
+                        <input type="text" class="form-control form-control-sm" id="filter_rent_dgn">
+                    </div>
+                    <div class="col-md-3">
+                            <label>&nbsp;</label>
+                            <div>
+                                <button class="btn btn-sm btn-info" id="btn_filter_rent_dgn">
+                                    <i class='bx bx-filter'></i> Filter
+                                </button>
+                            </div>
+                        </div>
+                </div>
+                <div class="table-responsive">
+                <table class="table table-bordered table-striped w-100" id="modalMuatRentDgnTable">
+                    <thead>
+                    <tr>
+                        <th width="30">No</th>
+                        <th>NO MUAT</th>
+                        <th>TGL MUAT</th>
+                        <th>CUSTOMER</th>
+                        <th>RUTE</th>
+                        <th>JUMLAH</th>
+                        <th>HARGA</th>
+                        <th>DISC</th>
+                        <th>DEL CHARGE</th>
+                        <th>TOTAL</th>
+                        <th>NO SJ</th>
+                        <th width="120">AKSI</th>
+                    </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+$(document).ready(function() {
+    // Set CSRF token in AJAX setup
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }
+    });
+    // ================================= Pilih No Muat =====================================
+    $('#no_muat_rent_dingin_btn').click(function(e) {
+        e.preventDefault();
+        $('#muatModalRentDgn').modal('show');
+        // hancurkan datatable jika sudah pernah dipakai
+        if ($.fn.DataTable.isDataTable('#modalMuatRentDgnTable')) {
+            $('#modalMuatRentDgnTable').DataTable().destroy();
+        }
+        var tableMuat = $('#modalMuatRentDgnTable').DataTable({
+            processing: true,
+            serverSide: true,
+            searching: false,
+            ajax: {
+            url: "{{ route('rentPendingin.data') }}",
+                data: function(d) {
+                    d.tgl_mulai = $('#filter_tgl_mulai_rentdgn').val();
+                    d.tgl_akhir = $('#filter_tgl_akhir_rentdgn').val();
+                    d.search_muat = $('#filter_rent_dgn').val();
+                }
+            },
+            // Scroll settings
+            scrollX: true,
+            scrollY: "400px",
+            scrollCollapse: true,
+            // Responsive settings
+            responsive: true,
+            autoWidth: true,
+            columns: [
+                { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false },
+                { data: 'NOMUAT', name: 'NOMUAT' },
+                { data: 'TGLMUAT', name: 'TGLMUAT' },
+                { data: 'CUSTOMER', name: 'CUSTOMER' },
+                { data: 'rute', name: 'rute' },
+                { data: 'JUMLAH', name: 'JUMLAH' },
+                { data: 'harga_formatted', name: 'HARGA' },
+                { data: 'DISC', name: 'DISC' },
+                { data: 'dc_formatted', name: 'DC' },
+                { data: 'total_formatted', name: 'GRAND' },
+                { data: 'NOSJ', name: 'NOSJ' },
+                { data: 'action', name: 'action', orderable: false, searchable: false }
+            ]
+        });
+
+        $('#btn_filter_rent_dgn').click(function () {
+            tableMuat.ajax.reload();
+        });
+    });
+    // ============================= End Of Pilih No Muat =====================================
+    // ================================ Delete No Muat ======================================
+    $(document).on('click', '.deleteRentDgn', function () {
+        let id     = $(this).data('id');
+        let nomuat = $(this).data('nomuat');
+
+        Swal.fire({
+            title: 'Hapus Data?',
+            text: 'No Muat ' + nomuat + ' akan dihapus!',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Ya, hapus',
+            cancelButtonText: 'Batal',
+            confirmButtonColor: '#d33'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                let url = "{{ route('rentPendingin.destroy', ':id') }}";
+                url = url.replace(':id', id);
+                $.ajax({
+                    url: url,
+                    type: 'POST',
+                    data: {
+                        _token: "{{ csrf_token() }}"
+                    },
+                    success: function (res) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Berhasil',
+                            text: res.message,
+                            timer: 1500,
+                            showConfirmButton: false
+                        });
+
+                        // reload datatable
+                        $('#modalMuatRentDgnTable').DataTable().ajax.reload(null, false);
+                    },
+                    error: function () {
+                        Swal.fire(
+                            'Gagal!',
+                            'Data tidak bisa dihapus',
+                            'error'
+                        );
+                    }
+                });
+            }
+        });
+    });
+    // ============================ End Of Delete No Muat ====================================
+});
+</script>
