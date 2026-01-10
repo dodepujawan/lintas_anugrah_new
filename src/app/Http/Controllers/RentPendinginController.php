@@ -120,4 +120,22 @@ class RentPendinginController extends Controller
             'message' => 'Data berhasil dihapus'
         ]);
     }
+
+    public function getDataCustomer(){
+        $customers = Mcustomer::select(['id', 'kode_cus','CUSTOMER', 'NAMACUST', 'TYPECUST', 'TELEPON', 'EMAIL', 'ALAMAT1', 'TELEPON', 'created_at']);
+
+        return DataTables::of($customers)
+            ->addIndexColumn()
+            ->addColumn('action', function($customer) {
+                return '
+                    <div class="btn-group">
+                        <button class="btn btn-sm btn-info view-btn-customer-rent-dingin" data-id="'.$customer->kode_cus.'" data-name="'.$customer->NAMACUST.'" data-customer="'.$customer->CUSTOMER.'" data-alamat="'.$customer->ALAMAT1.'" data-telepon="'.$customer->TELEPON.'" data-bs-toggle="tooltip" title="View">
+                            <i class="bx bx-check"></i>
+                        </button>
+                    </div>
+                ';
+            })
+            ->rawColumns(['action'])
+            ->make(true);
+    }
 }

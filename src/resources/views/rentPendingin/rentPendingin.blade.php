@@ -207,10 +207,31 @@
                         <div class="driver-section">
                             <div class="driver-header">DATA CUSTOMER</div>
                             <div class="row">
-                                <div class="col-md-8">
-                                    <label class="form-label">NAMA</label>
-                                    <input type="text" id="customer_rent_dingin" name="customer_rent_dingin"
-                                            class="form-control form-control-sm" placeholder="Masukkan nama customer">
+                                <div class="col-md-6 mt-2">
+                                    <div class="card border-light">
+                                        <div class="card-body p-2">
+                                            <label class="form-label fw-semibold">CUSTOMER</label>
+                                            <div class="input-group input-group-sm mb-2">
+                                                <input type="hidden" name="customer_rent_dingin_id" id="customer_rent_dingin_id">
+                                                <input type="text" class="form-control" id="customer_rent_dingin"
+                                                    name="customer_rent_dingin" readonly
+                                                    placeholder="Pilih customer...">
+                                                <button class="btn btn-outline-primary" id="customer_rent_dingin_btn" type="button">
+                                                    <i class="bx bx-search"></i>
+                                                </button>
+                                            </div>
+
+                                            <!-- CUSTOMER KODE -->
+                                            <div class="customer-kode-info">
+                                                <div class="d-flex align-items-center">
+                                                    <span class="badge bg-light text-dark me-2">Kode:</span>
+                                                    <input type="text" class="form-control form-control-sm border-0 bg-transparent"
+                                                        id="customer_kode_dingin" name="customer_kode_dingin"
+                                                        readonly style="font-weight: 600;">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                                 <div class="col-md-4">
                                     <label class="form-label">TELPON</label>
@@ -237,13 +258,11 @@
                             <div class="row">
                                 <div class="col-md-12">
                                     <label class="form-label">KENDARAAN</label>
-                                    <select id="kendaraan_rent_dingin" name="kendaraan_rent_dingin"
-                                            class="form-select form-select-sm">
-                                        <option selected>Pilih kendaraan</option>
-                                        <option>Truck Box Pendingin 10 Ton</option>
-                                        <option>Minibus Pendingin 2 Ton</option>
-                                        <option>Mobil Pendingin 5 Ton</option>
-                                    </select>
+                                    <div class="input-group input-group-sm">
+                                        <input type="hidden" class="form-control" id="kendaraan_rent_dingin_id" name="kendaraan_rent_dingin_id" placeholder="Pilih kendaraan...">
+                                        <input type="text" class="form-control" id="kendaraan_rent_dingin" name="kendaraan_rent_dingin" placeholder="Pilih kendaraan..." readonly>
+                                        <button class="btn btn-outline-secondary" id="kendaraan_rent_dingin_btn"><i class="bx bx-search"></i></button>
+                                    </div>
                                 </div>
                             </div>
                             <div class="row mt-2">
@@ -270,13 +289,11 @@
                             <div class="row">
                                 <div class="col-md-12">
                                     <label class="form-label">DRIVER</label>
-                                    <select id="driver_rent_dingin" name="driver_rent_dingin"
-                                            class="form-select form-select-sm">
-                                        <option selected>Pilih driver</option>
-                                        <option>Budi Santoso</option>
-                                        <option>Agus Wijaya</option>
-                                        <option>Rudi Hartono</option>
-                                    </select>
+                                    <div class="input-group input-group-sm">
+                                        <input type="hidden" class="form-control" id="driver_rent_dingin_id" name="driver_rent_dingin_id">
+                                        <input type="text" class="form-control" id="driver_rent_dingin" name="driver_rent_dingin" readonly placeholder="Pilih drver I">
+                                        <button class="btn btn-outline-secondary" id="driver_rent_dingin_btn"><i class="bx bx-search"></i></button>
+                                    </div>
                                 </div>
                             </div>
                             <div class="row mt-2">
@@ -522,6 +539,97 @@
         </div>
     </div>
 </div>
+{{-- Modal Customer --}}
+<div class="modal fade" id="customerModalDgn" tabindex="-1">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Data Pelanggan</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="table-responsive">
+                <table class="table table-bordered table-striped w-100" id="modalCusDgnTable">
+                    <thead>
+                    <tr>
+                        <th>No</th>
+                        <th>Kode</th>
+                        <th>Nama</th>
+                        <th>Jenis Usaha</th>
+                        <th>Telepon</th>
+                        <th>Email</th>
+                        <th>Aksi</th>
+                    </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{{-- Modal Kendaraan --}}
+<div class="modal fade" id="kendaraanModalDgn" tabindex="-1">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Data Kendaraan</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="table-responsive">
+                <table class="table table-bordered table-striped w-100" id="modalKendaraanDgnTable">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>No</th>
+                            <th>Kode</th>
+                            <th>Nama</th>
+                            <th>Plat</th>
+                            <th>Jenis</th>
+                            <th>FNO PRK B</th>
+                            <th>FNO PRK P</th>
+                            <th>FNO PRK S</th>
+                            <th>FNO PRK O</th>
+                            <th>FNO PRK M</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{{-- Modal Driver --}}
+<div class="modal fade" id="driverModalDgn" tabindex="-1">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Data Driver</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="table-responsive">
+                <table class="table table-bordered table-striped w-100" id="modalDriverDgnTable">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>No</th>
+                            <th>Kode</th>
+                            <th>Nama</th>
+                            <th>Alamat</th>
+                            <th>Phone</th>
+                            <th>Mulai Kerja</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 <script>
 $(document).ready(function() {
     // Set CSRF token in AJAX setup
@@ -578,7 +686,7 @@ $(document).ready(function() {
         });
     });
     // ============================= End Of Pilih No Muat =====================================
-    // ================================ Delete No Muat ======================================
+    // ================================ Delete No Rent Pendingin ======================================
     $(document).on('click', '.deleteRentDgn', function () {
         let id     = $(this).data('id');
         let nomuat = $(this).data('nomuat');
@@ -624,6 +732,159 @@ $(document).ready(function() {
             }
         });
     });
-    // ============================ End Of Delete No Muat ====================================
+    // ========================= End Of Delete No Rent Pendingin =================================
+    // ================================= Pilih Customer =====================================
+    $('#customer_rent_dingin_btn').click(function(e) {
+        e.preventDefault();
+        $('#customerModalDgn').modal('show');
+        // hancurkan datatable jika sudah pernah dipakai
+        if ($.fn.DataTable.isDataTable('#modalCusDgnTable')) {
+            $('#modalCusDgnTable').DataTable().destroy();
+        }
+        var table = $('#modalCusDgnTable').DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: '{{ route("rentPendingin.data") }}',
+            // Scroll settings
+            scrollX: true,
+            scrollY: "400px",
+            scrollCollapse: true,
+            // Responsive settings
+            responsive: true,
+            autoWidth: true,
+            columns: [
+                { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false },
+                { data: 'kode_cus', name: 'kode_cus' },
+                { data: 'NAMACUST', name: 'NAMACUST' },
+                { data: 'TYPECUST', name: 'TYPECUST' },
+                { data: 'TELEPON', name: 'TELEPON' },
+                { data: 'EMAIL', name: 'EMAIL' },
+                { data: 'action', name: 'action', orderable: false, searchable: false }
+            ]
+        });
+
+        // Initialize tooltips
+        $('[data-bs-toggle="tooltip"]').tooltip();
+    });
+
+    // ### Select Button
+    $(document).on('click', '.view-btn-customer-rent-dingin', function(e) {
+        e.preventDefault();
+        var kodeCus = $(this).data('id');
+        var namaCus = $(this).data('name');
+        var CUSTOMER = $(this).data('customer');
+        var alamat = $(this).data('alamat');
+        var telepon = $(this).data('telepon');
+        // Mengisi nilai ke elemen yang dituju
+        $('#customer_rent_dingin_id').val(kodeCus);
+        $('#customer_rent_dingin').val(namaCus);
+        $('#customer_kode_dingin').val(CUSTOMER);
+        // Kosongkan dulu item
+        $('#alamat_rent_dingin').val(alamat);
+        $('#telpon_rent_dingin').val(telepon);
+
+        // Tutup modal
+        $('#customerModalDgn').modal('hide');
+    });
+    // ============================== End Of Pilih Customer ==================================
+    // =================================== Pilih Kendaraan =====================================
+    $(document).on('click', '#kendaraan_rent_dingin_btn', function(e) {
+
+        $('#kendaraanModalDgn').modal('show');
+
+        // hancurkan datatable jika sudah pernah dipakai
+        if ($.fn.DataTable.isDataTable('#modalKendaraanDgnTable')) {
+            $('#modalKendaraanDgnTable').DataTable().destroy();
+        }
+
+        // rebuild datatable
+        $('#modalKendaraanDgnTable').DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: {
+                url: "{{ route('kendaraan.datamodel') }}",
+            },
+            columns: [
+                {data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false},
+                {data: 'KODE', name: 'KODE'},
+                {data: 'NAMA', name: 'NAMA'},
+                {data: 'PLAT', name: 'PLAT'},
+                {data: 'JENIS', name: 'JENIS'},
+                {data: 'FNO_PRK_B', name: 'FNO_PRK_B'},
+                {data: 'FNO_PRK_P', name: 'FNO_PRK_P'},
+                {data: 'FNO_PRK_S', name: 'FNO_PRK_S'},
+                {data: 'FNO_PRK_O', name: 'FNO_PRK_O'},
+                {data: 'FNO_PRK_M', name: 'FNO_PRK_M'},
+                {data: 'action', name: 'action', orderable: false, searchable: false}
+            ]
+        });
+    });
+    // ### Select Button
+    $(document).on('click', '.pickKendaraanModel', function(e) {
+        e.preventDefault();
+        var kodeKendaraan = $(this).data('id');
+        // Ambil KETERANGAN dari kolom di baris yang sama
+        var row = $(this).closest('tr');
+        var keterangan = row.find('td:eq(1)').text();
+        var nama = row.find('td:eq(2)').text();
+
+        // Mengisi nilai ke elemen yang dituju
+        $('#kendaraan_rent_dingin_id').val(keterangan);
+        $('#kendaraan_rent_dingin').val(nama);
+
+        // Tutup modal
+        $('#kendaraanModalDgn').modal('hide');
+    });
+    // =============================== End Of Pilih Kendaraan ==================================
+    // =================================== Pilih Driver =====================================
+    $(document).on('click', '#driver_rent_dingin_btn', function(e) {
+        e.preventDefault();
+        var kodeKen = $(this).data('id');
+        $('#driverModalDgn').modal('show');
+
+        // hancurkan datatable jika sudah pernah dipakai
+        if ($.fn.DataTable.isDataTable('#modalDriverDgnTable')) {
+            $('#modalDriverDgnTable').DataTable().destroy();
+        }
+
+        // rebuild datatable
+        $('#modalDriverDgnTable').DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: {
+                url: "{{ route('driver-modal.data') }}",
+            },
+            columns: [
+                {data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false},
+                {data: 'KODE', name: 'KODE'},
+                {data: 'NAMA', name: 'NAMA'},
+                {data: 'ALAMAT', name: 'ALAMAT',
+                    render: function(data) {
+                        return data && data.length > 30 ? data.substr(0, 30) + '...' : data;
+                    }
+                },
+                {data: 'PHONE', name: 'PHONE'},
+                {data: 'MULAI', name: 'MULAI',
+                    render: function(data) {
+                        return data ? new Date(data).toLocaleDateString('id-ID') : '-';
+                    }
+                },
+                {data: 'action', name: 'action', orderable: false, searchable: false}
+            ],
+        });
+    });
+    // ### Select Button
+    $(document).on('click', '.pickDriverModal', function(e) {
+        e.preventDefault();
+        var kodeDriver = $(this).data('id');
+        // Ambil KETERANGAN dari kolom di baris yang sama
+        var row = $(this).closest('tr');
+        var nama = row.find('td:eq(2)').text();
+        $('#driver_rent_dingin_id').val(kodeDriver);
+        $('#driver_rent_dingin').val(nama);
+        // Tutup modal
+        $('#driverModalDgn').modal('hide');
+    });
+    // =============================== End Of Pilih Driver ==================================
 });
 </script>

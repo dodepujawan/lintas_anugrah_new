@@ -138,7 +138,7 @@ Route::prefix('expedisi')->group(function() {
 
 Route::prefix('rent-pendingin')->group(function() {
     Route::get('/', [RentPendinginController::class, 'index'])->name('rentPendingin.index');
-    // Route::get('/data/cus', [ExpedisiController::class, 'getDataCustomer'])->name('expedisi-cus.data');
+    Route::get('/data/cus', [RentPendinginController::class, 'getDataCustomer'])->name('rentPendingin.data');
     // Route::post('/store', [ExpedisiController::class, 'store'])->name('expedisi.store');
     Route::get('/data', [RentPendinginController::class, 'getData'])->name('rentPendingin.data');
     // Route::get('/show', [ExpedisiController::class, 'show'])->name('expedisi.show');
