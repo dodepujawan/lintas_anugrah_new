@@ -19,7 +19,7 @@ class PricedinginController extends Controller
     public function getData(Request $request){
         if ($request->ajax()) {
             $data = DB::table('pricedingin')
-                ->leftJoin('kendaraan', 'pricedingin.KODE', '=', 'kendaraan.kode')
+                ->leftJoin('kendaraan', 'pricedingin.KODE', '=', 'kendaraan.KODE')
                 ->select(
                     'pricedingin.id',
                     'pricedingin.KODEDGN',
@@ -33,7 +33,7 @@ class PricedinginController extends Controller
                     // Format tanggal tanpa jam: dd-mm-yyyy
                     DB::raw("DATE_FORMAT(pricedingin.created_at, '%d-%m-%Y') as created_at"),
                     // Ambil nama dari tabel kendaraan
-                    'kendaraan.nama as nama_kendaraan'
+                    'kendaraan.NAMA as nama_kendaraan'
                 );
             $data->orderBy('pricedingin.created_at', 'desc');
             return DataTables::of($data)
@@ -77,11 +77,11 @@ class PricedinginController extends Controller
 
         // Ambil data kendaraan
         $kode = $request->input('KODE');
-        $kendaraan = Kendaraan::where('kode', $kode)->first();
+        $kendaraan = Kendaraan::where('KODE', $kode)->first();
 
         // Kalau kendaraan ada, tambahkan kolom jenis ke validated
         if ($kendaraan) {
-            $validated['JENIS'] = $kendaraan->jenis;
+            $validated['JENIS'] = $kendaraan->JENIS;
         } else {
             // Optional: kalau mau error kalau kendaraan tidak ditemukan
             return response()->json([
@@ -117,10 +117,10 @@ class PricedinginController extends Controller
         }
 
         // Ambil relasi dari kendaraan berdasarkan KODE
-        $kendaraan = Kendaraan::where('kode', $data->KODE)->first();
+        $kendaraan = Kendaraan::where('KODE', $data->KODE)->first();
 
         // Ambil nama kendaraan atau kosong jika tidak ada
-        $jenis = $kendaraan->nama ?? null;
+        $jenis = $kendaraan->NAMA ?? null;
 
         return response()->json([
             'success' => true,
@@ -143,11 +143,11 @@ class PricedinginController extends Controller
         $validated['USEREDIT'] = Auth::user()->user_id; // Atau ganti dengan user yang login
         // Ambil data kendaraan
         $kode = $request->input('KODE');
-        $kendaraan = Kendaraan::where('kode', $kode)->first();
+        $kendaraan = Kendaraan::where('KODE', $kode)->first();
 
         // Kalau kendaraan ada, tambahkan kolom jenis ke validated
         if ($kendaraan) {
-            $validated['JENIS'] = $kendaraan->jenis;
+            $validated['JENIS'] = $kendaraan->JENIS;
         } else {
             // Optional: kalau mau error kalau kendaraan tidak ditemukan
             return response()->json([

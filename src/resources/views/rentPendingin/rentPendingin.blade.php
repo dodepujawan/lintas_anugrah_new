@@ -254,14 +254,13 @@
                 <div class="row mb-4">
                     <div class="col-md-6">
                         <div class="driver-section">
-                            <div class="driver-header">DATA KENDARAAN</div>
-                            <div class="row">
+                            <div class="row mt-2">
                                 <div class="col-md-12">
-                                    <label class="form-label">KENDARAAN</label>
+                                    <label class="form-label">ITEM</label>
                                     <div class="input-group input-group-sm">
-                                        <input type="hidden" class="form-control" id="kendaraan_rent_dingin_id" name="kendaraan_rent_dingin_id" placeholder="Pilih kendaraan...">
-                                        <input type="text" class="form-control" id="kendaraan_rent_dingin" name="kendaraan_rent_dingin" placeholder="Pilih kendaraan..." readonly>
-                                        <button class="btn btn-outline-secondary" id="kendaraan_rent_dingin_btn"><i class="bx bx-search"></i></button>
+                                        <input type="hidden" class="form-control" id="item_rent_dingin_id" name="item_rent_dingin_id" placeholder="Pilih kendaraan...">
+                                        <input type="text" class="form-control" id="item_rent_dingin" name="item_rent_dingin" placeholder="Pilih Item..." readonly>
+                                        <button class="btn btn-outline-secondary" id="item_rent_dingin_btn"><i class="bx bx-search"></i></button>
                                     </div>
                                 </div>
                             </div>
@@ -269,14 +268,14 @@
                                 <div class="col-md-6">
                                     <label class="form-label">JML.HARI</label>
                                     <input type="number" id="jml_hari_rent_dingin" name="jml_hari_rent_dingin"
-                                            class="form-control form-control-sm" placeholder="0" min="1" value="1">
+                                            class="form-control form-control-sm" placeholder="0" min="1">
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label">HARGA</label>
                                     <div class="input-group input-group-sm">
                                         <span class="input-group-text">Rp</span>
                                         <input type="text" id="harga_rent_dingin" name="harga_rent_dingin"
-                                                class="form-control form-control-sm" placeholder="0" value="750000">
+                                                class="form-control form-control-sm" placeholder="0">
                                     </div>
                                 </div>
                             </div>
@@ -285,7 +284,6 @@
 
                     <div class="col-md-6">
                         <div class="driver-section">
-                            <div class="driver-header">DATA DRIVER</div>
                             <div class="row">
                                 <div class="col-md-12">
                                     <label class="form-label">DRIVER</label>
@@ -296,11 +294,14 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="row mt-2">
+                            <div class="row">
                                 <div class="col-md-12">
-                                    <label class="form-label">ITEM</label>
-                                    <textarea id="item_rent_dingin" name="item_rent_dingin"
-                                                class="form-control form-control-sm" rows="2" placeholder="Masukkan item yang akan diangkut"></textarea>
+                                    <label class="form-label">KENDARAAN</label>
+                                    <div class="input-group input-group-sm">
+                                        <input type="hidden" class="form-control" id="kendaraan_rent_dingin_id" name="kendaraan_rent_dingin_id" placeholder="Pilih kendaraan...">
+                                        <input type="text" class="form-control" id="kendaraan_rent_dingin" name="kendaraan_rent_dingin" placeholder="Pilih kendaraan..." readonly>
+                                        <button class="btn btn-outline-secondary" id="kendaraan_rent_dingin_btn"><i class="bx bx-search"></i></button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -568,30 +569,31 @@
         </div>
     </div>
 </div>
-{{-- Modal Kendaraan --}}
-<div class="modal fade" id="kendaraanModalDgn" tabindex="-1">
+{{-- Modal Item --}}
+<div class="modal fade" id="itemModalDgn" tabindex="-1">
     <div class="modal-dialog modal-xl">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Data Kendaraan</h5>
+                <h5 class="modal-title">Data Item</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
+                <div>
+                    <h3 id="custNameDgn"></h3>
+                    <h3 id="custKodeDgn"></h3>
+                </div>
                 <div class="table-responsive">
-                <table class="table table-bordered table-striped w-100" id="modalKendaraanDgnTable">
+                <table class="table table-bordered table-striped w-100" id="modalItemDgnTable">
                     <thead class="table-dark">
                         <tr>
                             <th>No</th>
-                            <th>Kode</th>
-                            <th>Nama</th>
-                            <th>Plat</th>
-                            <th>Jenis</th>
-                            <th>FNO PRK B</th>
-                            <th>FNO PRK P</th>
-                            <th>FNO PRK S</th>
-                            <th>FNO PRK O</th>
-                            <th>FNO PRK M</th>
-                            <th>Aksi</th>
+                            <th>Kendaraan</th>
+                            <th>ITEM</th>
+                            <th>PERIODE</th>
+                            <th>PLAT</th>
+                            <th>JENIS</th>
+                            <th>HARGA</th>
+                            <th>AKSI</th>
                         </tr>
                     </thead>
                     <tbody></tbody>
@@ -630,6 +632,39 @@
         </div>
     </div>
 </div>
+{{-- Modal Kendaraan --}}
+<div class="modal fade" id="kendaraanModalDgn" tabindex="-1">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Data Kendaraan</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="table-responsive">
+                <table class="table table-bordered table-striped w-100" id="modalKendaraanDgnTable">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>No</th>
+                            <th>Kode</th>
+                            <th>Nama</th>
+                            <th>Plat</th>
+                            <th>Jenis</th>
+                            <th>FNO PRK B</th>
+                            <th>FNO PRK P</th>
+                            <th>FNO PRK S</th>
+                            <th>FNO PRK O</th>
+                            <th>FNO PRK M</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 <script>
 $(document).ready(function() {
     // Set CSRF token in AJAX setup
@@ -656,7 +691,12 @@ $(document).ready(function() {
                     d.tgl_mulai = $('#filter_tgl_mulai_rentdgn').val();
                     d.tgl_akhir = $('#filter_tgl_akhir_rentdgn').val();
                     d.search_muat = $('#filter_rent_dgn').val();
-                }
+                },
+                dataSrc: function(response) {
+        // Debug: lihat struktur data di console
+        console.log('Response Data:', response.data);
+        return response.data;
+    }
             },
             // Scroll settings
             scrollX: true,
@@ -787,55 +827,77 @@ $(document).ready(function() {
         $('#customerModalDgn').modal('hide');
     });
     // ============================== End Of Pilih Customer ==================================
-    // =================================== Pilih Kendaraan =====================================
-    $(document).on('click', '#kendaraan_rent_dingin_btn', function(e) {
+    // =================================== Pilih Item =====================================
+    $(document).on('click', '#item_rent_dingin_btn', function(e) {
+        var expedisiId = $('#customer_rent_dingin_id').val();
 
-        $('#kendaraanModalDgn').modal('show');
+        if (!expedisiId || expedisiId.trim() === '') {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Warning',
+                text: 'Silahkan Pilih Customer!',
+                confirmButtonColor: '#3085d6'
+            });
+            e.preventDefault();
+            return false;
+        }
+
+        $('#itemModalDgn').modal('show');
 
         // hancurkan datatable jika sudah pernah dipakai
-        if ($.fn.DataTable.isDataTable('#modalKendaraanDgnTable')) {
-            $('#modalKendaraanDgnTable').DataTable().destroy();
+        if ($.fn.DataTable.isDataTable('#modalItemDgnTable')) {
+            $('#modalItemDgnTable').DataTable().destroy();
         }
 
         // rebuild datatable
-        $('#modalKendaraanDgnTable').DataTable({
+        $('#modalItemDgnTable').DataTable({
             processing: true,
             serverSide: true,
             ajax: {
-                url: "{{ route('kendaraan.datamodel') }}",
+                url: "{{ route('price-rentcus-modal.price', ':kode') }}".replace(':kode', expedisiId),
+                dataSrc: function (json) {
+                    // SET INFO CUSTOMER DI ATAS TABEL
+                    $("#custNameDgn").text(json.customer_nama);
+                    $("#custKodeDgn").text(json.customer_kode);
+                    return json.data;
+                }
             },
             columns: [
-                {data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false},
-                {data: 'KODE', name: 'KODE'},
-                {data: 'NAMA', name: 'NAMA'},
-                {data: 'PLAT', name: 'PLAT'},
-                {data: 'JENIS', name: 'JENIS'},
-                {data: 'FNO_PRK_B', name: 'FNO_PRK_B'},
-                {data: 'FNO_PRK_P', name: 'FNO_PRK_P'},
-                {data: 'FNO_PRK_S', name: 'FNO_PRK_S'},
-                {data: 'FNO_PRK_O', name: 'FNO_PRK_O'},
-                {data: 'FNO_PRK_M', name: 'FNO_PRK_M'},
-                {data: 'action', name: 'action', orderable: false, searchable: false}
+                { data: 'DT_RowIndex', orderable: false },
+                { data: 'nama_kendaraan' },
+                { data: 'ITEM' },
+                { data: 'PERIODE' },
+                { data: 'PLAT' },
+                { data: 'JENIS' },
+                { data: 'harga_html', orderable: false, searchable: false },
+                { data: 'action', orderable: false, searchable: false }
             ]
         });
     });
     // ### Select Button
-    $(document).on('click', '.pickKendaraanModel', function(e) {
+    $(document).on('click', '.pick-price-dgn', function(e) {
         e.preventDefault();
-        var kodeKendaraan = $(this).data('id');
+        var kodeCus = $(this).data('id');
+        var kodeMbl = $(this).data('kodembl');
+        var kodeDgn = $(this).data('kode');
         // Ambil KETERANGAN dari kolom di baris yang sama
         var row = $(this).closest('tr');
-        var keterangan = row.find('td:eq(1)').text();
-        var nama = row.find('td:eq(2)').text();
+        var kendaraan = row.find('td:eq(1)').text();
+        var item = row.find('td:eq(2)').text();
+        var harga = row.find('td:eq(6)').text().trim();
 
         // Mengisi nilai ke elemen yang dituju
-        $('#kendaraan_rent_dingin_id').val(keterangan);
-        $('#kendaraan_rent_dingin').val(nama);
-
+        $('#jml_hari_rent_dingin').val(1);
+        $('#item_rent_dingin_id').val(kodeDgn);
+        $('#item_rent_dingin').val(item);
+        $('#kendaraan_rent_dingin_id').val(kodeMbl);
+        $('#kendaraan_rent_dingin').val(kendaraan);
+        $('#harga_rent_dingin').val(harga);
+        // calculateTotal();
         // Tutup modal
-        $('#kendaraanModalDgn').modal('hide');
+        $('#itemModalDgn').modal('hide');
     });
-    // =============================== End Of Pilih Kendaraan ==================================
+    // =============================== End Of Pilih Item ==================================
     // =================================== Pilih Driver =====================================
     $(document).on('click', '#driver_rent_dingin_btn', function(e) {
         e.preventDefault();
@@ -886,5 +948,54 @@ $(document).ready(function() {
         $('#driverModalDgn').modal('hide');
     });
     // =============================== End Of Pilih Driver ==================================
+    // =================================== Pilih Kendaraan =====================================
+    $(document).on('click', '#kendaraan_rent_dingin_btn', function(e) {
+
+        $('#kendaraanModalDgn').modal('show');
+
+        // hancurkan datatable jika sudah pernah dipakai
+        if ($.fn.DataTable.isDataTable('#modalKendaraanDgnTable')) {
+            $('#modalKendaraanDgnTable').DataTable().destroy();
+        }
+
+        // rebuild datatable
+        $('#modalKendaraanDgnTable').DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: {
+                url: "{{ route('kendaraan.datamodel') }}",
+            },
+            columns: [
+                {data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false},
+                {data: 'KODE', name: 'KODE'},
+                {data: 'NAMA', name: 'NAMA'},
+                {data: 'PLAT', name: 'PLAT'},
+                {data: 'JENIS', name: 'JENIS'},
+                {data: 'FNO_PRK_B', name: 'FNO_PRK_B'},
+                {data: 'FNO_PRK_P', name: 'FNO_PRK_P'},
+                {data: 'FNO_PRK_S', name: 'FNO_PRK_S'},
+                {data: 'FNO_PRK_O', name: 'FNO_PRK_O'},
+                {data: 'FNO_PRK_M', name: 'FNO_PRK_M'},
+                {data: 'action', name: 'action', orderable: false, searchable: false}
+            ]
+        });
+    });
+    // ### Select Button
+    $(document).on('click', '.pickKendaraanModel', function(e) {
+        e.preventDefault();
+        var kodeKendaraan = $(this).data('id');
+        // Ambil KETERANGAN dari kolom di baris yang sama
+        var row = $(this).closest('tr');
+        var keterangan = row.find('td:eq(1)').text();
+        var nama = row.find('td:eq(2)').text();
+
+        // Mengisi nilai ke elemen yang dituju
+        $('#kendaraan_rent_dingin_id').val(keterangan);
+        $('#kendaraan_rent_dingin').val(nama);
+
+        // Tutup modal
+        $('#kendaraanModalDgn').modal('hide');
+    });
+    // =============================== End Of Pilih Kendaraan ==================================
 });
 </script>

@@ -383,7 +383,6 @@ $(document).ready(function() {
             url: '{{ route("price-expedition.show", ["id" => ":id"]) }}'.replace(':id', id),
             method: 'GET',
             success: function(response) {
-
                 $('#master_table_price').hide();
                 $('#formContainer').show();
 
@@ -396,7 +395,7 @@ $(document).ready(function() {
                 $('#rute_val_price').val(response.rute_id);
 
                 // nama rute (teks)
-                $('#rute_price').val(response.rute_nama);
+                $('#rute_price').val(response.rute_id);
 
                 $('#harga_price').val(response.harga);
 

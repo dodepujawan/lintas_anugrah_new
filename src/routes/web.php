@@ -122,6 +122,7 @@ Route::prefix('price-dingin-customer')->group(function() {
     Route::get('/price/{kodecus}', [PricedinginCustomerController::class, 'getPrice'])->name('price-rentcus.price');
     Route::post('/update-row', [PricedinginCustomerController::class, 'saveCustomerRow'])->name('price-rentcus.update-row');
     Route::post('/store', [PricedinginCustomerController::class, 'store'])->name('price-rentcus.store');
+    Route::get('/price/modal/{kodecus}', [PricedinginCustomerController::class, 'getPriceModal'])->name('price-rentcus-modal.price');
 });
 
 Route::prefix('expedisi')->group(function() {

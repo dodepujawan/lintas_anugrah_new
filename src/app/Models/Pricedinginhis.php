@@ -29,7 +29,7 @@ class Pricedinginhis extends Model
     ];
 
     protected $casts = [
-        'TANGGAL' => 'TANGGAL',
+        'TANGGAL' => 'datetime',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];

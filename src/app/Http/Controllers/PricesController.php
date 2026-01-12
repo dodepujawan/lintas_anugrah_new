@@ -106,14 +106,14 @@ class PricesController extends Controller
 
     public function show($id){
         $data = DB::table('prices')
-            ->leftJoin('rute', 'prices.RUTE', '=', 'rute.id')
+            // ->leftJoin('rute', 'prices.RUTE', '=', 'rute.RUTE')
             ->select(
                 'prices.id',
                 'prices.KETERANGAN',
                 'prices.DARI',
                 'prices.SAMPAI',
                 'prices.RUTE as rute_id',
-                'rute.RUTE as rute_nama',
+                // 'rute.RUTE as rute_nama',
                 'prices.HARGA',
                 'prices.JENIS'
             )
@@ -126,7 +126,7 @@ class PricesController extends Controller
             "dari"       => $data->DARI,
             "sampai"     => $data->SAMPAI,
             "rute_id"    => $data->rute_id,
-            "rute_nama"  => $data->rute_nama,
+            // "rute_nama"  => $data->rute_nama,
             "harga"      => $data->HARGA,
             "jenis"      => $data->JENIS
         ]);

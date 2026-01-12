@@ -243,7 +243,7 @@ $(document).ready(function(){
         columns: [
             { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false },
             { data: 'KODEDGN', name: 'KODEDGN' },
-            { data: 'nama_kendaraan', name: 'kendaraan.nama' },
+            { data: 'nama_kendaraan', name: 'kendaraan.NAMA' },
             { data: 'ITEM', name: 'ITEM' },
             { data: 'PERIODE', name: 'PERIODE' },
             { data: 'PLAT', name: 'PLAT' },
@@ -296,9 +296,9 @@ $(document).ready(function(){
         ajax: '{{ route("kendaraan.datamodel") }}',
         columns: [
             { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false },
-            { data: 'nama', name: 'nama' },
-            { data: 'plat', name: 'plat' },
-            { data: 'jenis', name: 'jenis' },
+            { data: 'NAMA', name: 'NAMA' },
+            { data: 'PLAT', name: 'PLAT' },
+            { data: 'JENIS', name: 'JENIS' },
             { data: 'action', name: 'action', orderable: false, searchable: false, width: '20%'}
         ]
     });
@@ -311,10 +311,10 @@ $(document).ready(function(){
 
         $.get("{{ route('kendaraan.edit', ':id') }}".replace(':id', id), function(data) {
             // console.log("aba" + data.id + data.kode + data.nama);
-            $('#kode_pricedingin').val(data.kode);
-            $('#jenis_pricedingin').val(data.nama);
-            $('#plat_pricedingin').val(data.plat);
-            $('#item_pricedingin').val(data.plat +' '+ data.jenis);
+            $('#kode_pricedingin').val(data.KODE);
+            $('#jenis_pricedingin').val(data.NAMA);
+            $('#plat_pricedingin').val(data.PLAT);
+            $('#item_pricedingin').val(data.PLAT +' '+ data.JENIS);
         });
     });
     // ============================ End Of Pick Kendaraan ===================================
