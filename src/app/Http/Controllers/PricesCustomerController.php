@@ -400,6 +400,7 @@ class PricesCustomerController extends Controller
                     data-id="'.$row->id.'"
                     data-kode="'.$row->KODE.'"
                     data-source="'.$row->source.'"
+                    data-jenis="'.$row->JENIS.'"
                     data-original="'.$row->HARGA.'">
                     <i class="bx bx-check"></i></button>';
             })

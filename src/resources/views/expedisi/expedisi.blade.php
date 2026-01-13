@@ -92,30 +92,28 @@
             <span class="badge bg-success ms-2">READY</span>
         </div>
         <div class="row">
-            <div class="col-md-3">
-                <label class="form-label">TGL MUAT</label>
-                <input type="date" class="form-control form-control-sm" id="tgl_muat_expedisi" name="tgl_muat_expedisi">
+            <div class="col-md-4">
+                <label class="form-label">TGL SJ</label>
+                <input type="date" class="form-control form-control-sm" id="tgl_sj_expedisi" name="tgl_sj_expedisi">
             </div>
-            <div class="col-md-3">
-                <label class="form-label">NO MUAT</label>
-                <div class="input-group input-group-sm">
-                    <input type="text" class="form-control" id="no_muat_expedisi" name="no_muat_expedisi" readonly placeholder="Auto Generate/ click for update">
-                    <button class="btn btn-outline-secondary" type="button" id="muat_expedisi_btn">
-                        <i class="bx bx-search"></i>
-                    </button>
+            <div class="col-md-4">
+                <label class="form-label">NO SJ</label>
+                <div class="input-group input-group-sm mb-2">
+                    <input type="text" class="form-control form-control-sm" id="no_sj_expedisi" name="no_sj_expedisi" placeholder="Auto Generate/ Click To Update" Readonly>
+                    <button class="btn btn-outline-secondary" id="no_sj_expedisi_btn"><i class="bx bx-search"></i></button>
                 </div>
             </div>
-            <div class="col-md-3">
+            <div class="col-md-4">
                 <label class="form-label">WILAYAH</label>
                 <select class="form-select form-select-sm" id="wilayah_expedisi" name="wilayah_expedisi">
                     <option value="denpasar">DENPASAR</option>
                     <option value="gianyar">GIANYAR</option>
                 </select>
             </div>
-            <div class="col-md-3">
+            {{-- <div class="col-md-3">
                 <label class="form-label">NOMOR PERJALANAN</label>
                 <input type="text" class="form-control form-control-sm" id="nomor_perjalanan_expedisi" name="nomor_perjalanan_expedisi" placeholder="Auto Generate" readonly>
-            </div>
+            </div> --}}
         </div>
         <div class="row">
             <!-- CUSTOMER SECTION -->
@@ -149,6 +147,7 @@
                 <label class="form-label">ITEM</label>
                 <div class="input-group input-group-sm">
                     <input type="hidden" name="item_expedisi_id" id="item_expedisi_id">
+                    <input type="hidden" name="item_expedisi_tipe" id="item_expedisi_tipe">
                     <input type="text" class="form-control" id="item_expedisi" name="item_expedisi" readonly placeholder="Pilih item...">
                     <button class="btn btn-outline-secondary" id="item_expedisi_btn"><i class="bx bx-search"></i></button>
                 </div>
@@ -162,7 +161,7 @@
             <h5><i class='bx bx-truck'></i> KENDARAAN & DRIVER</h5>
         </div>
         <div class="row">
-            <div class="col-md-6">
+            <div class="col-md-4">
                 <label class="form-label">KENDARAAN</label>
                 <div class="input-group input-group-sm">
                     <input type="hidden" class="form-control" id="kendaraan_expedisi_id" name="kendaraan_expedisi_id" placeholder="Pilih kendaraan...">
@@ -170,17 +169,7 @@
                     <button class="btn btn-outline-secondary" id="kendaraan_expedisi_btn"><i class="bx bx-search"></i></button>
                 </div>
             </div>
-            <div class="col-md-3">
-                <label class="form-label">TGL SJ</label>
-                <input type="date" class="form-control form-control-sm" id="tgl_sj_expedisi" name="tgl_sj_expedisi">
-            </div>
-            <div class="col-md-3">
-                <label class="form-label">NO SJ</label>
-                <input type="text" class="form-control form-control-sm" id="no_sj_expedisi" name="no_sj_expedisi" placeholder="Auto Generate" Readonly>
-            </div>
-        </div>
-        <div class="row mt-2">
-            <div class="col-md-6">
+            <div class="col-md-4">
                 <label class="form-label">DRIVER I</label>
                 <div class="input-group input-group-sm">
                     <input type="hidden" class="form-control" id="driver_1_expedisi_id" name="driver_1_expedisi_id">
@@ -188,7 +177,7 @@
                     <button class="btn btn-outline-secondary" id="driver_1_expedisi_btn" data-id="1"><i class="bx bx-search"></i></button>
                 </div>
             </div>
-            <div class="col-md-6">
+            <div class="col-md-4">
                 <label class="form-label">DRIVER II</label>
                 <div class="input-group input-group-sm">
                     <input type="hidden" class="form-control" id="driver_2_expedisi_id" name="driver_2_expedisi_id">
@@ -276,44 +265,6 @@
         </div>
     </div>
 
-    {{-- BIAYA & BKK (FINANCE) --}}
-    <div class="card-expedisi">
-        <div class="card-expedisi-header">
-            <h5><i class='bx bx-wallet'></i> BIAYA & BKK</h5>
-        </div>
-        <div class="row">
-            <div class="col-md-4">
-                <label class="form-label">NO BKK</label>
-                <input type="text" class="form-control form-control-sm" id="no_bkk_expedisi" name="no_bkk_expedisi">
-            </div>
-            <div class="col-md-4">
-                <label class="form-label">BIAYA</label>
-                <input type="number" class="form-control form-control-sm" id="biaya_expedisi" name="biaya_expedisi">
-            </div>
-            <div class="col-md-4 d-flex align-items-end">
-                <button class="btn btn-primary btn-sm me-2" id="input_biaya_expedisi" name="input_biaya_expedisi">INPUT BIAYA</button>
-                <button class="btn btn-secondary btn-sm" id="refresh_bkk_expedisi" name="refresh_bkk_expedisi">REFRESH</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Deteksi ADADC Section -->
-    <div class="card-expedisi">
-        <div class="card-expedisi-header">
-            <h5><i class='bx bx-error-circle me-2'></i>DETEKSI ADADC</h5>
-            <span class="status-deteksi">
-                <i class='bx bx-circle me-1'></i>
-                <span>0</span>
-            </span>
-        </div>
-        <div class="alert alert-warning alert-sm mb-0">
-            <small>
-                <i class='bx bx-info-circle me-1'></i>
-                Jika terdeteksi ada Delcharge Klik <strong>Auto DC</strong> untuk isi DC KET
-            </small>
-        </div>
-    </div>
-
     <!-- Action Buttons -->
     <div class="card-expedisi">
         <div class="row g-2">
@@ -335,6 +286,25 @@
         </div>
     </div>
 
+    <!-- Form Nomor Muat -->
+    <div class="card-expedisi">
+        <div class="row">
+            <div class="col-md-3">
+                    <label class="form-label">TGL MUAT</label>
+                    <input type="date" class="form-control form-control-sm" id="tgl_muat_expedisi" name="tgl_muat_expedisi">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">NO MUAT</label>
+                    <div class="input-group input-group-sm">
+                        <input type="text" class="form-control" id="no_muat_expedisi" name="no_muat_expedisi" readonly placeholder="Auto Generate/ click for update">
+                        <button class="btn btn-outline-secondary" type="button" id="muat_expedisi_btn">
+                            <i class="bx bx-search"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+    </div>
+
     <!-- Tabel Data SJ -->
     <div class="card-expedisi tabel-surat-jalan">
         <div class="card-expedisi-header">
@@ -348,12 +318,10 @@
                         <th width="30">NO</th>
                         <th width="120">NO.SJ</th>
                         <th width="100">TGL.SJ</th>
-                        <th width="120">PESANAN AWAL</th>
-                        <th width="50">GB</th>
                         <th width="100">DELCHARGE</th>
-                        <th width="120">PESANAN GABUNG</th>
                         <th width="80">JUMLAH</th>
                         <th width="80">UNIT</th>
+                        <th width="80">JENIS</th>
                         <th width="100">HARGA</th>
                         <th width="100">DISC</th>
                         <th width="100">PPN</th>
@@ -365,243 +333,21 @@
                 </tbody>
                 <tfoot>
                     <tr>
-                        <th colspan="12" class="text-end">GRAND TOTAL</th>
+                        <th colspan="10" class="text-end">GRAND TOTAL</th>
                         <th class="text-end" id="grandTotal">0</th>
                         <th></th>
                     </tr>
                 </tfoot>
             </table>
         </div>
-    </div>
-
-    <!-- Action Buttons -->
-    <div class="card-expedisi">
-        {{-- <div class="row g-2">
-            <div class="col-md-3 col-sm-6">
-                <button class="btn btn-primary btn-action w-100">
-                    <i class='bx bx-file me-1'></i>NEW [F1]
-                </button>
-            </div>
-            <div class="col-md-3 col-sm-6">
-                <button class="btn btn-success btn-action w-100">
-                    <i class='bx bx-plus-circle me-1'></i>TAMBAH [F2]
-                </button>
-            </div>
-            <div class="col-md-3 col-sm-6">
-                <button class="btn btn-info btn-action w-100">
-                    <i class='bx bx-save me-1'></i>SIMPAN [F3]
-                </button>
-            </div>
-            <div class="col-md-3 col-sm-6">
-                <button class="btn btn-warning btn-action w-100">
-                    <i class='bx bx-edit me-1'></i>EDIT [F4]
-                </button>
-            </div>
-            <div class="col-md-3 col-sm-6">
-                <button class="btn btn-secondary btn-action w-100">
-                    <i class='bx bx-x-circle me-1'></i>BATAL [F5]
-                </button>
-            </div>
-            <div class="col-md-3 col-sm-6">
-                <button class="btn btn-danger btn-action w-100">
-                    <i class='bx bx-trash me-1'></i>HAPUS [F6]
-                </button>
-            </div>
-            <div class="col-md-3 col-sm-6">
-                <button class="btn btn-outline-primary btn-action w-100">
-                    <i class='bx bx-arrow-back me-1'></i>RETUR SJ [F7]
-                </button>
-            </div>
-            <div class="col-md-3 col-sm-6">
-                <button class="btn btn-outline-danger btn-action w-100">
-                    <i class='bx bx-log-out me-1'></i>KELUAR [F12]
-                </button>
-            </div>
-        </div>
-    </div> --}}
-</div>
-
-{{-- Modal Muat Expedisi --}}
-<div class="modal fade" id="muatModalExp" tabindex="-1">
-    <div class="modal-dialog modal-xl">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Data Expedisi</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <div class="row mb-3">
-                    <div class="col-md-3">
-                        <label>Tanggal Mulai</label>
-                        <input type="date" class="form-control form-control-sm" id="filter_tgl_mulai">
-                    </div>
-                    <div class="col-md-3">
-                        <label>Tanggal Akhir</label>
-                        <input type="date" class="form-control form-control-sm" id="filter_tgl_akhir">
-                    </div>
-                    <div class="col-md-3">
-                        <label>Filter Data</label>
-                        <input type="text" class="form-control form-control-sm" id="filter_muat">
-                    </div>
-                    <div class="col-md-3">
-                            <label>&nbsp;</label>
-                            <div>
-                                <button class="btn btn-sm btn-info" id="btn_filter_muat">
-                                    <i class='bx bx-filter'></i> Filter
-                                </button>
-                            </div>
-                        </div>
-                </div>
-                <div class="table-responsive">
-                <table class="table table-bordered table-striped w-100" id="modalMuatExpTable">
-                    <thead>
-                    <tr>
-                        <th width="30">No</th>
-                        <th>NO MUAT</th>
-                        <th>TGL MUAT</th>
-                        <th>CUSTOMER</th>
-                        <th>RUTE</th>
-                        <th>JUMLAH</th>
-                        <th>HARGA</th>
-                        <th>DISC</th>
-                        <th>DEL CHARGE</th>
-                        <th>TOTAL</th>
-                        <th>NO SJ</th>
-                        <th width="120">AKSI</th>
-                    </tr>
-                    </thead>
-                    <tbody></tbody>
-                </table>
-                </div>
-            </div>
+        <div class="col-md-3 col-sm-6">
+            <button class="btn btn-success btn-action w-100" id="simpanMuatExpBtn">
+                <i class='bx bx-plus-circle me-1'></i>Tambah No Muat
+            </button>
         </div>
     </div>
 </div>
-{{-- Modal Customer --}}
-<div class="modal fade" id="customerModalExp" tabindex="-1">
-    <div class="modal-dialog modal-xl">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Data Pelanggan</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <div class="table-responsive">
-                <table class="table table-bordered table-striped w-100" id="modalCusExpTable">
-                    <thead>
-                    <tr>
-                        <th>No</th>
-                        <th>Kode</th>
-                        <th>Nama</th>
-                        <th>Jenis Usaha</th>
-                        <th>Telepon</th>
-                        <th>Email</th>
-                        <th>Aksi</th>
-                    </tr>
-                    </thead>
-                    <tbody></tbody>
-                </table>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-{{-- Modal Item --}}
-<div class="modal fade" id="itemModalExp" tabindex="-1">
-    <div class="modal-dialog modal-xl">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Data Item</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <div>
-                    <h3 id="custNameExp"></h3>
-                    <h3 id="custKodeExp"></h3>
-                </div>
-                <div class="table-responsive">
-                <table class="table table-bordered table-striped w-100" id="modalItemExpTable">
-                    <thead class="table-dark">
-                        <tr>
-                            <th>No</th>
-                            <th>NAMA ITEM</th>
-                            <th>DARI</th>
-                            <th>SAMPAI</th>
-                            <th>RUTE</th>
-                            <th>HARGA</th>
-                            <th>JENIS</th>
-                            <th>AKSI</th>
-                        </tr>
-                    </thead>
-                    <tbody></tbody>
-                </table>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-{{-- Modal Kendaraan --}}
-<div class="modal fade" id="kendaraanModalExp" tabindex="-1">
-    <div class="modal-dialog modal-xl">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Data Kendaraan</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <div class="table-responsive">
-                <table class="table table-bordered table-striped w-100" id="modalKendaraanExpTable">
-                    <thead class="table-dark">
-                        <tr>
-                            <th>No</th>
-                            <th>Kode</th>
-                            <th>Nama</th>
-                            <th>Plat</th>
-                            <th>Jenis</th>
-                            <th>FNO PRK B</th>
-                            <th>FNO PRK P</th>
-                            <th>FNO PRK S</th>
-                            <th>FNO PRK O</th>
-                            <th>FNO PRK M</th>
-                            <th>Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody></tbody>
-                </table>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-{{-- Modal Driver --}}
-<div class="modal fade" id="driverModalExp" tabindex="-1">
-    <div class="modal-dialog modal-xl">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Data Driver</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <div class="table-responsive">
-                <table class="table table-bordered table-striped w-100" id="modalDriverExpTable">
-                    <thead class="table-dark">
-                        <tr>
-                            <th>No</th>
-                            <th>Kode</th>
-                            <th>Nama</th>
-                            <th>Alamat</th>
-                            <th>Phone</th>
-                            <th>Mulai Kerja</th>
-                            <th>Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody></tbody>
-                </table>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+@include('expedisi.expedisi_modal')
 <script>
 $(document).ready(function() {
     // Set CSRF token in AJAX setup
@@ -649,6 +395,100 @@ $(document).ready(function() {
             });
     }
     // ============================ End Of driver Login ===================================
+    // ================================= Pilih No Surat Jalan =====================================
+    $('#no_sj_expedisi_btn').click(function(e) {
+        e.preventDefault();
+        $('#surjalModalExp').modal('show');
+        // hancurkan datatable jika sudah pernah dipakai
+        if ($.fn.DataTable.isDataTable('#modalSurjalExpTable')) {
+            $('#modalSurjalExpTable').DataTable().destroy();
+        }
+        var tableSurjal = $('#modalSurjalExpTable').DataTable({
+            processing: true,
+            serverSide: true,
+            searching: false,
+            ajax: {
+            url: "{{ route('expedisi-surjal.data') }}",
+                data: function(d) {
+                    d.tgl_mulai = $('#filter_tgl_mulai').val();
+                    d.tgl_akhir = $('#filter_tgl_akhir').val();
+                    d.search_muat = $('#filter_surjal').val();
+                }
+            },
+            // Scroll settings
+            scrollX: true,
+            scrollY: "400px",
+            scrollCollapse: true,
+            // Responsive settings
+            responsive: true,
+            autoWidth: true,
+            columns: [
+                { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false },
+                { data: 'NOSJ', name: 'NOSJ' },
+                { data: 'tglsj', name: 'tglsj' },
+                { data: 'CUSTOMER', name: 'CUSTOMER' },
+                { data: 'rute', name: 'rute' },
+                { data: 'JUMLAH', name: 'JUMLAH' },
+                { data: 'harga_formatted', name: 'HARGA' },
+                { data: 'DISC', name: 'DISC' },
+                { data: 'dc_formatted', name: 'DC' },
+                { data: 'total_formatted', name: 'GRAND' },
+                { data: 'action', name: 'action', orderable: false, searchable: false }
+            ]
+        });
+
+        $('#btn_filter_surjal').click(function () {
+            tableSurjal.ajax.reload();
+        });
+    });
+    // ============================= End Of Pilih No Surat Jalan =====================================
+    // ================================ Delete No Surat Jalan ======================================
+    $(document).on('click', '.deleteSurjal', function () {
+        let id     = $(this).data('id');
+        let nomuat = $(this).data('nomuat');
+
+        Swal.fire({
+            title: 'Hapus Data?',
+            text: 'No Muat ' + nomuat + ' akan dihapus!',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Ya, hapus',
+            cancelButtonText: 'Batal',
+            confirmButtonColor: '#d33'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                let url = "{{ route('expedisi.destroy', ':id') }}";
+                url = url.replace(':id', id);
+                $.ajax({
+                    url: url,
+                    type: 'POST',
+                    data: {
+                        _token: "{{ csrf_token() }}"
+                    },
+                    success: function (res) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Berhasil',
+                            text: res.message,
+                            timer: 1500,
+                            showConfirmButton: false
+                        });
+
+                        // reload datatable
+                        $('#modalSurjalExpTable').DataTable().ajax.reload(null, false);
+                    },
+                    error: function () {
+                        Swal.fire(
+                            'Gagal!',
+                            'Data tidak bisa dihapus',
+                            'error'
+                        );
+                    }
+                });
+            }
+        });
+    });
+    // ============================ End Of Delete No Surat Jalan ====================================
     // ================================= Pilih No Muat =====================================
     $('#muat_expedisi_btn').click(function(e) {
         e.preventDefault();
@@ -744,6 +584,104 @@ $(document).ready(function() {
         });
     });
     // ============================ End Of Delete No Muat ====================================
+    // ============================= Show Detail Surjal ================================
+    // Event listener untuk tombol pickMuat
+    $(document).on('click', '.pickSurjal', function() {
+        const id = $(this).data('id');
+        const nomuat = $(this).data('nosj');
+
+        $('#surjalModalExp').modal('hide');
+        $('#loading_modal').modal('show');
+        $('#loading_modal').one('shown.bs.modal', function () {
+            // Ambil data dari server berdasarkan id/nomuat
+            $.ajax({
+                url: '{{ route('expedisi-surjal.show') }}', // Ganti dengan endpoint yang sesuai
+                type: 'GET',
+                data: {
+                    id: id,
+                    nomuat: nomuat
+                },
+                success: function(response) {
+                    if (response.success) {
+                        const data = response.data;
+                        setButtonToUpdateMode();
+                         // DATA DOKUMEN
+                        $('#wilayah_expedisi').val(data.wilayah || 'denpasar');
+
+                        // Customer
+                        $('#customer_expedisi_id').val(data.customer_id || '');
+                        $('#customer_expedisi').val(data.customer_name || '');
+                        $('#customer_kode_expedisi').val(data.customer || '');
+
+                        // Item
+                        $('#item_expedisi_tipe').val(data.jenis_item || '');
+                        $('#item_expedisi').val(data.pesanan || '');
+
+                        // KENDARAAN & DRIVER
+                        $('#kendaraan_expedisi_id').val(data.kendaraan_id || '');
+                        $('#kendaraan_expedisi').val(data.kendaraan_nama || '');
+                        $('#tgl_sj_expedisi').val(data.tgl_sj || '');
+                        $('#no_sj_expedisi').val(data.no_sj || '');
+
+                        // Driver 1
+                        $('#driver_1_expedisi_id').val(data.driver_1_id || '');
+                        $('#driver_1_expedisi').val(data.driver_1_nama || '');
+
+                        // Driver 2
+                        $('#driver_2_expedisi_id').val(data.driver_2_id || '');
+                        $('#driver_2_expedisi').val(data.driver_2_nama || '');
+
+                        // DATA PENERIMA
+                        $('#penerima_expedisi').val(data.penerima || '');
+                        $('#nama_penerima_expedisi').val(data.nama_penerima || '');
+                        $('#phone_penerima_expedisi').val(data.phone_penerima || '');
+                        $('#alamat_penerima_expedisi').val(data.alamat_penerima || '');
+
+                        // DETAIL & PERHITUNGAN
+                        $('#rute_expedisi').val(data.rute || '');
+                        $('#jumlah_expedisi').val(parseFloat(data.jumlah) || 0);
+                        $('#harga_expedisi').val(data.harga || 0);
+                        $('#disc_expedisi').val(parseFloat(data.disc_percent) || 0);
+                        $('#del_charge_expedisi').val(data.del_charge || 0);
+
+                        // Button Print PDF
+                        $('#divPrintSuratJalan').removeClass('d-none');
+                        $('#btnPrintSuratJalan').attr('data-id',id);
+
+                        // Hitung total otomatis
+                        calculateTotal();
+
+                        // // Tampilkan pesan sukses
+                        // Swal.fire({
+                        //     icon: 'success',
+                        //     title: 'Data Dimuat',
+                        //     text: 'Data muatan berhasil dimuat ke form',
+                        //     timer: 2000,
+                        //     showConfirmButton: false
+                        // });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Gagal',
+                            text: response.message || 'Gagal memuat data'
+                        });
+                    }
+                },
+                error: function(xhr) {
+                    $('#loading_modal').modal('hide');
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Terjadi kesalahan saat mengambil data'
+                    });
+                },
+                complete: function() {
+                    $('#loading_modal').modal('hide');
+                }
+            });
+        });
+    });
+    // ======================== End Of Show Detail Surjal =============================
     // ================================= Pilih Customer =====================================
     $('#customer_expedisi_btn').click(function(e) {
         e.preventDefault();
@@ -790,6 +728,7 @@ $(document).ready(function() {
         $('#customer_kode_expedisi').val(CUSTOMER);
         // Kosongkan dulu item
         $('#item_expedisi_id').val('');
+        $('#item_expedisi_item').val('');
         $('#item_expedisi').val('');
 
         // Tutup modal
@@ -847,6 +786,7 @@ $(document).ready(function() {
     $(document).on('click', '.pick-price-exp', function(e) {
         e.preventDefault();
         var kodeCus = $(this).data('id');
+        var kodeJenis = $(this).data('jenis');
         // Ambil KETERANGAN dari kolom di baris yang sama
         var row = $(this).closest('tr');
         var keterangan = row.find('td:eq(1)').text();
@@ -856,6 +796,7 @@ $(document).ready(function() {
         // Mengisi nilai ke elemen yang dituju
         $('#jumlah_expedisi').val(1);
         $('#item_expedisi_id').val(kodeCus);
+        $('#item_expedisi_tipe').val(kodeJenis);
         $('#item_expedisi').val(keterangan);
         $('#rute_expedisi').val(rute);
         $('#harga_expedisi').val(harga);
@@ -1026,7 +967,7 @@ $(document).ready(function() {
         const errors = [];
 
         // Validasi required fields
-        if (!$('#tgl_muat_expedisi').val()) {
+        if (!$('#tgl_sj_expedisi').val()) {
             errors.push('Tgl Muat harus diisi');
             isValid = false;
         }
@@ -1041,6 +982,36 @@ $(document).ready(function() {
         if (!$('#jumlah_expedisi').val() || parseNumber($('#jumlah_expedisi').val()) <= 0) {
             errors.push('Jumlah harus diisi dan lebih dari 0');
             isValid = false;
+        }
+
+        // ===============================
+        // VALIDASI TABEL EXPEDISI
+        // ===============================
+        let tbody = $('#tableProsesExpedisi tbody');
+        let rowCount = tbody.find('tr').length;
+
+        if (rowCount > 0) {
+            // Ambil jenis dari row pertama
+            let jenisTabel = tbody
+                .find('tr:first td[data-jenis]')
+                .data('jenis');
+
+            let jenisInput = $('#item_expedisi_tipe').val();
+
+            if (jenisInput && jenisTabel != jenisInput) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Tipe Item Berbeda',
+                    html: `
+                        Tipe item yang dipilih <b>tidak sama</b> dengan data di tabel.<br><br>
+                        <b>Solusi:</b><br>
+                        • Hapus data di tabel terlebih dahulu<br>
+                        • Atau submit data yang sudah ada
+                    `,
+                    confirmButtonText: 'OK'
+                });
+                return false;
+            }
         }
 
         if (!isValid) {
@@ -1105,7 +1076,7 @@ $(document).ready(function() {
             GRAND: parseNumber($('#grand_total_expedisi').val()) || 0,
 
             // STATUS & DEFAULT VALUES
-            JENISHRG: '1', // Default jenis harga
+            JENISHRG: $('#item_expedisi_tipe').val(), // Default jenis harga
             JENIS: 'EKS', // Ekspedisi
             STS: 'INVOICE',
             SIMPAN: 'N',
@@ -1154,6 +1125,7 @@ $(document).ready(function() {
                                 DC: parseNumber(formData.DC),
                                 NDISC: formData.DISC,
                                 PPN: formData.PPN,
+                                JENISHRG: formData.JENISHRG,
                                 GRAND: parseNumber(formData.GRAND),
                             });
                         }
@@ -1298,12 +1270,58 @@ $(document).ready(function() {
         window.open(url, '_blank');
     });
     // ======================== End Of Print PDF =============================
-    // ======================== End Of Clear Form =============================
+    // ============================ Clear Form =============================
     $('#buttonClearExp').click(function() {
         resetFormExpedisi();
     });
     // ======================== End Of Clear Form =============================
-    // ======================== Hitung Total =============================
+    // ============================ Simpan Submit No Muat =================================
+    $('#simpanMuatExpBtn').on('click', function () {
+        // if (!validateForm()) return;
+
+        let nosjList = [];
+
+        $('#tableProsesExpedisi tbody tr').each(function () {
+            let nosj = $(this).find('td:eq(1)').text().trim();
+            if (nosj && nosj !== '-') {
+                nosjList.push(nosj);
+            }
+        });
+
+        if (nosjList.length === 0) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Data Kosong',
+                text: 'Tidak ada NO SJ untuk disimpan'
+            });
+            return;
+        }
+
+        $.ajax({
+            url: '{{ route('expedisi-muat.store') }}',
+            method: 'POST',
+            data: {
+                nosj: nosjList
+            },
+            success: function (res) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil',
+                    text: res.message
+                });
+            },
+            error: function () {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Gagal',
+                    text: 'Terjadi kesalahan saat menyimpan data'
+                });
+            }
+        });
+    });
+    // ======================== End of Simpan Submit No Muat =============================
+
+    // ########################### Function Helper ###############################
     // Fungsi untuk format number
     function formatNumber(num) {
         return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
@@ -1380,12 +1398,11 @@ $(document).ready(function() {
         $('input[type="text"], input[type="number"], textarea').val('');
         // Reset select
         $('select').prop('selectedIndex', 0);
-        // Set default tanggal muat
-        $('#tgl_muat_expedisi').val(new Date().toISOString().split('T')[0]);
         // Field khusus
-        $('#tgl_sj_expedisi').val('');
         $('#sub_total_expedisi, #dpp_expedisi, #ppn_expedisi, #grand_total_expedisi').val('');
         $('#wilayah_expedisi').val('denpasar');
+        // Set default tanggal muat
+        $('#tgl_sj_expedisi').val(new Date().toISOString().split('T')[0]);
         setButtonToSaveMode();
         loadInputPajak();
     }
@@ -1427,14 +1444,12 @@ $(document).ready(function() {
                 <td class="text-center">${no}</td>
                 <td>${nosjBaru || '-'}</td>
                 <td>${data.tglsj || '-'}</td>
-
-                <td></td>
-                <td class="text-center"></td>
                 <td class="text-end">${nvl(data.DC)}</td>
-                <td></td>
-
                 <td class="text-end">${nvl(data.JUMLAH)}</td>
                 <td class="text-center">KG</td>
+                <td data-jenis="${data.JENISHRG}">
+                    ${getJenisHargaLabel(data.JENISHRG)}
+                </td>
                 <td class="text-end">${nvl(data.HARGA)}</td>
                 <td class="text-end">${nvl(data.NDISC)}</td>
                 <td class="text-end">${nvl(data.PPN)}</td>
@@ -1447,6 +1462,13 @@ $(document).ready(function() {
                 </td>
             </tr>
         `;
+
+        // untuk convert janis harga
+        function getJenisHargaLabel(val) {
+            if (val == 1) return 'Eceran';
+            if (val == 2) return 'Booking';
+            return '-';
+        }
 
         tbody.append(row);
         hitungGrandTotal();
@@ -1466,7 +1488,7 @@ $(document).ready(function() {
         let total = 0;
 
         $('#tableProsesExpedisi tbody tr').each(function () {
-            let nilai = $(this).find('td:eq(12)').text();
+            let nilai = $(this).find('td:eq(10)').text();
             total += parseNumber(nilai) || 0;
         });
 
@@ -1499,6 +1521,5 @@ $(document).ready(function() {
     // }
     // // Trigger otomatis
     // $('#jumlah_expedisi, #harga_expedisi, #disc_expedisi').on('keyup change', hitungExpedisi);
-    // ===================== End Of Hitung Total =============================
 });
 </script>
