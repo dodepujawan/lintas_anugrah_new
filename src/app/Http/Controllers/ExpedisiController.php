@@ -549,18 +549,18 @@ class ExpedisiController extends Controller
     }
 
     // ExpedisiController.php
-    public function update(Request $request, $nomuat){
+    public function update(Request $request, $nosj){
         // ======================
         // VALIDASI (SAMA DENGAN STORE)
         // ======================
         $validator = Validator::make($request->all(), [
-            'TGLMUAT'  => 'required|date',
+            'tglsj'  => 'required|date',
             'CUSTOMER' => 'required|string|max:30',
             'rute'     => 'required|string|max:30',
             'JUMLAH'   => 'required|numeric|min:0',
             'HARGA'    => 'required|numeric|min:0',
         ], [
-            'TGLMUAT.required'  => 'Tanggal muat harus diisi',
+            'tglsj.required'  => 'Tanggal muat harus diisi',
             'CUSTOMER.required' => 'Customer harus dipilih',
             'rute.required'     => 'Rute harus diisi',
             'JUMLAH.required'   => 'Jumlah harus diisi',
@@ -581,7 +581,7 @@ class ExpedisiController extends Controller
             // ======================
             // AMBIL DATA EXISTING
             // ======================
-            $expedisi = Expedisi::where('NOMUAT', $nomuat)->first();
+            $expedisi = Expedisi::where('NOSJ', $nosj)->first();
 
             if (!$expedisi) {
                 return response()->json([
@@ -610,8 +610,8 @@ class ExpedisiController extends Controller
             // ======================
             $expedisiData = [
                 // IDENTITAS
-                'TGLMUAT'        => $request->TGLMUAT,
-                'NOJALAN'        => $request->NOJALAN,
+                // 'TGLMUAT'        => $request->TGLMUAT,
+                // 'NOJALAN'        => $request->NOJALAN,
                 'WILAYAH'        => $request->WILAYAH ?? $expedisi->WILAYAH,
                 'CUSTOMER_KODE' => $request->customer_expedisi_id,
                 'CUSTOMER'      => $request->CUSTOMER,
@@ -621,7 +621,7 @@ class ExpedisiController extends Controller
                 'KENDARAAN'      => $request->kendaraan_expedisi_id,
                 'NAMA_KENDARAAN' => $request->NAMA_KENDARAAN,
                 'tglsj'          => $request->tglsj,
-                'NOSJ'           => $request->NOSJ,
+                // 'NOSJ'           => $request->NOSJ,
                 'DRIVER'         => $request->driver_1_expedisi_id,
                 'NAMA_DRIVER'    => $request->NAMA_DRIVER,
                 'DRIVER2'        => $request->driver_2_expedisi_id,
@@ -724,6 +724,7 @@ class ExpedisiController extends Controller
 
             // 🔐 Generate NOMUAT aman (lock)
             $nomuat = $this->generateNomuatWithLock();
+            $nojalan = $this->generateNoJalan();
 
             // ⏱️ Waktu muat
             $tglMuat = Carbon::now();
@@ -733,6 +734,7 @@ class ExpedisiController extends Controller
                 ->update([
                     'NOMUAT'  => $nomuat,
                     'TGLMUAT' => $tglMuat,
+                    'NOJALAN' => $nojalan,
                     'updated_at' => now()
                 ]);
         });
@@ -744,52 +746,68 @@ class ExpedisiController extends Controller
     }
 
     private function generateNomuatWithLock(){
-        $currentYear = date('Y');
-        $currentMonth = date('m');
-        $prefix = 'MU' . $currentYear . $currentMonth;
+        return DB::transaction(function () {
+            $bulan = now()->format('m');
+            $tahun = now()->format('y');
+            $prefix = 'MU' . $bulan . $tahun;
 
-        // Gunakan lockForUpdate untuk mencegah race condition
-        $last = Expedisi::where('NOMUAT', 'like', $prefix . '%')
-            ->lockForUpdate() // Penting: lock row
-            ->orderBy('NOMUAT', 'desc')
-            ->first();
+            $last = Expedisi::where('NOMUAT', 'like', $prefix . '%')
+                ->lockForUpdate()
+                ->orderBy('NOMUAT', 'desc')
+                ->first();
 
-        if ($last) {
-            $lastNumber = intval(substr($last->NOMUAT, -5));
-            $increment = $lastNumber + 1;
-        } else {
-            $increment = 1;
-        }
+            $next = $last
+                ? ((int) substr($last->NOMUAT, -5) + 1)
+                : 1;
 
-        return $prefix . str_pad($increment, 5, '0', STR_PAD_LEFT);
+            return $prefix . str_pad($next, 5, '0', STR_PAD_LEFT);
+        });
     }
 
     private function generateNoSuratJalan(){
-        // Ambil nomor terakhir dari database
-        $last = Expedisi::orderBy('NOSJ', 'desc')->first();
+        return DB::transaction(function () {
 
-        if ($last) {
-            $nextNumber = $last->NOSJ + 1;
-        } else {
-            $nextNumber = 1;
-        }
+            $bulan = now()->format('m');
+            $tahun = now()->format('y');
+            $prefix = $bulan . $tahun;
 
-        // Format 5 digit: 00001, 00002, dst
-        return str_pad($nextNumber, 5, '0', STR_PAD_LEFT);
+            $last = Expedisi::where('NOSJ', 'like', $prefix . '%')
+                ->lockForUpdate()
+                ->orderBy('NOSJ', 'desc')
+                ->first();
+
+            if ($last) {
+                $lastNumber = (int) substr($last->NOSJ, -5);
+                $nextNumber = $lastNumber + 1;
+            } else {
+                $nextNumber = 1;
+            }
+
+            $number = str_pad($nextNumber, 5, '0', STR_PAD_LEFT);
+            return 'SJ' . $prefix . $number;
+        });
     }
 
     private function generateNoJalan(){
-        // Ambil nomor terakhir dari database
-        $last = Expedisi::orderBy('NOJALAN', 'desc')->first();
+        return DB::transaction(function () {
 
-        if ($last) {
-            $nextNumber = $last->NOSJ + 1;
-        } else {
-            $nextNumber = 1;
-        }
+            $bulan  = now()->format('m');
+            $tahun  = now()->format('y');
+            $prefix = $bulan . $tahun; // contoh: 0126
 
-        // Format 5 digit: 00001, 00002, dst
-        return str_pad($nextNumber, 5, '0', STR_PAD_LEFT);
+            $last = Expedisi::where('NOJALAN', 'like', 'PJ' . $prefix . '%')
+                ->lockForUpdate()
+                ->orderBy('NOJALAN', 'desc')
+                ->first();
+
+            $nextNumber = $last
+                ? ((int) substr($last->NOJALAN, -5) + 1)
+                : 1;
+
+            $number = str_pad($nextNumber, 5, '0', STR_PAD_LEFT);
+
+            return 'PJ' . $prefix . $number;
+        });
     }
 
     // Print PDF

@@ -286,28 +286,24 @@
         </div>
     </div>
 
-    <!-- Form Nomor Muat -->
-    <div class="card-expedisi">
-        <div class="row">
-            <div class="col-md-3">
-                    <label class="form-label">TGL MUAT</label>
-                    <input type="date" class="form-control form-control-sm" id="tgl_muat_expedisi" name="tgl_muat_expedisi">
-                </div>
-                <div class="col-md-3">
-                    <label class="form-label">NO MUAT</label>
-                    <div class="input-group input-group-sm">
-                        <input type="text" class="form-control" id="no_muat_expedisi" name="no_muat_expedisi" readonly placeholder="Auto Generate/ click for update">
-                        <button class="btn btn-outline-secondary" type="button" id="muat_expedisi_btn">
-                            <i class="bx bx-search"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-    </div>
-
     <!-- Tabel Data SJ -->
     <div class="card-expedisi tabel-surat-jalan">
-        <div class="card-expedisi-header">
+        <div class="row">
+            <div class="col-md-3">
+                <label class="form-label">TGL MUAT</label>
+                <input type="date" class="form-control form-control-sm" id="tgl_muat_expedisi" name="tgl_muat_expedisi" readonly>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">NO MUAT</label>
+                <div class="input-group input-group-sm">
+                    <input type="text" class="form-control" id="no_muat_expedisi" name="no_muat_expedisi" readonly placeholder="Auto Generate/ click for update">
+                    <button class="btn btn-outline-secondary" type="button" id="muat_expedisi_btn">
+                        <i class="bx bx-search"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="card-expedisi-header mt-3">
             <h5><i class='bx bx-table me-2'></i>DATA SURAT JALAN</h5>
         </div>
 
@@ -340,9 +336,12 @@
                 </tfoot>
             </table>
         </div>
-        <div class="col-md-3 col-sm-6">
-            <button class="btn btn-success btn-action w-100" id="simpanMuatExpBtn">
-                <i class='bx bx-plus-circle me-1'></i>Tambah No Muat
+        <div class="col-md-3 col-sm-6 d-flex gap-2">
+            <button class="btn btn-success btn-action flex-fill" id="simpanMuatExpBtn" style="display:none">
+                <i class='bx bx-plus-circle me-1'></i>Simpan No Muat
+            </button>
+            <button class="btn btn-danger btn-action flex-fill" id="clearMuatExpBtn" style="display:none">
+                <i class='bx bx-trash me-1'></i>Clear No Muat
             </button>
         </div>
     </div>
@@ -1090,7 +1089,7 @@ $(document).ready(function() {
         };
 
         // console.log('Data yang dikirim:', formData); // Untuk debugging
-        var url = $('#no_muat_expedisi').val() ? "{{ route('expedisi.update', ':nomuat') }}".replace(':nomuat', $('#no_muat_expedisi').val()): "{{ route('expedisi.store') }}";
+        var url = $('#no_sj_expedisi').val() ? "{{ route('expedisi.update', ':nosj') }}".replace(':nosj', $('#no_sj_expedisi').val()): "{{ route('expedisi.store') }}";
         // AJAX Request
         $.ajax({
             url: url, // Ganti dengan route Laravel Anda
@@ -1297,30 +1296,62 @@ $(document).ready(function() {
             return;
         }
 
-        $.ajax({
-            url: '{{ route('expedisi-muat.store') }}',
-            method: 'POST',
-            data: {
-                nosj: nosjList
-            },
-            success: function (res) {
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Berhasil',
-                    text: res.message
-                });
-            },
-            error: function () {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Gagal',
-                    text: 'Terjadi kesalahan saat menyimpan data'
-                });
-            }
+        $('#loading_modal').modal('show');
+        $('#loading_modal').one('shown.bs.modal', function () {
+            // Jalankan setelah modal benar2 muncul
+            submitFormMuat();
         });
+        function submitFormMuat() {
+            $.ajax({
+                url: '{{ route('expedisi-muat.store') }}',
+                method: 'POST',
+                data: {
+                    nosj: nosjList
+                },
+                success: function (res) {
+                    $('#loading_modal').modal('hide');
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Berhasil',
+                        text: res.message
+                    });
+                    deleteRowTabelMuat();
+                },
+                error: function () {
+                    $('#loading_modal').modal('hide');
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Gagal',
+                        text: 'Terjadi kesalahan saat menyimpan data'
+                    });
+                }
+            });
+        }
     });
     // ======================== End of Simpan Submit No Muat =============================
+    // =========================== Hapus row tabel generate no muat  ===========================
+    $(document).on('click', '.btn-hapus-row', function () {
+        let row = $(this).closest('tr');
+        row.remove();
+        $('#tableProsesExpedisi tbody tr').each(function (index) {
+            $(this).find('td:eq(0)').text(index + 1);
+        });
+        hitungGrandTotal();
+        // 🔽 CEK JIKA TABEL KOSONG
+        let totalRow = $('#tableProsesExpedisi tbody tr').length;
 
+        if (totalRow === 0) {
+            $('#simpanMuatExpBtn').hide();
+            $('#clearMuatExpBtn').hide();
+        }
+    });
+    // ======================= End Of Hapus row tabel generate no muat  ==========================
+    // =============================== Clear Table No Muat ===================================
+    $('#clearMuatExpBtn').on('click', function () {
+        // Hapus semua row tabel
+        deleteRowTabelMuat();
+    });
+    // ========================== End Of Clear Table No Muat =================================
     // ########################### Function Helper ###############################
     // Fungsi untuk format number
     function formatNumber(num) {
@@ -1332,6 +1363,7 @@ $(document).ready(function() {
         return parseFloat(str.toString().replace(/\./g, '').replace(',', '.'));
     }
 
+    // Menghitung nilai total di form expedisi
     function calculateTotal() {
         // Ambil nilai dari form
         const jumlah = parseNumber($('#jumlah_expedisi').val()) || 0;
@@ -1393,6 +1425,7 @@ $(document).ready(function() {
             $('#divPrintSuratJalan').addClass('d-none');
     }
 
+    // Fungsi Untuk Me Reset Form Expedisi
     function resetFormExpedisi() {
         // Reset semua input text, number, textarea
         $('input[type="text"], input[type="number"], textarea').val('');
@@ -1412,6 +1445,7 @@ $(document).ready(function() {
         return val ? val : 0;
     }
 
+    // MenambahBaris Tabel No Muat
     function addRowExpedisi(data) {
         let tbody = $('#tableProsesExpedisi tbody');
         let nosjBaru = (data.NOSJ || '').toString().trim();
@@ -1472,18 +1506,11 @@ $(document).ready(function() {
 
         tbody.append(row);
         hitungGrandTotal();
+        $('#simpanMuatExpBtn').show();
+        $('#clearMuatExpBtn').show();
     }
 
-    // Hapus row saat tombol trash diklik
-    $(document).on('click', '.btn-hapus-row', function () {
-        let row = $(this).closest('tr');
-        row.remove();
-        $('#tableProsesExpedisi tbody tr').each(function (index) {
-            $(this).find('td:eq(0)').text(index + 1);
-        });
-        hitungGrandTotal();
-    });
-
+    // Menghitung Lumalah Tabel No Muat
     function hitungGrandTotal() {
         let total = 0;
 
@@ -1493,6 +1520,16 @@ $(document).ready(function() {
         });
 
         $('#grandTotal').text(total.toLocaleString('id-ID'));
+    }
+
+    // Hapus semua row tabel no muat
+    function deleteRowTabelMuat() {
+        $('#tableProsesExpedisi tbody').empty();
+        hitungGrandTotal();
+        $('#simpanMuatExpBtn').hide();
+        $('#clearMuatExpBtn').hide();
+        $('#no_muat_expedisi').val('');
+        $('#tgl_muat_expedisi').val('');
     }
 
     // function hitungExpedisi() {

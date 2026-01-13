@@ -133,7 +133,7 @@ Route::prefix('expedisi')->group(function() {
     Route::get('/data', [ExpedisiController::class, 'getData'])->name('expedisi.data');
     Route::get('/show/surjal', [ExpedisiController::class, 'showSurjal'])->name('expedisi-surjal.show');
     Route::get('/show', [ExpedisiController::class, 'show'])->name('expedisi.show');
-    Route::post('/update/{nomuat}', [ExpedisiController::class, 'update'])->name('expedisi.update');
+    Route::post('/update/{nosj}', [ExpedisiController::class, 'update'])->name('expedisi.update');
     Route::post('/destroy/{id}', [ExpedisiController::class, 'destroy'])->name('expedisi.destroy');
     Route::post('/store/muat', [ExpedisiController::class, 'storeMuat'])->name('expedisi-muat.store');
     // PDF
