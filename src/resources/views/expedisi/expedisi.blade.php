@@ -488,101 +488,6 @@ $(document).ready(function() {
         });
     });
     // ============================ End Of Delete No Surat Jalan ====================================
-    // ================================= Pilih No Muat =====================================
-    $('#muat_expedisi_btn').click(function(e) {
-        e.preventDefault();
-        $('#muatModalExp').modal('show');
-        // hancurkan datatable jika sudah pernah dipakai
-        if ($.fn.DataTable.isDataTable('#modalMuatExpTable')) {
-            $('#modalMuatExpTable').DataTable().destroy();
-        }
-        var tableMuat = $('#modalMuatExpTable').DataTable({
-            processing: true,
-            serverSide: true,
-            searching: false,
-            ajax: {
-            url: "{{ route('expedisi.data') }}",
-                data: function(d) {
-                    d.tgl_mulai = $('#filter_tgl_mulai').val();
-                    d.tgl_akhir = $('#filter_tgl_akhir').val();
-                    d.search_muat = $('#filter_muat').val();
-                }
-            },
-            // Scroll settings
-            scrollX: true,
-            scrollY: "400px",
-            scrollCollapse: true,
-            // Responsive settings
-            responsive: true,
-            autoWidth: true,
-            columns: [
-                { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false },
-                { data: 'NOMUAT', name: 'NOMUAT' },
-                { data: 'TGLMUAT', name: 'TGLMUAT' },
-                { data: 'CUSTOMER', name: 'CUSTOMER' },
-                { data: 'rute', name: 'rute' },
-                { data: 'JUMLAH', name: 'JUMLAH' },
-                { data: 'harga_formatted', name: 'HARGA' },
-                { data: 'DISC', name: 'DISC' },
-                { data: 'dc_formatted', name: 'DC' },
-                { data: 'total_formatted', name: 'GRAND' },
-                { data: 'NOSJ', name: 'NOSJ' },
-                { data: 'action', name: 'action', orderable: false, searchable: false }
-            ]
-        });
-
-        $('#btn_filter_muat').click(function () {
-            tableMuat.ajax.reload();
-        });
-    });
-    // ============================= End Of Pilih No Muat =====================================
-    // ================================ Delete No Muat ======================================
-    $(document).on('click', '.deleteMuat', function () {
-        let id     = $(this).data('id');
-        let nomuat = $(this).data('nomuat');
-
-        Swal.fire({
-            title: 'Hapus Data?',
-            text: 'No Muat ' + nomuat + ' akan dihapus!',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonText: 'Ya, hapus',
-            cancelButtonText: 'Batal',
-            confirmButtonColor: '#d33'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                let url = "{{ route('expedisi.destroy', ':id') }}";
-                url = url.replace(':id', id);
-                $.ajax({
-                    url: url,
-                    type: 'POST',
-                    data: {
-                        _token: "{{ csrf_token() }}"
-                    },
-                    success: function (res) {
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Berhasil',
-                            text: res.message,
-                            timer: 1500,
-                            showConfirmButton: false
-                        });
-
-                        // reload datatable
-                        $('#modalMuatExpTable').DataTable().ajax.reload(null, false);
-                    },
-                    error: function () {
-                        Swal.fire(
-                            'Gagal!',
-                            'Data tidak bisa dihapus',
-                            'error'
-                        );
-                    }
-                });
-            }
-        });
-    });
-    // ============================ End Of Delete No Muat ====================================
     // ============================= Show Detail Surjal ================================
     // Event listener untuk tombol pickMuat
     $(document).on('click', '.pickSurjal', function() {
@@ -915,21 +820,6 @@ $(document).ready(function() {
         $('#driverModalExp').modal('hide');
     });
     // =============================== End Of Pilih Driver ==================================
-    // =================== Pajak PPN ==========================
-    function loadInputPajak(){
-        $.ajax({
-            url: '{{ route('get_pajak') }}',
-            type: 'GET',
-            success: function(response) {
-                let nilai_ppn = response.data.ppn;
-                $('#ppn_expedisi').val(nilai_ppn);
-            },
-            error: function() {
-                $('#ppn_expedisi').val('Error Loading');
-            }
-        });
-    }
-    // =================== End Of Pajak PPN ==========================
     // ============================ Submit Data Form =================================
     // Hitung otomatis
     $('#jumlah_expedisi, #harga_expedisi, #disc_expedisi, #del_charge_expedisi').on('input', function() {
@@ -1161,7 +1051,7 @@ $(document).ready(function() {
         });
     }
     // ======================== End Of Submit Data Form =============================
-    // ============================= Show Detail ================================
+    // ============================= Show Detail No Muat ================================
     // Event listener untuk tombol pickMuat
     $(document).on('click', '.pickMuat', function() {
         const id = $(this).data('id');
@@ -1260,7 +1150,7 @@ $(document).ready(function() {
             });
         });
     });
-    // ======================== End Of Show Detail =============================
+    // ======================== End Of Show Detail No Muat =============================
     // =========================== Print PDF ================================
     $('#btnPrintSuratJalan').on('click', function () {
         let id = $(this).data('id');
@@ -1274,6 +1164,101 @@ $(document).ready(function() {
         resetFormExpedisi();
     });
     // ======================== End Of Clear Form =============================
+    // ================================= Pilih No Muat =====================================
+    $('#muat_expedisi_btn').click(function(e) {
+        e.preventDefault();
+        $('#muatModalExp').modal('show');
+        // hancurkan datatable jika sudah pernah dipakai
+        if ($.fn.DataTable.isDataTable('#modalMuatExpTable')) {
+            $('#modalMuatExpTable').DataTable().destroy();
+        }
+        var tableMuat = $('#modalMuatExpTable').DataTable({
+            processing: true,
+            serverSide: true,
+            searching: false,
+            ajax: {
+            url: "{{ route('expedisi.data') }}",
+                data: function(d) {
+                    d.tgl_mulai = $('#filter_tgl_mulai').val();
+                    d.tgl_akhir = $('#filter_tgl_akhir').val();
+                    d.search_muat = $('#filter_muat').val();
+                }
+            },
+            // Scroll settings
+            scrollX: true,
+            scrollY: "400px",
+            scrollCollapse: true,
+            // Responsive settings
+            responsive: true,
+            autoWidth: true,
+            columns: [
+                { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false },
+                { data: 'NOMUAT', name: 'NOMUAT' },
+                { data: 'TGLMUAT', name: 'TGLMUAT' },
+                { data: 'CUSTOMER', name: 'CUSTOMER' },
+                { data: 'rute', name: 'rute' },
+                { data: 'JUMLAH', name: 'JUMLAH' },
+                { data: 'harga_formatted', name: 'HARGA' },
+                { data: 'DISC', name: 'DISC' },
+                { data: 'dc_formatted', name: 'DC' },
+                { data: 'total_formatted', name: 'GRAND' },
+                { data: 'NOSJ', name: 'NOSJ' },
+                { data: 'action', name: 'action', orderable: false, searchable: false }
+            ]
+        });
+
+        $('#btn_filter_muat').click(function () {
+            tableMuat.ajax.reload();
+        });
+    });
+    // ============================= End Of Pilih No Muat =====================================
+    // ================================ Delete No Muat ======================================
+    $(document).on('click', '.deleteMuat', function () {
+        let id     = $(this).data('id');
+        let nomuat = $(this).data('nomuat');
+
+        Swal.fire({
+            title: 'Hapus Data?',
+            text: 'No Muat ' + nomuat + ' akan dihapus!',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Ya, hapus',
+            cancelButtonText: 'Batal',
+            confirmButtonColor: '#d33'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                let url = "{{ route('expedisi.destroy', ':id') }}";
+                url = url.replace(':id', id);
+                $.ajax({
+                    url: url,
+                    type: 'POST',
+                    data: {
+                        _token: "{{ csrf_token() }}"
+                    },
+                    success: function (res) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Berhasil',
+                            text: res.message,
+                            timer: 1500,
+                            showConfirmButton: false
+                        });
+
+                        // reload datatable
+                        $('#modalMuatExpTable').DataTable().ajax.reload(null, false);
+                    },
+                    error: function () {
+                        Swal.fire(
+                            'Gagal!',
+                            'Data tidak bisa dihapus',
+                            'error'
+                        );
+                    }
+                });
+            }
+        });
+    });
+    // ============================ End Of Delete No Muat ====================================
     // ============================ Simpan Submit No Muat =================================
     $('#simpanMuatExpBtn').on('click', function () {
         // if (!validateForm()) return;
@@ -1352,7 +1337,9 @@ $(document).ready(function() {
         deleteRowTabelMuat();
     });
     // ========================== End Of Clear Table No Muat =================================
-    // ########################### Function Helper ###############################
+    // ########################################################################
+    // FUNCTION HELPER:
+    // ########################################################################
     // Fungsi untuk format number
     function formatNumber(num) {
         return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
@@ -1398,6 +1385,21 @@ $(document).ready(function() {
         $('#sub_total_expedisi').val(formatNumber(Math.round(subTotal)));
         $('#dpp_expedisi').val(formatNumber(Math.round(dpp)));
         $('#grand_total_expedisi').val(formatNumber(Math.round(grandTotal)));
+    }
+
+    // =================== Pajak PPN ==========================
+    function loadInputPajak(){
+        $.ajax({
+            url: '{{ route('get_pajak') }}',
+            type: 'GET',
+            success: function(response) {
+                let nilai_ppn = response.data.ppn;
+                $('#ppn_expedisi').val(nilai_ppn);
+            },
+            error: function() {
+                $('#ppn_expedisi').val('Error Loading');
+            }
+        });
     }
 
     function setButtonToUpdateMode() {
