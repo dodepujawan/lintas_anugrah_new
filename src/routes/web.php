@@ -128,13 +128,15 @@ Route::prefix('price-dingin-customer')->group(function() {
 Route::prefix('expedisi')->group(function() {
     Route::get('/', [ExpedisiController::class, 'index'])->name('expedisi.index');
     Route::get('/data/cus', [ExpedisiController::class, 'getDataCustomer'])->name('expedisi-cus.data');
-    Route::post('/store', [ExpedisiController::class, 'store'])->name('expedisi.store');
+    Route::post('/store', [ExpedisiController::class, 'storeSurjal'])->name('expedisi.store');
     Route::get('/data/surjal', [ExpedisiController::class, 'getDataSurjal'])->name('expedisi-surjal.data');
     Route::get('/data', [ExpedisiController::class, 'getDataMuat'])->name('expedisi.data');
     Route::get('/show/surjal', [ExpedisiController::class, 'showSurjal'])->name('expedisi-surjal.show');
-    Route::get('/show', [ExpedisiController::class, 'show'])->name('expedisi.show');
-    Route::post('/update/{nosj}', [ExpedisiController::class, 'update'])->name('expedisi.update');
-    Route::post('/destroy/{id}', [ExpedisiController::class, 'destroy'])->name('expedisi.destroy');
+    Route::get('/show', [ExpedisiController::class, 'showMuat'])->name('expedisi.show');
+    Route::post('/update/{nosj}', [ExpedisiController::class, 'updateSurjal'])->name('expedisi.update');
+    Route::post('/update/muat/{nomuat}', [ExpedisiController::class, 'updateMuat'])->name('expedisi-muat.update');
+    Route::post('/destroy/{id}', [ExpedisiController::class, 'destroySurjal'])->name('expedisi.destroy');
+    Route::post('/destroy/muat/{nomuat}', [ExpedisiController::class, 'destroyMuat'])->name('expedisi-muat.destroy');
     Route::post('/store/muat', [ExpedisiController::class, 'storeMuat'])->name('expedisi-muat.store');
     // PDF
     Route::get('/expedisi/{id}/print-surat-jalan', [ExpedisiController::class, 'printSuratJalan'])->name('expedisi.printSuratJalan');

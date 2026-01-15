@@ -37,7 +37,7 @@ class ExpedisiController extends Controller
             ->make(true);
     }
 
-    public function store(Request $request){
+    public function storeSurjal(Request $request){
         // Validasi
         $validator = Validator::make($request->all(), [
             'tglsj' => 'required|date',
@@ -165,7 +165,7 @@ class ExpedisiController extends Controller
                 'message' => 'Data ekspedisi berhasil disimpan',
                 'data' => [
                     'id' => $expedisi->id,
-                    'NOMUAT' => $expedisi->NOMUAT,
+                    // 'NOMUAT' => $expedisi->NOMUAT,
                     'NOSJ' => $expedisi->NOSJ,
                     'JENISHRG' => $expedisi->JENISHRG,
                     'GRAND' => number_format($expedisi->GRAND, 0, ',', '.'),
@@ -371,100 +371,68 @@ class ExpedisiController extends Controller
         }
     }
 
-    public function show(Request $request){
+    public function showMuat(Request $request){
         try {
-            $id = $request->input('id');
             $nomuat = $request->input('nomuat');
 
-            $query = Expedisi::query();
-
-            if ($id) {
-                $query->where('id', $id);
-            } else {
+            if (!$nomuat) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'ID atau NOMUAT harus diisi'
+                    'message' => 'NOMUAT wajib diisi'
                 ], 400);
             }
 
-            $expedisi = $query->first();
+            // 🔹 Ambil SEMUA baris dengan NOMUAT yang sama
+            $expedisi = Expedisi::where('NOMUAT', $nomuat)
+                ->where('JENIS', 'EKS')
+                ->orderBy('id')
+                ->get();
 
-            if (!$expedisi) {
+            if ($expedisi->isEmpty()) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Data tidak ditemukan'
                 ], 404);
             }
 
-            // Cek nilai customer untuk mengambil nama customer
-            $customerName = DB::table('mcustomer')
-                ->where('kode_cus', $expedisi->CUSTOMER_KODE)
-                ->value('NAMACUST') ?? "";
-
-            // Format data sesuai kebutuhan form
-            $data = [
-                // DATA DOKUMEN
-                'tgl_muat' => $expedisi->TGLMUAT,
-                'no_muat' => $expedisi->NOMUAT,
-                'wilayah' => $expedisi->WILAYAH,
-                'no_jalan' => $expedisi->NOJALAN,
-
-                // Customer (asumsi ada relasi)
-                'customer_id' => $expedisi->CUSTOMER_KODE,
-                'customer_name' => $customerName,
-                'customer' => $expedisi->CUSTOMER,
-                'pesanan' => $expedisi->PESANAN,
-
-                // KENDARAAN & DRIVER
-                'kendaraan_id' => $expedisi->KENDARAAN,
-                'kendaraan_nama' => $expedisi->NAMA_KENDARAAN,
-                'tgl_sj' => $expedisi->tglsj,
-                'no_sj' => $expedisi->NOSJ,
-
-                // Driver
-                'driver_1_id' => $expedisi->DRIVER,
-                'driver_1_nama' => $expedisi->NAMA_DRIVER,
-                'driver_2_id' => $expedisi->DRIVER2,
-                'driver_2_nama' => $expedisi->NAMA_DRIVER2,
-
-                // PENERIMA
-                'penerima' => $expedisi->P_PENERIMA,
-                'nama_penerima' => $expedisi->P_NAMA,
-                'phone_penerima' => $expedisi->P_PHONE,
-                'alamat_penerima' => $expedisi->P_ALAMAT,
-
-                // DETAIL & PERHITUNGAN
-                'rute' => $expedisi->rute,
-                'jumlah' => $expedisi->JUMLAH,
-                'harga' => $expedisi->HARGA,
-                'disc_percent' => $expedisi->DISC,
-                'del_charge' => $expedisi->DC,
-
-                // Untuk perhitungan
-                'sub_total' => $expedisi->TOTAL + $expedisi->NDISC,
-                'dpp' => $expedisi->TOTAL,
-                'ppn' => $expedisi->PPN,
-                'grand_total' => $expedisi->GRAND
-            ];
+            // 🔹 Mapping data ke format frontend
+            $rows = $expedisi->map(function ($row) {
+                return [
+                    'id'        => $row->id,
+                    'nomuat'      => $row->NOMUAT,
+                    'tglmuat'      => $row->TGLMUAT,
+                    'nosj'      => $row->NOSJ,
+                    'tgl_sj'    => $row->tglsj,
+                    'dc'        => $row->DC,
+                    'jumlah'    => $row->JUMLAH,
+                    'unit'      => $row->UNIT,
+                    'jenis'     => $row->JENIS,
+                    'jenishrg'  => $row->JENISHRG,
+                    'harga'     => $row->HARGA,
+                    'disc'      => $row->DISC,
+                    'ppn'       => $row->PPN,
+                    'total'     => $row->GRAND,
+                ];
+            });
 
             return response()->json([
                 'success' => true,
-                'message' => 'Data berhasil diambil',
-                'data' => $data
+                'nomuat'  => $nomuat,
+                'data'    => $rows
             ]);
 
         } catch (\Exception $e) {
-            \Log::error('Error get expedisi data: ' . $e->getMessage());
+            \Log::error($e->getMessage());
 
             return response()->json([
                 'success' => false,
-                'message' => 'Terjadi kesalahan saat mengambil data'
+                'message' => 'Terjadi kesalahan server'
             ], 500);
         }
     }
 
     // ExpedisiController.php
-    public function update(Request $request, $nosj){
+    public function updateSurjal(Request $request, $nosj){
         // ======================
         // VALIDASI (SAMA DENGAN STORE)
         // ======================
@@ -612,7 +580,7 @@ class ExpedisiController extends Controller
         }
     }
 
-    public function destroy($id){
+    public function destroySurjal($id){
         $data = Expedisi::find($id);
 
         if (!$data) {
@@ -660,11 +628,57 @@ class ExpedisiController extends Controller
         ]);
     }
 
+    public function updateMuat(Request $request, $nomuat){
+        $request->validate([
+            'nosj' => 'required|array|min:1',
+        ]);
+
+        DB::transaction(function () use ($request, $nomuat) {
+
+            $nosjBaru = $request->nosj;
+
+            // NOSJ lama di DB
+            $nosjLama = DB::table('expedisi')
+                ->where('NOMUAT', $nomuat)
+                ->pluck('NOSJ')
+                ->toArray();
+
+            // Tambah & hapus
+            $nosjTambah = array_diff($nosjBaru, $nosjLama);
+            $nosjHapus  = array_diff($nosjLama, $nosjBaru);
+
+            if (!empty($nosjTambah)) {
+                DB::table('expedisi')
+                    ->whereIn('NOSJ', $nosjTambah)
+                    ->update([
+                        'NOMUAT' => $nomuat,
+                        'TGLMUAT' => now(),
+                        'updated_at' => now()
+                    ]);
+            }
+
+            if (!empty($nosjHapus)) {
+                DB::table('expedisi')
+                    ->whereIn('NOSJ', $nosjHapus)
+                    ->update([
+                        'NOMUAT' => null,
+                        'updated_at' => now()
+                    ]);
+            }
+        });
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Data muatan berhasil diperbarui'
+        ]);
+    }
+
     public function getDataMuat(Request $request){
         // 🔹 Subquery: ambil BARIS PERTAMA per NOMUAT
         $subQuery = DB::table('expedisi')
             ->select(DB::raw('MIN(id) as id'))
             ->where('JENIS', 'EKS')
+            ->whereNotNull('NOMUAT')
             ->groupBy('NOMUAT');
 
         $expedisi = Expedisi::select([
@@ -686,7 +700,8 @@ class ExpedisiController extends Controller
             'NAMA_DRIVER',
             'STS',
             'created_at'
-        ])->whereIn('id', $subQuery)
+        ])->whereNotNull('NOMUAT')
+        ->whereIn('id', $subQuery)
         ->orderBy('id', 'desc');
 
         // 🔐 FILTER ROLE DRIVER
@@ -767,6 +782,28 @@ class ExpedisiController extends Controller
 
             ->rawColumns(['action'])
             ->make(true);
+    }
+
+    public function destroyMuat($nomuat){
+        $updated = Expedisi::where('NOMUAT', $nomuat)
+            ->update([
+                'NOMUAT' => null,
+                'TGLMUAT' => null,
+                'NOJALAN' => null,
+                'updated_at' => now()
+            ]);
+
+        if ($updated === 0) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Data tidak ditemukan'
+            ], 404);
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Muatan berhasil dibatalkan'
+        ]);
     }
 
     private function generateNomuatWithLock(){

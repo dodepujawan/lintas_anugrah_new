@@ -270,12 +270,12 @@
         <div class="row g-2">
             <div class="col-md-3 col-sm-6">
                 <button class="btn btn-info btn-action w-100" id="buttonSimpanExp">
-                    <i class='bx bx-save me-1'></i>SIMPAN [F3]
+                    <i class='bx bx-save me-1'></i>SIMPAN
                 </button>
             </div>
             <div class="col-md-3 col-sm-6">
                 <button class="btn btn-danger btn-action w-100" id="buttonClearExp">
-                    <i class='bx bx-trash me-1'></i>Clear [F6]
+                    <i class='bx bx-trash me-1'></i>Clear
                 </button>
             </div>
             <div class="col-md-3 col-sm-6 d-none" id="divPrintSuratJalan">
@@ -337,7 +337,7 @@
             </table>
         </div>
         <div class="col-md-3 col-sm-6 d-flex gap-2">
-            <button class="btn btn-success btn-action flex-fill" id="simpanMuatExpBtn" style="display:none">
+            <button class="btn btn-primary btn-action flex-fill" id="simpanMuatExpBtn" style="display:none">
                 <i class='bx bx-plus-circle me-1'></i>Simpan No Muat
             </button>
             <button class="btn btn-danger btn-action flex-fill" id="clearMuatExpBtn" style="display:none">
@@ -346,6 +346,7 @@
         </div>
     </div>
 </div>
+{{-- MASTER --}}
 @include('expedisi.expedisi_modal')
 <script>
 $(document).ready(function() {
@@ -489,7 +490,7 @@ $(document).ready(function() {
     });
     // ============================ End Of Delete No Surat Jalan ====================================
     // ============================= Show Detail Surjal ================================
-    // Event listener untuk tombol pickMuat
+    // Event listener untuk tombol pickSurjal
     $(document).on('click', '.pickSurjal', function() {
         const id = $(this).data('id');
         const nomuat = $(this).data('nosj');
@@ -1051,106 +1052,6 @@ $(document).ready(function() {
         });
     }
     // ======================== End Of Submit Data Form =============================
-    // ============================= Show Detail No Muat ================================
-    // Event listener untuk tombol pickMuat
-    $(document).on('click', '.pickMuat', function() {
-        const id = $(this).data('id');
-        const nomuat = $(this).data('nomuat');
-
-        $('#muatModalExp').modal('hide');
-        $('#loading_modal').modal('show');
-        $('#loading_modal').one('shown.bs.modal', function () {
-            // Ambil data dari server berdasarkan id/nomuat
-            $.ajax({
-                url: '{{ route('expedisi.show') }}', // Ganti dengan endpoint yang sesuai
-                type: 'GET',
-                data: {
-                    id: id,
-                    nomuat: nomuat
-                },
-                success: function(response) {
-                    if (response.success) {
-                        const data = response.data;
-                        setButtonToUpdateMode();
-                         // DATA DOKUMEN
-                        $('#tgl_muat_expedisi').val(data.tgl_muat || '');
-                        $('#no_muat_expedisi').val(data.no_muat || '');
-                        $('#wilayah_expedisi').val(data.wilayah || 'denpasar');
-                        $('#nomor_perjalanan_expedisi').val(data.no_jalan || '');
-
-                        // Customer
-                        $('#customer_expedisi_id').val(data.customer_id || '');
-                        $('#customer_expedisi').val(data.customer_name || '');
-                        $('#customer_kode_expedisi').val(data.customer || '');
-
-                        // Item
-                        $('#item_expedisi').val(data.pesanan || '');
-
-                        // KENDARAAN & DRIVER
-                        $('#kendaraan_expedisi_id').val(data.kendaraan_id || '');
-                        $('#kendaraan_expedisi').val(data.kendaraan_nama || '');
-                        $('#tgl_sj_expedisi').val(data.tgl_sj || '');
-                        $('#no_sj_expedisi').val(data.no_sj || '');
-
-                        // Driver 1
-                        $('#driver_1_expedisi_id').val(data.driver_1_id || '');
-                        $('#driver_1_expedisi').val(data.driver_1_nama || '');
-
-                        // Driver 2
-                        $('#driver_2_expedisi_id').val(data.driver_2_id || '');
-                        $('#driver_2_expedisi').val(data.driver_2_nama || '');
-
-                        // DATA PENERIMA
-                        $('#penerima_expedisi').val(data.penerima || '');
-                        $('#nama_penerima_expedisi').val(data.nama_penerima || '');
-                        $('#phone_penerima_expedisi').val(data.phone_penerima || '');
-                        $('#alamat_penerima_expedisi').val(data.alamat_penerima || '');
-
-                        // DETAIL & PERHITUNGAN
-                        $('#rute_expedisi').val(data.rute || '');
-                        $('#jumlah_expedisi').val(parseFloat(data.jumlah) || 0);
-                        $('#harga_expedisi').val(data.harga || 0);
-                        $('#disc_expedisi').val(parseFloat(data.disc_percent) || 0);
-                        $('#del_charge_expedisi').val(data.del_charge || 0);
-
-                        // Button Print PDF
-                        $('#divPrintSuratJalan').removeClass('d-none');
-                        $('#btnPrintSuratJalan').attr('data-id',id);
-
-                        // Hitung total otomatis
-                        calculateTotal();
-
-                        // // Tampilkan pesan sukses
-                        // Swal.fire({
-                        //     icon: 'success',
-                        //     title: 'Data Dimuat',
-                        //     text: 'Data muatan berhasil dimuat ke form',
-                        //     timer: 2000,
-                        //     showConfirmButton: false
-                        // });
-                    } else {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Gagal',
-                            text: response.message || 'Gagal memuat data'
-                        });
-                    }
-                },
-                error: function(xhr) {
-                    $('#loading_modal').modal('hide');
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: 'Terjadi kesalahan saat mengambil data'
-                    });
-                },
-                complete: function() {
-                    $('#loading_modal').modal('hide');
-                }
-            });
-        });
-    });
-    // ======================== End Of Show Detail No Muat =============================
     // =========================== Print PDF ================================
     $('#btnPrintSuratJalan').on('click', function () {
         let id = $(this).data('id');
@@ -1212,6 +1113,71 @@ $(document).ready(function() {
         });
     });
     // ============================= End Of Pilih No Muat =====================================
+    // ============================= Show Detail No Muat ================================
+    // Event listener untuk tombol pickMuat
+    $(document).on('click', '.pickMuat', function () {
+        const nomuat = $(this).data('nomuat');
+
+        $('#muatModalExp').modal('hide');
+        $('#loading_modal').modal('show');
+        $('#loading_modal').one('shown.bs.modal', function () {
+            showMuatDet();
+        });
+        function showMuatDet(){
+            $.ajax({
+                url: '{{ route('expedisi.show') }}',
+                type: 'GET',
+                data: { nomuat: nomuat },
+                success: function (res) {
+                    $('#loading_modal').modal('hide');
+                    if (!res.success) {
+                        Swal.fire('Gagal', res.message, 'error');
+                        return;
+                    }
+                    const tbody = $('#tableProsesExpedisi tbody');
+                    tbody.empty();
+
+                    let grandTotal = 0;
+
+                    res.data.forEach((row, index) => {
+                        // grandTotal += parseFloat(row.total || 0);
+
+                        tbody.append(`
+                            <tr>
+                                <td class="text-center">${index + 1}</td>
+                                <td>${row.nosj ?? '-'}</td>
+                                <td>${row.tgl_sj ?? '-'}</td>
+                                <td class="text-end">${formatNumber(row.dc)}</td>
+                                <td class="text-end">${formatNumber(row.jumlah)}</td>
+                                <td>KG</td>
+                                <td data-jenis="${row.jenishrg}">
+                                    ${getJenisHargaLabel(row.jenishrg)}
+                                </td>
+                                <td class="text-end">${formatNumber(row.harga)}</td>
+                                <td class="text-end">${row.disc ?? 0}%</td>
+                                <td class="text-end">${row.ppn ?? 0 }</td>
+                                <td class="text-end">${formatNumber(nvl(row.total))}</td>
+                                <td class="text-center">
+                                    <button class="btn btn-sm btn-danger btn-hapus-row">
+                                        <i class="bx bx-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        `);
+                    });
+
+                    $('#tgl_muat_expedisi').val(res.data[0].tglmuat);
+                    $('#no_muat_expedisi').val(res.data[0].nomuat);
+                    hitungGrandTotal();
+                    $('#simpanMuatExpBtn').removeClass('btn-primary').addClass('btn-success').html("<i class='bx bx-plus-circle me-1'></i> Update No Muat");
+                    $('#simpanMuatExpBtn').show();
+                    $('#clearMuatExpBtn').show();
+                    // $('#grandTotal').text(formatNumber(grandTotal));
+                }
+            });
+        };
+    });
+    // ======================== End Of Show Detail No Muat =============================
     // ================================ Delete No Muat ======================================
     $(document).on('click', '.deleteMuat', function () {
         let id     = $(this).data('id');
@@ -1227,8 +1193,8 @@ $(document).ready(function() {
             confirmButtonColor: '#d33'
         }).then((result) => {
             if (result.isConfirmed) {
-                let url = "{{ route('expedisi.destroy', ':id') }}";
-                url = url.replace(':id', id);
+                let url = "{{ route('expedisi-muat.destroy', ':nomuat') }}";
+                url = url.replace(':nomuat', nomuat);
                 $.ajax({
                     url: url,
                     type: 'POST',
@@ -1280,15 +1246,17 @@ $(document).ready(function() {
             });
             return;
         }
+        let nomuat = $('#no_muat_expedisi').val();
+        let url = nomuat ? "{{ route('expedisi-muat.update', ':nomuat') }}".replace(':nomuat', nomuat) : "{{ route('expedisi-muat.store') }}";
 
         $('#loading_modal').modal('show');
         $('#loading_modal').one('shown.bs.modal', function () {
             // Jalankan setelah modal benar2 muncul
-            submitFormMuat();
+            submitFormMuat(url);
         });
-        function submitFormMuat() {
+        function submitFormMuat(url) {
             $.ajax({
-                url: '{{ route('expedisi-muat.store') }}',
+                url: url,
                 method: 'POST',
                 data: {
                     nosj: nosjList
@@ -1326,8 +1294,11 @@ $(document).ready(function() {
         let totalRow = $('#tableProsesExpedisi tbody tr').length;
 
         if (totalRow === 0) {
+            $('#simpanMuatExpBtn').removeClass('btn-success').addClass('btn-primary').html("<i class='bx bx-plus-circle me-1'></i> Simpan No Muat");
             $('#simpanMuatExpBtn').hide();
             $('#clearMuatExpBtn').hide();
+            $('#tgl_muat_expedisi').val('');
+            $('#no_muat_expedisi').val('');
         }
     });
     // ======================= End Of Hapus row tabel generate no muat  ==========================
@@ -1430,7 +1401,9 @@ $(document).ready(function() {
     // Fungsi Untuk Me Reset Form Expedisi
     function resetFormExpedisi() {
         // Reset semua input text, number, textarea
-        $('input[type="text"], input[type="number"], textarea').val('');
+        $('input[type="text"], input[type="number"], textarea')
+        .not('#no_muat_expedisi, #tgl_muat_expedisi')
+        .val('');
         // Reset select
         $('select').prop('selectedIndex', 0);
         // Field khusus
@@ -1447,7 +1420,7 @@ $(document).ready(function() {
         return val ? val : 0;
     }
 
-    // MenambahBaris Tabel No Muat
+    // Menambah Baris Tabel No Muat
     function addRowExpedisi(data) {
         let tbody = $('#tableProsesExpedisi tbody');
         let nosjBaru = (data.NOSJ || '').toString().trim();
@@ -1499,17 +1472,17 @@ $(document).ready(function() {
             </tr>
         `;
 
-        // untuk convert janis harga
-        function getJenisHargaLabel(val) {
-            if (val == 1) return 'Eceran';
-            if (val == 2) return 'Booking';
-            return '-';
-        }
-
         tbody.append(row);
         hitungGrandTotal();
         $('#simpanMuatExpBtn').show();
         $('#clearMuatExpBtn').show();
+    }
+
+    // untuk convert janis harga pada Tabel No Muat Row
+    function getJenisHargaLabel(val) {
+        if (val == 1) return 'Eceran';
+        if (val == 2) return 'Booking';
+        return '-';
     }
 
     // Menghitung Lumalah Tabel No Muat
@@ -1528,6 +1501,7 @@ $(document).ready(function() {
     function deleteRowTabelMuat() {
         $('#tableProsesExpedisi tbody').empty();
         hitungGrandTotal();
+        $('#simpanMuatExpBtn').removeClass('btn-success').addClass('btn-primary').html("<i class='bx bx-plus-circle me-1'></i> Simpan No Muat");
         $('#simpanMuatExpBtn').hide();
         $('#clearMuatExpBtn').hide();
         $('#no_muat_expedisi').val('');
