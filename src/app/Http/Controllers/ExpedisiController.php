@@ -385,7 +385,7 @@ class ExpedisiController extends Controller
             // 🔹 Ambil SEMUA baris dengan NOMUAT yang sama
             $expedisi = Expedisi::where('NOMUAT', $nomuat)
                 ->where('JENIS', 'EKS')
-                ->orderBy('id')
+                ->orderBy('id', 'desc')
                 ->get();
 
             if ($expedisi->isEmpty()) {
@@ -830,7 +830,8 @@ class ExpedisiController extends Controller
 
             $bulan = now()->format('m');
             $tahun = now()->format('y');
-            $prefix = $bulan . $tahun;
+
+            $prefix = 'SJ' . $bulan . $tahun;
 
             $last = Expedisi::where('NOSJ', 'like', $prefix . '%')
                 ->lockForUpdate()
@@ -845,7 +846,8 @@ class ExpedisiController extends Controller
             }
 
             $number = str_pad($nextNumber, 5, '0', STR_PAD_LEFT);
-            return 'SJ' . $prefix . $number;
+
+            return $prefix . $number;
         });
     }
 

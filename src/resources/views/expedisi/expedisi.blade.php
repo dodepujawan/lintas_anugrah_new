@@ -278,9 +278,14 @@
                     <i class='bx bx-trash me-1'></i>Clear
                 </button>
             </div>
+            <div class="col-md-3 col-sm-6" style="display:none" id="divButtonAppendExp">
+                <button class="btn btn-warning btn-action w-100" id="buttonAppendExp">
+                    <i class='bx bx-plus-circle me-1'></i>Tambah Muatan
+                </button>
+            </div>
             <div class="col-md-3 col-sm-6 d-none" id="divPrintSuratJalan">
-                <button class="btn btn-primary" id="btnPrintSuratJalan" data-id="">
-                    <i class="bx bx-printer"></i> Print Surat Jalan
+                <button class="btn btn-primary btn-action w-100" id="btnPrintSuratJalan" data-id="">
+                    <i class="bx bx-printer me-1"></i> Print Surat Jalan
                 </button>
             </div>
         </div>
@@ -336,11 +341,11 @@
                 </tfoot>
             </table>
         </div>
-        <div class="col-md-3 col-sm-6 d-flex gap-2">
-            <button class="btn btn-primary btn-action flex-fill" id="simpanMuatExpBtn" style="display:none">
+        <div class="col-md-6 col-sm-6 d-flex gap-2">
+            <button class="btn btn-primary btn-action flex-fill w-100" id="simpanMuatExpBtn" style="display:none">
                 <i class='bx bx-plus-circle me-1'></i>Simpan No Muat
             </button>
-            <button class="btn btn-danger btn-action flex-fill" id="clearMuatExpBtn" style="display:none">
+            <button class="btn btn-danger btn-action flex-fill w-100" id="clearMuatExpBtn" style="display:none">
                 <i class='bx bx-trash me-1'></i>Clear No Muat
             </button>
         </div>
@@ -1052,6 +1057,24 @@ $(document).ready(function() {
         });
     }
     // ======================== End Of Submit Data Form =============================
+    // ================================= Append Form to Table No Muat ====================================
+    $('#buttonAppendExp').on('click', function () {
+        if (userRole === 'admin') {
+            addRowExpedisi({
+                NOSJ: $('#no_sj_expedisi').val(),
+                tglsj: $('#tgl_sj_expedisi').val(),
+                JUMLAH: $('#jumlah_expedisi').val(),
+                HARGA: $('#harga_expedisi').val(),
+                DC: $('#del_charge_expedisi').val(),
+                NDISC: $('#disc_expedisi').val(),
+                PPN: $('#ppn_expedisi').val(),
+                JENISHRG: $('#item_expedisi_tipe').val(),
+                GRAND: $('#grand_total_expedisi').val(),
+            });
+        }
+        resetFormExpedisi();
+    });
+    // ============================== End Of Append Form to Table No Muat ==============================
     // =========================== Print PDF ================================
     $('#btnPrintSuratJalan').on('click', function () {
         let id = $(this).data('id');
@@ -1377,12 +1400,16 @@ $(document).ready(function() {
         $('#buttonSimpanExp')
             .removeClass('btn-info')
             .addClass('btn-success')
-            .html('<i class="bx bx-edit me-1"></i>UPDATE [F3]')
+            .html('<i class="bx bx-edit me-1"></i>UPDATE')
             .attr('title', 'Update data ekspedisi')
             .data('mode', 'update')
 
         // Tambahkan badge info
         $('#buttonSimpanExp').append('<span class="badge bg-light text-dark ms-2">EDIT MODE</span>');
+        // aktifkan button papend to table
+        if (userRole === 'admin') {
+            $('#divButtonAppendExp').show();
+        }
     }
 
     // Fungsi untuk mengubah tombol ke mode CREATE/SIMPAN
@@ -1390,12 +1417,14 @@ $(document).ready(function() {
         $('#buttonSimpanExp')
             .removeClass('btn-success')
             .addClass('btn-info')
-            .html('<i class="bx bx-save me-1"></i>SIMPAN [F3]')
+            .html('<i class="bx bx-save me-1"></i>SIMPAN')
             .attr('title', 'Simpan data ekspedisi baru')
             .data('mode', 'save')
             .data('id', '')
             .find('.badge').remove(); // Hapus badge jika ada
             $('#divPrintSuratJalan').addClass('d-none');
+            // aktifkan button papend to table
+            $('#divButtonAppendExp').hide();
     }
 
     // Fungsi Untuk Me Reset Form Expedisi
