@@ -114,6 +114,12 @@ class ExpedisiController extends Controller
                 'P_PHONE' => $request->P_PHONE,
                 'P_ALAMAT' => $request->P_ALAMAT,
 
+                // BARANG
+                'barang' => $request->barang,
+                'penyimpanan' => $request->penyimpanan,
+                'koli' => $request->koli,
+                'catatan' => $request->catatan,
+
                 // DETAIL & PERHITUNGAN
                 'rute' => $request->rute,
                 'JUMLAH' => $jumlah,
@@ -340,6 +346,12 @@ class ExpedisiController extends Controller
                 'phone_penerima' => $expedisi->P_PHONE,
                 'alamat_penerima' => $expedisi->P_ALAMAT,
 
+                // BARANG
+                'barang' => $expedisi->barang,
+                'penyimpanan' => $expedisi->penyimpanan,
+                'koli' => $expedisi->koli,
+                'catatan' => $expedisi->catatan,
+
                 // DETAIL & PERHITUNGAN
                 'rute' => $expedisi->rute,
                 'jumlah' => $expedisi->JUMLAH,
@@ -367,66 +379,6 @@ class ExpedisiController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Terjadi kesalahan saat mengambil data'
-            ], 500);
-        }
-    }
-
-    public function showMuat(Request $request){
-        try {
-            $nomuat = $request->input('nomuat');
-
-            if (!$nomuat) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'NOMUAT wajib diisi'
-                ], 400);
-            }
-
-            // 🔹 Ambil SEMUA baris dengan NOMUAT yang sama
-            $expedisi = Expedisi::where('NOMUAT', $nomuat)
-                ->where('JENIS', 'EKS')
-                ->orderBy('id', 'desc')
-                ->get();
-
-            if ($expedisi->isEmpty()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Data tidak ditemukan'
-                ], 404);
-            }
-
-            // 🔹 Mapping data ke format frontend
-            $rows = $expedisi->map(function ($row) {
-                return [
-                    'id'        => $row->id,
-                    'nomuat'      => $row->NOMUAT,
-                    'tglmuat'      => $row->TGLMUAT,
-                    'nosj'      => $row->NOSJ,
-                    'tgl_sj'    => $row->tglsj,
-                    'dc'        => $row->DC,
-                    'jumlah'    => $row->JUMLAH,
-                    'unit'      => $row->UNIT,
-                    'jenis'     => $row->JENIS,
-                    'jenishrg'  => $row->JENISHRG,
-                    'harga'     => $row->HARGA,
-                    'disc'      => $row->DISC,
-                    'ppn'       => $row->PPN,
-                    'total'     => $row->GRAND,
-                ];
-            });
-
-            return response()->json([
-                'success' => true,
-                'nomuat'  => $nomuat,
-                'data'    => $rows
-            ]);
-
-        } catch (\Exception $e) {
-            \Log::error($e->getMessage());
-
-            return response()->json([
-                'success' => false,
-                'message' => 'Terjadi kesalahan server'
             ], 500);
         }
     }
@@ -516,6 +468,12 @@ class ExpedisiController extends Controller
                 'P_PHONE'    => $request->P_PHONE,
                 'P_ALAMAT'   => $request->P_ALAMAT,
 
+                // BARANG
+                'barang' => $request->barang,
+                'penyimpanan' => $request->penyimpanan,
+                'koli' => $request->koli,
+                'catatan' => $request->catatan,
+
                 // DETAIL & HITUNGAN
                 'rute'     => $request->rute,
                 'JUMLAH'   => $jumlah,
@@ -598,6 +556,66 @@ class ExpedisiController extends Controller
         ]);
     }
 
+    public function showMuat(Request $request){
+        try {
+            $nomuat = $request->input('nomuat');
+
+            if (!$nomuat) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'NOMUAT wajib diisi'
+                ], 400);
+            }
+
+            // 🔹 Ambil SEMUA baris dengan NOMUAT yang sama
+            $expedisi = Expedisi::where('NOMUAT', $nomuat)
+                ->where('JENIS', 'EKS')
+                ->orderBy('id', 'desc')
+                ->get();
+
+            if ($expedisi->isEmpty()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Data tidak ditemukan'
+                ], 404);
+            }
+
+            // 🔹 Mapping data ke format frontend
+            $rows = $expedisi->map(function ($row) {
+                return [
+                    'id'        => $row->id,
+                    'nomuat'      => $row->NOMUAT,
+                    'tglmuat'      => $row->TGLMUAT,
+                    'nosj'      => $row->NOSJ,
+                    'tgl_sj'    => $row->tglsj,
+                    'dc'        => $row->DC,
+                    'jumlah'    => $row->JUMLAH,
+                    'unit'      => $row->UNIT,
+                    'jenis'     => $row->JENIS,
+                    'jenishrg'  => $row->JENISHRG,
+                    'harga'     => $row->HARGA,
+                    'disc'      => $row->DISC,
+                    'ppn'       => $row->PPN,
+                    'total'     => $row->GRAND,
+                ];
+            });
+
+            return response()->json([
+                'success' => true,
+                'nomuat'  => $nomuat,
+                'data'    => $rows
+            ]);
+
+        } catch (\Exception $e) {
+            \Log::error($e->getMessage());
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan server'
+            ], 500);
+        }
+    }
+
     public function storeMuat(Request $request){
         $request->validate([
             'nosj' => 'required|array|min:1',
@@ -662,6 +680,7 @@ class ExpedisiController extends Controller
                     ->whereIn('NOSJ', $nosjHapus)
                     ->update([
                         'NOMUAT' => null,
+                        'TGLMUAT' => null,
                         'updated_at' => now()
                     ]);
             }
@@ -876,6 +895,11 @@ class ExpedisiController extends Controller
     // Print PDF
     public function printSuratJalan($id){
         $expedisi = Expedisi::findOrFail($id);
+
+        $expedisi->PLAT = DB::table('kendaraan')
+            ->where('KODE', $expedisi->KENDARAAN)
+            ->value('PLAT');
+
         $user = auth()->user();
 
         // 🔐 CEK AKSES

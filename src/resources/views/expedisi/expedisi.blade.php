@@ -123,9 +123,7 @@
                         <label class="form-label fw-semibold">CUSTOMER</label>
                         <div class="input-group input-group-sm mb-2">
                             <input type="hidden" name="customer_expedisi_id" id="customer_expedisi_id">
-                            <input type="text" class="form-control" id="customer_expedisi"
-                                name="customer_expedisi" readonly
-                                placeholder="Pilih customer...">
+                            <input type="text" class="form-control" id="customer_expedisi" name="customer_expedisi" readonly placeholder="Pilih customer...">
                             <button class="btn btn-outline-primary" id="customer_expedisi_btn" type="button">
                                 <i class="bx bx-search"></i>
                             </button>
@@ -158,7 +156,7 @@
     {{-- KENDARAAN & DRIVER --}}
     <div class="card-expedisi">
         <div class="card-expedisi-header">
-            <h5><i class='bx bx-truck'></i> KENDARAAN & DRIVER</h5>
+            <h5><i class='bx bx-car'></i> KENDARAAN & DRIVER</h5>
         </div>
         <div class="row">
             <div class="col-md-4">
@@ -209,6 +207,35 @@
             <div class="col-md-12 mt-2">
                 <label class="form-label">ALAMAT</label>
                 <textarea class="form-control form-control-sm" rows="2" id="alamat_penerima_expedisi" name="alamat_penerima_expedisi"></textarea>
+            </div>
+        </div>
+    </div>
+
+    {{-- DATA BARANG --}}
+    <div class="card-expedisi">
+        <div class="card-expedisi-header">
+            <h5><i class='bx bx-box'></i> DATA BARANG</h5>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                <label class="form-label">Barang</label>
+                <input type="text" class="form-control form-control-sm" id="barang_expedisi" name="barang_expedisi">
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Penyimpanan</label>
+                <select class="form-select form-select-sm" id="penyimpanan_expedisi" name="penyimpanan_expedisi">
+                    <option value="F">F</option>
+                    <option value="C">C</option>
+                    <option value="D">D</option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Koli</label>
+                <input type="number" class="form-control form-control-sm" id="koli_expedisi" name="koli_expedisi">
+            </div>
+            <div class="col-md-12 mt-2">
+                <label class="form-label">Catatan</label>
+                <textarea class="form-control form-control-sm" rows="2" id="catatan_expedisi" name="catatan_expedisi"></textarea>
             </div>
         </div>
     </div>
@@ -547,6 +574,12 @@ $(document).ready(function() {
                         $('#phone_penerima_expedisi').val(data.phone_penerima || '');
                         $('#alamat_penerima_expedisi').val(data.alamat_penerima || '');
 
+                        // DATA BARANG
+                        $('#barang_expedisi').val(data.barang || '');
+                        $('#penyimpanan_expedisi').val(data.penyimpanan || '');
+                        $('#koli_expedisi').val(data.koli || '');
+                        $('#catatan_expedisi').val(data.catatan || '');
+
                         // DETAIL & PERHITUNGAN
                         $('#rute_expedisi').val(data.rute || '');
                         $('#jumlah_expedisi').val(parseFloat(data.jumlah) || 0);
@@ -826,7 +859,7 @@ $(document).ready(function() {
         $('#driverModalExp').modal('hide');
     });
     // =============================== End Of Pilih Driver ==================================
-    // ============================ Submit Data Form =================================
+    // ============================ Submit Data Form Surjal =================================
     // Hitung otomatis
     $('#jumlah_expedisi, #harga_expedisi, #disc_expedisi, #del_charge_expedisi').on('input', function() {
         calculateTotal();
@@ -953,6 +986,12 @@ $(document).ready(function() {
             P_PHONE: $('#phone_penerima_expedisi').val(),
             P_ALAMAT: $('#alamat_penerima_expedisi').val(),
 
+            // BARANG
+            barang: $('#barang_expedisi').val(),
+            penyimpanan: $('#penyimpanan_expedisi').val(),
+            koli: $('#koli_expedisi').val(),
+            catatan: $('#catatan_expedisi').val(),
+
             // DETAIL & PERHITUNGAN
             rute: $('#rute_expedisi').val(),
             JUMLAH: parseNumber($('#jumlah_expedisi').val()) || 0,
@@ -984,6 +1023,13 @@ $(document).ready(function() {
             // _token: $('meta[name="csrf-token"]').attr('content') // CSRF token untuk Laravel
         };
 
+        console.log({
+            barang: $('#barang_expedisi').val(),
+            penyimpanan: $('#penyimpanan_expedisi').val(),
+            koli: $('#koli_expedisi').val(),
+            catatan: $('#catatan_expedisi').val(),
+            });
+
         // console.log('Data yang dikirim:', formData); // Untuk debugging
         var url = $('#no_sj_expedisi').val() ? "{{ route('expedisi.update', ':nosj') }}".replace(':nosj', $('#no_sj_expedisi').val()): "{{ route('expedisi.store') }}";
         // AJAX Request
@@ -1000,7 +1046,6 @@ $(document).ready(function() {
                     title: 'Berhasil Disimpan',
                     html: `
                         <div class="text-start">
-                            <p><strong>NO MUAT:</strong> ${response.data.NOMUAT}</p>
                             <p><strong>NO SJ:</strong> ${response.data.NOSJ || '-'}</p>
                             <p><strong>TOTAL:</strong> Rp ${response.data.GRAND}</p>
                         </div>
@@ -1056,7 +1101,7 @@ $(document).ready(function() {
             }
         });
     }
-    // ======================== End Of Submit Data Form =============================
+    // ======================== End Of Submit Data Form Surjal =============================
     // ================================= Append Form to Table No Muat ====================================
     $('#buttonAppendExp').on('click', function () {
         if (userRole === 'admin') {
@@ -1438,6 +1483,7 @@ $(document).ready(function() {
         // Field khusus
         $('#sub_total_expedisi, #dpp_expedisi, #ppn_expedisi, #grand_total_expedisi').val('');
         $('#wilayah_expedisi').val('denpasar');
+        $('#penyimpanan_expedisi').val('F');
         // Set default tanggal muat
         $('#tgl_sj_expedisi').val(new Date().toISOString().split('T')[0]);
         setButtonToSaveMode();
