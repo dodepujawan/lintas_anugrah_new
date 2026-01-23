@@ -378,7 +378,7 @@
         </div>
     </div>
 </div>
-{{-- MASTER --}}
+{{-- MODAL --}}
 @include('expedisi.expedisi_modal')
 <script>
 $(document).ready(function() {
