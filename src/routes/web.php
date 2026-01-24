@@ -147,6 +147,7 @@ Route::prefix('rent-pendingin')->group(function() {
     Route::get('/data/cus', [RentPendinginController::class, 'getDataCustomer'])->name('rentPendingin-cus.data');
     // Route::post('/store', [ExpedisiController::class, 'store'])->name('expedisi.store');
     Route::get('/data', [RentPendinginController::class, 'getDataMuat'])->name('rentPendingin.data');
+    Route::get('/data/surjal', [RentPendinginController::class, 'getDataSurjal'])->name('rentPendingin-surjal.data');
     // Route::get('/show', [ExpedisiController::class, 'show'])->name('expedisi.show');
     // Route::post('/update/{nomuat}', [ExpedisiController::class, 'update'])->name('expedisi.update');
     Route::post('/destroy/{id}', [RentPendinginController::class, 'destroy'])->name('rentPendingin.destroy');

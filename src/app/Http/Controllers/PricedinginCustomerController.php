@@ -394,7 +394,7 @@ class PricedinginCustomerController extends Controller
                     data-kodembl="'.$row->KODE.'"
                     data-source="'.$row->source.'"
                     data-original="'.$row->HARGA.'">
-                    <i class="bx bx-save"></i></button>';
+                    <i class="bx bx-check"></i></button>';
             })
             ->rawColumns(['harga_html', 'action'])
             ->make(true);

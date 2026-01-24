@@ -333,7 +333,7 @@
                                 <div class="input-group input-group-sm">
                                     <span class="input-group-text">Rp</span>
                                     <input type="text" id="sub_total_rent_dingin" name="sub_total_rent_dingin"
-                                            class="form-control form-control-sm" value="750.000" readonly>
+                                            class="form-control form-control-sm" value="0" readonly>
                                 </div>
                             </div>
                         </div>
@@ -353,7 +353,7 @@
                                 <div class="input-group input-group-sm">
                                     <span class="input-group-text">Rp</span>
                                     <input type="text" id="dpp_rent_dingin" name="dpp_rent_dingin"
-                                            class="form-control form-control-sm" value="750.000" readonly>
+                                            class="form-control form-control-sm" value="0" readonly>
                                 </div>
                             </div>
                         </div>
@@ -361,9 +361,8 @@
                             <div class="mb-2">
                                 <label class="form-label">PAJAK</label>
                                 <div class="input-group input-group-sm">
-                                    <span class="input-group-text">Rp</span>
                                     <input type="text" id="pajak_rent_dingin" name="pajak_rent_dingin"
-                                            class="form-control form-control-sm" value="75.000" readonly>
+                                            class="form-control form-control-sm" readonly>
                                 </div>
                             </div>
                         </div>
@@ -383,82 +382,8 @@
                                 <div class="input-group input-group-lg">
                                     <span class="input-group-text fw-bold">Rp</span>
                                     <input type="text" id="total_rent_dingin" name="total_rent_dingin"
-                                            class="form-control form-control-lg fw-bold" value="825.000" readonly>
+                                            class="form-control form-control-lg fw-bold" value="0" readonly>
                                 </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Tabel Biaya -->
-                <div class="row mt-4">
-                    <div class="col-md-12">
-                        <div class="driver-section">
-                            <div class="driver-header">BIAYA TAMBAHAN</div>
-
-                            <!-- Input Biaya Baru -->
-                            <div class="row mb-3">
-                                <div class="col-md-3">
-                                    <label class="form-label">NO.BKK</label>
-                                    <input type="text" id="no_bkk_rent_dingin" name="no_bkk_rent_dingin"
-                                            class="form-control form-control-sm" placeholder="Masukkan nomor BKK">
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label">BIAYA</label>
-                                    <input type="text" id="biaya_rent_dingin" name="biaya_rent_dingin"
-                                            class="form-control form-control-sm" placeholder="Masukkan deskripsi biaya">
-                                </div>
-                                <div class="col-md-3">
-                                    <label class="form-label">INPUT BIAYA</label>
-                                    <div class="input-group input-group-sm">
-                                        <span class="input-group-text">Rp</span>
-                                        <input type="text" id="input_biaya_rent_dingin" name="input_biaya_rent_dingin"
-                                                class="form-control form-control-sm" placeholder="0">
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Tombol Aksi Biaya -->
-                            <div class="row mb-3">
-                                <div class="col-md-12">
-                                    <button class="btn btn-sm btn-outline-success btn-action">TAMBAH BIAYA</button>
-                                    <button class="btn btn-sm btn-outline-warning btn-action">REFRESH BKK</button>
-                                </div>
-                            </div>
-
-                            <!-- Tabel Daftar Biaya -->
-                            <div class="table-responsive">
-                                <table class="table table-bordered table-sm table-custom">
-                                    <thead>
-                                        <tr>
-                                            <th width="5%">NO</th>
-                                            <th width="20%">NO.BKK</th>
-                                            <th width="45%">BIAYA</th>
-                                            <th width="20%">JUMLAH</th>
-                                            <th width="10%">AKSI</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td class="text-center">1</td>
-                                            <td>BKK001</td>
-                                            <td>Biaya Tol</td>
-                                            <td class="text-end">Rp 150.000</td>
-                                            <td class="text-center">
-                                                <button class="btn btn-sm btn-outline-danger btn-action">Hapus</button>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td class="text-center">2</td>
-                                            <td>BKK002</td>
-                                            <td>Biaya Parkir</td>
-                                            <td class="text-end">Rp 75.000</td>
-                                            <td class="text-center">
-                                                <button class="btn btn-sm btn-outline-danger btn-action">Hapus</button>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
                             </div>
                         </div>
                     </div>
@@ -467,26 +392,26 @@
                 <!-- Tombol Aksi -->
                 <div class="row mt-4">
                     <div class="col-md-12 text-center">
-                        <div class="function-keys d-inline-block px-4 py-2 mb-3">
+                        {{-- <div class="function-keys d-inline-block px-4 py-2 mb-3">
                             <span class="fw-bold">Function Keys:</span>
                             <span class="badge bg-secondary mx-1">F1 = NEW</span>
                             <span class="badge bg-secondary mx-1">F3 = SIMPAN</span>
                             <span class="badge bg-secondary mx-1">F4 = EDIT</span>
                             <span class="badge bg-secondary mx-1">F12 = KELUAR</span>
-                        </div>
+                        </div> --}}
 
                         <div class="d-flex justify-content-center">
                             <button class="btn btn-danger btn-action">
-                                <i class="bi bi-box-arrow-left"></i> KELUAR [F12]
+                                <i class="bi bi-box-arrow-left"></i> KELUAR
                             </button>
                             <button class="btn btn-success btn-action mx-2">
-                                <i class="bi bi-plus-circle"></i> NEW [F1]
+                                <i class="bi bi-plus-circle"></i> NEW
                             </button>
                             <button class="btn btn-primary btn-action">
-                                <i class="bi bi-save"></i> SIMPAN [F3]
+                                <i class="bi bi-save"></i> SIMPAN
                             </button>
                             <button class="btn btn-warning btn-action mx-2">
-                                <i class="bi bi-pencil"></i> EDIT [F4]
+                                <i class="bi bi-pencil"></i> EDIT
                             </button>
                         </div>
                     </div>
@@ -494,9 +419,9 @@
             </div>
 
             <!-- Status Deteksi -->
-            <div class="mt-3 text-end">
+            {{-- <div class="mt-3 text-end">
                 <span class="status-deteksi">STATUS: DATA DITEMUKAN - NO. MUAT: MU20260000023</span>
-            </div>
+            </div> --}}
         </div>
     </div>
 </div>
@@ -510,6 +435,8 @@ $(document).ready(function() {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
         }
     });
+    // Generate Pajak
+    loadInputPajakDgn();
     // ================================= Pilih No Muat =====================================
     $('#no_muat_rent_dingin_btn').click(function(e) {
         e.preventDefault();
@@ -610,6 +537,53 @@ $(document).ready(function() {
         });
     });
     // ========================= End Of Delete No Rent Pendingin =================================
+    // ================================= Pilih No Surat Jalan =====================================
+    $('#no_surjal_rent_dingin_btn').click(function(e) {
+        e.preventDefault();
+        $('#surjalModalRentPendingin').modal('show');
+        // hancurkan datatable jika sudah pernah dipakai
+        if ($.fn.DataTable.isDataTable('#modalSurjalRentDgnTable')) {
+            $('#modalSurjalRentDgnTable').DataTable().destroy();
+        }
+        var tableSurjalRentDgn = $('#modalSurjalRentDgnTable').DataTable({
+            processing: true,
+            serverSide: true,
+            searching: false,
+            ajax: {
+            url: "{{ route('rentPendingin-surjal.data') }}",
+                data: function(d) {
+                    d.tgl_mulai = $('#filter_tgl_mulai').val();
+                    d.tgl_akhir = $('#filter_tgl_akhir').val();
+                    d.search_muat = $('#filter_surjal_rent_dgn').val();
+                }
+            },
+            // Scroll settings
+            scrollX: true,
+            scrollY: "400px",
+            scrollCollapse: true,
+            // Responsive settings
+            responsive: true,
+            autoWidth: true,
+            columns: [
+                { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false },
+                { data: 'NOSJ', name: 'NOSJ' },
+                { data: 'tglsj', name: 'tglsj' },
+                { data: 'CUSTOMER', name: 'CUSTOMER' },
+                { data: 'rute', name: 'rute' },
+                { data: 'JUMLAH', name: 'JUMLAH' },
+                { data: 'harga_formatted', name: 'HARGA' },
+                { data: 'DISC', name: 'DISC' },
+                { data: 'dc_formatted', name: 'DC' },
+                { data: 'total_formatted', name: 'GRAND' },
+                { data: 'action', name: 'action', orderable: false, searchable: false }
+            ]
+        });
+
+        $('#btn_filter_surjal_rent_dgn').click(function () {
+            tableSurjalRentDgn.ajax.reload();
+        });
+    });
+    // ============================= End Of Pilih No Surat Jalan =====================================
     // ================================= Pilih Customer =====================================
     $('#customer_rent_dingin_btn').click(function(e) {
         e.preventDefault();
@@ -730,7 +704,7 @@ $(document).ready(function() {
         $('#kendaraan_rent_dingin_id').val(kodeMbl);
         $('#kendaraan_rent_dingin').val(kendaraan);
         $('#harga_rent_dingin').val(harga);
-        // calculateTotal();
+        calculateTotalDgn();
         // Tutup modal
         $('#itemModalDgn').modal('hide');
     });
@@ -834,5 +808,76 @@ $(document).ready(function() {
         $('#kendaraanModalDgn').modal('hide');
     });
     // =============================== End Of Pilih Kendaraan ==================================
+    // =================================== Input Total ======================================
+    $('#harga_rent_dingin, #jml_hari_rent_dingin, #discount_rent_dingin').on('input', function() {
+        calculateTotalDgn();
+    });
+    // =============================== End Of Input Total ==================================
 });
+
+
+// =================== Pajak PPN ==========================
+    function loadInputPajakDgn(){
+        $.ajax({
+            url: '{{ route('get_pajak') }}',
+            type: 'GET',
+            success: function(response) {
+                let nilai_ppn = response.data.ppn;
+                $('#pajak_rent_dingin').val(nilai_ppn);
+            },
+            error: function() {
+                $('#ppn_expedisi').val('Error Loading');
+            }
+        });
+    }
+
+    // =================== Hitung Total Form ==========================
+    function unformatRupiah(value) {
+        if (!value) return 0;
+        return parseInt(value.replace(/[^\d]/g, '')) || 0;
+    }
+
+    function formatRupiah(value) {
+        return value.toLocaleString('id-ID');
+    }
+
+    function calculateTotalDgn() {
+        // =============================
+        // AMBIL NILAI DARI FORM
+        // =============================
+        const harga = unformatRupiah($('#harga_rent_dingin').val()) || 0;
+        const hari = parseInt($('#jml_hari_rent_dingin').val()) || 0;
+
+        // discount RENT DINGIN = NOMINAL
+        const discountNominal = unformatRupiah($('#discount_rent_dingin').val()) || 0;
+
+        // pajak = PERSEN (misal 11)
+        const pajakPercent = parseFloat($('#pajak_rent_dingin').val()) || 0;
+
+        // =============================
+        // PERHITUNGAN
+        // =============================
+
+        // 1. Sub total
+        const subTotal = harga * hari;
+
+        // 2. Discount tidak boleh melebihi subtotal
+        const validDiscount = Math.min(discountNominal, subTotal);
+
+        // 3. DPP
+        const dpp = subTotal - validDiscount;
+
+        // 4. Pajak (PERSEN)
+        const pajakAmount = dpp * (pajakPercent / 100);
+
+        // 5. Total
+        const total = dpp + pajakAmount;
+
+        // =============================
+        // SET KE FORM
+        // =============================
+        $('#sub_total_rent_dingin').val(formatRupiah(Math.round(subTotal)));
+        $('#dpp_rent_dingin').val(formatRupiah(Math.round(dpp)));
+        $('#total_rent_dingin').val(formatRupiah(Math.round(total)));
+    }
 </script>
