@@ -177,12 +177,10 @@
             <footer class="content-footer footer bg-footer-theme">
               <div class="container-xxl d-flex flex-wrap justify-content-between py-2 flex-md-row flex-column">
                 <div class="mb-2 mb-md-0">
-                  ©
-                  <script>
+                  Copyright © 2026; Powered By DWebPro "Your Reliable IT Solutions !"
+                  {{-- <script>
                     document.write(new Date().getFullYear());
-                  </script>
-                  , Created by DWebPro Your Reliable IT Solutions !.
-
+                  </script> --}}
                 </div>
               </div>
             </footer>

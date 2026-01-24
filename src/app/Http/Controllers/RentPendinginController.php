@@ -253,6 +253,160 @@ class RentPendinginController extends Controller
             ->rawColumns(['action'])
             ->make(true);
     }
+
+    public function storeRentPendinginSurjal(Request $request){
+        $validator = Validator::make($request->all(), [
+            'tanggal_surjal_rent_dingin' => 'required|date',
+            'customer_rent_dingin' => 'required|string',
+            'jml_hari_rent_dingin' => 'required|numeric|min:1',
+            'harga_rent_dingin' => 'required|numeric|min:0',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        DB::beginTransaction();
+
+        try {
+            // ======================
+            // GENERATE NOSJ
+            // ======================
+            $nosj = $this->generateNoSuratJalan();
+
+            // ======================
+            // HITUNG ULANG (SERVER SIDE)
+            // ======================
+            $jumlah = (int) $request->jml_hari_rent_dingin;
+            $harga  = (int) $request->harga_rent_dingin;
+            // DISC dari form = PERSEN
+            $discPercent = (float) ($request->discount_rent_dingin ?? 0);
+            // Pajak = PERSEN
+            $ppnPercent = (float) ($request->pajak_rent_dingin ?? 0);
+            // ======================
+            // PERHITUNGAN
+            // ======================
+            // 1. Sub total
+            $subTotal = $jumlah * $harga;
+            // 2. Discount dalam rupiah
+            $discAmount = round($subTotal * ($discPercent / 100));
+            // 3. Safety: diskon tidak boleh > subtotal
+            $discAmount = min($discAmount, $subTotal);
+            // 4. DPP
+            $dpp = $subTotal - $discAmount;
+            // 5. Pajak
+            $ppn = round($dpp * ($ppnPercent / 100));
+            // 6. Grand total
+            $grandTotal = $dpp + $ppn;
+
+            // ======================
+            // SIMPAN DATA
+            // ======================
+            $expedisi = Expedisi::create([
+                // DOKUMEN
+                'tglsj' => $request->tanggal_surjal_rent_dingin,
+                'NOSJ' => $nosj,
+                'WILAYAH' => $request->wilayah_nosj_rent_dingin,
+
+                // CUSTOMER
+                'CUSTOMER_KODE' => $request->customer_rent_dingin_id,
+                'CUSTOMER' => $request->customer_rent_dingin,
+
+                // ITEM RENT
+                'PESANAN' => $request->item_rent_dingin,
+
+                // DRIVER & KENDARAAN
+                'DRIVER' => $request->driver_rent_dingin_id,
+                'NAMA_DRIVER' => $request->driver_rent_dingin,
+                'KENDARAAN' => $request->kendaraan_rent_dingin_id,
+                'NAMA_KENDARAAN' => $request->kendaraan_rent_dingin,
+
+                // PERHITUNGAN
+                'JUMLAH' => $jumlah,
+                'UNIT' => 'HARI',
+                'HARGA' => $harga,
+                'DISC' => $discPercent,
+                'NDISC' => $discAmount,
+                'TOTAL' => $dpp,
+                'PPN' => $ppnPercent,
+                'GRAND' => $grandTotal,
+
+                // STATUS
+                'JENIS' => 'REN',
+                'STS' => 'INVOICE',
+                'READY' => 'Y',
+                'CLOSSING' => 'N',
+
+                // KETERANGAN
+                'KETERANGAN' => $request->keterangan_rent_dingin ?? 'RENT PENDINGIN',
+
+                // USER
+                'user_id' => auth()->user()->user_id,
+                'user' => auth()->user()->name,
+            ]);
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Rent pendingin berhasil disimpan',
+                'data' => [
+                    'NOSJ' => $expedisi->NOSJ,
+                    'GRAND' => number_format($expedisi->GRAND, 0, ',', '.'),
+                ]
+            ]);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal menyimpan rent pendingin',
+                'error' => config('app.debug') ? $e->getMessage() : null
+            ], 500);
+        }
+    }
+
+    public function showSurjal($nosj){
+        $data = Expedisi::where('NOSJ', $nosj)
+            ->where('JENIS', 'REN')
+            ->firstOrFail();
+
+        return response()->json([
+            'success' => true,
+            'data' => $data
+        ]);
+    }
+
+    private function generateNoSuratJalan(){
+        return DB::transaction(function () {
+
+            $bulan = now()->format('m');
+            $tahun = now()->format('y');
+
+            $prefix = 'SJ' . $bulan . $tahun;
+
+            $last = Expedisi::where('NOSJ', 'like', $prefix . '%')
+                ->lockForUpdate()
+                ->orderBy('NOSJ', 'desc')
+                ->first();
+
+            if ($last) {
+                $lastNumber = (int) substr($last->NOSJ, -5);
+                $nextNumber = $lastNumber + 1;
+            } else {
+                $nextNumber = 1;
+            }
+
+            $number = str_pad($nextNumber, 5, '0', STR_PAD_LEFT);
+
+            return $prefix . $number;
+        });
+    }
+
 }
 
 // public function getDataMuat1(Request $request){

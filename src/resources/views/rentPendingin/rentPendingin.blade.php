@@ -341,7 +341,6 @@
                             <div class="mb-2">
                                 <label class="form-label">DISCOUNT</label>
                                 <div class="input-group input-group-sm">
-                                    <span class="input-group-text">Rp</span>
                                     <input type="text" id="discount_rent_dingin" name="discount_rent_dingin"
                                             class="form-control form-control-sm" value="0">
                                 </div>
@@ -407,8 +406,8 @@
                             <button class="btn btn-success btn-action mx-2">
                                 <i class="bi bi-plus-circle"></i> NEW
                             </button>
-                            <button class="btn btn-primary btn-action">
-                                <i class="bi bi-save"></i> SIMPAN
+                            <button class="btn btn-primary btn-action" id="btnSimpanRentPendinginSurjal">
+                                <i class="bx bx-save me-1"></i> SIMPAN
                             </button>
                             <button class="btn btn-warning btn-action mx-2">
                                 <i class="bi bi-pencil"></i> EDIT
@@ -813,10 +812,155 @@ $(document).ready(function() {
         calculateTotalDgn();
     });
     // =============================== End Of Input Total ==================================
+    // =============================== Submit Form Surjal ==================================
+    $('#btnSimpanRentPendinginSurjal').on('click', function () {
+
+        $('#loading_modal').modal('show');
+        $('#loading_modal').one('shown.bs.modal', function () {
+            // Jalankan setelah modal benar2 muncul
+            submitFormMuatSurjalRentDgn();
+        });
+        function submitFormMuatSurjalRentDgn(){
+            let formData = {
+                _token: $('input[name="_token"]').val(),
+
+                tanggal_surjal_rent_dingin: $('#tanggal_surjal_rent_dingin').val(),
+                wilayah_nosj_rent_dingin: $('#wilayah_nosj_rent_dingin').val(),
+
+                customer_rent_dingin_id: $('#customer_rent_dingin_id').val(),
+                customer_rent_dingin: $('#customer_rent_dingin').val(),
+
+                item_rent_dingin: $('#item_rent_dingin').val(),
+
+                jml_hari_rent_dingin: $('#jml_hari_rent_dingin').val(),
+                harga_rent_dingin: $('#harga_rent_dingin').val(),
+                discount_rent_dingin: $('#discount_rent_dingin').val(),
+                pajak_rent_dingin: $('#pajak_rent_dingin').val(),
+                total_rent_dingin: $('#total_rent_dingin').val(),
+
+                driver_rent_dingin_id: $('#driver_rent_dingin_id').val(),
+                driver_rent_dingin: $('#driver_rent_dingin').val(),
+
+                kendaraan_rent_dingin_id: $('#kendaraan_rent_dingin_id').val(),
+                kendaraan_rent_dingin: $('#kendaraan_rent_dingin').val(),
+
+                keterangan_rent_dingin: $('#keterangan_rent_dingin').val(),
+            };
+
+            $.ajax({
+                url: "{{ route('rentPendingin-surjal.store') }}",
+                type: "POST",
+                data: formData,
+                dataType: "json",
+                success: function (res) {
+                    if (res.success) {
+                        $('#loading_modal').modal('hide');
+                        alert('Berhasil disimpan\nNOSJ: ' + res.data.NOSJ);
+
+                        // reset form kalau mau
+                        // $('#formRentPendingin')[0].reset();
+                    }
+                },
+
+                error: function (xhr) {
+                    $('#loading_modal').modal('hide');
+                    let msg = 'Terjadi kesalahan';
+
+                    if (xhr.status === 422) {
+                        let errors = xhr.responseJSON.errors;
+                        msg = Object.values(errors).map(e => e[0]).join('\n');
+                    } else if (xhr.responseJSON?.message) {
+                        msg = xhr.responseJSON.message;
+                    }
+
+                    alert(msg);
+                },
+            });
+        }
+    });
+    // =============================== Submit Form Surjal ==================================
+    // =============================== Show Form Surjal ==================================
+    $(document).on('click', '.pickSurjal', function (e) {
+        e.preventDefault();
+        const nosj = $(this).data('nosj');
+        alert(nosj);
+
+        if (!nosj) {
+            alert('No Surat Jalan tidak ditemukan');
+            return;
+        }
+
+        const surjalDataUrlRentDingin = "{{ route('rentPendinginSurjal.show', ['nosj' => ':nosj']) }}";
+        const url = surjalDataUrlRentDingin.replace(':nosj', nosj);
+        $.ajax({
+            url: url,
+            type: 'GET',
+            dataType: 'json',
+            beforeSend: function () {
+                // optional loading
+                $('#loadingModal').modal('show');
+            },
+            success: function (res) {
+                if (!res.success) {
+                    alert(res.message || 'Data tidak ditemukan');
+                    return;
+                }
+
+                const d = res.data;
+
+                // =========================
+                // ISI FORM
+                // =========================
+                $('#no_surjal_rent_dingin').val(d.NOSJ);
+                $('#tanggal_surjal_rent_dingin').val(d.tglsj);
+                $('#wilayah_nosj_rent_dingin').val(d.WILAYAH);
+
+                // CUSTOMER
+                $('#customer_rent_dingin_id').val(d.CUSTOMER_KODE);
+                $('#customer_rent_dingin').val(d.CUSTOMER);
+                $('#customer_kode_dingin').val(d.CUSTOMER_KODE);
+                $('#telpon_rent_dingin').val(d.TELEPON ?? '');
+                $('#alamat_rent_dingin').val(d.ALAMAT1 ?? '');
+
+                // ITEM
+                $('#item_rent_dingin').val(d.PESANAN);
+                $('#item_rent_dingin_id').val(d.PESANAN);
+
+                // DRIVER & KENDARAAN
+                $('#driver_rent_dingin_id').val(d.DRIVER);
+                $('#driver_rent_dingin').val(d.NAMA_DRIVER);
+                $('#kendaraan_rent_dingin_id').val(d.KENDARAAN);
+                $('#kendaraan_rent_dingin').val(d.NAMA_KENDARAAN);
+
+                // PERHITUNGAN
+                $('#jml_hari_rent_dingin').val(d.JUMLAH);
+                $('#harga_rent_dingin').val(formatRupiah(d.HARGA));
+                $('#discount_rent_dingin').val(d.DISC); // persen
+                $('#sub_total_rent_dingin').val(formatRupiah(d.JUMLAH * d.HARGA));
+                $('#dpp_rent_dingin').val(formatRupiah(d.TOTAL));
+                $('#pajak_rent_dingin').val(d.PPN);
+                $('#total_rent_dingin').val(formatRupiah(d.GRAND));
+
+                $('#keterangan_rent_dingin').val(d.KETERANGAN);
+
+                // Hitung ulang biar konsisten
+                calculateTotalDgn();
+            },
+            error: function (xhr) {
+                console.error(xhr.responseText);
+                alert('Gagal mengambil data');
+            },
+            complete: function () {
+                $('#loadingModal').modal('hide');
+            }
+        });
+    });
+    // ============================ End Of Show Form Surjal ==================================
 });
-
-
-// =================== Pajak PPN ==========================
+    // ########################################################################
+    // FUNCTION HELPER:
+    // ########################################################################
+    // =================== Pajak PPN ==========================
     function loadInputPajakDgn(){
         $.ajax({
             url: '{{ route('get_pajak') }}',
@@ -846,10 +990,10 @@ $(document).ready(function() {
         // AMBIL NILAI DARI FORM
         // =============================
         const harga = unformatRupiah($('#harga_rent_dingin').val()) || 0;
-        const hari = parseInt($('#jml_hari_rent_dingin').val()) || 0;
+        const hari  = parseInt($('#jml_hari_rent_dingin').val()) || 0;
 
-        // discount RENT DINGIN = NOMINAL
-        const discountNominal = unformatRupiah($('#discount_rent_dingin').val()) || 0;
+        // discount = PERSEN (misal 10)
+        const discountPercent = parseFloat($('#discount_rent_dingin').val()) || 0;
 
         // pajak = PERSEN (misal 11)
         const pajakPercent = parseFloat($('#pajak_rent_dingin').val()) || 0;
@@ -858,16 +1002,16 @@ $(document).ready(function() {
         // PERHITUNGAN
         // =============================
 
-        // 1. Sub total
+        // 1. Sub Total
         const subTotal = harga * hari;
 
-        // 2. Discount tidak boleh melebihi subtotal
-        const validDiscount = Math.min(discountNominal, subTotal);
+        // 2. Discount dalam RUPIAH
+        const discountAmount = subTotal * (discountPercent / 100);
 
-        // 3. DPP
-        const dpp = subTotal - validDiscount;
+        // 3. DPP (setelah discount)
+        const dpp = subTotal - discountAmount;
 
-        // 4. Pajak (PERSEN)
+        // 4. Pajak
         const pajakAmount = dpp * (pajakPercent / 100);
 
         // 5. Total
