@@ -250,32 +250,32 @@
                                         </div>
                                     </div>
                                 </div>
-                                
+
                                 <!-- Kanan: Nama Penerima & Telpon dalam satu kolom bertumpuk -->
                                 <div class="col-md-6">
                                     <!-- Nama Penerima -->
                                     <div class="mb-3">
                                         <label class="form-label">NAMA PENERIMA</label>
                                         <input type="text" id="nama_penerima_rent_dingin" name="nama_penerima_rent_dingin"
-                                                class="form-control form-control-sm" 
+                                                class="form-control form-control-sm"
                                                 placeholder="Masukkan nama penerima">
                                     </div>
-                                    
+
                                     <!-- Telpon -->
                                     <div>
                                         <label class="form-label">TELEPON PENERIMA</label>
                                         <input type="text" id="telpon_rent_dingin" name="telpon_rent_dingin"
-                                                class="form-control form-control-sm" 
+                                                class="form-control form-control-sm"
                                                 placeholder="Masukkan nomor telepon">
                                     </div>
                                 </div>
                             </div>
-                            
+
                             <div class="row mt-2">
                                 <div class="col-md-12">
                                     <label class="form-label">ALAMAT PENERIMA</label>
                                     <textarea id="alamat_rent_dingin" name="alamat_rent_dingin"
-                                                class="form-control form-control-sm" rows="2" 
+                                                class="form-control form-control-sm" rows="2"
                                                 placeholder="Masukkan alamat customer"></textarea>
                                 </div>
                             </div>
@@ -417,8 +417,8 @@
                                 </button>
                             </div>
 
-                            <div class="col-md-3 col-sm-6 d-none" id="btnMuatRentPendinginSurjalDiv">
-                                <button class="btn btn-primary btn-sm w-100 py-2 fw-semibold">
+                            <div class="col-md-3 col-sm-6 d-none" id="btnMuatRentPendinginDiv">
+                                <button class="btn btn-primary btn-sm w-100 py-2 fw-semibold" id="btnMuatRentPendingin">
                                     <i class='bx bx-car me-1'></i>PROSES NOMUAT
                                 </button>
                             </div>
@@ -555,52 +555,6 @@ $(document).ready(function() {
         });
     });
     // ========================= End Of Delete No Rent Pendingin =================================
-    // ================================= Pilih No Surat Jalan =====================================
-    $('#no_surjal_rent_dingin_btn').click(function(e) {
-        e.preventDefault();
-        $('#surjalModalRentPendingin').modal('show');
-        // hancurkan datatable jika sudah pernah dipakai
-        if ($.fn.DataTable.isDataTable('#modalSurjalRentDgnTable')) {
-            $('#modalSurjalRentDgnTable').DataTable().destroy();
-        }
-        var tableSurjalRentDgn = $('#modalSurjalRentDgnTable').DataTable({
-            processing: true,
-            serverSide: true,
-            searching: false,
-            ajax: {
-            url: "{{ route('rentPendingin-surjal.data') }}",
-                data: function(d) {
-                    d.tgl_mulai = $('#filter_tgl_mulai').val();
-                    d.tgl_akhir = $('#filter_tgl_akhir').val();
-                    d.search_muat = $('#filter_surjal_rent_dgn').val();
-                }
-            },
-            // Scroll settings
-            scrollX: true,
-            scrollY: "400px",
-            scrollCollapse: true,
-            // Responsive settings
-            responsive: true,
-            autoWidth: true,
-            columns: [
-                { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false },
-                { data: 'NOSJ', name: 'NOSJ' },
-                { data: 'tglsj', name: 'tglsj' },
-                { data: 'CUSTOMER', name: 'CUSTOMER' },
-                { data: 'PESANAN', name: 'PESANAN' },
-                { data: 'JUMLAH', name: 'JUMLAH' },
-                { data: 'harga_formatted', name: 'HARGA' },
-                { data: 'DISC', name: 'DISC' },
-                { data: 'total_formatted', name: 'GRAND' },
-                { data: 'action', name: 'action', orderable: false, searchable: false }
-            ]
-        });
-
-        $('#btn_filter_surjal_rent_dgn').click(function () {
-            tableSurjalRentDgn.ajax.reload();
-        });
-    });
-    // ============================= End Of Pilih No Surat Jalan =====================================
     // ================================= Pilih Customer =====================================
     $('#customer_rent_dingin_btn').click(function(e) {
         e.preventDefault();
@@ -833,42 +787,45 @@ $(document).ready(function() {
     // =============================== End Of Input Total ==================================
     // =============================== Submit Form Surjal ==================================
     $('#btnSimpanRentPendinginSurjal').on('click', function () {
+        let formData = {
+            _token: $('input[name="_token"]').val(),
 
+            no_muat_rent_dingin: $('#no_muat_rent_dingin').val(),
+            tanggal_rent_dingin: $('#tanggal_rent_dingin').val(),
+
+            no_surjal_rent_dingin: $('#no_surjal_rent_dingin').val(),
+            tanggal_surjal_rent_dingin: $('#tanggal_surjal_rent_dingin').val(),
+            wilayah_nosj_rent_dingin: $('#wilayah_nosj_rent_dingin').val(),
+
+            customer_rent_dingin_id: $('#customer_rent_dingin_id').val(),
+            customer_rent_dingin: $('#customer_rent_dingin').val(),
+            nama_penerima_rent_dingin: $('#nama_penerima_rent_dingin').val(),
+            telpon_rent_dingin: $('#telpon_rent_dingin').val(),
+            alamat_rent_dingin: $('#alamat_rent_dingin').val(),
+
+            item_rent_dingin: $('#item_rent_dingin').val(),
+
+            jml_hari_rent_dingin: $('#jml_hari_rent_dingin').val(),
+            harga_rent_dingin: $('#harga_rent_dingin').val(),
+            discount_rent_dingin: $('#discount_rent_dingin').val(),
+            pajak_rent_dingin: $('#pajak_rent_dingin').val(),
+            total_rent_dingin: $('#total_rent_dingin').val(),
+
+            driver_rent_dingin_id: $('#driver_rent_dingin_id').val(),
+            driver_rent_dingin: $('#driver_rent_dingin').val(),
+
+            kendaraan_rent_dingin_id: $('#kendaraan_rent_dingin_id').val(),
+            kendaraan_rent_dingin: $('#kendaraan_rent_dingin').val(),
+
+            keterangan_rent_dingin: $('#keterangan_rent_dingin').val(),
+            KETERANGAN: 'REN ' + ($('#item_rent_dingin').val() || '') + ' ' + ($('#customer_rent_dingin').val() || '') + ' KE ' + ($('#nama_penerima_rent_dingin').val() || ''),
+        };
         $('#loading_modal').modal('show');
         $('#loading_modal').one('shown.bs.modal', function () {
             // Jalankan setelah modal benar2 muncul
-            submitFormMuatSurjalRentDgn();
+            submitFormSurjalRentDgn();
         });
-        function submitFormMuatSurjalRentDgn(){
-            let formData = {
-                _token: $('input[name="_token"]').val(),
-
-                tanggal_surjal_rent_dingin: $('#tanggal_surjal_rent_dingin').val(),
-                wilayah_nosj_rent_dingin: $('#wilayah_nosj_rent_dingin').val(),
-
-                customer_rent_dingin_id: $('#customer_rent_dingin_id').val(),
-                customer_rent_dingin: $('#customer_rent_dingin').val(),
-                nama_penerima_rent_dingin: $('#nama_penerima_rent_dingin').val(),
-                telpon_rent_dingin: $('#telpon_rent_dingin').val(),
-                alamat_rent_dingin: $('#alamat_rent_dingin').val(),
-
-                item_rent_dingin: $('#item_rent_dingin').val(),
-
-                jml_hari_rent_dingin: $('#jml_hari_rent_dingin').val(),
-                harga_rent_dingin: $('#harga_rent_dingin').val(),
-                discount_rent_dingin: $('#discount_rent_dingin').val(),
-                pajak_rent_dingin: $('#pajak_rent_dingin').val(),
-                total_rent_dingin: $('#total_rent_dingin').val(),
-
-                driver_rent_dingin_id: $('#driver_rent_dingin_id').val(),
-                driver_rent_dingin: $('#driver_rent_dingin').val(),
-
-                kendaraan_rent_dingin_id: $('#kendaraan_rent_dingin_id').val(),
-                kendaraan_rent_dingin: $('#kendaraan_rent_dingin').val(),
-
-                keterangan_rent_dingin: $('#keterangan_rent_dingin').val(),
-                KETERANGAN: 'REN ' + ($('#item_rent_dingin').val() || '') + ' ' + ($('#customer_rent_dingin').val() || '') + ' KE ' + ($('#nama_penerima_rent_dingin').val() || ''),
-            };
+        function submitFormSurjalRentDgn(){
 
             var url = $('#no_surjal_rent_dingin').val() ? "{{ route('rentPendinginSurjal.update', ':nosj') }}".replace(':nosj', $('#no_surjal_rent_dingin').val()): "{{ route('rentPendingin-surjal.store') }}";
 
@@ -897,7 +854,7 @@ $(document).ready(function() {
                                 confirmButtonColor: '#3085d6'
                             });
                         }
-                        
+
                         clearRentDinginForm();
                         setButtonToSaveMode();
                         // reset form kalau mau
@@ -928,6 +885,52 @@ $(document).ready(function() {
         setButtonToSaveMode();
     });
     // ============================ End Of Clear Form Surjal ================================
+    // ================================= Pilih No Surat Jalan =====================================
+    $('#no_surjal_rent_dingin_btn').click(function(e) {
+        e.preventDefault();
+        $('#surjalModalRentPendingin').modal('show');
+        // hancurkan datatable jika sudah pernah dipakai
+        if ($.fn.DataTable.isDataTable('#modalSurjalRentDgnTable')) {
+            $('#modalSurjalRentDgnTable').DataTable().destroy();
+        }
+        var tableSurjalRentDgn = $('#modalSurjalRentDgnTable').DataTable({
+            processing: true,
+            serverSide: true,
+            searching: false,
+            ajax: {
+            url: "{{ route('rentPendingin-surjal.data') }}",
+                data: function(d) {
+                    d.tgl_mulai = $('#filter_tgl_mulai').val();
+                    d.tgl_akhir = $('#filter_tgl_akhir').val();
+                    d.search_muat = $('#filter_surjal_rent_dgn').val();
+                }
+            },
+            // Scroll settings
+            scrollX: true,
+            scrollY: "400px",
+            scrollCollapse: true,
+            // Responsive settings
+            responsive: true,
+            autoWidth: true,
+            columns: [
+                { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false },
+                { data: 'NOSJ', name: 'NOSJ' },
+                { data: 'tglsj', name: 'tglsj' },
+                { data: 'CUSTOMER', name: 'CUSTOMER' },
+                { data: 'PESANAN', name: 'PESANAN' },
+                { data: 'JUMLAH', name: 'JUMLAH' },
+                { data: 'harga_formatted', name: 'HARGA' },
+                { data: 'DISC', name: 'DISC' },
+                { data: 'total_formatted', name: 'GRAND' },
+                { data: 'action', name: 'action', orderable: false, searchable: false }
+            ]
+        });
+
+        $('#btn_filter_surjal_rent_dgn').click(function () {
+            tableSurjalRentDgn.ajax.reload();
+        });
+    });
+    // ============================= End Of Pilih No Surat Jalan =====================================
     // =============================== Show Form Surjal ==================================
     $(document).on('click', '.pickSurjalRentDgn', function (e) {
         e.preventDefault();
@@ -1006,6 +1009,148 @@ $(document).ready(function() {
         });
     });
     // ============================ End Of Show Form Surjal ==================================
+    // ================================ Delete No Surat Jalan ======================================
+    $(document).on('click', '.deleteSurjalRentDgn', function () {
+        let id     = $(this).data('id');
+        let nosj = $(this).data('nosj');
+
+        Swal.fire({
+            title: 'Hapus Data?',
+            text: 'No Muat ' + nosj + ' akan dihapus!',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Ya, hapus',
+            cancelButtonText: 'Batal',
+            confirmButtonColor: '#d33'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                let url = "{{ route('rentPendinginSurjal.destroy', ':id') }}";
+                url = url.replace(':id', id);
+                $.ajax({
+                    url: url,
+                    type: 'POST',
+                    data: {
+                        _token: "{{ csrf_token() }}"
+                    },
+                    success: function (res) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Berhasil',
+                            text: res.message,
+                            timer: 1500,
+                            showConfirmButton: false
+                        });
+
+                        // reload datatable
+                        $('#modalSurjalRentDgnTable').DataTable().ajax.reload(null, false);
+                    },
+                    error: function () {
+                        Swal.fire(
+                            'Gagal!',
+                            'Data tidak bisa dihapus',
+                            'error'
+                        );
+                    }
+                });
+            }
+        });
+    });
+    // ============================ End Of Delete No Surat Jalan ====================================
+    // =============================== Submit Form Muat ==================================
+    $('#btnMuatRentPendingin').on('click', function () {
+        let formData = {
+            _token: $('input[name="_token"]').val(),
+
+            no_muat_rent_dingin: $('#no_muat_rent_dingin').val(),
+            tanggal_rent_dingin: $('#tanggal_rent_dingin').val(),
+
+            no_surjal_rent_dingin: $('#no_surjal_rent_dingin').val(),
+            tanggal_surjal_rent_dingin: $('#tanggal_surjal_rent_dingin').val(),
+            wilayah_nosj_rent_dingin: $('#wilayah_nosj_rent_dingin').val(),
+
+            customer_rent_dingin_id: $('#customer_rent_dingin_id').val(),
+            customer_rent_dingin: $('#customer_rent_dingin').val(),
+            nama_penerima_rent_dingin: $('#nama_penerima_rent_dingin').val(),
+            telpon_rent_dingin: $('#telpon_rent_dingin').val(),
+            alamat_rent_dingin: $('#alamat_rent_dingin').val(),
+
+            item_rent_dingin: $('#item_rent_dingin').val(),
+
+            jml_hari_rent_dingin: $('#jml_hari_rent_dingin').val(),
+            harga_rent_dingin: $('#harga_rent_dingin').val(),
+            discount_rent_dingin: $('#discount_rent_dingin').val(),
+            pajak_rent_dingin: $('#pajak_rent_dingin').val(),
+            total_rent_dingin: $('#total_rent_dingin').val(),
+
+            driver_rent_dingin_id: $('#driver_rent_dingin_id').val(),
+            driver_rent_dingin: $('#driver_rent_dingin').val(),
+
+            kendaraan_rent_dingin_id: $('#kendaraan_rent_dingin_id').val(),
+            kendaraan_rent_dingin: $('#kendaraan_rent_dingin').val(),
+
+            keterangan_rent_dingin: $('#keterangan_rent_dingin').val(),
+            KETERANGAN: 'REN ' + ($('#item_rent_dingin').val() || '') + ' ' + ($('#customer_rent_dingin').val() || '') + ' KE ' + ($('#nama_penerima_rent_dingin').val() || ''),
+        };
+        $('#loading_modal').modal('show');
+        $('#loading_modal').one('shown.bs.modal', function () {
+            // Jalankan setelah modal benar2 muncul
+            submitFormMuatRentDgn();
+        });
+        function submitFormMuatRentDgn(){
+            let nosj = $('#no_surjal_rent_dingin').val();
+            let url = "{{ route('rentPendinginMuat.update', ':nosj') }}";
+            url = url.replace(':nosj', nosj);
+
+            $.ajax({
+                url: url,
+                type: "POST",
+                data: formData,
+                dataType: "json",
+                success: function (res) {
+                    if (res.success) {
+                        $('#loading_modal').modal('hide');
+                        if($('#no_surjal_rent_dingin').val() != ""){
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Berhasil Diupdate!',
+                                text: `Data berhasil diupdate dengan NOSJ: ${res.data.NOSJ}`,
+                                confirmButtonText: 'OK',
+                                confirmButtonColor: '#2add69'
+                            });
+                        }else{
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Berhasil Disimpan!',
+                                text: `Data berhasil disimpan dengan NOSJ: ${res.data.NOSJ}`,
+                                confirmButtonText: 'OK',
+                                confirmButtonColor: '#3085d6'
+                            });
+                        }
+
+                        clearRentDinginForm();
+                        setButtonToSaveMode();
+                        // reset form kalau mau
+                        // $('#formRentPendingin')[0].reset();
+                    }
+                },
+
+                error: function (xhr) {
+                    $('#loading_modal').modal('hide');
+                    let msg = 'Terjadi kesalahan';
+
+                    if (xhr.status === 422) {
+                        let errors = xhr.responseJSON.errors;
+                        msg = Object.values(errors).map(e => e[0]).join('\n');
+                    } else if (xhr.responseJSON?.message) {
+                        msg = xhr.responseJSON.message;
+                    }
+
+                    alert(msg);
+                },
+            });
+        }
+    });
+    // ============================ End Of Submit Form Muat ==================================
 });
     // ########################################################################
     // FUNCTION HELPER:
@@ -1083,7 +1228,7 @@ $(document).ready(function() {
         $('#no_surjal_rent_dingin').val('');
         $('#tanggal_surjal_rent_dingin').val(new Date().toISOString().split('T')[0]);
         $('#wilayah_nosj_rent_dingin').val('DENPASAR'); // Reset ke default
-        
+
         // Reset Customer Data
         $('#customer_rent_dingin_id').val('');
         $('#customer_rent_dingin').val('');
@@ -1091,19 +1236,19 @@ $(document).ready(function() {
         $('#nama_penerima_rent_dingin').val('');
         $('#telpon_rent_dingin').val('');
         $('#alamat_rent_dingin').val('');
-        
+
         // Reset Item
         $('#item_rent_dingin_id').val('');
         $('#item_rent_dingin').val('');
         $('#jml_hari_rent_dingin').val('');
         $('#harga_rent_dingin').val('');
-        
+
         // Reset Driver dan Kendaraan
         $('#driver_rent_dingin_id').val('');
         $('#driver_rent_dingin').val('');
         $('#kendaraan_rent_dingin_id').val('');
         $('#kendaraan_rent_dingin').val('');
-        
+
         // Reset Perhitungan
         $('#sub_total_rent_dingin').val('0');
         $('#discount_rent_dingin').val('0');
@@ -1111,7 +1256,7 @@ $(document).ready(function() {
         loadInputPajakDgn();
         $('#keterangan_rent_dingin').val('');
         $('#total_rent_dingin').val('0');
-        
+
         // Focus ke field pertama
         // $('#no_muat_rent_dingin').focus();
     }
@@ -1128,7 +1273,7 @@ $(document).ready(function() {
         $('#btnSimpanRentPendinginSurjal').append('<span class="badge bg-light text-dark ms-2">EDIT MODE</span>');
         // aktifkan button papend to table
         if (userRole === 'admin') {
-            $('#btnMuatRentPendinginSurjalDiv').removeClass('d-none');
+            $('#btnMuatRentPendinginDiv').removeClass('d-none');
         }
     }
 
@@ -1144,6 +1289,6 @@ $(document).ready(function() {
             .find('.badge').remove(); // Hapus badge jika ada
             // $('#divPrintSuratJalan').addClass('d-none');
             // aktifkan button papend to table
-            $('#btnMuatRentPendinginSurjalDiv').addClass('d-none');
+            $('#btnMuatRentPendinginDiv').addClass('d-none');
     }
 </script>
