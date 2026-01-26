@@ -154,6 +154,7 @@ class RentPendinginController extends Controller
             'tglsj',
             'CUSTOMER',
             'rute',
+            'PESANAN',
             'JUMLAH',
             'UNIT',
             'HARGA',
@@ -203,11 +204,11 @@ class RentPendinginController extends Controller
             ->addIndexColumn()
             ->addColumn('action', function($row) {
                 $btn = '<div class="d-flex gap-2">'; // Gap lebih besar
-                $btn .= '<button type="button" class="btn btn-sm btn-outline-primary px-3 py-1 pickSurjal"
+                $btn .= '<button type="button" class="btn btn-sm btn-outline-primary px-3 py-1 pickSurjalRentDgn"
                             data-id="'.$row->id.'" data-nosj="'.$row->NOSJ.'" title="Pilih">
                             <i class="bx bx-check" style="font-size: 14px;"></i>
                         </button>';
-                $btn .= '<button type="button" class="btn btn-sm btn-outline-danger px-3 py-1 deleteSurjal"
+                $btn .= '<button type="button" class="btn btn-sm btn-outline-danger px-3 py-1 deleteSurjalRentDgn"
                             data-id="'.$row->id.'" data-nosj="'.$row->NOSJ.'" title="Hapus">
                             <i class="bx bx-trash" style="font-size: 14px;"></i>
                         </button>';
@@ -314,6 +315,11 @@ class RentPendinginController extends Controller
                 // CUSTOMER
                 'CUSTOMER_KODE' => $request->customer_rent_dingin_id,
                 'CUSTOMER' => $request->customer_rent_dingin,
+                'P_PENERIMA' => $request->nama_penerima_rent_dingin,
+                'P_ALAMAT' => $request->alamat_rent_dingin,
+                'P_NAMA' => $request->nama_penerima_rent_dingin,
+                'P_PHONE' => $request->telpon_rent_dingin,
+
 
                 // ITEM RENT
                 'PESANAN' => $request->item_rent_dingin,
@@ -339,9 +345,10 @@ class RentPendinginController extends Controller
                 'STS' => 'INVOICE',
                 'READY' => 'Y',
                 'CLOSSING' => 'N',
+                'KETERANGAN' => $request->KETERANGAN,
 
                 // KETERANGAN
-                'KETERANGAN' => $request->keterangan_rent_dingin ?? 'RENT PENDINGIN',
+                'catatan' => $request->keterangan_rent_dingin ?? 'RENT PENDINGIN',
 
                 // USER
                 'user_id' => auth()->user()->user_id,
@@ -365,6 +372,100 @@ class RentPendinginController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Gagal menyimpan rent pendingin',
+                'error' => config('app.debug') ? $e->getMessage() : null
+            ], 500);
+        }
+    }
+
+    public function updateRentPendinginSurjal(Request $request, $nosj){
+        $validator = Validator::make($request->all(), [
+            'tanggal_surjal_rent_dingin' => 'required|date',
+            'customer_rent_dingin' => 'required|string',
+            'jml_hari_rent_dingin' => 'required|numeric|min:1',
+            'harga_rent_dingin' => 'required|numeric|min:0',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        DB::beginTransaction();
+
+        try {
+            $expedisi = Expedisi::where('NOSJ', $nosj)->lockForUpdate()->firstOrFail();
+
+            // ======================
+            // HITUNG ULANG
+            // ======================
+            $jumlah = (int) $request->jml_hari_rent_dingin;
+            $harga  = (int) $request->harga_rent_dingin;
+
+            $discPercent = (float) ($request->discount_rent_dingin ?? 0);
+            $ppnPercent  = (float) ($request->pajak_rent_dingin ?? 0);
+
+            $subTotal = $jumlah * $harga;
+            $discAmount = round($subTotal * ($discPercent / 100));
+            $discAmount = min($discAmount, $subTotal);
+            $dpp = $subTotal - $discAmount;
+            $ppn = round($dpp * ($ppnPercent / 100));
+            $grandTotal = $dpp + $ppn;
+
+            // ======================
+            // UPDATE DATA
+            // ======================
+            $expedisi->update([
+                'tglsj' => $request->tanggal_surjal_rent_dingin,
+                'WILAYAH' => $request->wilayah_nosj_rent_dingin,
+
+                'CUSTOMER_KODE' => $request->customer_rent_dingin_id,
+                'CUSTOMER' => $request->customer_rent_dingin,
+                'P_PENERIMA' => $request->nama_penerima_rent_dingin,
+                'P_ALAMAT' => $request->alamat_rent_dingin,
+                'P_NAMA' => $request->nama_penerima_rent_dingin,
+                'P_PHONE' => $request->telpon_rent_dingin,
+
+                'PESANAN' => $request->item_rent_dingin,
+
+                'DRIVER' => $request->driver_rent_dingin_id,
+                'NAMA_DRIVER' => $request->driver_rent_dingin,
+                'KENDARAAN' => $request->kendaraan_rent_dingin_id,
+                'NAMA_KENDARAAN' => $request->kendaraan_rent_dingin,
+
+                'JUMLAH' => $jumlah,
+                'HARGA' => $harga,
+                'DISC' => $discPercent,
+                'NDISC' => $discAmount,
+                'TOTAL' => $dpp,
+                'PPN' => $ppnPercent,
+                'GRAND' => $grandTotal,
+
+                'KETERANGAN' => $request->KETERANGAN,
+                'catatan' => $request->keterangan_rent_dingin ?? 'RENT PENDINGIN',
+
+                'user_id' => auth()->user()->user_id,
+                'user' => auth()->user()->name,
+            ]);
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Data rent pendingin berhasil diperbarui',
+                'data' => [
+                    'NOSJ' => $expedisi->NOSJ,
+                    'GRAND' => number_format($expedisi->GRAND, 0, ',', '.'),
+                ]
+            ]);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal update data',
                 'error' => config('app.debug') ? $e->getMessage() : null
             ], 500);
         }

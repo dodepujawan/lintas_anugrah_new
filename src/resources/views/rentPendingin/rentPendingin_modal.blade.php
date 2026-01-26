@@ -54,7 +54,7 @@
         </div>
     </div>
 </div>
-{{-- Modal Muat Expedisi --}}
+{{-- Modal Surjal Expedisi --}}
 <div class="modal fade" id="surjalModalRentPendingin" tabindex="-1">
     <div class="modal-dialog modal-xl">
         <div class="modal-content">
@@ -93,11 +93,10 @@
                         <th>NO SJ</th>
                         <th>TGL SJ</th>
                         <th>CUSTOMER</th>
-                        <th>RUTE</th>
+                        <th>PESANAN</th>
                         <th>JUMLAH</th>
                         <th>HARGA</th>
                         <th>DISC</th>
-                        <th>DEL CHARGE</th>
                         <th>TOTAL</th>
                         <th width="120">AKSI</th>
                     </tr>
