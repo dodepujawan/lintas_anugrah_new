@@ -153,6 +153,8 @@ Route::prefix('rent-pendingin')->group(function() {
     Route::post('/destroy/surjal/{id}', [RentPendinginController::class, 'destroySurjal'])->name('rentPendinginSurjal.destroy');
     Route::post('/destroy/{id}', [RentPendinginController::class, 'destroy'])->name('rentPendingin.destroy');
     Route::post('/update/muat/{nosj}', [RentPendinginController::class, 'updateRentPendinginMuat'])->name('rentPendinginMuat.update');
+    Route::get('/show/muat/{nomuat}', [RentPendinginController::class, 'showMuat'])->name('rentPendinginMuat.show');
+    Route::post('/destroy/muat/{id}', [RentPendinginController::class, 'destroyMuat'])->name('rentPendinginMuat.destroy');
     // // PDF
     // Route::get('/expedisi/{id}/print-surat-jalan', [ExpedisiController::class, 'printSuratJalan'])->name('expedisi.printSuratJalan');
 });

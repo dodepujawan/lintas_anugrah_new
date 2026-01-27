@@ -411,7 +411,7 @@
                 <div class="row mt-4">
                     <div class="col-md-12 text-center">
                         <div class="row justify-content-center mt-4 g-3">
-                            <div class="col-md-3 col-sm-6">
+                            <div class="col-md-3 col-sm-6" id="btnSimpanRentPendinginSurjalDiv">
                                 <button class="btn btn-info btn-sm w-100 py-2 fw-semibold" id="btnSimpanRentPendinginSurjal">
                                     <i class='bx bx-save me-1'></i>SIMPAN
                                 </button>
@@ -492,11 +492,10 @@ $(document).ready(function() {
                 { data: 'NOMUAT', name: 'NOMUAT' },
                 { data: 'TGLMUAT', name: 'TGLMUAT' },
                 { data: 'CUSTOMER', name: 'CUSTOMER' },
-                { data: 'rute', name: 'rute' },
+                { data: 'PESANAN', name: 'PESANAN' },
                 { data: 'JUMLAH', name: 'JUMLAH' },
                 { data: 'harga_formatted', name: 'HARGA' },
                 { data: 'DISC', name: 'DISC' },
-                { data: 'dc_formatted', name: 'DC' },
                 { data: 'total_formatted', name: 'GRAND' },
                 { data: 'NOSJ', name: 'NOSJ' },
                 { data: 'action', name: 'action', orderable: false, searchable: false }
@@ -508,6 +507,89 @@ $(document).ready(function() {
         });
     });
     // ============================= End Of Pilih No Muat =====================================
+     // =============================== Show Form Muat ==================================
+    $(document).on('click', '.pickRentDgn', function (e) {
+        e.preventDefault();
+        const nomuat = $(this).data('nomuat');
+
+        if (!nomuat) {
+            alert('No Surat Jalan tidak ditemukan');
+            return;
+        }
+
+        const surjalDataUrlRentDingin = "{{ route('rentPendinginMuat.show', ['nomuat' => ':nomuat']) }}";
+        const url = surjalDataUrlRentDingin.replace(':nomuat', nomuat);
+        $.ajax({
+            url: url,
+            type: 'GET',
+            dataType: 'json',
+            beforeSend: function () {
+                // optional loading
+                $('#loadingModal').modal('show');
+            },
+            success: function (res) {
+                if (!res.success) {
+                    alert(res.message || 'Data tidak ditemukan');
+                    return;
+                }
+                $('#muatModalRentDgn').modal('hide');
+                const d = res.data;
+
+                // =========================
+                // ISI FORM
+                // =========================
+                $('#no_muat_rent_dingin').val(d.NOMUAT);
+                $('#tanggal_rent_dingin').val(d.TGLMUAT);
+                $('#no_surjal_rent_dingin').val(d.NOSJ);
+                $('#tanggal_surjal_rent_dingin').val(d.tglsj);
+                $('#wilayah_nosj_rent_dingin').val(d.WILAYAH);
+
+                // CUSTOMER
+                $('#customer_rent_dingin_id').val(d.CUSTOMER_KODE);
+                $('#customer_rent_dingin').val(d.CUSTOMER);
+                $('#customer_kode_dingin').val(d.CUSTOMER_KODE);
+                $('#nama_penerima_rent_dingin').val(d.P_NAMA ?? '');
+                $('#telpon_rent_dingin').val(d.P_PHONE ?? '');
+                $('#alamat_rent_dingin').val(d.P_ALAMAT ?? '');
+
+                // ITEM
+                $('#item_rent_dingin').val(d.PESANAN);
+                $('#item_rent_dingin_id').val(d.PESANAN);
+
+                // DRIVER & KENDARAAN
+                $('#driver_rent_dingin_id').val(d.DRIVER);
+                $('#driver_rent_dingin').val(d.NAMA_DRIVER);
+                $('#kendaraan_rent_dingin_id').val(d.KENDARAAN);
+                $('#kendaraan_rent_dingin').val(d.NAMA_KENDARAAN);
+
+                // PERHITUNGAN
+                $('#jml_hari_rent_dingin').val(toNumber(d.JUMLAH));
+                $('#harga_rent_dingin').val(formatRupiah(d.HARGA));
+                $('#discount_rent_dingin').val(toNumber(d.DISC)); // persen
+                $('#sub_total_rent_dingin').val(formatRupiah(d.JUMLAH * d.HARGA));
+                $('#dpp_rent_dingin').val(formatRupiah(d.TOTAL));
+                $('#pajak_rent_dingin').val(toNumber(d.PPN));
+                $('#total_rent_dingin').val(formatRupiah(d.GRAND));
+
+                $('#keterangan_rent_dingin').val(d.catatan);
+
+                // Hitung ulang biar konsisten
+                calculateTotalDgn();
+                // Hide Button
+                $('#btnMuatRentPendinginDiv').removeClass('d-none')
+                $('#btnMuatRentPendingin').removeClass('btn-primary').addClass('btn-success').html('<i class="bx bx-car me-1"></i>UPDATE NOMUAT');
+                $('#btnSimpanRentPendinginSurjalDiv').addClass('d-none');
+            },
+            error: function (xhr) {
+                console.error(xhr.responseText);
+                alert('Gagal mengambil data');
+            },
+            complete: function () {
+                $('#loadingModal').modal('hide');
+            }
+        });
+    });
+    // ============================ End Of Show Form Muat ==================================
     // ================================ Delete No Rent Pendingin ======================================
     $(document).on('click', '.deleteRentDgn', function () {
         let id     = $(this).data('id');
@@ -985,12 +1067,12 @@ $(document).ready(function() {
                 $('#kendaraan_rent_dingin').val(d.NAMA_KENDARAAN);
 
                 // PERHITUNGAN
-                $('#jml_hari_rent_dingin').val(d.JUMLAH);
+                $('#jml_hari_rent_dingin').val(toNumber(d.JUMLAH));
                 $('#harga_rent_dingin').val(formatRupiah(d.HARGA));
-                $('#discount_rent_dingin').val(d.DISC); // persen
+                $('#discount_rent_dingin').val(toNumber(d.DISC)); // persen
                 $('#sub_total_rent_dingin').val(formatRupiah(d.JUMLAH * d.HARGA));
                 $('#dpp_rent_dingin').val(formatRupiah(d.TOTAL));
-                $('#pajak_rent_dingin').val(d.PPN);
+                $('#pajak_rent_dingin').val(toNumber(d.PPN));
                 $('#total_rent_dingin').val(formatRupiah(d.GRAND));
 
                 $('#keterangan_rent_dingin').val(d.catatan);
@@ -1180,6 +1262,11 @@ $(document).ready(function() {
         return value.toLocaleString('id-ID');
     }
 
+    function toNumber(val) {
+        if (val === null || val === undefined) return '';
+        return String(val).replace(/,/g, '');
+    }
+
     function calculateTotalDgn() {
         // =============================
         // AMBIL NILAI DARI FORM
@@ -1262,6 +1349,7 @@ $(document).ready(function() {
     }
 
     function setButtonToUpdateMode() {
+        $('#btnSimpanRentPendinginSurjalDiv').removeClass('d-none');
         $('#btnSimpanRentPendinginSurjal')
             .removeClass('btn-info')
             .addClass('btn-success')
@@ -1274,11 +1362,13 @@ $(document).ready(function() {
         // aktifkan button papend to table
         if (userRole === 'admin') {
             $('#btnMuatRentPendinginDiv').removeClass('d-none');
+            $('#btnMuatRentPendingin').removeClass('btn-success').addClass('btn-primary').html('<i class="bx bx-car me-1"></i>PROSES NOMUAT');
         }
     }
 
     // Fungsi untuk mengubah tombol ke mode CREATE/SIMPAN
     function setButtonToSaveMode() {
+        $('#btnSimpanRentPendinginSurjalDiv').removeClass('d-none');
         $('#btnSimpanRentPendinginSurjal')
             .removeClass('btn-success')
             .addClass('btn-info')

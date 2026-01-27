@@ -3,7 +3,7 @@
     <div class="modal-dialog modal-xl">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Data Rental Mobil Pendingin</h5>
+                <h5 class="modal-title">Data Rental Muat Mobil Pendingin</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
@@ -37,11 +37,10 @@
                         <th>NO MUAT</th>
                         <th>TGL MUAT</th>
                         <th>CUSTOMER</th>
-                        <th>RUTE</th>
+                        <th>PESANAN</th>
                         <th>JUMLAH</th>
                         <th>HARGA</th>
                         <th>DISC</th>
-                        <th>DEL CHARGE</th>
                         <th>TOTAL</th>
                         <th>NO SJ</th>
                         <th width="120">AKSI</th>

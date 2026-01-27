@@ -31,6 +31,7 @@ class RentPendinginController extends Controller
             'NOMUAT',
             'TGLMUAT',
             'CUSTOMER',
+            'PESANAN',
             'rute',
             'JUMLAH',
             'UNIT',
@@ -604,6 +605,35 @@ class RentPendinginController extends Controller
                 'error' => config('app.debug') ? $e->getMessage() : null
             ], 500);
         }
+    }
+
+    public function showMuat($nomuat){
+        $data = Expedisi::where('NOMUAT', $nomuat)
+            ->where('JENIS', 'REN')
+            ->firstOrFail();
+
+        return response()->json([
+            'success' => true,
+            'data' => $data
+        ]);
+    }
+
+    public function destroyMuat($id){
+        $data = Expedisi::find($id);
+
+        if (!$data) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Data tidak ditemukan'
+            ], 404);
+        }
+
+        $data->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Data berhasil dihapus'
+        ]);
     }
 
     private function generateNoSuratJalan(){
