@@ -423,6 +423,12 @@
                                 </button>
                             </div>
 
+                            <div class="col-md-3 col-sm-6 d-none" id="divPrintSuratJalanRent">
+                                <button class="btn btn-warning btn-sm w-100 py-2 fw-semibold" id="btnPrintSuratJalanRent" data-id="">
+                                    <i class="bx bx-printer me-1"></i> Print Surat Jalan
+                                </button>
+                            </div>
+
                             <div class="col-md-3 col-sm-6">
                                 <button class="btn btn-danger btn-sm w-100 py-2 fw-semibold" id="btnClearRentPendinginSurjal">
                                     <i class='bx bx-trash me-1'></i>CLEAR
@@ -563,12 +569,12 @@ $(document).ready(function() {
                 $('#kendaraan_rent_dingin').val(d.NAMA_KENDARAAN);
 
                 // PERHITUNGAN
-                $('#jml_hari_rent_dingin').val(toNumber(d.JUMLAH));
+                $('#jml_hari_rent_dingin').val(toFloat(d.JUMLAH));
                 $('#harga_rent_dingin').val(formatRupiah(d.HARGA));
-                $('#discount_rent_dingin').val(toNumber(d.DISC)); // persen
+                $('#discount_rent_dingin').val(toFloat(d.DISC)); // persen
                 $('#sub_total_rent_dingin').val(formatRupiah(d.JUMLAH * d.HARGA));
                 $('#dpp_rent_dingin').val(formatRupiah(d.TOTAL));
-                $('#pajak_rent_dingin').val(toNumber(d.PPN));
+                $('#pajak_rent_dingin').val(toFloat(d.PPN));
                 $('#total_rent_dingin').val(formatRupiah(d.GRAND));
 
                 $('#keterangan_rent_dingin').val(d.catatan);
@@ -1067,15 +1073,19 @@ $(document).ready(function() {
                 $('#kendaraan_rent_dingin').val(d.NAMA_KENDARAAN);
 
                 // PERHITUNGAN
-                $('#jml_hari_rent_dingin').val(toNumber(d.JUMLAH));
+                $('#jml_hari_rent_dingin').val(toFloat(d.JUMLAH));
                 $('#harga_rent_dingin').val(formatRupiah(d.HARGA));
-                $('#discount_rent_dingin').val(toNumber(d.DISC)); // persen
+                $('#discount_rent_dingin').val(toFloat(d.DISC)); // persen
                 $('#sub_total_rent_dingin').val(formatRupiah(d.JUMLAH * d.HARGA));
                 $('#dpp_rent_dingin').val(formatRupiah(d.TOTAL));
-                $('#pajak_rent_dingin').val(toNumber(d.PPN));
+                $('#pajak_rent_dingin').val(toFloat(d.PPN));
                 $('#total_rent_dingin').val(formatRupiah(d.GRAND));
 
                 $('#keterangan_rent_dingin').val(d.catatan);
+
+                // Button Print PDF
+                $('#divPrintSuratJalanRent').removeClass('d-none');
+                $('#btnPrintSuratJalanRent').attr('data-sj',nosj);
 
                 // Hitung ulang biar konsisten
                 calculateTotalDgn();
@@ -1233,6 +1243,14 @@ $(document).ready(function() {
         }
     });
     // ============================ End Of Submit Form Muat ==================================
+    // =========================== Print PDF ================================
+    $('#btnPrintSuratJalanRent').on('click', function () {
+        let sj = $(this).data('sj');
+        let url = "{{ route('rentPendingin.printSuratJalan', ':sj') }}";
+        url = url.replace(':sj', sj);
+        window.open(url, '_blank');
+    });
+    // ======================== End Of Print PDF =============================
 });
     // ########################################################################
     // FUNCTION HELPER:
@@ -1262,9 +1280,9 @@ $(document).ready(function() {
         return value.toLocaleString('id-ID');
     }
 
-    function toNumber(val) {
-        if (val === null || val === undefined) return '';
-        return String(val).replace(/,/g, '');
+    function toFloat(value) {
+        if (value === null || value === undefined) return 0;
+        return parseFloat(value) || 0;
     }
 
     function calculateTotalDgn() {
@@ -1380,5 +1398,6 @@ $(document).ready(function() {
             // $('#divPrintSuratJalan').addClass('d-none');
             // aktifkan button papend to table
             $('#btnMuatRentPendinginDiv').addClass('d-none');
+            $('#divPrintSuratJalanRent').addClass('d-none');
     }
 </script>

@@ -156,7 +156,7 @@ Route::prefix('rent-pendingin')->group(function() {
     Route::get('/show/muat/{nomuat}', [RentPendinginController::class, 'showMuat'])->name('rentPendinginMuat.show');
     Route::post('/destroy/muat/{id}', [RentPendinginController::class, 'destroyMuat'])->name('rentPendinginMuat.destroy');
     // // PDF
-    // Route::get('/expedisi/{id}/print-surat-jalan', [ExpedisiController::class, 'printSuratJalan'])->name('expedisi.printSuratJalan');
+    Route::get('/rent/pendingin/{nosj}/print-surat-jalan', [RentPendinginController::class, 'printSurjalRent'])->name('rentPendingin.printSuratJalan');
 });
 
 Route::prefix('pajak')->middleware('auth')->group(function () {

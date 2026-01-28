@@ -681,6 +681,65 @@ class RentPendinginController extends Controller
         });
     }
 
+    public function printSurjalRent($nosj){
+        try {
+            // Ambil data expedisi berdasarkan NOSJ (nomor surat jalan)
+            $expedisi = Expedisi::where('NOSJ', $nosj)->firstOrFail();
+
+            $expedisi->PLAT = DB::table('kendaraan')
+            ->where('KODE', $expedisi->KENDARAAN)
+            ->value('PLAT');
+
+            // Pastikan ini adalah data RENT
+            if ($expedisi->JENIS !== 'REN') {
+                abort(404, 'Data bukan tipe RENT');
+            }
+
+            // Konfigurasi mPDF
+            $mpdfConfig = [
+                'mode' => 'utf-8',
+                'format' => 'A4',
+                'default_font_size' => 10,
+                'default_font' => 'dejavusans',
+                'margin_left' => 10,
+                'margin_right' => 10,
+                'margin_top' => 15,
+                'margin_bottom' => 15,
+                'margin_header' => 5,
+                'margin_footer' => 5,
+                'orientation' => 'P',
+            ];
+
+            // Inisialisasi mPDF
+            $mpdf = new Mpdf($mpdfConfig);
+
+            // Set metadata
+            $mpdf->SetTitle("Surat Jalan Sewa Unit - {$expedisi->NOSJ}");
+            $mpdf->SetAuthor("PT. Lintas Mitra Anugerah Sejati");
+
+            // Render view Blade ke HTML
+            $html = view('rentPendingin.rentPendingin-surjal-pdf', compact('expedisi'))->render();
+
+            // Write HTML content
+            $mpdf->WriteHTML($html);
+
+            // Output PDF
+            $filename = "Surjal_Rent_{$expedisi->NOSJ}.pdf";
+
+            // Untuk preview di browser
+            return $mpdf->Output($filename, \Mpdf\Output\Destination::INLINE);
+
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            abort(404, 'Surat Jalan tidak ditemukan');
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal generate PDF',
+                'error' => config('app.debug') ? $e->getMessage() : null
+            ], 500);
+        }
+    }
+
 }
 
 // public function getDataMuat1(Request $request){
