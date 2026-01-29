@@ -69,9 +69,8 @@
             margin-top: 25px;
         }
         .signature-table td {
-            height: 70px;
-            text-align: center;
-            vertical-align: bottom;
+            padding: 6px;
+            vertical-align: top;
             border: 1px solid #000;
         }
         .note {
@@ -292,7 +291,7 @@
                     </table>
                 </div>
 
-                <div style="margin-bottom: 20px;">
+                <div style="margin-bottom: 10px;">
                     <table style="width: 100%; border-collapse: collapse;">
                         <tr>
                             <td style="width: 35%; border: none; padding: 3px 0; font-size: 10px;">JABATAN</td>
@@ -302,7 +301,7 @@
                     </table>
                 </div>
 
-                <div style="margin-bottom: 20px;">
+                <div style="margin-bottom: 10px;">
                     <table style="width: 100%; border-collapse: collapse;">
                         <tr>
                             <td style="width: 35%; border: none; padding: 3px 0; font-size: 10px;">TGL. DIPERIKSA</td>
@@ -328,7 +327,7 @@
                     DISERAHKAN
                 </div>
 
-                <div style="margin-bottom: 20px;">
+                <div style="margin-bottom: 10px;">
                     <table style="width: 100%; border-collapse: collapse;">
                         <tr>
                             <td style="width: 35%; border: none; padding: 3px 0; font-size: 10px;">NAMA</td>
@@ -338,7 +337,7 @@
                     </table>
                 </div>
 
-                <div style="margin-bottom: 20px;">
+                <div style="margin-bottom: 10px;">
                     <table style="width: 100%; border-collapse: collapse;">
                         <tr>
                             <td style="width: 35%; border: none; padding: 3px 0; font-size: 10px;">JABATAN</td>
@@ -348,7 +347,7 @@
                     </table>
                 </div>
 
-                <div style="margin-bottom: 20px;">
+                <div style="margin-bottom: 10px;">
                     <table style="width: 100%; border-collapse: collapse;">
                         <tr>
                             <td style="width: 35%; border: none; padding: 3px 0; font-size: 10px;">TGL. DIKIRIM</td>
@@ -374,7 +373,7 @@
                     DITERIMA
                 </div>
 
-                <div style="margin-bottom: 20px;">
+                <div style="margin-bottom: 10px;">
                     <table style="width: 100%; border-collapse: collapse;">
                         <tr>
                             <td style="width: 35%; border: none; padding: 3px 0; font-size: 10px;">NAMA</td>
@@ -384,7 +383,7 @@
                     </table>
                 </div>
 
-                <div style="margin-bottom: 20px;">
+                <div style="margin-bottom: 10px;">
                     <table style="width: 100%; border-collapse: collapse;">
                         <tr>
                             <td style="width: 35%; border: none; padding: 3px 0; font-size: 10px;">JABATAN</td>
@@ -394,7 +393,7 @@
                     </table>
                 </div>
 
-                <div style="margin-bottom: 20px;">
+                <div style="margin-bottom: 10px;">
                     <table style="width: 100%; border-collapse: collapse;">
                         <tr>
                             <td style="width: 35%; border: none; padding: 3px 0; font-size: 10px;">TGL. DITERIMA</td>
@@ -426,7 +425,7 @@
     <div style="margin-top: 30px; font-size: 9px; color: #666; border-top: 1px dashed #ccc; padding-top: 5px;">
         <strong>INFORMASI INTERNAL:</strong><br>
         No. SJ: {{ $expedisi->NOSJ }} | Customer: {{ $expedisi->CUSTOMER }} |
-        Jumlah: {{ $expedisi->JUMLAH }} {{ $expedisi->UNIT }} |
+        Jumlah: {{ rtrim(rtrim(number_format($expedisi->JUMLAH, 3, '.', ''), '0'), '.') }} {{ $expedisi->UNIT }} |
         Harga: Rp {{ number_format($expedisi->HARGA, 0, ',', '.') }} |
         Subtotal: Rp {{ number_format(($expedisi->JUMLAH * $expedisi->HARGA), 0, ',', '.') }}<br>
         Disc: {{ $expedisi->DISC ?? 0 }}% (Rp {{ number_format($expedisi->NDISC ?? 0, 0, ',', '.') }}) |
