@@ -118,6 +118,11 @@
                     </a>
                 </li>
                 <li class="menu-item">
+                    <a href="#" class="menu-link" id="sidebar_invoice_expedisi">
+                    <span class="menu-text">Invoice Ekspedisi</span>
+                    </a>
+                </li>
+                <li class="menu-item">
                     <div class="dropdown-divider my-2"></div>
                 </li>
                 <li class="menu-item">

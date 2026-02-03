@@ -271,6 +271,25 @@ $(document).ready(function() {
         });
     }
 // ========================= End Of New Expedisi ======================================
+// ========================= New Expedisi Invoice ======================================
+    $(document).on('click', '#sidebar_invoice_expedisi', function(e) {
+        e.preventDefault();
+        loadInvoiceExpedisiForm();
+    });
+
+    function loadInvoiceExpedisiForm() {
+        $.ajax({
+            url: '{{ route('expedisiInvoice.index') }}', // Route to load the form
+            type: 'GET',
+            success: function(response) {
+                $('.master-page').html(response);
+            },
+            error: function() {
+                $('.master-page').html('<p>Error loading form.</p>');
+            }
+        });
+    }
+// ======================= End Of New Expedisi Invoice ====================================
 // ========================= New Rent Dingin ======================================
     $(document).on('click', '#sidebar_new_rent_dingin', function(e) {
         e.preventDefault();
