@@ -149,6 +149,7 @@ Route::prefix('expedisi-invoice')->group(function() {
     // Route::post('/store', [ExpedisiController::class, 'storeSurjal'])->name('expedisi.store');
     // Route::get('/data/surjal', [ExpedisiController::class, 'getDataSurjal'])->name('expedisi-surjal.data');
     Route::get('/data', [ExpedisiInvoiceController::class, 'getDataMuat'])->name('expedisiInvoice.data');
+    Route::get('/data/gabung', [ExpedisiInvoiceController::class, 'dataGabung'])->name('expedisiInvoiceGabung.data');
     // Route::get('/show/surjal', [ExpedisiController::class, 'showSurjal'])->name('expedisi-surjal.show');
     // Route::get('/show', [ExpedisiController::class, 'showMuat'])->name('expedisi.show');
     // Route::post('/update/{nosj}', [ExpedisiController::class, 'updateSurjal'])->name('expedisi.update');

@@ -77,7 +77,7 @@
     .swal2-container {
         z-index: 2000 !important;
     }
-    /*  */
+    /* Styling Highlight Table */
     table#InvoiceExpTable.table-striped > tbody > tr.selected > * {
         background-color: #cfe2ff !important;
     }
@@ -85,6 +85,35 @@
     table#InvoiceExpTable tbody tr:hover {
         cursor: pointer;
     }
+
+    /* Styling Form Input Invoice */
+    #InvoiceExpTable tbody tr {
+        cursor: pointer;
+    }
+
+    #InvoiceExpTable tbody tr.selected {
+        background-color: #cfe2ff !important;
+    }
+
+    .table-sm td {
+        padding: 4px 6px;
+    }
+
+    .card-header {
+        background: linear-gradient(to bottom, #f8f9fa, #e9ecef);
+    }
+
+    /* Table Gabung Size */
+    #GabungExpTable {
+        font-size: 12px;
+    }
+
+    #GabungExpTable th,
+    #GabungExpTable td {
+        padding: 4px 6px !important;
+        vertical-align: middle;
+    }
+
 </style>
 <div class="container-fluid mt-3">
     <!-- Header Form -->
@@ -166,6 +195,73 @@
             </div>
         </div>
     </div>
+
+    {{-- Bagian Show Detail Invoice --}}
+    <div class="d-none" id="form_gabung_inv_exp">
+        <div class="row g-3">
+
+            <!-- KIRI -->
+            <div class="col-md-7">
+                <div class="card shadow-sm h-100">
+                    <div class="card-header fw-bold">
+                        DATA MUAT / INVOICE
+                    </div>
+                    <div class="card-body p-2">
+
+                        <table id="InvoiceExpTable" class="table table-bordered table-striped w-100">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>No</th>
+                                    <th>No Muat</th>
+                                    <th>Tgl Muat</th>
+                                    <th>Customer</th>
+                                    <th>Rute</th>
+                                    <th>Total</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+
+                    </div>
+
+                    <div class="card-footer text-end">
+                        <button class="btn btn-primary" id="gabungInvExpBtn">
+                            <i class="bx bx-plus-circle me-1"></i>
+                            Gabung Surat Jalan
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- KANAN -->
+            <div class="col-md-5">
+                <div class="card shadow-sm h-100">
+                    <div class="card-header fw-bold">
+                        DATA SURAT JALAN
+                    </div>
+                    <div class="table-responsive mt-3">
+                        <table class="table table-bordered table-striped table-sm w-100" id="GabungExpTable">
+                            <thead>
+                                <tr>
+                                    <th>No</th>
+                                    <th>NO MUAT</th>
+                                    <th>TGL MUAT</th>
+                                    <th>PESANAN</th>
+                                    <th>RUTE</th>
+                                    <th>KENDARAAN</th>
+                                    <th>JUMLAH</th>
+                                    <th>HARGA</th>
+                                    <th>NO SJ</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
 </div>
 <script>
 $(document).ready(function() {
@@ -180,6 +276,8 @@ $(document).ready(function() {
         if ($.fn.DataTable.isDataTable('#InvoiceExpTable')) {
             $('#InvoiceExpTable').DataTable().destroy();
         }
+        // untuk kepentingan ambil nilai CustomerKode saat di highlights
+        let selectedRowData = null;
         var tableInvoiceExp = $('#InvoiceExpTable').DataTable({
             processing: true,
             serverSide: true,
@@ -231,14 +329,72 @@ $(document).ready(function() {
         if ($(this).hasClass('selected')) {
             // klik ulang → unselect
             $(this).removeClass('selected');
+            selectedRowData = null;
         } else {
             // hapus selection lain
             $('#InvoiceExpTable tbody tr.selected').removeClass('selected');
             // select baris ini
             $(this).addClass('selected');
+            selectedRowData = tableInvoiceExp.row(this).data();
         }
     });
     // ========================== End Of Highlight No Muat Table ==================================
+    // ================================ Pilih No Muat ====================================
+    $('#gabungInvExpBtn').on('click', function () {
+        if (!selectedRowData) {
+            alert('Pilih data terlebih dahulu');
+            return;
+        }
+        // 🚫 SUDAH ADA INVOICE
+        if (selectedRowData.INVOICE && selectedRowData.INVOICE.trim() !== '') {
+            alert('Invoice sudah terbentuk untuk data ini');
+            return;
+        }
+        let customerKode = selectedRowData.CUSTOMER_KODE;
+        // 🔥 ambil semua NOMUAT customer tsb yg invoice kosong
+        $('#loading_modal').modal('show');
+        $('#loading_modal').one('shown.bs.modal', function () {
+            loadDataGabung(customerKode);
+        });
+    });
+    function loadDataGabung(customerKode) {
+        // destroy dulu kalau sudah ada
+        if ($.fn.DataTable.isDataTable('#GabungExpTable')) {
+            $('#GabungExpTable').DataTable().destroy();
+        }
+
+        $('#GabungExpTable').DataTable({
+            processing: true,
+            serverSide: true,
+            searching: false,
+            paging: false,
+            info: false,
+            ajax: {
+                url: "{{ route('expedisiInvoiceGabung.data') }}",
+                data: {
+                    customer_kode: customerKode
+                }
+            },
+            columns: [
+                { data: 'DT_RowIndex', orderable: false },
+                { data: 'NOMUAT' },
+                { data: 'TGLMUAT' },
+                { data: 'PESANAN' },
+                { data: 'rute' },
+                { data: 'NAMA_KENDARAAN' },
+                { data: 'JUMLAH' },
+                { data: 'harga_formatted' },
+                { data: 'NOSJ' },
+            ],
+            initComplete: function () {
+                // Data sudah siap
+                $('#loading_modal').modal('hide');
+                $('#master_form_exp_inv').addClass('d-none');
+                $('#form_gabung_inv_exp').removeClass('d-none');
+            }
+        });
+    }
+    // ============================ End Of Pilih No Muat ==================================
 });
 </script>
 

@@ -25,6 +25,7 @@ class ExpedisiInvoiceController extends Controller
             'NOMUAT',
             'TGLMUAT',
             'CUSTOMER',
+            'CUSTOMER_KODE',
             'PESANAN',
             'GB',
             'PESANANGB',
@@ -97,5 +98,38 @@ class ExpedisiInvoiceController extends Controller
             )
             ->make(true);
     }
+    public function dataGabung(Request $request){
+        $data = Expedisi::select([
+            'id',
+            'NOMUAT',
+            'TGLMUAT',
+            'PESANAN',
+            'rute',
+            'NAMA_KENDARAAN',
+            'JUMLAH',
+            'UNIT',
+            'HARGA',
+            'NOSJ',
+        ])
+        ->where('CUSTOMER_KODE', $request->customer_kode)
+        ->whereNotNull('NOMUAT')
+        ->where(function ($q) {
+            $q->whereNull('INVOICE')
+            ->orWhere('INVOICE', '');
+        })
+        ->orderBy('TGLMUAT');
 
+        return DataTables::of($data)
+            ->addIndexColumn()
+            ->editColumn('TGLMUAT', fn ($r) =>
+                $r->TGLMUAT ? date('d-m-Y', strtotime($r->TGLMUAT)) : '-'
+            )
+            ->editColumn('JUMLAH', fn ($r) =>
+                number_format($r->JUMLAH ?? 0, 0, ',', '.') . ' ' . ($r->UNIT ?? '')
+            )
+            ->addColumn('harga_formatted', fn ($r) =>
+                'Rp ' . number_format($r->HARGA ?? 0, 0, ',', '.')
+            )
+            ->make(true);
+    }
 }
