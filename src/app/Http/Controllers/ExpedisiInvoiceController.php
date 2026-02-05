@@ -20,19 +20,16 @@ class ExpedisiInvoiceController extends Controller
     }
 
     public function getDataMuat(Request $request){
-        // 🔹 Subquery: ambil BARIS PERTAMA per NOMUAT
-        $subQuery = DB::table('expedisi')
-            ->select(DB::raw('MIN(id) as id'))
-            ->where('JENIS', 'EKS')
-            ->whereNotNull('NOMUAT')
-            ->groupBy('NOMUAT');
-
         $expedisi = Expedisi::select([
             'id',
             'NOMUAT',
             'TGLMUAT',
             'CUSTOMER',
+            'PESANAN',
+            'GB',
+            'PESANANGB',
             'rute',
+            'NAMA_KENDARAAN',
             'JUMLAH',
             'UNIT',
             'HARGA',
@@ -40,27 +37,21 @@ class ExpedisiInvoiceController extends Controller
             'DC',
             'GRAND',
             'NOSJ',
-            'KENDARAAN',
-            'NAMA_KENDARAAN',
-            'DRIVER',
-            'NAMA_DRIVER',
-            'STS',
-            'created_at'
-        ])->whereNotNull('NOMUAT')
-        ->whereIn('id', $subQuery)
-        ->orderBy('id', 'desc');
+            'INVOICE',
+        ])
+        ->whereNotNull('NOMUAT')   // 🔒 wajib punya NOMUAT
+        ->orderByDesc('id');
 
-        // 🔐 FILTER ROLE DRIVER
+        // 🔐 FILTER DRIVER
         if (auth()->user()->roles === 'driver') {
             $expedisi->where('user_id', auth()->user()->user_id);
         }
 
-        // 📅 FILTER TANGGAL MULAI
+        // 📅 FILTER TANGGAL
         if ($request->filled('tgl_mulai')) {
             $expedisi->whereDate('TGLMUAT', '>=', $request->tgl_mulai);
         }
 
-        // 📅 FILTER TANGGAL AKHIR
         if ($request->filled('tgl_akhir')) {
             $expedisi->whereDate('TGLMUAT', '<=', $request->tgl_akhir);
         }
@@ -76,8 +67,8 @@ class ExpedisiInvoiceController extends Controller
             });
         }
 
-        // 🧾 FILTER INVOICE
-        $filterInvoice = $request->filter_invoice ?? 'belum'; // default
+        // 🧾 FILTER INVOICE (DEFAULT: BELUM)
+        $filterInvoice = $request->filter_invoice ?? 'belum';
 
         if ($filterInvoice === 'belum') {
             $expedisi->where(function ($q) {
@@ -85,58 +76,26 @@ class ExpedisiInvoiceController extends Controller
                 ->orWhere('INVOICE', '');
             });
         }
+        // kalau 'semua' → TIDAK difilter apa pun
 
         return DataTables::of($expedisi)
             ->addIndexColumn()
-
-            // 🔘 ACTION BUTTON
-            ->addColumn('action', function ($row) {
-                $btn = '<div class="d-flex gap-2">'; // Gap lebih besar
-                $btn .= '<button type="button" class="btn btn-sm btn-outline-primary px-3 py-1 pickMuat"
-                            data-id="'.$row->id.'"
-                            data-nomuat="'.$row->NOMUAT.'"
-                            title="Pilih">
-                            <i class="bx bx-check" style="font-size: 14px;"></i>
-                        </button>';
-                $btn .= '<button type="button" class="btn btn-sm btn-outline-danger px-3 py-1 deleteMuat"
-                            data-id="'.$row->id.'"
-                            data-nomuat="'.$row->NOMUAT.'"
-                            title="Hapus">
-                            <i class="bx bx-trash" style="font-size: 14px;"></i>
-                        </button>';
-                $btn .= '</div>';
-                return $btn;
-            })
-
-            // 💰 FORMAT HARGA
-            ->addColumn('harga_formatted', function ($row) {
-                return 'Rp ' . number_format($row->HARGA ?? 0, 0, ',', '.');
-            })
-
-            ->addColumn('dc_formatted', function ($row) {
-                return 'Rp ' . number_format($row->DC ?? 0, 0, ',', '.');
-            })
-
-            ->addColumn('total_formatted', function ($row) {
-                return 'Rp ' . number_format($row->GRAND ?? 0, 0, ',', '.');
-            })
-
-            // ✏️ EDIT KOLOM
-            ->editColumn('TGLMUAT', function ($row) {
-                return $row->TGLMUAT
-                    ? date('d-m-Y', strtotime($row->TGLMUAT))
-                    : '-';
-            })
-
-            ->editColumn('JUMLAH', function ($row) {
-                return number_format($row->JUMLAH ?? 0, 0, ',', '.') . ' ' . ($row->UNIT ?? '');
-            })
-
-            ->editColumn('DISC', function ($row) {
-                return $row->DISC ? $row->DISC . '%' : '-';
-            })
-
-            ->rawColumns(['action'])
+            ->editColumn('TGLMUAT', fn ($r) =>
+                $r->TGLMUAT ? date('d-m-Y', strtotime($r->TGLMUAT)) : '-'
+            )
+            ->editColumn('JUMLAH', fn ($r) =>
+                number_format($r->JUMLAH ?? 0, 0, ',', '.') . ' ' . ($r->UNIT ?? '')
+            )
+            ->addColumn('harga_formatted', fn ($r) =>
+                'Rp ' . number_format($r->HARGA ?? 0, 0, ',', '.')
+            )
+            ->addColumn('dc_formatted', fn ($r) =>
+                'Rp ' . number_format($r->DC ?? 0, 0, ',', '.')
+            )
+            ->addColumn('total_formatted', fn ($r) =>
+                'Rp ' . number_format($r->GRAND ?? 0, 0, ',', '.')
+            )
             ->make(true);
     }
+
 }
