@@ -104,12 +104,15 @@
     }
 
     /* Table Gabung Size */
-    #GabungExpTable {
+    #GabungExpTableRight,
+    #GabungExpTableLeft {
         font-size: 12px;
     }
 
-    #GabungExpTable th,
-    #GabungExpTable td {
+    #GabungExpTableRight th,
+    #GabungExpTableRight td,
+    #GabungExpTableLeft th,
+    #GabungExpTableLeft td {
         padding: 4px 6px !important;
         vertical-align: middle;
     }
@@ -207,21 +210,90 @@
                         DATA MUAT / INVOICE
                     </div>
                     <div class="card-body p-2">
+                        <!-- FORM INPUT -->
+                        <div class="row g-2">
+                            <div class="col-md-4">
+                                <label class="form-label small">Nomor</label>
+                                <input type="text" class="form-control form-control-sm" id="no_gabung_exp_inv" readonly>
+                            </div>
 
-                        <table id="InvoiceExpTable" class="table table-bordered table-striped w-100">
-                            <thead class="table-light">
-                                <tr>
-                                    <th>No</th>
-                                    <th>No Muat</th>
-                                    <th>Tgl Muat</th>
-                                    <th>Customer</th>
-                                    <th>Rute</th>
-                                    <th>Total</th>
-                                </tr>
-                            </thead>
-                            <tbody></tbody>
-                        </table>
+                            <div class="col-md-8">
+                                <label class="form-label small">Customer</label>
+                                <input type="text" class="form-control form-control-sm" id="customer_gabung_exp_inv">
+                            </div>
 
+                            <div class="col-md-12">
+                                <input type="text" class="form-control form-control-sm" id="customer_kode_gabung_exp_inv">
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label small">No. SJ</label>
+                                <input type="text" class="form-control form-control-sm">
+                            </div>
+
+                            <div class="col-md-8">
+                            <label class="form-label small">Item</label>
+                            <div class="input-group input-group-sm">
+                                <input type="text" class="form-control" id="item_gabung_exp_inv" placeholder="Cari item...">
+                                <button class="btn btn-primary" type="button" id="btnItemGabungExp">
+                                    <i class="bx bx-search"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label small">Jumlah (KG)</label>
+                                <input type="text" class="form-control form-control-sm text-end" id="jumlah_gabung_exp_inv">
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label small">Harga @</label>
+                                <input type="text" class="form-control form-control-sm text-end" id="harga_gabung_exp_inv">
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label small">DPP</label>
+                                <input type="text" class="form-control form-control-sm text-end" id="dpp_gabung_exp_inv" readonly>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label small">Sub Total</label>
+                                <input type="text" class="form-control form-control-sm text-end" id="total_gabung_exp_inv" readonly>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label small">PPN</label>
+                                <div class="input-group input-group-sm">
+                                    <span class="input-group-text">11%</span>
+                                    <input type="text" class="form-control text-end" id="ppnrp_gabung_exp_inv" readonly>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label small">Grand Total</label>
+                                <input type="text" class="form-control form-control-sm text-end" id="grand_total_gabung_exp_inv" readonly>
+                            </div>
+                        </div>
+
+                        <!-- TABLE KECIL -->
+                        <div class="table-responsive mt-3">
+                            <table id="GabungExpTableLeft" class="table table-bordered table-striped table-sm w-100">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>No</th>
+                                        <th>NO MUAT</th>
+                                        <th>TGL MUAT</th>
+                                        <th>NO SJ</th>
+                                        <th>PESANAN</th>
+                                        <th>RUTE</th>
+                                        <th>KENDARAAN</th>
+                                        <th>JUMLAH</th>
+                                        <th>HARGA</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
                     </div>
 
                     <div class="card-footer text-end">
@@ -240,23 +312,26 @@
                         DATA SURAT JALAN
                     </div>
                     <div class="table-responsive mt-3">
-                        <table class="table table-bordered table-striped table-sm w-100" id="GabungExpTable">
+                        <table class="table table-bordered table-striped table-sm w-100" id="GabungExpTableRight">
                             <thead>
                                 <tr>
                                     <th>No</th>
                                     <th>NO MUAT</th>
                                     <th>TGL MUAT</th>
+                                    <th>NO SJ</th>
                                     <th>PESANAN</th>
                                     <th>RUTE</th>
                                     <th>KENDARAAN</th>
                                     <th>JUMLAH</th>
                                     <th>HARGA</th>
-                                    <th>NO SJ</th>
                                 </tr>
                             </thead>
                             <tbody></tbody>
                         </table>
                     </div>
+                    <button class="btn btn-success w-100" id="addToInvExpBtn">
+                        <i class="bx bx-arrow-from-right"></i> Tambahkan ke Invoice
+                    </button>
                 </div>
             </div>
 
@@ -351,6 +426,7 @@ $(document).ready(function() {
             return;
         }
         let customerKode = selectedRowData.CUSTOMER_KODE;
+        console.log('ngah :' + customerKode);
         // 🔥 ambil semua NOMUAT customer tsb yg invoice kosong
         $('#loading_modal').modal('show');
         $('#loading_modal').one('shown.bs.modal', function () {
@@ -359,11 +435,11 @@ $(document).ready(function() {
     });
     function loadDataGabung(customerKode) {
         // destroy dulu kalau sudah ada
-        if ($.fn.DataTable.isDataTable('#GabungExpTable')) {
-            $('#GabungExpTable').DataTable().destroy();
+        if ($.fn.DataTable.isDataTable('#GabungExpTableRight')) {
+            $('#GabungExpTableRight').DataTable().destroy();
         }
 
-        $('#GabungExpTable').DataTable({
+        $('#GabungExpTableRight').DataTable({
             processing: true,
             serverSide: true,
             searching: false,
@@ -379,12 +455,12 @@ $(document).ready(function() {
                 { data: 'DT_RowIndex', orderable: false },
                 { data: 'NOMUAT' },
                 { data: 'TGLMUAT' },
+                { data: 'NOSJ' },
                 { data: 'PESANAN' },
                 { data: 'rute' },
                 { data: 'NAMA_KENDARAAN' },
                 { data: 'JUMLAH' },
-                { data: 'harga_formatted' },
-                { data: 'NOSJ' },
+                { data: 'harga_formatted' }
             ],
             initComplete: function () {
                 // Data sudah siap
@@ -395,6 +471,110 @@ $(document).ready(function() {
         });
     }
     // ============================ End Of Pilih No Muat ==================================
+    // ============================ Highlight Tabel Gabung ==================================
+    let selectedGabungRows = [];
+    $('#GabungExpTableRight tbody').on('click', 'tr', function () {
+        $(this).toggleClass('selected');
+        let table = $('#GabungExpTableRight').DataTable();
+        let data = table.row(this).data();
+        if (!data) return;
+        let index = selectedGabungRows.findIndex(r => r.NOMUAT === data.NOMUAT);
+        if ($(this).hasClass('selected')) {
+            if (index === -1) selectedGabungRows.push(data);
+        } else {
+            if (index !== -1) selectedGabungRows.splice(index, 1);
+        }
+    });
+    // ============================ End Of Highlight Tabel Gabung ==================================
+    // ================================= Select Tabel Gabung ==================================
+    let leftTable = $('#GabungExpTableLeft').DataTable({
+        processing: true,
+        serverSide: false,
+        paging: false,
+        searching: false,
+        info: false,
+        columns: [
+            {
+                data: null,
+                orderable: false,
+                render: function (data, type, row, meta) {
+                    return meta.row + 1;
+                }
+            },
+            { data: 'NOMUAT' },
+            { data: 'TGLMUAT' },
+            { data: 'NOSJ' },
+            { data: 'PESANAN' },
+            { data: 'rute' },
+            { data: 'NAMA_KENDARAAN' },
+            { data: 'JUMLAH' },
+            { data: 'harga_formatted' },
+            {
+                data: null,
+                orderable: false,
+                width: '40px',
+                render: function () {
+                    return `
+                        <button class="btn btn-sm btn-outline-danger btn-remove-left">
+                            <i class="bx bx-trash"></i>
+                        </button>
+                    `;
+                }
+            }
+        ]
+    });
+
+    $('#addToInvExpBtn').on('click', function () {
+        if (selectedGabungRows.length === 0) {
+            alert('Pilih data yang akan digabung');
+            return;
+        }
+
+        let leftTable  = $('#GabungExpTableLeft').DataTable();
+        let rightTable = $('#GabungExpTableRight').DataTable();
+
+        selectedGabungRows.forEach(row => {
+
+            // 🔍 CEK APAKAH NOSJ SUDAH ADA DI TABEL KIRI
+            let exists = leftTable
+                .rows()
+                .data()
+                .toArray()
+                .some(r => r.NOSJ === row.NOSJ);
+
+            if (exists) {
+                alert(`Surat Jalan ${row.NOSJ} sudah ditambahkan`);
+                return; // skip row ini
+            }
+
+            // ➕ tambahkan ke tabel kiri
+            leftTable.row.add(row).draw(false);
+
+            // ❌ hapus dari tabel kanan
+            rightTable
+                .rows(function (idx, data) {
+                    return data.NOSJ === row.NOSJ;
+                })
+                .remove();
+        });
+
+        rightTable.draw(false);
+        selectedGabungRows = [];
+    });
+    // ============================ End Of Select Tabel Gabung ==================================
+    // ================================= Delete Tabel Gabung ==================================
+    $('#GabungExpTableLeft tbody').on('click', '.btn-remove-left', function () {
+        let row = leftTable.row($(this).closest('tr'));
+        let rowData = row.data();
+
+        // hapus dari tabel kiri
+        row.remove().draw(false);
+
+        // 🔁 (opsional) balikin ke tabel kanan
+        let rightTable = $('#GabungExpTableRight').DataTable();
+        rightTable.row.add(rowData).draw(false);
+    });
+    // ============================ End Of Delete Tabel Gabung ==================================
 });
 </script>
 
