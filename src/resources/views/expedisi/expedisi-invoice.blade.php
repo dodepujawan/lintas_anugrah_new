@@ -264,8 +264,8 @@
                             <div class="col-md-4">
                                 <label class="form-label small">PPN</label>
                                 <div class="input-group input-group-sm">
-                                    <span class="input-group-text">11%</span>
-                                    <input type="text" class="form-control text-end" id="ppnrp_gabung_exp_inv" readonly>
+                                    {{-- <span class="input-group-text">11%</span> --}}
+                                    <input type="text" class="form-control text-end" id="ppn_gabung_exp_inv" readonly>
                                 </div>
                             </div>
 
@@ -417,7 +417,14 @@ $(document).ready(function() {
     // ================================ Pilih No Muat ====================================
     $('#gabungInvExpBtn').on('click', function () {
         if (!selectedRowData) {
-            alert('Pilih data terlebih dahulu');
+            // alert('Pilih data terlebih dahulu');
+            Swal.fire({
+                title: 'Pilih data !!!',
+                text: `Pilih data terlebih dahulu.`,
+                icon: 'warning',
+                confirmButtonText: 'Saya Mengerti',
+                confirmButtonColor: '#f39c12', // Warna oranye peringatan
+            });
             return;
         }
         // 🚫 SUDAH ADA INVOICE
@@ -526,7 +533,14 @@ $(document).ready(function() {
 
     $('#addToInvExpBtn').on('click', function () {
         if (selectedGabungRows.length === 0) {
-            alert('Pilih data yang akan digabung');
+            // alert('Pilih data yang akan digabung');
+            Swal.fire({
+                title: 'Pilih data !!!',
+                text: `Pilih data yang akan digabung.`,
+                icon: 'warning',
+                confirmButtonText: 'Saya Mengerti',
+                confirmButtonColor: '#f39c12', // Warna oranye peringatan
+            });
             return;
         }
 
@@ -534,22 +548,43 @@ $(document).ready(function() {
         let rightTable = $('#GabungExpTableRight').DataTable();
 
         selectedGabungRows.forEach(row => {
+            // 🔍 CEK APAKAH JENIS PESANAN SUDAH SAMA
+            let jenisRow = getJenisPesanan(row.PESANAN);
+            // ambil jenis dari data yang sudah ada di tabel kiri
+            let leftData = leftTable.rows().data().toArray();
+            if (leftData.length > 0) {
+                let jenisExisting = getJenisPesanan(leftData[0].PESANAN);
 
+                if (jenisExisting !== jenisRow) {
+                    Swal.fire({
+                        title: 'Tidak Bisa Digabung!',
+                        text: `Pesanan ${jenisExisting} tidak bisa digabung dengan ${jenisRow}.`,
+                        icon: 'error',
+                        confirmButtonText: 'Saya Mengerti',
+                        confirmButtonColor: '#d33'
+                    });
+                    return;
+                }
+            }
             // 🔍 CEK APAKAH NOSJ SUDAH ADA DI TABEL KIRI
             let exists = leftTable
                 .rows()
                 .data()
                 .toArray()
                 .some(r => r.NOSJ === row.NOSJ);
-
             if (exists) {
-                alert(`Surat Jalan ${row.NOSJ} sudah ditambahkan`);
+                // alert(`Surat Jalan ${row.NOSJ} sudah ditambahkan`);
+                Swal.fire({
+                    title: 'Data Sudah Ada!',
+                    text: `Surat Jalan ${row.NOSJ} sudah terdaftar di sistem.`,
+                    icon: 'warning',
+                    confirmButtonText: 'Saya Mengerti',
+                    confirmButtonColor: '#f39c12', // Warna oranye peringatan
+                });
                 return; // skip row ini
             }
-
             // ➕ tambahkan ke tabel kiri
             leftTable.row.add(row).draw(false);
-
             // ❌ hapus dari tabel kanan
             rightTable
                 .rows(function (idx, data) {
@@ -557,7 +592,6 @@ $(document).ready(function() {
                 })
                 .remove();
         });
-
         rightTable.draw(false);
         selectedGabungRows = [];
     });
@@ -576,5 +610,22 @@ $(document).ready(function() {
     });
     // ============================ End Of Delete Tabel Gabung ==================================
 });
+    // ########################################################################
+    // FUNCTION HELPER:
+    // ########################################################################
+    // Fungsi untuk membedakan eceran dan booking
+    function getJenisPesanan(pesanan) {
+        if (!pesanan) return null;
+
+        if (pesanan.toUpperCase().startsWith('EC')) {
+            return 'ECERAN';
+        }
+
+        if (pesanan.toUpperCase().startsWith('BOK')) {
+            return 'BOOKING';
+        }
+
+        return null;
+    }
 </script>
 
