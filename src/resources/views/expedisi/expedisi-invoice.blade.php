@@ -219,11 +219,8 @@
 
                             <div class="col-md-8">
                                 <label class="form-label small">Customer</label>
+                                <input type="hidden" id="customer_kode_gabung_exp_inv">
                                 <input type="text" class="form-control form-control-sm" id="customer_gabung_exp_inv">
-                            </div>
-
-                            <div class="col-md-12">
-                                <input type="text" class="form-control form-control-sm" id="customer_kode_gabung_exp_inv">
                             </div>
 
                             <div class="col-md-4">
@@ -234,7 +231,7 @@
                             <div class="col-md-8">
                             <label class="form-label small">Item</label>
                             <div class="input-group input-group-sm">
-                                <input type="text" class="form-control" id="item_gabung_exp_inv" placeholder="Cari item...">
+                                <input type="text" class="form-control" id="item_gabung_exp_inv" placeholder="Cari item..." readonly>
                                 <button class="btn btn-primary" type="button" id="btnItemGabungExp">
                                     <i class="bx bx-search"></i>
                                 </button>
@@ -273,6 +270,7 @@
                                 <label class="form-label small">Grand Total</label>
                                 <input type="text" class="form-control form-control-sm text-end" id="grand_total_gabung_exp_inv" readonly>
                             </div>
+                            <input type="hidden" id="jenis_hrg_exp_inv">
                         </div>
 
                         <!-- TABLE KECIL -->
@@ -289,6 +287,7 @@
                                         <th>KENDARAAN</th>
                                         <th>JUMLAH</th>
                                         <th>HARGA</th>
+                                        <th>G.TOTAL</th>
                                     </tr>
                                 </thead>
                                 <tbody></tbody>
@@ -324,6 +323,7 @@
                                     <th>KENDARAAN</th>
                                     <th>JUMLAH</th>
                                     <th>HARGA</th>
+                                    <th>G.TOTAL</th>
                                 </tr>
                             </thead>
                             <tbody></tbody>
@@ -335,6 +335,40 @@
                 </div>
             </div>
 
+        </div>
+    </div>
+</div>
+{{-- Modal Item --}}
+<div class="modal fade" id="itemModalInvExp" tabindex="-1">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Data Item</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div>
+                    <h3 id="custNameInvExp"></h3>
+                    <h3 id="custKodeInvExp"></h3>
+                </div>
+                <div class="table-responsive">
+                <table class="table table-bordered table-striped w-100" id="modalItemInvExpTable">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>No</th>
+                            <th>NAMA ITEM</th>
+                            <th>DARI</th>
+                            <th>SAMPAI</th>
+                            <th>RUTE</th>
+                            <th>HARGA</th>
+                            <th>JENIS</th>
+                            <th>AKSI</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -467,10 +501,18 @@ $(document).ready(function() {
                 { data: 'rute' },
                 { data: 'NAMA_KENDARAAN' },
                 { data: 'JUMLAH' },
-                { data: 'harga_formatted' }
+                { data: 'harga_formatted' },
+                { data: 'gtotal_formatted' }
             ],
-            initComplete: function () {
+            // tambahkan parameter settings, json
+            initComplete: function (settings, json) {
                 // Data sudah siap
+                if (json.data && json.data.length > 0) {
+                    let row = json.data[0];
+
+                    $('#customer_kode_gabung_exp_inv').val(row.CUSTOMER_KODE);
+                    $('#customer_gabung_exp_inv').val(row.CUSTOMER);
+                }
                 $('#loading_modal').modal('hide');
                 $('#master_form_exp_inv').addClass('d-none');
                 $('#form_gabung_inv_exp').removeClass('d-none');
@@ -481,16 +523,20 @@ $(document).ready(function() {
     // ============================ Highlight Tabel Gabung ==================================
     let selectedGabungRows = [];
     $('#GabungExpTableRight tbody').on('click', 'tr', function () {
-        $(this).toggleClass('selected');
         let table = $('#GabungExpTableRight').DataTable();
-        let data = table.row(this).data();
+        let data  = table.row(this).data();
         if (!data) return;
-        let index = selectedGabungRows.findIndex(r => r.NOMUAT === data.NOMUAT);
+        // kalau row ini sudah selected → UNSELECT
         if ($(this).hasClass('selected')) {
-            if (index === -1) selectedGabungRows.push(data);
-        } else {
-            if (index !== -1) selectedGabungRows.splice(index, 1);
+            $(this).removeClass('selected');
+            selectedGabungRows = [];
+            return;
         }
+        // kalau belum selected → SELECT BARU
+        $('#GabungExpTableRight tbody tr').removeClass('selected');
+        selectedGabungRows = [];
+        $(this).addClass('selected');
+        selectedGabungRows.push(data);
     });
     // ============================ End Of Highlight Tabel Gabung ==================================
     // ================================= Select Tabel Gabung ==================================
@@ -516,6 +562,7 @@ $(document).ready(function() {
             { data: 'NAMA_KENDARAAN' },
             { data: 'JUMLAH' },
             { data: 'harga_formatted' },
+            { data: 'gtotal_formatted' },
             {
                 data: null,
                 orderable: false,
@@ -539,7 +586,7 @@ $(document).ready(function() {
                 text: `Pilih data yang akan digabung.`,
                 icon: 'warning',
                 confirmButtonText: 'Saya Mengerti',
-                confirmButtonColor: '#f39c12', // Warna oranye peringatan
+                confirmButtonColor: '#f39c12',
             });
             return;
         }
@@ -547,15 +594,23 @@ $(document).ready(function() {
         let leftTable  = $('#GabungExpTableLeft').DataTable();
         let rightTable = $('#GabungExpTableRight').DataTable();
 
-        selectedGabungRows.forEach(row => {
-            // 🔍 CEK APAKAH JENIS PESANAN SUDAH SAMA
-            let jenisRow = getJenisPesanan(row.PESANAN);
-            // ambil jenis dari data yang sudah ada di tabel kiri
-            let leftData = leftTable.rows().data().toArray();
-            if (leftData.length > 0) {
-                let jenisExisting = getJenisPesanan(leftData[0].PESANAN);
+        let leftData = leftTable.rows().data().toArray();
 
-                if (jenisExisting !== jenisRow) {
+        // 🔍 SET JENIS HRG SEKALI SAJA
+        if (leftData.length === 0) {
+            $('#jenis_hrg_exp_inv').val(selectedGabungRows[0].JENISHRG);
+        }
+
+        selectedGabungRows.forEach(row => {
+
+            // 🔍 CEK APAKAH JENIS PESANAN SUDAH SAMA (BERDASARKAN JENISHRG)
+            let jenisRow = getJenisPesanan(row);
+
+            let existingData = leftTable.rows().data().toArray();
+            if (existingData.length > 0) {
+                let jenisExisting = getJenisPesanan(existingData[0]);
+
+                if (jenisExisting && jenisRow && jenisExisting !== jenisRow) {
                     Swal.fire({
                         title: 'Tidak Bisa Digabung!',
                         text: `Pesanan ${jenisExisting} tidak bisa digabung dengan ${jenisRow}.`,
@@ -563,36 +618,64 @@ $(document).ready(function() {
                         confirmButtonText: 'Saya Mengerti',
                         confirmButtonColor: '#d33'
                     });
-                    return;
+                    return; // skip row ini
                 }
             }
+
             // 🔍 CEK APAKAH NOSJ SUDAH ADA DI TABEL KIRI
-            let exists = leftTable
-                .rows()
-                .data()
-                .toArray()
-                .some(r => r.NOSJ === row.NOSJ);
+            let exists = existingData.some(r => r.NOSJ === row.NOSJ);
             if (exists) {
-                // alert(`Surat Jalan ${row.NOSJ} sudah ditambahkan`);
                 Swal.fire({
                     title: 'Data Sudah Ada!',
                     text: `Surat Jalan ${row.NOSJ} sudah terdaftar di sistem.`,
                     icon: 'warning',
                     confirmButtonText: 'Saya Mengerti',
-                    confirmButtonColor: '#f39c12', // Warna oranye peringatan
+                    confirmButtonColor: '#f39c12',
                 });
                 return; // skip row ini
             }
+
             // ➕ tambahkan ke tabel kiri
             leftTable.row.add(row).draw(false);
+
             // ❌ hapus dari tabel kanan
             rightTable
-                .rows(function (idx, data) {
-                    return data.NOSJ === row.NOSJ;
-                })
+                .rows((idx, data) => data.NOSJ === row.NOSJ)
                 .remove();
+
+            // 🔍 SET JENISHRG (HANYA SEKALI)
+            if (
+                $('#jenis_hrg_exp_inv').val() === '' ||
+                $('#jenis_hrg_exp_inv').val() === null
+            ) {
+                $('#jenis_hrg_exp_inv').val(row.JENISHRG);
+            }
         });
+
         rightTable.draw(false);
+
+        // 🔍 SET ITEM & GRAND TOTAL
+        let jenisFinal = $('#jenis_hrg_exp_inv').val();
+        // set item dari baris pertama tabel kiri (paling aman)
+        let firstRow = $('#GabungExpTableLeft').DataTable().rows().data().toArray()[0];
+        // set item dari data pertama
+        $('#item_gabung_exp_inv').val(
+            decodeHtml(selectedGabungRows[0].PESANAN)
+        )
+
+        if (jenisFinal == 1) {
+        // ECERAN
+        $('#btnItemGabungExp')
+            .prop('disabled', true)
+            .addClass('disabled');
+        } else {
+        // BOOKING
+            $('#btnItemGabungExp')
+                .prop('disabled', false)
+                .removeClass('disabled');
+        }
+
+        updateGrandTotalGabung();
         selectedGabungRows = [];
     });
     // ============================ End Of Select Tabel Gabung ==================================
@@ -607,25 +690,107 @@ $(document).ready(function() {
         // 🔁 (opsional) balikin ke tabel kanan
         let rightTable = $('#GabungExpTableRight').DataTable();
         rightTable.row.add(rowData).draw(false);
+
+        updateGrandTotalGabung();
+
+        if (leftTable.rows().count() === 0) {
+            $('#jenis_hrg_exp_inv').val('');
+            $('#grand_total_gabung_exp_inv').val('');
+            $('#item_gabung_exp_inv').val("");
+        }
     });
     // ============================ End Of Delete Tabel Gabung ==================================
+    // =================================== Pilih Item =====================================
+    $(document).on('click', '#btnItemGabungExp', function(e) {
+        var expedisiId = $('#customer_kode_gabung_exp_inv').val();
+
+        if (!expedisiId || expedisiId.trim() === '') {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Warning',
+                text: 'Silahkan Pilih Customer!',
+                confirmButtonColor: '#3085d6'
+            });
+            e.preventDefault();
+            return false;
+        }
+
+        $('#itemModalInvExp').modal('show');
+
+        // hancurkan datatable jika sudah pernah dipakai
+        if ($.fn.DataTable.isDataTable('#modalItemInvExpTable')) {
+            $('#modalItemInvExpTable').DataTable().destroy();
+        }
+
+        // rebuild datatable
+        $('#modalItemInvExpTable').DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: {
+                url: "{{ route('price-customer-modal.price', ':kode') }}".replace(':kode', expedisiId),
+                dataSrc: function (json) {
+                    // SET INFO CUSTOMER DI ATAS TABEL
+                    $("#custNameInvExp").text(json.customer_nama);
+                    $("#custKodeInvExp").text(json.customer_kode);
+                    return json.data;
+                }
+            },
+            columns: [
+                { data: 'DT_RowIndex', name: 'DT_RowIndex' },
+                { data: 'KETERANGAN' },
+                { data: 'DARI' },
+                { data: 'SAMPAI' },
+                { data: 'nama_rute' },
+                { data: 'harga_html', orderable: false, searchable: false },
+                { data: 'jenis_text' },
+                { data: 'aksi', orderable: false, searchable: false }
+            ]
+        });
+    });
+    // ### Select Button
+    $(document).on('click', '.pick-price-exp', function(e) {
+        e.preventDefault();
+        var row = $(this).closest('tr');
+        var pesanan = row.find('td:eq(1)').text();
+
+        // Mengisi nilai ke elemen yang dituju
+        $('#item_gabung_exp_inv').val(pesanan);
+        // Tutup modal
+        $('#itemModalInvExp').modal('hide');
+    });
+    // =============================== End Of Pilih Item ==================================
 });
     // ########################################################################
     // FUNCTION HELPER:
     // ########################################################################
-    // Fungsi untuk membedakan eceran dan booking
-    function getJenisPesanan(pesanan) {
-        if (!pesanan) return null;
+    // decode HTML entity (ER 99 &gt; 60 -> ER 99 > 60)
+    function decodeHtml(str) {
+        return $('<textarea/>').html(str).text();
+    }
 
-        if (pesanan.toUpperCase().startsWith('EC')) {
-            return 'ECERAN';
-        }
+    // fungsi untuk membedakan eceran dan booking (BERDASARKAN JENISHRG)
+    function getJenisPesanan(row) {
+        if (!row || !row.JENISHRG) return null;
 
-        if (pesanan.toUpperCase().startsWith('BOK')) {
-            return 'BOOKING';
-        }
+        if (parseInt(row.JENISHRG) === 1) return 'ECERAN';
+        if (parseInt(row.JENISHRG) === 2) return 'BOOKING';
 
         return null;
+    }
+
+    // hitung ulang grand total tabel kiri
+    function updateGrandTotalGabung() {
+        let table = $('#GabungExpTableLeft').DataTable();
+        let data  = table.rows().data().toArray();
+
+        let total = 0;
+        data.forEach(row => {
+            total += parseFloat(row.GRAND || 0);
+        });
+
+        $('#grand_total_gabung_exp_inv').val(
+            total.toLocaleString('id-ID')
+        );
     }
 </script>
 

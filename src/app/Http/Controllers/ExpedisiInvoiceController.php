@@ -104,11 +104,15 @@ class ExpedisiInvoiceController extends Controller
             'NOMUAT',
             'TGLMUAT',
             'PESANAN',
+            'CUSTOMER_KODE',
+            'CUSTOMER',
             'rute',
             'NAMA_KENDARAAN',
             'JUMLAH',
             'UNIT',
+            'JENISHRG',
             'HARGA',
+            'GRAND',
             'NOSJ',
         ])
         ->where('CUSTOMER_KODE', $request->customer_kode)
@@ -129,6 +133,9 @@ class ExpedisiInvoiceController extends Controller
             )
             ->addColumn('harga_formatted', fn ($r) =>
                 'Rp ' . number_format($r->HARGA ?? 0, 0, ',', '.')
+            )
+            ->addColumn('gtotal_formatted', fn ($r) =>
+                'Rp ' . number_format($r->GRAND ?? 0, 0, ',', '.')
             )
             ->make(true);
     }
