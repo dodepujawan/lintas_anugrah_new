@@ -249,7 +249,7 @@
                             </div>
 
                             <div class="col-md-4">
-                                <label class="form-label small">Diskon</label>
+                                <label class="form-label small">Diskon %</label>
                                 <input type="text" class="form-control form-control-sm text-end" id="diskon_gabung_exp_inv">
                             </div>
 
@@ -269,10 +269,10 @@
                             </div>
 
                             <div class="col-md-4">
-                                <label class="form-label small">PPN</label>
+                                <label class="form-label small">PPN %</label>
                                 <div class="input-group input-group-sm">
                                     {{-- <span class="input-group-text">11%</span> --}}
-                                    <input type="text" class="form-control text-end" id="ppn_gabung_exp_inv" readonly>
+                                    <input type="text" class="form-control text-end" id="ppn_gabung_exp_inv">
                                 </div>
                             </div>
 
@@ -698,6 +698,10 @@ $(document).ready(function() {
         selectedGabungRows = [];
     });
     // ============================ End Of Select Tabel Gabung ==================================
+    // ================================ Ubah Nilai Grand Total =====================================
+    $('#harga_gabung_exp_inv, #diskon_gabung_exp_inv, #dc_gabung_exp_inv')
+    .on('keyup change', updateGrandTotalGabung);
+    // ============================ End Of Ubah Nilai Grand Total ==================================
     // ================================= Delete Tabel Gabung ==================================
     $('#GabungExpTableLeft tbody').on('click', '.btn-remove-left', function () {
         let row = leftTable.row($(this).closest('tr'));
@@ -716,9 +720,7 @@ $(document).ready(function() {
         updateGrandTotalGabung();
 
         if (leftTable.rows().count() === 0) {
-            $('#jenis_hrg_exp_inv').val('');
-            $('#grand_total_gabung_exp_inv').val('');
-            $('#item_gabung_exp_inv').val("");
+           resetFormGabungInvoice();
         }
     });
     // ============================ End Of Delete Tabel Gabung ==================================
@@ -789,7 +791,7 @@ $(document).ready(function() {
             Swal.fire('Warning', 'Tidak ada data yang digabung', 'warning');
             return;
         }
-        console.log('cobta' + nosjList);
+        $('#loading_modal').modal('show');
         let payload = {
             nosj_list: nosjList,
 
@@ -856,17 +858,37 @@ $(document).ready(function() {
 
     // hitung ulang grand total tabel kiri
     function updateGrandTotalGabung() {
-        let table = $('#GabungExpTableLeft').DataTable();
-        let data  = table.rows().data().toArray();
+        let harga   = toNumber($('#harga_gabung_exp_inv').val());
+        let discPct = toNumber($('#diskon_gabung_exp_inv').val());
+        let dc      = toNumber($('#dc_gabung_exp_inv').val());
 
-        let total = 0;
-        data.forEach(row => {
-            total += parseFloat(row.GRAND || 0);
-        });
+        if (discPct > 100) discPct = 100;
+        if (discPct < 0) discPct = 0;
 
-        $('#grand_total_gabung_exp_inv').val(
-            total.toLocaleString('id-ID')
-        );
+        const PPN_PCT = 11; // ⬅️ INI YANG DISIMPAN KE DB
+
+        // Diskon nominal (hanya hitungan)
+        let diskonNominal = harga * (discPct / 100);
+
+        // DPP
+        let dpp = harga - diskonNominal + dc;
+        if (dpp < 0) dpp = 0;
+
+        // PPN nominal (hanya hitung)
+        let ppnNominal = dpp * (PPN_PCT / 100);
+
+        // Grand total
+        let grand = dpp + ppnNominal;
+
+        // TAMPILAN
+        $('#dpp_gabung_exp_inv').val(formatIDR(dpp));
+        $('#total_gabung_exp_inv').val(formatIDR(dpp));
+        $('#ppn_gabung_exp_inv').val(PPN_PCT);
+        $('#grand_total_gabung_exp_inv').val(formatIDR(grand));
+
+        // NILAI UNTUK BACKEND
+        $('#ppn_value').val(PPN_PCT);          // persen
+        $('#grand_value').val(Math.round(grand));
     }
 
     // fungsi mengecek jumlah tabel da nonaktifkan tombol
@@ -894,6 +916,7 @@ $(document).ready(function() {
         return data.map(r => r.NOSJ);
     }
 
+    // Reset Form Tabel Kiri
     function resetFormGabungInvoice() {
         $('#no_gabung_exp_inv').val('');
         $('#item_gabung_exp_inv').val('');
@@ -906,8 +929,6 @@ $(document).ready(function() {
         $('#ppn_gabung_exp_inv').val('');
         $('#grand_total_gabung_exp_inv').val('');
         $('#jenis_hrg_exp_inv').val('');
-
-        $('#btnItemGabungExp').prop('disabled', true);
     }
 
     // Fungsi clean number
@@ -918,6 +939,10 @@ $(document).ready(function() {
             .replace(/\./g, '')   // hapus ribuan
             .replace(',', '.')    // jaga-jaga desimal
         ) || 0;
+    }
+
+    function formatIDR(num) {
+        return num.toLocaleString('id-ID');
     }
 
 </script>

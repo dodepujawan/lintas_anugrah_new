@@ -7,6 +7,7 @@ use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\DB;
 use App\Models\Expedisi;
 use App\Models\Mcustomer;
+use App\Models\Arh;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Log;
 use Mpdf\Mpdf;
@@ -149,6 +150,7 @@ class ExpedisiInvoiceController extends Controller
 
     public function storeGabungInvoice(Request $request){
         try {
+            // DB::transaction tambahandari try and catch iar lebih paten
             DB::transaction(function () use ($request) {
                 $rows = Expedisi::whereIn('NOSJ', $request->nosj_list)
                 ->lockForUpdate()
@@ -228,6 +230,20 @@ class ExpedisiInvoiceController extends Controller
 
                     $row->save();
                 }
+                // Bagian ARH
+                // Ambil nilai baris pertama yang diatas patokannya $isFirst = true;
+                $masterRow = $rows->first();
+                Arh::create([
+                    'NOFAKTUR'   => $invoiceNo,
+                    'TGLFAKTUR'  => $masterRow->TGLINVOICE,
+                    'CUSTOMER'   => $masterRow->CUSTOMER,
+                    'PIUTANG'    => $masterRow->GRAND,
+                    'DISCOUNT'   => $masterRow->NDISC,
+                    'SALDO'      => $masterRow->GRAND,
+                    'CABANG'     => $masterRow->CABANG ?? '',
+                    'KETERANGAN' => 'INVOICE DARI EXPEDISI',
+                    'USER'   => auth()->user()->user_id,
+                ]);
             });
             return response()->json([
                 'status'  => true,
