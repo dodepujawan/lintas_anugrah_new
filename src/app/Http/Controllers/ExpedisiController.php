@@ -142,7 +142,7 @@ class ExpedisiController extends Controller
                 // STATUS & DEFAULT
                 'JENISHRG' => $request->JENISHRG,
                 'JENIS' => $request->JENIS ?? 'EKS',
-                'STS' => $request->STS ?? 'INVOICE',
+                // 'STS' => $request->STS ?? 'INVOICE',
                 'SIMPAN' => $request->SIMPAN ?? 'N',
                 'READY' => $request->READY ?? 'Y',
                 'CLOSSING' => $request->CLOSSING ?? 'N',
@@ -492,7 +492,7 @@ class ExpedisiController extends Controller
                 // STATUS
                 'JENISHRG'  => $request->JENISHRG ?? $expedisi->JENISHRG,
                 'JENIS'     => $request->JENIS ?? $expedisi->JENIS,
-                'STS'       => $request->STS ?? $expedisi->STS,
+                // 'STS'       => $request->STS ?? $expedisi->STS,
                 'SIMPAN'    => $request->SIMPAN ?? $expedisi->SIMPAN,
                 'READY'     => $request->READY ?? $expedisi->READY,
                 'CLOSSING'  => $request->CLOSSING ?? $expedisi->CLOSSING,

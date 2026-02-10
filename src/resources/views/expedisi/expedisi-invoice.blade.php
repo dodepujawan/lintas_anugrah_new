@@ -249,6 +249,16 @@
                             </div>
 
                             <div class="col-md-4">
+                                <label class="form-label small">Diskon</label>
+                                <input type="text" class="form-control form-control-sm text-end" id="diskon_gabung_exp_inv">
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label small">Del charge</label>
+                                <input type="text" class="form-control form-control-sm text-end" id="dc_gabung_exp_inv">
+                            </div>
+
+                            <div class="col-md-4">
                                 <label class="form-label small">DPP</label>
                                 <input type="text" class="form-control form-control-sm text-end" id="dpp_gabung_exp_inv" readonly>
                             </div>
@@ -296,7 +306,7 @@
                     </div>
 
                     <div class="card-footer text-end">
-                        <button class="btn btn-primary" id="gabungInvExpBtn">
+                        <button class="btn btn-primary" id="gabungInvExpBtnLeft">
                             <i class="bx bx-plus-circle me-1"></i>
                             Gabung Surat Jalan
                         </button>
@@ -638,6 +648,9 @@ $(document).ready(function() {
             // ➕ tambahkan ke tabel kiri
             leftTable.row.add(row).draw(false);
 
+            // Mendissable button search
+            refreshItemButtonState();
+
             // ❌ hapus dari tabel kanan
             rightTable
                 .rows((idx, data) => data.NOSJ === row.NOSJ)
@@ -655,25 +668,31 @@ $(document).ready(function() {
         rightTable.draw(false);
 
         // 🔍 SET ITEM & GRAND TOTAL
-        let jenisFinal = $('#jenis_hrg_exp_inv').val();
+        // let jenisFinal = $('#jenis_hrg_exp_inv').val();
         // set item dari baris pertama tabel kiri (paling aman)
         let firstRow = $('#GabungExpTableLeft').DataTable().rows().data().toArray()[0];
         // set item dari data pertama
         $('#item_gabung_exp_inv').val(
             decodeHtml(selectedGabungRows[0].PESANAN)
         )
-
-        if (jenisFinal == 1) {
-        // ECERAN
-        $('#btnItemGabungExp')
-            .prop('disabled', true)
-            .addClass('disabled');
-        } else {
-        // BOOKING
-            $('#btnItemGabungExp')
-                .prop('disabled', false)
-                .removeClass('disabled');
-        }
+        $('#jumlah_gabung_exp_inv').val(parseFloat(selectedGabungRows[0].jumlahreal));
+        $('#harga_gabung_exp_inv').val(selectedGabungRows[0].HARGA);
+        $('#diskon_gabung_exp_inv').val(parseFloat(selectedGabungRows[0].DISC));
+        $('#dc_gabung_exp_inv').val(selectedGabungRows[0].DC);
+        $('#total_gabung_exp_inv').val(selectedGabungRows[0].TOTAL);
+        $('#dpp_gabung_exp_inv').val(selectedGabungRows[0].TOTAL);
+        $('#ppn_gabung_exp_inv').val(parseFloat(selectedGabungRows[0].PPN));
+        // if (jenisFinal == 1) {
+        // // ECERAN
+        // $('#btnItemGabungExp')
+        //     .prop('disabled', true)
+        //     .addClass('disabled');
+        // } else {
+        // // BOOKING
+        //     $('#btnItemGabungExp')
+        //         .prop('disabled', false)
+        //         .removeClass('disabled');
+        // }
 
         updateGrandTotalGabung();
         selectedGabungRows = [];
@@ -686,6 +705,9 @@ $(document).ready(function() {
 
         // hapus dari tabel kiri
         row.remove().draw(false);
+
+        // Mendissable button search
+        refreshItemButtonState();
 
         // 🔁 (opsional) balikin ke tabel kanan
         let rightTable = $('#GabungExpTableRight').DataTable();
@@ -759,6 +781,60 @@ $(document).ready(function() {
         $('#itemModalInvExp').modal('hide');
     });
     // =============================== End Of Pilih Item ==================================
+    // ================================== Submit Invoice ======================================
+    $('#gabungInvExpBtnLeft').on('click', function () {
+        // Ambil Nomor Surat Jalan Dari Table kiri Sebagai Parameter
+        let nosjList = getNosjFromLeftTable();
+        if (nosjList.length === 0) {
+            Swal.fire('Warning', 'Tidak ada data yang digabung', 'warning');
+            return;
+        }
+        console.log('cobta' + nosjList);
+        let payload = {
+            nosj_list: nosjList,
+
+            no_invoice: $('#no_gabung_exp_inv').val(),
+            customer_kode: $('#customer_kode_gabung_exp_inv').val(),
+            item: $('#item_gabung_exp_inv').val(),
+
+            jumlah: toNumber($('#jumlah_gabung_exp_inv').val()),
+            harga: toNumber($('#harga_gabung_exp_inv').val()),
+            diskon: toNumber($('#diskon_gabung_exp_inv').val()),
+            dc: toNumber($('#dc_gabung_exp_inv').val()),
+
+            dpp: toNumber($('#dpp_gabung_exp_inv').val()),
+            total: toNumber($('#total_gabung_exp_inv').val()),
+            ppn: toNumber($('#ppn_gabung_exp_inv').val()),
+            grand_total: toNumber($('#grand_total_gabung_exp_inv').val()),
+
+            jenis_hrg: $('#jenis_hrg_exp_inv').val(),
+            _token: $('meta[name="csrf-token"]').attr('content')
+        };
+
+        $('#loading_modal').one('shown.bs.modal', function () {
+            $.ajax({
+                url: "{{ route('expedisiInvoice.store') }}",
+                type: "POST",
+                data: payload,
+                success: function (res) {
+                    $('#loading_modal').modal('hide');
+                    Swal.fire('Success', res.message, 'success');
+
+                    // reload table
+                    $('#GabungExpTableLeft').DataTable().clear().draw();
+                    $('#GabungExpTableRight').DataTable().ajax.reload();
+                    // reset form
+                    resetFormGabungInvoice();
+                },
+                error: function (xhr) {
+                    $('#loading_modal').modal('hide');
+                    let msg = xhr.responseJSON?.message ?? 'Terjadi kesalahan';
+                    Swal.fire('Error', msg, 'error');
+                }
+            });
+        });
+    });
+    // =============================== End Of Submit Invoice ==================================
 });
     // ########################################################################
     // FUNCTION HELPER:
@@ -792,5 +868,57 @@ $(document).ready(function() {
             total.toLocaleString('id-ID')
         );
     }
+
+    // fungsi mengecek jumlah tabel da nonaktifkan tombol
+    function refreshItemButtonState() {
+        let rowCount = $('#GabungExpTableLeft').DataTable().rows().count();
+
+        if (rowCount > 1) {
+            // lebih dari satu baris → ENABLE
+            $('#btnItemGabungExp')
+                .prop('disabled', false)
+                .removeClass('disabled');
+        } else {
+            // satu baris atau kosong → DISABLE
+            $('#btnItemGabungExp')
+                .prop('disabled', true)
+                .addClass('disabled');
+        }
+    }
+
+    // Mengambil Nilai SJ Dari Tabel Kiri
+    function getNosjFromLeftTable() {
+        let table = $('#GabungExpTableLeft').DataTable();
+        let data  = table.rows().data().toArray();
+
+        return data.map(r => r.NOSJ);
+    }
+
+    function resetFormGabungInvoice() {
+        $('#no_gabung_exp_inv').val('');
+        $('#item_gabung_exp_inv').val('');
+        $('#jumlah_gabung_exp_inv').val('');
+        $('#harga_gabung_exp_inv').val('');
+        $('#diskon_gabung_exp_inv').val('');
+        $('#dc_gabung_exp_inv').val('');
+        $('#dpp_gabung_exp_inv').val('');
+        $('#total_gabung_exp_inv').val('');
+        $('#ppn_gabung_exp_inv').val('');
+        $('#grand_total_gabung_exp_inv').val('');
+        $('#jenis_hrg_exp_inv').val('');
+
+        $('#btnItemGabungExp').prop('disabled', true);
+    }
+
+    // Fungsi clean number
+    function toNumber(val) {
+        if (!val) return 0;
+        return parseFloat(
+            val.toString()
+            .replace(/\./g, '')   // hapus ribuan
+            .replace(',', '.')    // jaga-jaga desimal
+        ) || 0;
+    }
+
 </script>
 

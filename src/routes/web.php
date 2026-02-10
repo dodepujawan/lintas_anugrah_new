@@ -146,7 +146,7 @@ Route::prefix('expedisi')->group(function() {
 Route::prefix('expedisi-invoice')->group(function() {
     Route::get('/', [ExpedisiInvoiceController::class, 'index'])->name('expedisiInvoice.index');
     // Route::get('/data/cus', [ExpedisiController::class, 'getDataCustomer'])->name('expedisi-cus.data');
-    // Route::post('/store', [ExpedisiController::class, 'storeSurjal'])->name('expedisi.store');
+    Route::post('/store', [ExpedisiInvoiceController::class, 'storeGabungInvoice'])->name('expedisiInvoice.store');
     // Route::get('/data/surjal', [ExpedisiController::class, 'getDataSurjal'])->name('expedisi-surjal.data');
     Route::get('/data', [ExpedisiInvoiceController::class, 'getDataMuat'])->name('expedisiInvoice.data');
     Route::get('/data/gabung', [ExpedisiInvoiceController::class, 'dataGabung'])->name('expedisiInvoiceGabung.data');

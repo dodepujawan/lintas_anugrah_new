@@ -343,7 +343,7 @@ class RentPendinginController extends Controller
 
                 // STATUS
                 'JENIS' => 'REN',
-                'STS' => 'INVOICE',
+                // 'STS' => 'INVOICE',
                 'READY' => 'Y',
                 'CLOSSING' => 'N',
                 'KETERANGAN' => $request->KETERANGAN,
