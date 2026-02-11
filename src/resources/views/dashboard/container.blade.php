@@ -53,6 +53,34 @@
     </div>
 </div>
 {{-- End Of Modal Update Pajak --}}
+{{-- Modal Update Signature --}}
+<div class="modal fade" id="signatureModal" tabindex="-1" aria-labelledby="signatureModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <form id="signatureForm">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="signatureModalLabel">Update Signature</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="modal-signature" class="form-label">Nama</label>
+                        <input type="text" step="0.01" class="form-control" id="modal-signature" name="signature" required>
+                        <div class="form-text">Masukan Nama Pennaggung Jawab</div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <input type="hidden" name="id" id="modal-id">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-primary" id="submit_signature">Update</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{{-- End Of Modal Update Signature --}}
 
 @endsection
 @section('footer')
@@ -356,6 +384,71 @@ $(document).ready(function() {
         });
     });
 // ========================= End Of Update Pajak ======================================
+// =============================== Rekening ========================================
+    $(document).on('click', '#sidebar_extra_rekening', function(e) {
+        e.preventDefault();
+        loadDataRekening();
+        function loadDataRekening(){
+            $.ajax({
+                url: '{{ route('rekening.index') }}',
+                type: 'GET',
+                success: function(response) {
+                    $('.master-page').html(response);
+                },
+                error: function() {
+                   $('.master-page').html('<p>Error loading form.</p>');
+                }
+            });
+        }
+    });
+// ============================== End Of Rekening =======================================
+// ========================= Update Signature ======================================
+    $(document).on('click', '#sidebar_extra_signature', function(e) {
+        e.preventDefault();
+        loadDataSign();
+        function loadDataSign(){
+            $.ajax({
+                url: '{{ route('get_signature') }}',
+                type: 'GET',
+                success: function(response) {
+                    let nilai_signature = response.data.nama;
+                    $('#modal-signature').val(nilai_signature);
+                },
+                error: function() {
+                    $('#modal-signature').val('Error Loading');
+                }
+            });
+        }
+        $('#signatureModal').modal('show');
+    });
+    // ### Submit Signature ###
+    $('#submit_signature').on('click', function (e) {
+    e.preventDefault();
+    let nama_signature = $('#modal-signature').val();
+        $.ajax({
+            url: '{{ route('update_signature') }}', // Ganti sesuai route di Laravel kamu
+            type: 'POST',
+            data: {
+                _token: $('meta[name="csrf-token"]').attr('content'), // CSRF token
+                signature: nama_signature
+            },
+            success: function (response) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Sukses!',
+                    text: response.message || 'Signature berhasil disimpan!',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+                $('#signatureModal').modal('hide');
+            },
+            error: function (xhr) {
+                console.error('Gagal:', xhr.responseText);
+                alert('Gagal menyimpan PPN');
+            }
+        });
+    });
+// ========================= End Of Update Signature ======================================
 // +++++++++++++++++++++++++++ End Of SIDEBAR ROOM ++++++++++++++++++++++++++++++++++++++
 });
 </script>

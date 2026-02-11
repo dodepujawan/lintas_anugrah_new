@@ -308,7 +308,7 @@
                     <div class="card-footer text-end">
                         <button class="btn btn-primary" id="gabungInvExpBtnLeft">
                             <i class="bx bx-plus-circle me-1"></i>
-                            Gabung Surat Jalan
+                            Proses Invoice
                         </button>
                     </div>
                 </div>
@@ -827,6 +827,10 @@ $(document).ready(function() {
                     $('#GabungExpTableRight').DataTable().ajax.reload();
                     // reset form
                     resetFormGabungInvoice();
+                    // Cetak PDF
+                    if (res.status) {
+                        window.open(res.redirect, '_blank');
+                    }
                 },
                 error: function (xhr) {
                     $('#loading_modal').modal('hide');

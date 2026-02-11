@@ -180,6 +180,16 @@
                     <span class="menu-text">Pajak</span>
                     </a>
                 </li>
+                <li class="menu-item">
+                    <a href="#" class="menu-link" id="sidebar_extra_rekening">
+                    <span class="menu-text">Rekening</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="#" class="menu-link" id="sidebar_extra_signature">
+                    <span class="menu-text">Penanggung Jawab</span>
+                    </a>
+                </li>
                 </ul>
             </li>
             {{-- Extra Spasi --}}

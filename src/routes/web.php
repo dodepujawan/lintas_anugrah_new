@@ -15,6 +15,8 @@ use App\Http\Controllers\ExpedisiController;
 use App\Http\Controllers\ExpedisiInvoiceController;
 use App\Http\Controllers\RentPendinginController;
 use App\Http\Controllers\PajakController;
+use App\Http\Controllers\RekeningController;
+use App\Http\Controllers\SignatureController;
 
 Route::get('/', function () {
     return redirect()->route('login');
@@ -158,7 +160,7 @@ Route::prefix('expedisi-invoice')->group(function() {
     // Route::post('/destroy/muat/{nomuat}', [ExpedisiController::class, 'destroyMuat'])->name('expedisi-muat.destroy');
     // Route::post('/store/muat', [ExpedisiController::class, 'storeMuat'])->name('expedisi-muat.store');
     // // PDF
-    // Route::get('/expedisi/{id}/print-surat-jalan', [ExpedisiController::class, 'printSuratJalan'])->name('expedisi.printSuratJalan');
+    Route::get('/expedisi/invoice/pdf/{invoiceNo}', [ExpedisiInvoiceController::class, 'pdfGabungInvoice'])->name('expedisiInvoice.printSuratJalan');
 });
 
 Route::prefix('rent-pendingin')->group(function() {
@@ -181,6 +183,18 @@ Route::prefix('rent-pendingin')->group(function() {
 Route::prefix('pajak')->middleware('auth')->group(function () {
     Route::get('/get-pajak', [PajakController::class, 'get_pajak'])->name('get_pajak');
     Route::post('/edit/show', [PajakController::class, 'update_pajak'])->name('update_pajak');
+});
+
+Route::prefix('rekening')->middleware('auth')->group(function () {
+    Route::get('/', [RekeningController::class, 'index'])->name('rekening.index');
+    Route::get('/data', [RekeningController::class, 'data'])->name('rekening.data');
+    Route::post('/store', [RekeningController::class, 'store'])->name('rekening.store');
+    Route::post('/pilih/{id}', [RekeningController::class, 'pilih'])->name('rekening.pilih');
+});
+
+Route::prefix('signature')->middleware('auth')->group(function () {
+    Route::get('/get-sign', [SignatureController::class, 'get_signature'])->name('get_signature');
+    Route::post('/edit/show', [SignatureController::class, 'update_signature'])->name('update_signature');
 });
 // Route::prefix('register')->group(function () {
 //     Route::get('/users', UsersPage::class)->name('users.page');

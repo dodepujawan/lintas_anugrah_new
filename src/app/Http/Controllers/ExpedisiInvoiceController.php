@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\DB;
 use App\Models\Expedisi;
+use App\Models\Rekening;
+use App\Models\Signature;
 use App\Models\Mcustomer;
 use App\Models\Arh;
 use Illuminate\Support\Facades\Validator;
@@ -150,8 +152,10 @@ class ExpedisiInvoiceController extends Controller
 
     public function storeGabungInvoice(Request $request){
         try {
+            // untuk mengambil nilai dalam transaction dibawah supaya bisa kirim ke json respon karna json respon diluar transaction
+            $invoiceNo = null;
             // DB::transaction tambahandari try and catch iar lebih paten
-            DB::transaction(function () use ($request) {
+            DB::transaction(function () use ($request, &$invoiceNo) {
                 $rows = Expedisi::whereIn('NOSJ', $request->nosj_list)
                 ->lockForUpdate()
                 ->orderBy('NOSJ')
@@ -247,9 +251,9 @@ class ExpedisiInvoiceController extends Controller
             });
             return response()->json([
                 'status'  => true,
-                'message' => 'Invoice gabung berhasil disimpan'
+                'message' => 'Invoice gabung berhasil disimpan',
+                'redirect' => route('expedisiInvoice.printSuratJalan', ['invoiceNo' => $invoiceNo])
             ]);
-
         } catch (\Throwable $e) {
             return response()->json([
                 'status'  => false,
@@ -297,6 +301,35 @@ class ExpedisiInvoiceController extends Controller
         }
 
         return $total * ($diskon / 100);
+    }
+
+    public function pdfGabungInvoice($invoiceNo){
+        $rows = Expedisi::where('INVOICE', $invoiceNo)
+            ->orderBy('NOSJ')
+            ->get();
+
+        if ($rows->isEmpty()) {
+            abort(404, 'Invoice tidak ditemukan');
+        }
+
+        $master = $rows->first();
+        // 🔥 ambil rekening aktif
+        $rekening = Rekening::where('AKTIF', 1)->first();
+        $signature = Signature::orderByDesc('id')->first();
+
+        $mpdf = new Mpdf([
+            'mode' => 'utf-8',
+            'format' => 'A4',
+            'margin_top' => 10,
+            'margin_bottom' => 10,
+            'margin_left' => 10,
+            'margin_right' => 10,
+        ]);
+
+        $html = view('expedisi.expedisi-invoice-pdf', compact('rows', 'master', 'rekening', 'signature'))->render();
+
+        $mpdf->WriteHTML($html);
+        return $mpdf->Output("INVOICE-{$invoiceNo}.pdf", 'I'); // tampil di browser
     }
 
 }
