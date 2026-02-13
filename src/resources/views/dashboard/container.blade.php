@@ -318,6 +318,25 @@ $(document).ready(function() {
         });
     }
 // ======================= End Of New Expedisi Invoice ====================================
+// ========================= New Expedisi Kwitansi ======================================
+    $(document).on('click', '#sidebar_kwitansi_expedisi', function(e) {
+        e.preventDefault();
+        loadKwitansiExpedisiForm();
+    });
+
+    function loadKwitansiExpedisiForm() {
+        $.ajax({
+            url: '{{ route('expedisiKwitansi.index') }}', // Route to load the form
+            type: 'GET',
+            success: function(response) {
+                $('.master-page').html(response);
+            },
+            error: function() {
+                $('.master-page').html('<p>Error loading form.</p>');
+            }
+        });
+    }
+// ======================= End Of New Expedisi Kwitansi ====================================
 // ========================= New Rent Dingin ======================================
     $(document).on('click', '#sidebar_new_rent_dingin', function(e) {
         e.preventDefault();

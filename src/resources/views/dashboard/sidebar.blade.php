@@ -123,6 +123,11 @@
                     </a>
                 </li>
                 <li class="menu-item">
+                    <a href="#" class="menu-link" id="sidebar_kwitansi_expedisi">
+                    <span class="menu-text">Kwitansi Ekspedisi</span>
+                    </a>
+                </li>
+                <li class="menu-item">
                     <div class="dropdown-divider my-2"></div>
                 </li>
                 <li class="menu-item">

@@ -13,6 +13,7 @@ use App\Http\Controllers\PricedinginController;
 use App\Http\Controllers\PricedinginCustomerController;
 use App\Http\Controllers\ExpedisiController;
 use App\Http\Controllers\ExpedisiInvoiceController;
+use App\Http\Controllers\ExpedisiKwitansiController;
 use App\Http\Controllers\RentPendinginController;
 use App\Http\Controllers\PajakController;
 use App\Http\Controllers\RekeningController;
@@ -161,6 +162,24 @@ Route::prefix('expedisi-invoice')->group(function() {
     // Route::post('/store/muat', [ExpedisiController::class, 'storeMuat'])->name('expedisi-muat.store');
     // // PDF
     Route::get('/expedisi/invoice/pdf/{invoiceNo}', [ExpedisiInvoiceController::class, 'pdfGabungInvoice'])->name('expedisiInvoice.printSuratJalan');
+});
+
+Route::prefix('expedisi-kwitansi')->group(function() {
+    Route::get('/', [ExpedisiKwitansiController::class, 'index'])->name('expedisiKwitansi.index');
+    // Route::get('/data/cus', [ExpedisiController::class, 'getDataCustomer'])->name('expedisi-cus.data');
+    // Route::post('/store', [ExpedisiInvoiceController::class, 'storeGabungInvoice'])->name('expedisiInvoice.store');
+    // Route::get('/data/surjal', [ExpedisiController::class, 'getDataSurjal'])->name('expedisi-surjal.data');
+    Route::get('/data', [ExpedisiKwitansiController::class, 'getDataInvoiceKwt'])->name('expedisiKwitansi.data');
+    // Route::get('/data/gabung', [ExpedisiInvoiceController::class, 'dataGabung'])->name('expedisiInvoiceGabung.data');
+    // Route::get('/show/surjal', [ExpedisiController::class, 'showSurjal'])->name('expedisi-surjal.show');
+    Route::get('/show/{invoice}', [ExpedisiKwitansiController::class, 'showInvoiceGabung'])->name('expedisiKwitansi.show');
+    // Route::post('/update/{nosj}', [ExpedisiController::class, 'updateSurjal'])->name('expedisi.update');
+    // Route::post('/update/muat/{nomuat}', [ExpedisiController::class, 'updateMuat'])->name('expedisi-muat.update');
+    // Route::post('/destroy/{id}', [ExpedisiController::class, 'destroySurjal'])->name('expedisi.destroy');
+    // Route::post('/destroy/muat/{nomuat}', [ExpedisiController::class, 'destroyMuat'])->name('expedisi-muat.destroy');
+    // Route::post('/store/muat', [ExpedisiController::class, 'storeMuat'])->name('expedisi-muat.store');
+    // // PDF
+    // Route::get('/expedisi/invoice/pdf/{invoiceNo}', [ExpedisiInvoiceController::class, 'pdfGabungInvoice'])->name('expedisiInvoice.printSuratJalan');
 });
 
 Route::prefix('rent-pendingin')->group(function() {
