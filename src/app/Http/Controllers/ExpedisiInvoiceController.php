@@ -243,7 +243,7 @@ class ExpedisiInvoiceController extends Controller
                     'CUSTOMER'   => $masterRow->CUSTOMER,
                     'PIUTANG'    => $masterRow->GRAND,
                     'DISCOUNT'   => $masterRow->NDISC,
-                    'SALDO'      => $masterRow->GRAND,
+                    'SALDO'      => 0,
                     'CABANG'     => $masterRow->CABANG ?? '',
                     'KETERANGAN' => 'INVOICE DARI EXPEDISI',
                     'USER'   => auth()->user()->user_id,

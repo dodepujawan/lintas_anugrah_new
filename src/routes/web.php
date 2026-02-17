@@ -167,7 +167,7 @@ Route::prefix('expedisi-invoice')->group(function() {
 Route::prefix('expedisi-kwitansi')->group(function() {
     Route::get('/', [ExpedisiKwitansiController::class, 'index'])->name('expedisiKwitansi.index');
     // Route::get('/data/cus', [ExpedisiController::class, 'getDataCustomer'])->name('expedisi-cus.data');
-    // Route::post('/store', [ExpedisiInvoiceController::class, 'storeGabungInvoice'])->name('expedisiInvoice.store');
+    Route::post('/store', [ExpedisiKwitansiController::class, 'prosesKwitansiStore'])->name('expedisiKwitansi.store');
     // Route::get('/data/surjal', [ExpedisiController::class, 'getDataSurjal'])->name('expedisi-surjal.data');
     Route::get('/data', [ExpedisiKwitansiController::class, 'getDataInvoiceKwt'])->name('expedisiKwitansi.data');
     // Route::get('/data/gabung', [ExpedisiInvoiceController::class, 'dataGabung'])->name('expedisiInvoiceGabung.data');
@@ -179,7 +179,7 @@ Route::prefix('expedisi-kwitansi')->group(function() {
     // Route::post('/destroy/muat/{nomuat}', [ExpedisiController::class, 'destroyMuat'])->name('expedisi-muat.destroy');
     // Route::post('/store/muat', [ExpedisiController::class, 'storeMuat'])->name('expedisi-muat.store');
     // // PDF
-    // Route::get('/expedisi/invoice/pdf/{invoiceNo}', [ExpedisiInvoiceController::class, 'pdfGabungInvoice'])->name('expedisiInvoice.printSuratJalan');
+    Route::get('/kwitansi/invoice/pdf/{invoiceNo}', [ExpedisiKwitansiController::class, 'pdfInvoiceKwitansi'])->name('expedisiKwitansi.pdfKwitansi');
 });
 
 Route::prefix('rent-pendingin')->group(function() {
