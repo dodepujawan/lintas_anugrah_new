@@ -390,7 +390,7 @@ $(document).ready(function() {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
         }
     });
-    // ================================= Pilih No Muat =====================================
+    // ================================= Tabel No Muat =====================================
         // hancurkan datatable jika sudah pernah dipakai
         if ($.fn.DataTable.isDataTable('#InvoiceExpTable')) {
             $('#InvoiceExpTable').DataTable().destroy();
@@ -440,7 +440,7 @@ $(document).ready(function() {
         $('#btn_filter_invoice_expedisi').click(function () {
             tableInvoiceExp.ajax.reload();
         });
-    // ============================= End Of Pilih No Muat =====================================
+    // ============================= End Of Tabel No Muat =====================================
     // ============================= Highlight No Muat Table =====================================
     $('#InvoiceExpTable tbody').on('click', 'tr', function () {
         // Abaikan child row (kalau responsive aktif)

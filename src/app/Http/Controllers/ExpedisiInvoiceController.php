@@ -43,7 +43,9 @@ class ExpedisiInvoiceController extends Controller
             'GRAND',
             'NOSJ',
             'INVOICE',
+            'JENIS',
         ])
+        ->where('JENIS', 'EKS')
         ->whereNotNull('NOMUAT')   // 🔒 wajib punya NOMUAT
         ->orderByDesc('id');
 
@@ -126,6 +128,7 @@ class ExpedisiInvoiceController extends Controller
             'NOSJ',
         ])
         ->where('CUSTOMER_KODE', $request->customer_kode)
+        ->where('JENIS', 'EKS')
         ->whereNotNull('NOMUAT')
         ->where(function ($q) {
             $q->whereNull('INVOICE')

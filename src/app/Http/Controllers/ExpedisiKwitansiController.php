@@ -30,12 +30,15 @@ class ExpedisiKwitansiController extends Controller
                 'CUSTOMER',
                 'GRAND',
                 'PIUTANG',
-                'USERINV'
+                'USERINV',
+                'JENIS'
             ])
+            ->where('JENIS', 'EKS')
             ->whereNotNull('INVOICE')
             ->whereNull('kwt')
-            // ->where('kwt', '==', '')
-            ->where('GRAND', '>', 0); // ambil master saja
+            // ->where('kwt', '=', '')
+            ->where('GRAND', '>', 0)// ambil master saja
+            ->latest();
 
         return DataTables::of($query)
 
