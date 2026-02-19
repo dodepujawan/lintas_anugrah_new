@@ -113,7 +113,10 @@
         <tr>
             <td class="center">{{ $i + 1 }}</td>
             <td>{{ $row->NOSJ }}</td>
-            <td>{{ $row->PESANANGB }}</td>
+            {{-- Sengaja Diisi IF soalnya di pendingin gak pakai pesanangb --}}
+            <td>
+                {{ trim($row->PESANANGB) !== '' ? $row->PESANANGB : $row->PESANAN }}
+            </td>
             <td class="center">KG</td>
             <td class="right">
                 {{ number_format($row->HARGA, 0, ',', '.') }}

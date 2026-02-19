@@ -150,24 +150,24 @@
                     </div>
 
                     <div class="col-md-4">
+                        <label class="form-label small">PPN %</label>
+                        <input type="text"
+                            class="form-control form-control-sm text-end"
+                            id="ppn_gabung_dgn_inv">
+                    </div>
+
+                    <div class="col-md-4">
                         <label class="form-label small">DPP</label>
                         <input type="text"
-                            class="form-control form-control-sm text-end bg-light"
+                            class="form-control form-control-sm text-end fw-bold bg-light"
                             id="dpp_gabung_dgn_inv" readonly>
                     </div>
 
                     <div class="col-md-4">
                         <label class="form-label small">Sub Total</label>
                         <input type="text"
-                            class="form-control form-control-sm text-end bg-light"
+                            class="form-control form-control-sm text-end fw-bold bg-light"
                             id="total_gabung_dgn_inv" readonly>
-                    </div>
-
-                    <div class="col-md-4">
-                        <label class="form-label small">PPN %</label>
-                        <input type="text"
-                            class="form-control form-control-sm text-end"
-                            id="ppn_gabung_dgn_inv">
                     </div>
 
                 </div>
@@ -275,13 +275,14 @@ $(document).ready(function() {
                         $('#customer_gabung_dgn_inv').val(d.CUSTOMER);
                         $('#surjal_gabung_dgn_inv').val(d.NOSJ);
                         $('#item_gabung_dgn_inv').val(d.PESANAN);
-                        $('#jumlah_gabung_dgn_inv').val(d.JUMLAH);
-                        $('#harga_gabung_dgn_inv').val(d.HARGA);
-                        $('#diskon_gabung_dgn_inv').val(d.DISC);
-                        $('#dc_gabung_dgn_inv').val(d.DC);
-                        $('#ppn_gabung_dgn_inv').val(d.PPN);
-                        $('#total_gabung_dgn_inv').val(d.TOTAL);
-                        $('#grand_total_gabung_dgn_inv').val(d.GRAND);
+                        $('#jumlah_gabung_dgn_inv').val(parseFloat(d.JUMLAH) || 0);
+                        $('#harga_gabung_dgn_inv').val(parseFloat(d.HARGA) || 0);
+                        $('#diskon_gabung_dgn_inv').val(parseFloat(d.DISC) || 0);
+                        $('#dc_gabung_dgn_inv').val(parseFloat(d.DC) || 0);
+                        $('#ppn_gabung_dgn_inv').val(parseFloat(d.PPN));
+                        $('#dpp_gabung_dgn_inv').val(formatIDR(toNumber(d.TOTAL)));
+                        $('#total_gabung_dgn_inv').val(formatIDR(toNumber(d.TOTAL)));
+                        $('#grand_total_gabung_dgn_inv').val(formatIDR(toNumber(d.GRAND)));
                         $('#jenis_hrg_dgn_inv').val(d.JENISHRG);
 
                     }
@@ -290,5 +291,133 @@ $(document).ready(function() {
         });
     });
     // ============================= End Of Pilih No Muat =====================================
+    // ================================= Keyups Hitung =======================================
+    $('#jumlah_gabung_dgn_inv, #harga_gabung_dgn_inv, #diskon_gabung_dgn_inv, #ppn_gabung_dgn_inv, #dc_gabung_dgn_inv').on('keyup change', function () {
+        hitungTotalDgnInv();
+    });
+    // ============================== End Of Keyups Hitung ====================================
+    // ================================= Submit No Muat =======================================
+    $('#gabungInvDgnBtnLeft').on('click', function () {
+        $('#loading_modal').modal('show');
+        $('#loading_modal').one('shown.bs.modal', function () {
+            $.ajax({
+                url: "{{ route('rentPendinginInv.store') }}",
+                type: "POST",
+                data: {
+                    _token: "{{ csrf_token() }}",
+
+                    nomuat: $('#no_gabung_dgn_inv').val(),
+                    item: $('#item_gabung_dgn_inv').val(),
+
+                    harga: toNumber($('#harga_gabung_dgn_inv').val()),
+                    diskon: toNumber($('#diskon_gabung_dgn_inv').val()),
+                    dc: toNumber($('#dc_gabung_dgn_inv').val()),
+                    total: toNumber($('#total_gabung_dgn_inv').val()),
+                    ppn: toNumber($('#ppn_gabung_dgn_inv').val()),
+                    grand_total: toNumber($('#grand_total_gabung_dgn_inv').val())
+                },
+
+                success: function (res) {
+
+                    if (res.status) {
+                        $('#loading_modal').modal('hide');
+                        Swal.fire('Success', res.message, 'success');
+
+                        // redirect ke print
+                        window.open(res.redirect, '_blank');
+
+                        // reset form
+                        clearFormDgnInv();
+                        $('#form_gabung_inv_exp').addClass('d-none');
+                        $('#master_form_dgn_inv').removeClass('d-none');
+                        // reload table
+                        $('#InvoiceDgnTable').DataTable().clear().draw();
+                        $('#InvoiceDgnTable').DataTable().ajax.reload();
+
+                    } else {
+                        $('#loading_modal').modal('hide');
+                        Swal.fire('Error', res.message, 'error');
+                    }
+                },
+
+                error: function (xhr) {
+                    $('#loading_modal').modal('hide');
+                    let msg = xhr.responseJSON?.message ?? 'Terjadi kesalahan';
+                    // alert(msg);
+                },
+            });
+        });
+    });
+    // ============================= End Of Submit No Muat =====================================
 });
+    // ########################################################################
+    // FUNCTION HELPER:
+    // ########################################################################
+
+    // Fungsi Clear Form Invoice
+    function clearFormDgnInv() {
+        // Text biasa
+        $('#no_gabung_dgn_inv').val('');
+        $('#customer_kode_gabung_dgn_inv').val('');
+        $('#customer_gabung_dgn_inv').val('');
+        $('#surjal_gabung_dgn_inv').val('');
+        $('#item_gabung_dgn_inv').val('');
+        $('#jenis_hrg_dgn_inv').val('');
+
+        // Numeric reset ke 0
+        $('#jumlah_gabung_dgn_inv').val(0);
+        $('#harga_gabung_dgn_inv').val(0);
+        $('#diskon_gabung_dgn_inv').val(0);
+        $('#dc_gabung_dgn_inv').val(0);
+        $('#ppn_gabung_dgn_inv').val(0);
+
+        // Total format reset
+        $('#dpp_gabung_dgn_inv').val('0');
+        $('#total_gabung_dgn_inv').val('0');
+        $('#grand_total_gabung_dgn_inv').val('0');
+    }
+
+    // Fungsi clean number
+    function toNumber(val) {
+        if (!val) return 0;
+        return parseFloat(
+            val.toString()
+            .replace(/\./g, '')   // hapus ribuan
+            .replace(',', '.')    // jaga-jaga desimal
+        ) || 0;
+    }
+
+    // Fungsi Untuk Ubah Ke Rupiah
+    function formatIDR(num) {
+        return num.toLocaleString('id-ID');
+    }
+
+    // Fungsi Penjumlahan Grand Total
+    function hitungTotalDgnInv() {
+        let jumlah = parseFloat($('#jumlah_gabung_dgn_inv').val()) || 0;
+        let harga = parseFloat($('#harga_gabung_dgn_inv').val()) || 0;
+        let diskonPersen = parseFloat($('#diskon_gabung_dgn_inv').val()) || 0;
+        let ppnPersen = parseFloat($('#ppn_gabung_dgn_inv').val()) || 0;
+        let dc = parseFloat($('#dc_gabung_dgn_inv').val()) || 0;
+
+        // 1️⃣ Subtotal
+        let subtotal = jumlah * harga;
+
+        // 2️⃣ Diskon Rupiah
+        let diskonRupiah = subtotal * (diskonPersen / 100);
+
+        // 3️⃣ DPP (setelah diskon)
+        let dpp = subtotal + dc - diskonRupiah;
+
+        // 4️⃣ PPN Rupiah
+        let ppnRupiah = dpp * (ppnPersen / 100);
+
+        // 5️⃣ Grand Total
+        let grandTotal = dpp + ppnRupiah + dc;
+
+        // Isi ke form
+        $('#dpp_gabung_dgn_inv').val(formatIDR(toNumber(dpp.toFixed(0))));
+        $('#total_gabung_dgn_inv').val(formatIDR(toNumber(dpp.toFixed(0))));
+        $('#grand_total_gabung_dgn_inv').val(formatIDR(toNumber(grandTotal.toFixed(0))));
+}
 </script>

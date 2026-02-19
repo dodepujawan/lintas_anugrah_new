@@ -203,7 +203,7 @@ Route::prefix('rent-pendingin')->group(function() {
 Route::prefix('rent-pendingin-invoice')->group(function() {
     Route::get('/', [RentPendinginInvoiceController::class, 'index'])->name('rentPendinginInv.index');
     // Route::get('/data/cus', [ExpedisiController::class, 'getDataCustomer'])->name('expedisi-cus.data');
-    // Route::post('/store', [ExpedisiInvoiceController::class, 'storeGabungInvoice'])->name('expedisiInvoice.store');
+    Route::post('/store', [RentPendinginInvoiceController::class, 'storeRentDinginInvoice'])->name('rentPendinginInv.store');
     // Route::get('/data/surjal', [ExpedisiController::class, 'getDataSurjal'])->name('expedisi-surjal.data');
     Route::get('/data', [RentPendinginInvoiceController::class, 'getDataMuat'])->name('rentPendinginInv.data');
     Route::get('/data/muat', [RentPendinginInvoiceController::class, 'getDetailByNomuat'])->name('rentPendinginInv.detail');

@@ -133,4 +133,106 @@ class RentPendinginInvoiceController extends Controller
         ]);
     }
 
+    public function storeRentDinginInvoice(Request $request)
+    {
+        try {
+
+            $invoiceNo = null;
+
+            DB::transaction(function () use ($request, &$invoiceNo) {
+
+                $row = Expedisi::where('NOMUAT', $request->nomuat)
+                    ->lockForUpdate()
+                    ->first();
+
+                if (!$row) {
+                    throw new \Exception('Data tidak ditemukan');
+                }
+
+                if ($row->STS === 'INVOICE') {
+                    throw new \Exception("NOMUAT {$row->NOMUAT} sudah di-invoice");
+                }
+
+                $invoiceNo = $this->generateInvoiceOnline();
+
+                // Backup nilai lama
+                $row->HARGAAW = $row->HARGA;
+                $row->NDISCAW = $row->NDISC;
+                $row->DCAW    = $row->DC;
+
+                // Update jadi invoice
+                $row->INVOICE     = $invoiceNo;
+                $row->TGLINVOICE  = now();
+                $row->STS         = 'INVOICE';
+
+                $row->HARGA   = $request->harga;
+                $row->DISC    = $request->diskon;
+                $row->NDISC   = $this->calcNominalDiskon($request);
+                $row->DC      = $request->dc;
+                $row->TOTAL   = $request->total;
+                $row->PPN     = $request->ppn;
+                $row->GRAND   = $request->grand_total;
+                $row->PIUTANG = $request->grand_total;
+
+                $row->USERINV = auth()->user()->user_id . '-' . now()->format('d-m-Y h:i:s A');
+
+                $row->save();
+
+                // Simpan ke ARH
+                Arh::create([
+                    'NOFAKTUR'   => $invoiceNo,
+                    'TGLFAKTUR'  => $row->TGLINVOICE,
+                    'CUSTOMER'   => $row->CUSTOMER,
+                    'PIUTANG'    => $row->GRAND,
+                    'DISCOUNT'   => $row->NDISC,
+                    'SALDO'      => 0,
+                    'CABANG'     => $row->CABANG ?? '',
+                    'KETERANGAN' => 'INVOICE DARI EXPEDISI (NOMUAT)',
+                    'USER'       => auth()->user()->user_id,
+                ]);
+            });
+
+            return response()->json([
+                'status'  => true,
+                'message' => 'Invoice berhasil disimpan',
+                'redirect' => route('expedisiInvoice.printSuratJalan', [
+                    'invoiceNo' => $invoiceNo
+                ])
+            ]);
+
+        } catch (\Throwable $e) {
+
+            return response()->json([
+                'status'  => false,
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    private function generateInvoiceOnline(): string{
+        $tahun = now()->format('Y');
+
+        $last = Expedisi::where('INVOICE', 'like', "FJO{$tahun}%")
+            ->orderBy('INVOICE', 'desc')
+            ->lockForUpdate()
+            ->first();
+
+        $lastNo = $last
+            ? intval(substr($last->INVOICE, -6))
+            : 0;
+
+        return 'FJO' . $tahun . str_pad($lastNo + 1, 6, '0', STR_PAD_LEFT);
+    }
+
+    private function calcNominalDiskon(Request $request){
+        $total  = (float) $request->total;   // total_gabung_exp_inv
+        $diskon = (float) $request->diskon;  // persen, contoh: 5
+
+        if ($total <= 0 || $diskon <= 0) {
+            return 0;
+        }
+
+        return $total * ($diskon / 100);
+    }
+
 }
