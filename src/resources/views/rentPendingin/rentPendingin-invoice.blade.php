@@ -108,10 +108,10 @@
                         <div class="input-group input-group-sm">
                             <input type="text" class="form-control"
                                 id="item_gabung_dgn_inv" readonly>
-                            <button class="btn btn-outline-primary"
+                            {{-- <button class="btn btn-outline-primary"
                                 type="button" id="btnItemGabungDgn">
                                 <i class="bx bx-search"></i>
-                            </button>
+                            </button> --}}
                         </div>
                     </div>
                 </div>

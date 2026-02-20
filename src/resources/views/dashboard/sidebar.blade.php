@@ -140,6 +140,11 @@
                     <span class="menu-text">Invoice Sewa Mobil Pendingin</span>
                     </a>
                 </li>
+                <li class="menu-item">
+                    <a href="#" class="menu-link" id="sidebar_kwitansi_rent_dingin">
+                    <span class="menu-text">Kwitansi Sewa Mobil Pendingin</span>
+                    </a>
+                </li>
                 {{-- <li class="menu-item">
                     <a href="#" class="menu-link" id="sidebar_new_rent">
                     <span class="menu-text">Rent</span>
