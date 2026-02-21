@@ -67,4 +67,115 @@ class RentPendinginKwitansiController extends Controller
             ->make(true);
     }
 
+    public function showInvoiceDetail($invoice)
+    {
+        $master = Expedisi::where('INVOICE', $invoice)
+            // ->where('GRAND', '>', 0)
+            ->first();
+
+        if (!$master) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Invoice tidak ditemukan'
+            ]);
+        }
+
+        // ambil semua SJ yang tergabung
+        $details = Expedisi::where('INVOICE', $invoice)
+            ->orderBy('NOSJ')
+            ->get();
+
+        return response()->json([
+            'status' => true,
+            'data' => [
+                'invoice'      => $master->INVOICE,
+                'tgl_invoice'  => $master->TGLINVOICE,
+                'customer'     => $master->CUSTOMER,
+                'nomor_muat'   => $master->NOMUAT ?? '',
+                'kendaraan'    => $master->NAMA_KENDARAAN ?? '',
+
+                'sub_total'    => $master->HARGA,
+                'disc_persen'  => $master->DISC,
+                'disc_rp'      => $master->NDISC,
+                'd_charge'     => $master->DC,
+                'total'        => $master->TOTAL,
+                'ppn'          => $master->PPN,
+                'grand'        => $master->GRAND,
+                // 'piutang'      => $master->PIUTANG,
+                // dikarenakan tipe data double jadi yang tersimpan malah isi koma
+                'piutang' => (int) ceil($master->PIUTANG),
+
+                'nomor_sj'     => $details->pluck('NOSJ')->implode(', ')
+            ]
+        ]);
+    }
+
+    public function prosesKwitansiStore(Request $request){
+        try {
+            // untuk mengambil nilai dalam transaction dibawah supaya bisa kirim ke json respon karna json respon diluar transaction
+            $invoice = null;
+            DB::transaction(function () use ($request, &$invoice) {
+
+                $invoice = $request->invoice;
+                $bayar   = str_replace('.', '', $request->bayar);
+                $top     = $request->top;
+                $tglJtp  = $request->tgl_jtp;
+
+                // 🔹 Generate Nomor KW
+                $noKw = $this->generateKW();
+
+                // =======================
+                // UPDATE ARH
+                // =======================
+                Arh::where('NOFAKTUR', $invoice)
+                    ->update([
+                        'BAYAR' => $bayar,
+                        'SALDO' => $top
+                    ]);
+
+                // =======================
+                // UPDATE EXPEDISI
+                // =======================
+                Expedisi::where('INVOICE', $invoice)
+                    ->update([
+                        'kwt'    => $noKw,
+                        'TGLKW' => $tglJtp
+                    ]);
+
+            });
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Kwitansi berhasil diproses',
+                'redirect' => route('expedisiKwitansi.pdfKwitansi', ['invoiceNo' => $invoice])
+            ]);
+
+        } catch (\Throwable $e) {
+
+            return response()->json([
+                'status' => false,
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    private function generateKW()
+    {
+        $year = now()->format('Y');
+
+        $last = Expedisi::where('kwt', 'like', 'KW'.$year.'%')
+            ->lockForUpdate()
+            ->orderByDesc('kwt')
+            ->value('kwt');
+
+        if (!$last) {
+            return 'KW' . $year . '0000001';
+        }
+
+        $number = (int) substr($last, 7);
+        $number++;
+
+        return 'KW' . $year . str_pad($number, 7, '0', STR_PAD_LEFT);
+    }
+
 }

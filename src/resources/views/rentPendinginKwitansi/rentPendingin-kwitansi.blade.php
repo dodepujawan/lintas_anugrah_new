@@ -155,7 +155,7 @@ $(document).ready(function() {
         }
     });
 });
-// ================================= Tabel Kwitansi Expedisi =====================================
+// ================================= Tabel Kwitansi Dingin =====================================
     if ($.fn.DataTable.isDataTable('#DgnKwtTable')) {
         $('#DgnKwtTable').DataTable().destroy();
     }
@@ -173,5 +173,172 @@ $(document).ready(function() {
             { data: 'action', name: 'action', orderable: false, searchable: false }
         ]
     });
-// ============================== End Of Tabel Kwitansi Expedisi ==================================
+// ============================== End Of Tabel Kwitansi Dingin ==================================
+// =============================== Form Detail Kwitansi Dingin ===================================
+    $(document).on('click', '.btn-show-invoice-dgn-kwt', function() {
+
+        let invoiceNo = $(this).data('invoice');
+
+        // bisa ajax ambil detail invoice juga kalau mau
+        $('#loading_modal').modal('show');
+        $('#loading_modal').one('shown.bs.modal', function () {
+            $.ajax({
+                url: "{{ route('rentPendinginKwitansi.show', ':kode') }}".replace(':kode', invoiceNo),
+                type: "GET",
+                success: function(response) {
+
+                    if (!response.status) {
+                        alert(response.message);
+                        return;
+                    }
+                    $('#loading_modal').modal('hide');
+                    $('#table_kwt_dgn').addClass('d-none');
+                    $('#form_kwt_dgn').removeClass('d-none');
+                    // Clear Form Dulu
+                    clearAllKwtDgn();
+
+                    let d = response.data;
+                    // ===== LEFT SIDE =====
+                    $('#sub_total_kwt_dgn').val(formatRupiah(d.sub_total));
+                    $('#d_charge_kwt_dgn').val(formatRupiah(d.d_charge));
+                    $('#total_kwt_dgn').val(formatRupiah(d.total));
+
+                    $('#disc_persen_kwt_dgn').val(d.disc_persen);
+                    $('#disc_rp_kwt_dgn').val(formatRupiah(d.disc_rp));
+
+                    $('#dpp_kwt_dgn').val(formatRupiah(d.total - d.disc_rp));
+                    $('#ppn_persen_kwt_dgn').val(formatRupiah(d.ppn));
+                    $('#grand_kwt_dgn').val(formatRupiah(d.grand));
+
+                    $('#tgl_invoice_kwt_dgn').val(
+                        d.tgl_invoice.substring(0,10)
+                    );
+
+                    // ===== RIGHT SIDE =====
+                    $('#no_faktur_kwt_dgn').val(d.invoice);
+                    $('#nomor_muat_kwt_dgn').val(d.nomor_muat);
+                    $('#nomor_sj_kwt_dgn').val(d.nomor_sj);
+                    $('#kendaraan_kwt_dgn').val(d.kendaraan);
+                    $('#customer_kwt_dgn').val(d.customer);
+
+                    // ===== BAYAR SECTION =====
+                    $('#bayar_kwt_dgn').val(0);
+                    $('#top_kwt_dgn').val(0);
+                    $('#piutang_kwt_dgn').val(formatRupiah(d.piutang));
+                },
+                error: function(xhr) {
+                    $('#loading_modal').modal('hide');
+                    alert('Terjadi kesalahan server');
+                }
+            });
+        });
+    });
+
+// ============================ End Of Form Detail Kwitansi Dingin ===============================
+// =============================== Submit Kwitansi Dingin ===================================
+    $('#proses_kwt_dgn').on('click', function() {
+        let bayar = parseFloat($('#bayar_kwt_dgn').val());
+        let top   = parseFloat($('#top_kwt_dgn').val());
+
+        // Validasi BAYAR
+        if (isNaN(bayar) || bayar <= 0) {
+            alert('Nominal bayar harus angka dan lebih dari 0');
+            $('#bayar_kwt_dgn').focus();
+            return false;
+        }
+
+        // Validasi TOP
+        if (isNaN(top) || top < 0) {
+            alert('TOP harus angka dan tidak boleh negatif');
+            $('#top_kwt_dgn').focus();
+            return false;
+        }
+
+        let data = {
+            invoice: $('#no_faktur_kwt_dgn').val(),
+            bayar: $('#bayar_kwt_dgn').val(),
+            top: $('#top_kwt_dgn').val(),
+            tgl_jtp: $('#tgl_jtp_kwt_dgn').val()
+        };
+        $('#loading_modal').modal('show');
+        $('#loading_modal').one('shown.bs.modal', function () {
+            $.ajax({
+                url: "{{ route('rentPendinginKwitansi.store') }}",
+                type: "POST",
+                data: data,
+                success: function(response) {
+
+                    if (response.status) {
+                        $('#loading_modal').modal('hide');
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Berhasil',
+                            text: response.message
+                        });
+                        $('#form_kwt_dgn').addClass('d-none');
+                        $('#table_kwt_dgn').removeClass('d-none');
+                        $('#DgnKwtTable').DataTable().ajax.reload();
+                        // Cetak PDF
+                        window.open(response.redirect, '_blank');
+                    } else {
+                        $('#loading_modal').modal('hide');
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Gagal',
+                            text: response.message
+                        });
+                    }
+
+                },
+                error: function(xhr) {
+                    $('#loading_modal').modal('hide');
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Gagal',
+                        text: 'Terjadi Kesalahan Server !'
+                    });
+                }
+            });
+        });
+
+    });
+// ============================ End Of Submit Kwitansi Dingin ===============================
+// ########################################################################
+// FUNCTION HELPER:
+// ########################################################################
+// Format Angka
+function formatRupiah(angka) {
+    if (!angka) return 0;
+
+    return parseFloat(angka)
+        .toLocaleString('id-ID');
+}
+// Clear Form
+function clearAllKwtDgn() {
+    // ===== LEFT SIDE =====
+    $('#sub_total_kwt_dgn').val('');
+    $('#d_charge_kwt_dgn').val('');
+    $('#total_kwt_dgn').val('');
+    $('#disc_persen_kwt_dgn').val('');
+    $('#disc_rp_kwt_dgn').val('');
+    $('#dpp_kwt_dgn').val('');
+    $('#ppn_persen_kwt_dgn').val('');
+    $('#grand_kwt_dgn').val('');
+    $('#tgl_invoice_kwt_dgn').val('');
+
+    // ===== RIGHT SIDE =====
+    $('#no_faktur_kwt_dgn').val('');
+    $('#nomor_muat_kwt_dgn').val('');
+    $('#nomor_sj_kwt_dgn').val('');
+    $('#kendaraan_kwt_dgn').val('');
+    $('#customer_kwt_dgn').val('');
+
+    // ===== BAYAR SECTION =====
+    $('#bayar_kwt_dgn').val('');
+    $('#top_kwt_dgn').val('');
+    $('#piutang_kwt_dgn').val('');
+
+    // set ulang tanggal hari ini
+    $('#tgl_jtp_kwt_dgn').val(new Date().toISOString().split('T')[0]);
+}
 </script>

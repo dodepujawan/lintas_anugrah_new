@@ -225,7 +225,7 @@ $(document).ready(function() {
                     $('#top_kwt_exp').val(0);
                     $('#piutang_kwt_exp').val(formatRupiah(d.piutang));
 
-                    $('#modalKwitansiExp').modal('show');
+                    // $('#modalKwitansiExp').modal('show');
                 },
                 error: function(xhr) {
                     $('#loading_modal').modal('hide');

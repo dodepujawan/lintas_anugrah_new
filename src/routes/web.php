@@ -222,12 +222,12 @@ Route::prefix('rent-pendingin-invoice')->group(function() {
 Route::prefix('rent-pendingin-kwitansi')->group(function() {
     Route::get('/', [RentPendinginKwitansiController::class, 'index'])->name('rentPendinginKwitansi.index');
     // Route::get('/data/cus', [ExpedisiController::class, 'getDataCustomer'])->name('expedisi-cus.data');
-    // Route::post('/store', [ExpedisiKwitansiController::class, 'prosesKwitansiStore'])->name('expedisiKwitansi.store');
+    Route::post('/store', [RentPendinginKwitansiController::class, 'prosesKwitansiStore'])->name('rentPendinginKwitansi.store');
     // Route::get('/data/surjal', [ExpedisiController::class, 'getDataSurjal'])->name('expedisi-surjal.data');
     Route::get('/data', [RentPendinginKwitansiController::class, 'getDataInvoiceKwt'])->name('rentPendinginKwitansi.data');
-    // Route::get('/data/gabung', [ExpedisiInvoiceController::class, 'dataGabung'])->name('expedisiInvoiceGabung.data');
+    // Route::get('/data/gabung', [RentPendinginKwitansiController::class, 'showInvoiceDetail'])->name('rentPendinginKwitansi.detail');
     // Route::get('/show/surjal', [ExpedisiController::class, 'showSurjal'])->name('expedisi-surjal.show');
-    // Route::get('/show/{invoice}', [ExpedisiKwitansiController::class, 'showInvoiceGabung'])->name('expedisiKwitansi.show');
+    Route::get('/show/{invoice}', [RentPendinginKwitansiController::class, 'showInvoiceDetail'])->name('rentPendinginKwitansi.show');
     // Route::post('/update/{nosj}', [ExpedisiController::class, 'updateSurjal'])->name('expedisi.update');
     // Route::post('/update/muat/{nomuat}', [ExpedisiController::class, 'updateMuat'])->name('expedisi-muat.update');
     // Route::post('/destroy/{id}', [ExpedisiController::class, 'destroySurjal'])->name('expedisi.destroy');
