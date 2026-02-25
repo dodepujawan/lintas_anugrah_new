@@ -2,6 +2,16 @@
 <div class="container mt-3" id="table_kwt_exp">
     <div class="card p-3">
         <h5 class="text-center mb-3">FORM PROSES INVOICE EXPEDISI</h5>
+        <div class="mb-3">
+            <label>
+                <input type="radio" name="filter_kwt_exp" value="belum" checked>
+                Belum Kwitansi
+            </label>
+            <label class="ms-3">
+                <input type="radio" name="filter_kwt_exp" value="sudah">
+                Sudah Kwitansi
+            </label>
+        </div>
         <div class="table-responsive">
             <table id="ExpKwtTable" class="table table-bordered table-striped w-100">
                 <thead>
@@ -12,6 +22,7 @@
                         <th>Customer</th>
                         <th>Grand Total</th>
                         <th>Piutang</th>
+                        <th>No Kwitansi</th>
                         <th>Aksi</th>
                     </tr>
                 </thead>
@@ -158,10 +169,15 @@ $(document).ready(function() {
     if ($.fn.DataTable.isDataTable('#ExpKwtTable')) {
         $('#ExpKwtTable').DataTable().destroy();
     }
-    $('#ExpKwtTable').DataTable({
+    let table_kwt = $('#ExpKwtTable').DataTable({
         processing: true,
         serverSide: true,
-        ajax: "{{ route('expedisiKwitansi.data') }}",
+        ajax:{
+            url: "{{ route('expedisiKwitansi.data') }}",
+            data: function (d) {
+                d.status_kwt = $('input[name="filter_kwt_exp"]:checked').val();
+            }
+        },
         columns: [
             { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false },
             { data: 'INVOICE', name: 'INVOICE' },
@@ -169,8 +185,23 @@ $(document).ready(function() {
             { data: 'CUSTOMER', name: 'CUSTOMER' },
             { data: 'GRAND', name: 'GRAND', className: 'text-end' },
             { data: 'PIUTANG', name: 'PIUTANG', className: 'text-end' },
+            { data: 'no_kwt', visible: false },
             { data: 'action', name: 'action', orderable: false, searchable: false }
         ]
+    });
+
+    // Mengubah Radio Status Kwitansi
+    $('input[name="filter_kwt_exp"]').on('change', function() {
+
+        let status = $(this).val();
+
+        if(status === 'sudah'){
+            table_kwt.column(6).visible(true); // tampilkan kolom No Kwitansi
+        } else {
+            table_kwt.column(6).visible(false);
+        }
+
+        table_kwt.ajax.reload();
     });
 // ============================== End Of Tabel Kwitansi Expedisi ==================================
 // =============================== Form Detail Kwitansi Expedisi ===================================

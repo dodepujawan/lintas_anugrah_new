@@ -30,15 +30,19 @@ class ExpedisiKwitansiController extends Controller
                 'CUSTOMER',
                 'GRAND',
                 'PIUTANG',
-                'USERINV',
-                'JENIS'
+                'kwt'
             ])
             ->where('JENIS', 'EKS')
             ->whereNotNull('INVOICE')
-            ->whereNull('kwt')
-            // ->where('kwt', '=', '')
-            ->where('GRAND', '>', 0)// ambil master saja
-            ->latest();
+            ->where('GRAND', '>', 0);
+
+        if($request->status_kwt == 'belum'){
+            $query->whereNull('kwt');
+        }
+
+        if($request->status_kwt == 'sudah'){
+            $query->whereNotNull('kwt');
+        }
 
         return DataTables::of($query)
 
@@ -53,7 +57,25 @@ class ExpedisiKwitansiController extends Controller
                 return number_format($row->GRAND, 0, ',', '.');
             })
 
-            ->addColumn('action', function ($row) {
+            ->addColumn('no_kwt', function($row){
+                return $row->kwt ?? '-';
+            })
+
+            ->addColumn('action', function ($row) use ($request) {
+
+                if($request->status_kwt == 'sudah'){
+                    return '
+                        <div class="d-flex justify-content-end gap-2">
+                            <button class="btn btn-sm btn-warning d-flex align-items-center justify-content-center btn-edit-kwt-exp" style="width:32px;height:32px;" title="Edit">
+                                <i class="bx bx-pencil"></i>
+                            </button>
+                            <button class="btn btn-sm btn-danger d-flex align-items-center justify-content-center btn-hapus-kwt-exp" style="width:32px;height:32px;" title="Hapus">
+                                <i class="bx bx-trash"></i>
+                            </button>
+                        </div>
+                    ';
+                }
+
                 return '
                     <button
                         class="btn btn-sm btn-primary btn-show-invoice-kwt"
@@ -85,6 +107,12 @@ class ExpedisiKwitansiController extends Controller
             ->orderBy('NOSJ')
             ->get();
 
+        // =============================
+        // Tambahan untuk mode edit ambil nilai arh
+        // =============================
+
+        $arh = Arh::where('NOFAKTUR', $invoice)->first();
+
         return response()->json([
             'status' => true,
             'data' => [
@@ -105,7 +133,13 @@ class ExpedisiKwitansiController extends Controller
                 // dikarenakan tipe data double jadi yang tersimpan malah isi koma
                 'piutang' => (int) ceil($master->PIUTANG),
 
-                'nomor_sj'     => $details->pluck('NOSJ')->implode(', ')
+                'nomor_sj'     => $details->pluck('NOSJ')->implode(', '),
+
+                // ========= DATA ARH =========
+                'tgl_jt'       => $arh->TGLJT ?? null,
+                'piutang_arh'  => $arh->PIUTANG ?? null,
+                'bayar'        => $arh->BAYAR ?? null,
+                'saldo'        => $arh->SALDO ?? null,
             ]
         ]);
     }
