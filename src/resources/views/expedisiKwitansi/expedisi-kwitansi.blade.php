@@ -21,7 +21,6 @@
                         <th>Tanggal</th>
                         <th>Customer</th>
                         <th>Grand Total</th>
-                        <th>Piutang</th>
                         <th>No Kwitansi</th>
                         <th>Aksi</th>
                     </tr>
@@ -124,10 +123,16 @@
         </div>
 
         <hr>
+        <div id="edit_mode_alert"
+            class="alert alert-warning text-center fw-bold"
+            style="display: none; font-size: 16px;">
+            ⚠ MODE EDIT KWITANSI !
+        </div>
 
         <!-- BAYAR SECTION -->
         <div class="card p-3 mt-3" style="background-color:#e6e6e6;">
             <div class="row">
+                <input type="hidden" id="kwt_exp_flag">
                 <div class="col-md-3">
                     <label>BAYAR</label>
                     <input type="text" id="bayar_kwt_exp" class="form-control text-end">
@@ -144,7 +149,7 @@
                 </div>
 
                 <div class="col-md-4">
-                    <label>PIUTANG</label>
+                    <label>TOTAL</label>
                     <input type="text" id="piutang_kwt_exp" class="form-control text-end"  readonly>
                 </div>
             </div>
@@ -184,8 +189,8 @@ $(document).ready(function() {
             { data: 'TGLINVOICE', name: 'TGLINVOICE' },
             { data: 'CUSTOMER', name: 'CUSTOMER' },
             { data: 'GRAND', name: 'GRAND', className: 'text-end' },
-            { data: 'PIUTANG', name: 'PIUTANG', className: 'text-end' },
-            { data: 'no_kwt', visible: false },
+            // { data: 'PIUTANG', name: 'PIUTANG', className: 'text-end' },
+            { data: 'no_kwt', name: 'kwt', visible: false },
             { data: 'action', name: 'action', orderable: false, searchable: false }
         ]
     });
@@ -196,9 +201,9 @@ $(document).ready(function() {
         let status = $(this).val();
 
         if(status === 'sudah'){
-            table_kwt.column(6).visible(true); // tampilkan kolom No Kwitansi
+            table_kwt.column(5).visible(true); // tampilkan kolom No Kwitansi
         } else {
-            table_kwt.column(6).visible(false);
+            table_kwt.column(5).visible(false);
         }
 
         table_kwt.ajax.reload();
@@ -252,8 +257,10 @@ $(document).ready(function() {
                     $('#customer_kwt_exp').val(d.customer);
 
                     // ===== BAYAR SECTION =====
+                    $('#kwt_exp_flag').val(0);
                     $('#bayar_kwt_exp').val(0);
                     $('#top_kwt_exp').val(0);
+                    $('#tgl_jtp_kwt_exp').val(d.tgl_jt);
                     $('#piutang_kwt_exp').val(formatRupiah(d.piutang));
 
                     // $('#modalKwitansiExp').modal('show');
@@ -290,7 +297,8 @@ $(document).ready(function() {
             invoice: $('#no_faktur_kwt_exp').val(),
             bayar: $('#bayar_kwt_exp').val(),
             top: $('#top_kwt_exp').val(),
-            tgl_jtp: $('#tgl_jtp_kwt_exp').val()
+            tgl_jtp: $('#tgl_jtp_kwt_exp').val(),
+            kwt_flag: $('#kwt_exp_flag').val()
         };
         $('#loading_modal').modal('show');
         $('#loading_modal').one('shown.bs.modal', function () {
@@ -335,6 +343,80 @@ $(document).ready(function() {
 
     });
 // ============================ End Of Submit Kwitansi Expedisi ===============================
+// =========================== Form Detail Edit Kwitansi Expedisi ==============================
+    $(document).on('click', '.btn-edit-kwt-exp', function() {
+
+        let invoiceNo = $(this).data('invoice');
+
+        // bisa ajax ambil detail invoice juga kalau mau
+        $('#loading_modal').modal('show');
+        $('#loading_modal').one('shown.bs.modal', function () {
+            $.ajax({
+                url: "{{ route('expedisiKwitansi.show', ':kode') }}".replace(':kode', invoiceNo),
+                type: "GET",
+                success: function(response) {
+
+                    if (!response.status) {
+                        alert(response.message);
+                        return;
+                    }
+                    $('#loading_modal').modal('hide');
+                    $('#table_kwt_exp').addClass('d-none');
+                    $('#form_kwt_exp').removeClass('d-none');
+                    // Clear Form Dulu
+                    clearAllKwtExp();
+
+                    let d = response.data;
+                    // ===== LEFT SIDE =====
+                    $('#sub_total_kwt_exp').val(formatRupiah(d.sub_total));
+                    $('#d_charge_kwt_exp').val(formatRupiah(d.d_charge));
+                    $('#total_kwt_exp').val(formatRupiah(d.total));
+
+                    $('#disc_persen_kwt_exp').val(d.disc_persen);
+                    $('#disc_rp_kwt_exp').val(formatRupiah(d.disc_rp));
+
+                    $('#dpp_kwt_exp').val(formatRupiah(d.total - d.disc_rp));
+                    $('#ppn_persen_kwt_exp').val(formatRupiah(d.ppn));
+                    $('#grand_kwt_exp').val(formatRupiah(d.grand));
+
+                    $('#tgl_invoice_kwt_exp').val(
+                        d.tgl_invoice.substring(0,10)
+                    );
+
+                    // ===== RIGHT SIDE =====
+                    $('#no_faktur_kwt_exp').val(d.invoice);
+                    $('#nomor_muat_kwt_exp').val(d.nomor_muat);
+                    $('#nomor_sj_kwt_exp').val(d.nomor_sj);
+                    $('#kendaraan_kwt_exp').val(d.kendaraan);
+                    $('#customer_kwt_exp').val(d.customer);
+
+                    // ===== BAYAR SECTION =====
+                    $('#edit_mode_alert').fadeIn();
+                    $('#kwt_exp_flag').val(1);
+                    $('#bayar_kwt_exp').val(formatRupiah(d.bayar));
+                    $('#top_kwt_exp').val(formatRupiah(d.saldo));
+                    $('#tgl_jtp_kwt_exp').val(d.tgl_jt);
+                    $('#piutang_kwt_exp').val(formatRupiah(d.piutang));
+                    // console.log('nyoba' + d.bayar + d.saldo);
+
+                    // $('#modalKwitansiExp').modal('show');
+                },
+                error: function(xhr) {
+                    $('#loading_modal').modal('hide');
+                    alert('Terjadi kesalahan server');
+                }
+            });
+        });
+    });
+
+// ======================== End Of Form Detail Edit Kwitansi Expedisi ============================
+// ============================== Click Return ================================
+$(document).on('click', '#keluar_kwt_exp', function() {
+    $('#form_kwt_exp').addClass('d-none');
+    $('#table_kwt_exp').removeClass('d-none');
+    $('#ExpKwtTable').DataTable().ajax.reload();
+});
+// ============================== End Of Click Return ================================
 });
 // ########################################################################
 // FUNCTION HELPER:
@@ -349,6 +431,7 @@ function formatRupiah(angka) {
 
 // Clear Form
 function clearAllKwtExp() {
+    $('#edit_mode_alert').fadeOut();
     // ===== LEFT SIDE =====
     $('#sub_total_kwt_exp').val('');
     $('#d_charge_kwt_exp').val('');
@@ -368,12 +451,13 @@ function clearAllKwtExp() {
     $('#customer_kwt_exp').val('');
 
     // ===== BAYAR SECTION =====
+    $('#kwt_exp_flag').val('');
     $('#bayar_kwt_exp').val('');
     $('#top_kwt_exp').val('');
     $('#piutang_kwt_exp').val('');
 
     // set ulang tanggal hari ini
-    $('#tgl_jtp_kwt_exp').val(new Date().toISOString().split('T')[0]);
+    // $('#tgl_jtp_kwt_exp').val(new Date().toISOString().split('T')[0]);
 }
 
 </script>
