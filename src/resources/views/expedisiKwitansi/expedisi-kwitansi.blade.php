@@ -410,6 +410,40 @@ $(document).ready(function() {
     });
 
 // ======================== End Of Form Detail Edit Kwitansi Expedisi ============================
+// ============================== Delete Kwitansi ================================
+    $(document).on('click', '.btn-hapus-kwt-exp', function() {
+        var invoice = $(this).data('invoice');
+
+        Swal.fire({
+            title: 'Apakah Anda yakin?',
+            text: "Kwitansi Akan Dihapus!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Ya, hapus!',
+            cancelButtonText: 'Batal'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $('#loading_modal').modal('show');
+                $('#loading_modal').one('shown.bs.modal', function () {
+                    $.ajax({
+                        url: "{{ route('expedisiKwitansi.destroy') }}",
+                        type: 'POST',
+                        data: {
+                            invoice: invoice
+                        },
+                        success: function(response) {
+                            $('#loading_modal').modal('hide');
+                            Swal.fire('Terhapus!', response.success, 'success');
+                            $('#ExpKwtTable').DataTable().ajax.reload();
+                        }
+                    });
+                });
+            }
+        });
+    });
+// ============================== End Of Delete Kwitansi ================================
 // ============================== Click Return ================================
 $(document).on('click', '#keluar_kwt_exp', function() {
     $('#form_kwt_exp').addClass('d-none');

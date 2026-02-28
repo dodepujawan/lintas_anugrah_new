@@ -31,14 +31,23 @@ class RentPendinginKwitansiController extends Controller
                 'GRAND',
                 'PIUTANG',
                 'USERINV',
-                'JENIS'
+                'JENIS',
+                'kwt'
             ])
             ->where('JENIS', 'REN')
             ->whereNotNull('INVOICE')
-            ->whereNull('kwt')
+            // ->whereNull('kwt')
             // ->where('kwt', '=', '')
             // ->where('GRAND', '>', 0)// ambil master saja
             ->latest();
+
+            if($request->status_kwt == 'belum'){
+                $query->whereNull('kwt');
+            }
+
+            if($request->status_kwt == 'sudah'){
+                $query->whereNotNull('kwt');
+            }
 
         return DataTables::of($query)
 
@@ -53,7 +62,25 @@ class RentPendinginKwitansiController extends Controller
                 return number_format($row->GRAND, 0, ',', '.');
             })
 
-            ->addColumn('action', function ($row) {
+            ->addColumn('no_kwt', function($row){
+                return $row->kwt ?? '-';
+            })
+
+            ->addColumn('action', function ($row) use ($request) {
+
+                if($request->status_kwt == 'sudah'){
+                    return '
+                        <div class="d-flex justify-content-end gap-2">
+                            <button class="btn btn-sm btn-warning d-flex align-items-center justify-content-center btn-edit-kwt-dgn" style="width:32px;height:32px;" title="Edit" data-invoice="'.$row->INVOICE.'">
+                                <i class="bx bx-pencil"></i>
+                            </button>
+                            <button class="btn btn-sm btn-danger d-flex align-items-center justify-content-center btn-hapus-kwt-dgn" style="width:32px;height:32px;" title="Hapus" data-invoice="'.$row->INVOICE.'">
+                                <i class="bx bx-trash"></i>
+                            </button>
+                        </div>
+                    ';
+                }
+
                 return '
                     <button
                         class="btn btn-sm btn-primary btn-show-invoice-dgn-kwt"

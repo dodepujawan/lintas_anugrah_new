@@ -177,7 +177,7 @@ Route::prefix('expedisi-kwitansi')->group(function() {
     Route::get('/show/{invoice}', [ExpedisiKwitansiController::class, 'showInvoiceGabung'])->name('expedisiKwitansi.show');
     // Route::post('/update/{nosj}', [ExpedisiController::class, 'updateSurjal'])->name('expedisi.update');
     // Route::post('/update/muat/{nomuat}', [ExpedisiController::class, 'updateMuat'])->name('expedisi-muat.update');
-    // Route::post('/destroy/{id}', [ExpedisiController::class, 'destroySurjal'])->name('expedisi.destroy');
+    Route::post('/destroy', [ExpedisiKwitansiController::class, 'prosesKwitansiDelete'])->name('expedisiKwitansi.destroy');
     // Route::post('/destroy/muat/{nomuat}', [ExpedisiController::class, 'destroyMuat'])->name('expedisi-muat.destroy');
     // Route::post('/store/muat', [ExpedisiController::class, 'storeMuat'])->name('expedisi-muat.store');
     // // PDF

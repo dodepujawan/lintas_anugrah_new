@@ -2,6 +2,16 @@
 <div class="container mt-3" id="table_kwt_dgn">
     <div class="card p-3">
         <h5 class="text-center mb-3">FORM PROSES INVOICE MOBIL PENDINGIN</h5>
+        <div class="mb-3">
+            <label>
+                <input type="radio" name="filter_kwt_dgn" value="belum" checked>
+                Belum Kwitansi
+            </label>
+            <label class="ms-3">
+                <input type="radio" name="filter_kwt_dgn" value="sudah">
+                Sudah Kwitansi
+            </label>
+        </div>
         <div class="table-responsive">
             <table id="DgnKwtTable" class="table table-bordered table-striped w-100">
                 <thead>
@@ -11,7 +21,7 @@
                         <th>Tanggal</th>
                         <th>Customer</th>
                         <th>Grand Total</th>
-                        <th>Piutang</th>
+                        <th>No Kwitansi</th>
                         <th>Aksi</th>
                     </tr>
                 </thead>
@@ -154,24 +164,43 @@ $(document).ready(function() {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
         }
     });
-});
 // ================================= Tabel Kwitansi Dingin =====================================
     if ($.fn.DataTable.isDataTable('#DgnKwtTable')) {
         $('#DgnKwtTable').DataTable().destroy();
     }
-    $('#DgnKwtTable').DataTable({
+    let table_kwt_dgn = $('#DgnKwtTable').DataTable({
         processing: true,
         serverSide: true,
-        ajax: "{{ route('rentPendinginKwitansi.data') }}",
+        ajax:{
+            url: "{{ route('rentPendinginKwitansi.data') }}",
+            data: function (d) {
+                d.status_kwt = $('input[name="filter_kwt_dgn"]:checked').val();
+            }
+        },
         columns: [
             { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false },
             { data: 'INVOICE', name: 'INVOICE' },
             { data: 'TGLINVOICE', name: 'TGLINVOICE' },
             { data: 'CUSTOMER', name: 'CUSTOMER' },
             { data: 'GRAND', name: 'GRAND', className: 'text-end' },
-            { data: 'PIUTANG', name: 'PIUTANG', className: 'text-end' },
+            // { data: 'PIUTANG', name: 'PIUTANG', className: 'text-end' },
+            { data: 'no_kwt', name: 'kwt', visible: false },
             { data: 'action', name: 'action', orderable: false, searchable: false }
         ]
+    });
+
+    // Mengubah Radio Status Kwitansi
+    $('input[name="filter_kwt_dgn"]').on('change', function() {
+
+        let status = $(this).val();
+
+        if(status === 'sudah'){
+            table_kwt_dgn.column(5).visible(true); // tampilkan kolom No Kwitansi
+        } else {
+            table_kwt_dgn.column(5).visible(false);
+        }
+
+        table_kwt_dgn.ajax.reload();
     });
 // ============================== End Of Tabel Kwitansi Dingin ==================================
 // =============================== Form Detail Kwitansi Dingin ===================================
@@ -303,6 +332,7 @@ $(document).ready(function() {
 
     });
 // ============================ End Of Submit Kwitansi Dingin ===============================
+});
 // ########################################################################
 // FUNCTION HELPER:
 // ########################################################################

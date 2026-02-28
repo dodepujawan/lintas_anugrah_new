@@ -249,6 +249,59 @@ class ExpedisiKwitansiController extends Controller
         }
     }
 
+    public function prosesKwitansiDelete(Request $request){
+        try {
+
+            DB::transaction(function () use ($request) {
+
+                $invoice = $request->invoice;
+
+                $expedisi = Expedisi::where('INVOICE', $invoice)->first();
+
+                if (!$expedisi) {
+                    throw new \Exception('Invoice tidak ditemukan');
+                }
+
+                $grand = $expedisi->GRAND;
+
+                // ===============================
+                // Reverse ARH
+                // ===============================
+                Arh::where('NOFAKTUR', $invoice)
+                    ->update([
+                        'BAYAR'       => 0,
+                        'SALDO'       => 0,
+                        'PIUTANG'     => $grand, // kembali seperti awal
+                        'TGLJT'       => null,
+                        'USER_UPDATE' => auth()->user()->user_id,
+                        'updated_at'  => now()
+                    ]);
+
+                // ===============================
+                // Reverse EXPEDISI
+                // ===============================
+                Expedisi::where('INVOICE', $invoice)
+                    ->update([
+                        'kwt'   => null,
+                        'TGLKW' => null,
+                        'TGLJT' => null
+                    ]);
+            });
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Kwitansi berhasil dihapus / direverse'
+            ]);
+
+        } catch (\Throwable $e) {
+
+            return response()->json([
+                'status' => false,
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
+
     public function pdfInvoiceKwitansi($invoice){
         $master = Expedisi::where('INVOICE', $invoice)
             ->where('GRAND', '>', 0)
