@@ -36,7 +36,7 @@
         <div class="row">
             <!-- LEFT SIDE -->
             <div class="col-md-5">
-
+                <input type="hidden" id="kwt_exp_flag_dgn">
                 <div class="mb-2">
                     <label>SUB TOTAL</label>
                     <input type="text" id="sub_total_kwt_dgn" class="form-control text-end" readonly>
@@ -123,7 +123,11 @@
         </div>
 
         <hr>
-
+        <div id="edit_mode_alert_dgn"
+            class="alert alert-warning text-center fw-bold"
+            style="display: none; font-size: 16px;">
+            ⚠ MODE EDIT KWITANSI !
+        </div>
         <!-- BAYAR SECTION -->
         <div class="card p-3 mt-3" style="background-color:#e6e6e6;">
             <div class="row">
@@ -251,6 +255,7 @@ $(document).ready(function() {
                     $('#customer_kwt_dgn').val(d.customer);
 
                     // ===== BAYAR SECTION =====
+                    $('#kwt_exp_flag_dgn').val(0);
                     $('#bayar_kwt_dgn').val(0);
                     $('#top_kwt_dgn').val(0);
                     $('#piutang_kwt_dgn').val(formatRupiah(d.piutang));
@@ -332,6 +337,70 @@ $(document).ready(function() {
 
     });
 // ============================ End Of Submit Kwitansi Dingin ===============================
+// =============================== Form Detail Edit Kwitansi Dingin ===================================
+    $(document).on('click', '.btn-edit-kwt-dgn', function() {
+
+        let invoiceNo = $(this).data('invoice');
+
+        // bisa ajax ambil detail invoice juga kalau mau
+        $('#loading_modal').modal('show');
+        $('#loading_modal').one('shown.bs.modal', function () {
+            $.ajax({
+                url: "{{ route('rentPendinginKwitansi.show', ':kode') }}".replace(':kode', invoiceNo),
+                type: "GET",
+                success: function(response) {
+
+                    if (!response.status) {
+                        alert(response.message);
+                        return;
+                    }
+                    $('#loading_modal').modal('hide');
+                    $('#table_kwt_dgn').addClass('d-none');
+                    $('#form_kwt_dgn').removeClass('d-none');
+                    // Clear Form Dulu
+                    clearAllKwtDgn();
+
+                    let d = response.data;
+                    // ===== LEFT SIDE =====
+                    $('#sub_total_kwt_dgn').val(formatRupiah(d.sub_total));
+                    $('#d_charge_kwt_dgn').val(formatRupiah(d.d_charge));
+                    $('#total_kwt_dgn').val(formatRupiah(d.total));
+
+                    $('#disc_persen_kwt_dgn').val(d.disc_persen);
+                    $('#disc_rp_kwt_dgn').val(formatRupiah(d.disc_rp));
+
+                    $('#dpp_kwt_dgn').val(formatRupiah(d.total - d.disc_rp));
+                    $('#ppn_persen_kwt_dgn').val(formatRupiah(d.ppn));
+                    $('#grand_kwt_dgn').val(formatRupiah(d.grand));
+
+                    $('#tgl_invoice_kwt_dgn').val(
+                        d.tgl_invoice.substring(0,10)
+                    );
+
+                    // ===== RIGHT SIDE =====
+                    $('#no_faktur_kwt_dgn').val(d.invoice);
+                    $('#nomor_muat_kwt_dgn').val(d.nomor_muat);
+                    $('#nomor_sj_kwt_dgn').val(d.nomor_sj);
+                    $('#kendaraan_kwt_dgn').val(d.kendaraan);
+                    $('#customer_kwt_dgn').val(d.customer);
+
+                    // ===== BAYAR SECTION =====
+                    $('#edit_mode_alert_dgn').fadeIn();
+                    $('#kwt_exp_flag_dgn').val(1);
+                    $('#bayar_kwt_dgn').val(formatRupiah(d.bayar));
+                    $('#top_kwt_dgn').val(formatRupiah(d.saldo));
+                    $('#tgl_jtp_kwt_dgn').val(d.tgl_jt);
+                    $('#piutang_kwt_dgn').val(formatRupiah(d.piutang));
+                },
+                error: function(xhr) {
+                    $('#loading_modal').modal('hide');
+                    alert('Terjadi kesalahan server');
+                }
+            });
+        });
+    });
+
+// ============================ End Of Form Detail Edit Kwitansi Dingin ===============================
 });
 // ########################################################################
 // FUNCTION HELPER:
@@ -345,6 +414,7 @@ function formatRupiah(angka) {
 }
 // Clear Form
 function clearAllKwtDgn() {
+    $('#edit_mode_alert_dgn').fadeOut();
     // ===== LEFT SIDE =====
     $('#sub_total_kwt_dgn').val('');
     $('#d_charge_kwt_dgn').val('');
@@ -364,6 +434,7 @@ function clearAllKwtDgn() {
     $('#customer_kwt_dgn').val('');
 
     // ===== BAYAR SECTION =====
+    $('#kwt_exp_flag_dgn').val('');
     $('#bayar_kwt_dgn').val('');
     $('#top_kwt_dgn').val('');
     $('#piutang_kwt_dgn').val('');

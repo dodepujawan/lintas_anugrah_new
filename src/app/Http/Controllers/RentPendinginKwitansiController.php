@@ -112,6 +112,30 @@ class RentPendinginKwitansiController extends Controller
             ->orderBy('NOSJ')
             ->get();
 
+        // =============================
+        // Tambahan untuk mode edit ambil nilai arh
+        // =============================
+
+        $arh = Arh::where('NOFAKTUR', $invoice)->first();
+
+        // =============================
+        // HITUNG TGL JATUH TEMPO
+        // =============================
+
+        // ambil kode customer dari expedisi
+        $kodeCustomer = $master->CUSTOMER_KODE ?? null;
+
+        $topKredit = 0;
+
+        if ($kodeCustomer) {
+            $customer = Mcustomer::where('kode_cus', $kodeCustomer)->first();
+            $topKredit = $customer->TOPKREDIT ?? 0;
+        }
+
+        // hitung jatuh tempo dari TGLINVOICE
+        $tglInvoice = Carbon::parse($master->TGLINVOICE);
+        $tglJatuhTempo = $tglInvoice->copy()->addDays((int)$topKredit);
+
         return response()->json([
             'status' => true,
             'data' => [
@@ -132,49 +156,91 @@ class RentPendinginKwitansiController extends Controller
                 // dikarenakan tipe data double jadi yang tersimpan malah isi koma
                 'piutang' => (int) ceil($master->PIUTANG),
 
-                'nomor_sj'     => $details->pluck('NOSJ')->implode(', ')
+                'nomor_sj'     => $details->pluck('NOSJ')->implode(', '),
+                // ========= DATA ARH =========
+                'tgl_jt'       => $arh->TGLJT ?? $tglJatuhTempo->format('Y-m-d'),
+                'piutang_arh'  => $arh->PIUTANG ?? null,
+                'bayar'        => $arh->BAYAR ?? null,
+                'saldo'        => $arh->SALDO ?? null,
             ]
         ]);
     }
 
     public function prosesKwitansiStore(Request $request){
         try {
-            // untuk mengambil nilai dalam transaction dibawah supaya bisa kirim ke json respon karna json respon diluar transaction
+
             $invoice = null;
+
             DB::transaction(function () use ($request, &$invoice) {
 
-                $invoice = $request->invoice;
-                $bayar   = str_replace('.', '', $request->bayar);
-                $top     = $request->top;
-                $tglJtp  = $request->tgl_jtp;
+                $invoice  = $request->invoice;
+                $bayar = (int) preg_replace('/[^0-9]/', '', $request->bayar);
+                $top   = (int) preg_replace('/[^0-9]/', '', $request->top);
+                $tglJtp   = $request->tgl_jtp;
+                $flag     = $request->kwt_flag;
 
-                // 🔹 Generate Nomor KW
-                $noKw = $this->generateKW();
+                // ambil GRAND dari expedisi
+                $expedisi = Expedisi::where('INVOICE', $invoice)->first();
 
-                // =======================
-                // UPDATE ARH
-                // =======================
-                Arh::where('NOFAKTUR', $invoice)
-                    ->update([
-                        'BAYAR' => $bayar,
-                        'SALDO' => $top
-                    ]);
+                if (!$expedisi) {
+                    throw new \Exception('Invoice tidak ditemukan');
+                }
+                $grand = $expedisi->GRAND;
 
-                // =======================
-                // UPDATE EXPEDISI
-                // =======================
-                Expedisi::where('INVOICE', $invoice)
-                    ->update([
-                        'kwt'    => $noKw,
-                        'TGLKW' => $tglJtp
-                    ]);
+                // 🔹 hitung PIUTANG baru
+                $piutangBaru = $grand - $bayar;
 
+                // ===============================
+                // MODE STORE (BARU)
+                // ===============================
+                if ($flag == 0) {
+
+                    $noKw = $this->generateKW();
+
+                    // Update ARH
+                    Arh::where('NOFAKTUR', $invoice)
+                        ->update([
+                            'BAYAR'  => $bayar,
+                            'SALDO'  => $top,
+                            'PIUTANG' => $piutangBaru,
+                            'TGLJT'  => $tglJtp,
+                            'USER_UPDATE' => auth()->user()->user_id,
+                        ]);
+
+                    // Update EXPEDISI
+                    Expedisi::where('INVOICE', $invoice)
+                        ->update([
+                            'kwt'   => $noKw,
+                            'TGLKW' => now(),
+                            'TGLJT' => $tglJtp
+                        ]);
+                }
+
+                // ===============================
+                // MODE EDIT
+                // ===============================
+                if ($flag == 1) {
+
+                    Arh::where('NOFAKTUR', $invoice)
+                        ->update([
+                            'BAYAR'       => $bayar,
+                            'SALDO'       => $top,
+                            'PIUTANG' => $piutangBaru,
+                            'USER_UPDATE' => auth()->user()->user_id,
+                            'updated_at'  => now()
+                        ]);
+
+                    // Expedisi tidak perlu ubah TGLJT
+                    // kwt juga tidak perlu diganti
+                }
             });
 
             return response()->json([
                 'status' => true,
                 'message' => 'Kwitansi berhasil diproses',
-                'redirect' => route('expedisiKwitansi.pdfKwitansi', ['invoiceNo' => $invoice])
+                'redirect' => route('expedisiKwitansi.pdfKwitansi', [
+                    'invoiceNo' => $invoice
+                ])
             ]);
 
         } catch (\Throwable $e) {
