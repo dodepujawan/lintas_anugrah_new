@@ -337,7 +337,41 @@ $(document).ready(function() {
 
     });
 // ============================ End Of Submit Kwitansi Dingin ===============================
-// =============================== Form Detail Edit Kwitansi Dingin ===================================
+// ============================== Delete Kwitansi ================================
+    $(document).on('click', '.btn-hapus-kwt-dgn', function() {
+        var invoice = $(this).data('invoice');
+
+        Swal.fire({
+            title: 'Apakah Anda yakin?',
+            text: "Kwitansi Akan Dihapus!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Ya, hapus!',
+            cancelButtonText: 'Batal'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $('#loading_modal').modal('show');
+                $('#loading_modal').one('shown.bs.modal', function () {
+                    $.ajax({
+                        url: "{{ route('rentPendinginKwitansi.destroy') }}",
+                        type: 'POST',
+                        data: {
+                            invoice: invoice
+                        },
+                        success: function(response) {
+                            $('#loading_modal').modal('hide');
+                            Swal.fire('Terhapus!', response.success, 'success');
+                            $('#DgnKwtTable').DataTable().ajax.reload();
+                        }
+                    });
+                });
+            }
+        });
+    });
+// ============================== End Of Delete Kwitansi ================================
+// ============================= Form Detail Edit Kwitansi Dingin ===============================
     $(document).on('click', '.btn-edit-kwt-dgn', function() {
 
         let invoiceNo = $(this).data('invoice');
@@ -400,7 +434,7 @@ $(document).ready(function() {
         });
     });
 
-// ============================ End Of Form Detail Edit Kwitansi Dingin ===============================
+// ========================= End Of Form Detail Edit Kwitansi Dingin ==============================
 });
 // ########################################################################
 // FUNCTION HELPER:

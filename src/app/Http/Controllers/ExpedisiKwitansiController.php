@@ -311,9 +311,12 @@ class ExpedisiKwitansiController extends Controller
             ->orderBy('NOSJ')
             ->get();
 
+        $arh = Arh::where('NOFAKTUR', $invoice)
+            ->first();
+
         $signature = Signature::orderByDesc('id')->first();
 
-        $html = view('expedisiKwitansi.expedisi-kwitansi-pdf', compact('master','details','signature'))->render();
+        $html = view('expedisiKwitansi.expedisi-kwitansi-pdf', compact('master','details','arh','signature'))->render();
 
         $mpdf = new Mpdf([
             'mode' => 'utf-8',

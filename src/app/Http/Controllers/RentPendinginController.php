@@ -24,6 +24,7 @@ class RentPendinginController extends Controller
             ->select(DB::raw('MIN(id) as id'))
             ->where('JENIS', 'REN')
             ->whereNotNull('NOMUAT')
+            ->whereNull('kwt')
             ->groupBy('NOMUAT');
 
         $expedisi = Expedisi::select([

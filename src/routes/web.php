@@ -230,7 +230,7 @@ Route::prefix('rent-pendingin-kwitansi')->group(function() {
     Route::get('/show/{invoice}', [RentPendinginKwitansiController::class, 'showInvoiceDetail'])->name('rentPendinginKwitansi.show');
     // Route::post('/update/{nosj}', [ExpedisiController::class, 'updateSurjal'])->name('expedisi.update');
     // Route::post('/update/muat/{nomuat}', [ExpedisiController::class, 'updateMuat'])->name('expedisi-muat.update');
-    // Route::post('/destroy/{id}', [ExpedisiController::class, 'destroySurjal'])->name('expedisi.destroy');
+    Route::post('/destroy', [RentPendinginKwitansiController::class, 'prosesKwitansiDelete'])->name('rentPendinginKwitansi.destroy');
     // Route::post('/destroy/muat/{nomuat}', [ExpedisiController::class, 'destroyMuat'])->name('expedisi-muat.destroy');
     // Route::post('/store/muat', [ExpedisiController::class, 'storeMuat'])->name('expedisi-muat.store');
     // // PDF
