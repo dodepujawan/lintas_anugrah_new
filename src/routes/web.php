@@ -17,6 +17,7 @@ use App\Http\Controllers\ExpedisiKwitansiController;
 use App\Http\Controllers\RentPendinginController;
 use App\Http\Controllers\RentPendinginInvoiceController;
 use App\Http\Controllers\RentPendinginKwitansiController;
+use App\Http\Controllers\MsupplierController;
 use App\Http\Controllers\PajakController;
 use App\Http\Controllers\RekeningController;
 use App\Http\Controllers\SignatureController;
@@ -235,6 +236,13 @@ Route::prefix('rent-pendingin-kwitansi')->group(function() {
     // Route::post('/store/muat', [ExpedisiController::class, 'storeMuat'])->name('expedisi-muat.store');
     // // PDF
     // Route::get('/kwitansi/invoice/pdf/{invoiceNo}', [ExpedisiKwitansiController::class, 'pdfInvoiceKwitansi'])->name('expedisiKwitansi.pdfKwitansi');
+});
+
+Route::prefix('supplier')->middleware('auth')->group(function () {
+    Route::get('/', [MsupplierController::class, 'index_supplier'])->name('msupplier.index');
+    // Route::get('/data', [RekeningController::class, 'data'])->name('rekening.data');
+    Route::post('/store', [MsupplierController::class, 'store'])->name('msupplier.store');
+    // Route::post('/pilih/{id}', [RekeningController::class, 'pilih'])->name('rekening.pilih');
 });
 
 Route::prefix('pajak')->middleware('auth')->group(function () {

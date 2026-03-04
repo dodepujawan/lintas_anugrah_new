@@ -182,7 +182,34 @@
                 </li> --}}
                 </ul>
             </li>
-
+            <li class="menu-item">
+                <a class="menu-link" data-bs-toggle="collapse" href="#supplierMenu" role="button" aria-expanded="false">
+                <i class="menu-icon bx bx-package"></i>
+                <span class="menu-text">Supplier</span>
+                <i class="menu-arrow bx bx-chevron-right"></i>
+                </a>
+                <ul class="sub-menu collapse" id="supplierMenu">
+                <li class="menu-item">
+                    <a href="#" class="menu-link" id="sidebar_new_supplier">
+                    <span class="menu-text">Supplier</span>
+                    </a>
+                </li>
+                </ul>
+            </li>
+            <li class="menu-item">
+                <a class="menu-link" data-bs-toggle="collapse" href="#serviceMenu" role="button" aria-expanded="false">
+                <i class="menu-icon bx bx-wrench"></i>
+                <span class="menu-text">Service</span>
+                <i class="menu-arrow bx bx-chevron-right"></i>
+                </a>
+                <ul class="sub-menu collapse" id="serviceMenu">
+                <li class="menu-item">
+                    <a href="#" class="menu-link" id="sidebar_new_service">
+                    <span class="menu-text">Service</span>
+                    </a>
+                </li>
+                </ul>
+            </li>
             <li class="menu-item">
                 <a class="menu-link" data-bs-toggle="collapse" href="#extraMenu" role="button" aria-expanded="false">
                 <i class="menu-icon bx-slider-alt"></i>
