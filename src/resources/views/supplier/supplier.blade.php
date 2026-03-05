@@ -2,8 +2,34 @@
     <div class="card-header bg-primary text-white">
         <h5 class="mb-0">Form Supplier / Leasing</h5>
     </div>
-
-    <div class="card-body">
+    <div class="card-body" id="table_supplier_master">
+        <div class="mt-3">
+            <button class="btn btn-primary" id="add_supplier">
+                + Tambah Supplier
+            </button>
+        </div>
+        <div class="table-responsive">
+            <table id="table_supplier" class="table table-bordered table-striped">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Kode</th>
+                        <th>Kategori</th>
+                        <th>Nama</th>
+                        <th>Kota</th>
+                        <th>Telepon</th>
+                        <th>Email</th>
+                        <th width="120">Action</th>
+                    </tr>
+                </thead>
+            </table>
+        </div>
+    </div>
+    <div class="card-body d-none" id="form_supplier_master">
+        <div class="mb-3">
+            <button class="btn btn-success" id="btn_table_supplier">
+                Tampilkan Table
+            </button>
+        </div>
         <form id="form_supplier">
 
             {{-- ========================= --}}
@@ -14,6 +40,7 @@
             </h6>
 
             <div class="row mb-3">
+                <input type="hidden" id="supplier_id" name="supplier_id">
                 <div class="col-md-3">
                     <label class="form-label">Kategori</label>
                     <select name="kategori_supplier" id="kategori_supplier"
@@ -139,13 +166,11 @@
             <input type="hidden" name="disc_reg_supplier" value="0">
 
             <div class="text-end">
-                <button type="reset" class="btn btn-secondary me-2">
+                {{-- <button type="reset" class="btn btn-secondary me-2">
                     Reset
-                </button>
+                </button> --}}
 
-                <button type="submit" class="btn btn-success px-4">
-                    <i class="bi bi-save"></i> Simpan
-                </button>
+                <button type="submit" id="btn_simpan_supplier"></button>
             </div>
 
         </form>
@@ -159,15 +184,54 @@ $(document).ready(function() {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
         }
     });
+// ================================= Table Supplier =====================================
+    if ($.fn.DataTable.isDataTable('#table_supplier')) {
+        $('#table_supplier').DataTable().destroy();
+    }
+    let tableSupplier = $('#table_supplier').DataTable({
+        processing: true,
+        serverSide: true,
+        ajax: "{{ route('msupplier.data') }}",
+
+        columns: [
+            {data: 'SUPPLIER'},
+            {data: 'kategori_label', orderable:false, searchable:false},
+            {data: 'NAMA'},
+            {data: 'KOTA'},
+            {data: 'TELEPON'},
+            {data: 'EMAIL'},
+            {data: 'action', orderable:false, searchable:false}
+        ]
+    });
+// ============================== End Of Table Supplier ==================================
+// ================================= Add Supplier ====================================
+    $('#add_supplier').on('click', function(e){
+        $('#table_supplier_master').addClass('d-none');
+        $('#form_supplier_master').removeClass('d-none');
+        $('#form_supplier')[0].reset();
+        $('#btn_simpan_supplier')
+        .removeClass('btn btn-success')
+        .addClass('btn btn-primary')
+        .html('<i class="bx bx-save"></i> Simpan');
+    });
+// ============================== End Of Add Supplier ==================================
+// ================================= Add Supplier ====================================
+    $('#btn_table_supplier').on('click', function(e){
+        $('#form_supplier_master').addClass('d-none');
+        $('#table_supplier_master').removeClass('d-none');
+        $('#table_supplier').DataTable().ajax.reload();
+    });
+// ============================== End Of Add Supplier =================================
 // ================================= Store Supplier =====================================
     $('#form_supplier').on('submit', function(e){
         e.preventDefault();
+        let formData = $(this).serialize();
         $('#loading_modal').modal('show');
         $('#loading_modal').one('shown.bs.modal', function () {
             $.ajax({
                 url: "{{ route('msupplier.store') }}",
                 method: "POST",
-                data: $(this).serialize(),
+                data: formData,
                 success: function(res){
 
                     if(res.status){
@@ -184,6 +248,10 @@ $(document).ready(function() {
 
                         $('#form_supplier')[0].reset();
 
+                        // Kembali Ke Table
+                        $('#form_supplier_master').addClass('d-none');
+                        $('#table_supplier_master').removeClass('d-none');
+                        $('#table_supplier').DataTable().ajax.reload();
                     } else {
                         $('#loading_modal').modal('hide');
                         alert(res.message);
@@ -199,5 +267,118 @@ $(document).ready(function() {
 
     });
 // ============================== End Of Store Supplier ==================================
+// ================================== Show Supplier =====================================
+    $(document).on('click', '.btn-edit-supplier', function(){
+        let id = $(this).data('id');
+
+        $('#loading_modal').modal('show');
+        $('#loading_modal').one('shown.bs.modal', function () {
+            $.ajax({
+                url: "{{ route('msupplier.show', ':id') }}".replace(':id', id),
+                type: 'GET',
+                success: function(res){
+                    $('#loading_modal').modal('hide');
+                    if(res.status){
+                        let data = res.data;
+
+                        // tampilkan form
+                        $('#table_supplier_master').addClass('d-none');
+                        $('#form_supplier_master').removeClass('d-none');
+
+                        // isi form
+                        $('#kode_supplier').val(data.SUPPLIER);
+                        $('#kategori_supplier').val(data.KATEGORI);
+
+                        $('#nama_supplier').val(data.NAMA);
+                        $('#alamat1_supplier').val(data.ALAMAT1);
+                        $('#alamat2_supplier').val(data.ALAMAT2);
+                        $('#kota_supplier').val(data.KOTA);
+
+                        $('#telepon_supplier').val(data.TELEPON);
+                        $('#fax_supplier').val(data.FAX);
+                        $('#email_supplier').val(data.EMAIL);
+
+                        $('#kontak_supplier').val(data.KONTAK);
+
+                        $('#bank_supplier').val(data.BANK);
+                        $('#norek_supplier').val(data.NOREK);
+                        $('#atasnama_supplier').val(data.ATASNAMA);
+
+                        // simpan id untuk update
+                        $('#supplier_id').val(data.id);
+                        // ubah tombol
+                        $('#btn_simpan_supplier')
+                        .removeClass('btn btn-primary')
+                        .addClass('btn btn-success')
+                        .html('<i class="bx bx-edit"></i> Update');
+                    }else{
+                        alert(res.message);
+                    }
+                },
+                error:function(){
+                    $('#loading_modal').modal('hide');
+                    alert('Gagal mengambil data');
+                }
+            });
+        });
+    });
+// ============================== End Of Store Supplier ==================================
+// ================================== Edit Supplier =====================================
+    $(document).on('click', '.btn-delete-supplier', function(){
+        let id = $(this).data('id');
+
+        Swal.fire({
+            title: 'Hapus Supplier?',
+            text: "Data yang dihapus tidak bisa dikembalikan!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Ya, Hapus!',
+            cancelButtonText: 'Batal'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $('#loading_modal').modal('show');
+                $('#loading_modal').one('shown.bs.modal', function () {
+                    $.ajax({
+                        url: "{{ route('msupplier.destroy', ':id') }}".replace(':id', id),
+                        type: 'DELETE',
+                        data: {
+                            _token: "{{ csrf_token() }}"
+                        },
+                        success: function(res){
+                            $('#loading_modal').modal('hide');
+                            if(res.status){
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Berhasil',
+                                    text: res.message,
+                                    timer: 1500,
+                                    showConfirmButton: false
+                                });
+                                $('#table_supplier').DataTable().ajax.reload(null,false);
+                            }else{
+                                $('#loading_modal').modal('hide');
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Gagal',
+                                    text: res.message
+                                });
+                            }
+                        },
+                        error:function(){
+                            $('#loading_modal').modal('hide');
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: 'Terjadi kesalahan server'
+                            });
+                        }
+                    });
+                });
+            }
+        });
+    });
+// ============================== End Of Edit Supplier ==================================
 });
 </script>

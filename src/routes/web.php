@@ -240,9 +240,10 @@ Route::prefix('rent-pendingin-kwitansi')->group(function() {
 
 Route::prefix('supplier')->middleware('auth')->group(function () {
     Route::get('/', [MsupplierController::class, 'index_supplier'])->name('msupplier.index');
-    // Route::get('/data', [RekeningController::class, 'data'])->name('rekening.data');
+    Route::get('/data', [MsupplierController::class, 'data'])->name('msupplier.data');
     Route::post('/store', [MsupplierController::class, 'store'])->name('msupplier.store');
-    // Route::post('/pilih/{id}', [RekeningController::class, 'pilih'])->name('rekening.pilih');
+    Route::get('/show/{id}', [MsupplierController::class, 'show'])->name('msupplier.show');
+    Route::delete('/delete/{id}', [MsupplierController::class, 'destroy'])->name('msupplier.destroy');
 });
 
 Route::prefix('pajak')->middleware('auth')->group(function () {
