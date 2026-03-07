@@ -215,13 +215,13 @@ $(document).ready(function() {
         .html('<i class="bx bx-save"></i> Simpan');
     });
 // ============================== End Of Add Supplier ==================================
-// ================================= Add Supplier ====================================
+// ================================= Return Table Supplier ====================================
     $('#btn_table_supplier').on('click', function(e){
         $('#form_supplier_master').addClass('d-none');
         $('#table_supplier_master').removeClass('d-none');
         $('#table_supplier').DataTable().ajax.reload();
     });
-// ============================== End Of Add Supplier =================================
+// ============================== End Of Return Table Supplier =================================
 // ================================= Store Supplier =====================================
     $('#form_supplier').on('submit', function(e){
         e.preventDefault();

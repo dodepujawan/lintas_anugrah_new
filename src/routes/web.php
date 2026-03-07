@@ -249,8 +249,8 @@ Route::prefix('supplier')->middleware('auth')->group(function () {
 
 Route::prefix('service')->middleware('auth')->group(function () {
     Route::get('/', [ServiceController::class, 'index'])->name('service.index');
-    // Route::get('/data', [MsupplierController::class, 'data'])->name('msupplier.data');
-    // Route::post('/store', [MsupplierController::class, 'store'])->name('msupplier.store');
+    Route::get('/data', [ServiceController::class, 'data'])->name('service.data');
+    Route::post('/store', [ServiceController::class, 'store'])->name('service.store');
     // Route::get('/show/{id}', [MsupplierController::class, 'show'])->name('msupplier.show');
     // Route::delete('/delete/{id}', [MsupplierController::class, 'destroy'])->name('msupplier.destroy');
 });

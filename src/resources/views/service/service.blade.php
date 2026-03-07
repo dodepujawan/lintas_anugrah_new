@@ -13,7 +13,33 @@
     <div class="card-header bg-success text-white fw-bold">
         SERVICE MOBIL
     </div>
-    <div class="card-body">
+
+    <div class="card-body" id="tableServiceMaster">
+        <div class="mt-3">
+            <button class="btn btn-primary" id="add_service">
+                + Tambah
+            </button>
+        </div>
+        <table class="table table-bordered" id="tableService">
+            <thead>
+                <tr>
+                    <th>No Bukti</th>
+                    <th>Supplier</th>
+                    <th>Kendaraan</th>
+                    <th>Nilai Service</th>
+                    <th>Tanggal</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+        </table>
+    </div>
+
+    <div class="card-body d-none" id="formServiceMaster">
+        <div class="mt-3">
+            <button class="btn btn-success" id="return_table_service">
+            << Kembali
+            </button>
+        </div>
         <form id="formService">
             @csrf
 
@@ -122,7 +148,7 @@
             <hr>
 
             <div class="d-flex gap-3">
-                <button type="submit" class="btn btn-success">💾 SIMPAN</button>
+                <button type="submit" class="btn btn-success" id="button_service_submit">💾 SIMPAN</button>
                 <button class="btn btn-secondary">🆕 BARU</button>
                 <button class="btn btn-danger">❌ HAPUS</button>
             </div>
@@ -142,12 +168,54 @@ $(document).ready(function(){
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
         }
     });
+// ================================= Table Service =====================================
+    if ($.fn.DataTable.isDataTable('#tableService')) {
+        $('#tableService').DataTable().destroy();
+    }
+    $('#tableService').DataTable({
+
+        processing: true,
+        serverSide: true,
+
+        ajax: "{{ route('service.data') }}",
+
+        columns: [
+
+            { data:'NO_SERVICE', name:'NO_SERVICE' },
+            { data:'KODE_SUPPLIER', name:'KODE_SUPPLIER' },
+            { data:'KODE_MOBIL', name:'KODE_MOBIL' },
+            { data:'NILAI_SERVIS', name:'NILAI_SERVIS' },
+            { data:'TGL_SERVIS', name:'TGL_SERVIS' },
+            { data:'action', name:'action', orderable:false, searchable:false }
+
+        ]
+
+    });
+// ============================== End Of Table Service ==================================
+// ================================= Add Supplier ====================================
+    $('#add_service').on('click', function(e){
+        $('#tableServiceMaster').addClass('d-none');
+        $('#formServiceMaster').removeClass('d-none');
+        $('#formService')[0].reset();
+        $('#button_service_submit')
+        .removeClass('btn btn-success')
+        .addClass('btn btn-primary')
+        .html('<i class="bx bx-save"></i> SIMPAN');
+    });
+// ============================== End Of Add Supplier ==================================
+// ================================= Return Table Supplier ====================================
+    $('#return_table_service').on('click', function(e){
+        $('#formServiceMaster').addClass('d-none');
+        $('#tableServiceMaster').removeClass('d-none');
+        $('#tableService').DataTable().ajax.reload();
+    });
+// ============================== End Of Return Table Supplier =================================
 // ================================= Submit Service =====================================
     $('#formService').submit(function(e){
         e.preventDefault();
 
         $.ajax({
-            url: "{{ route('servis.store') }}",
+            url: "{{ route('service.store') }}",
             type: "POST",
             data: $(this).serialize(),
             success: function(response){

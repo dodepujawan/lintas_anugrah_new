@@ -13,6 +13,29 @@ class ServiceController extends Controller
         return view('service.service');
     }
 
+    public function data(){
+        $data = DB::table('service')
+            ->orderBy('id','desc'); // terbaru dulu
+
+        return DataTables::of($data)
+
+            ->addIndexColumn()
+
+            ->addColumn('action', function($row){
+
+                $edit = '<button class="btn btn-sm btn-warning edit" data-id="'.$row->id.'">Edit</button>';
+
+                $delete = '<button class="btn btn-sm btn-danger delete" data-id="'.$row->id.'">Delete</button>';
+
+                return $edit.' '.$delete;
+
+            })
+
+            ->rawColumns(['action'])
+
+            ->make(true);
+    }
+
     public function store(Request $request){
         try {
 
