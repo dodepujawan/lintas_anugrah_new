@@ -413,6 +413,25 @@ $(document).ready(function() {
         });
     }
 // ============================ End Of Form Supplier ====================================
+// ================================ Form Service ======================================
+    $(document).on('click', '#sidebar_new_service', function(e) {
+        e.preventDefault();
+        loadServiceForm();
+    });
+
+    function loadServiceForm() {
+        $.ajax({
+            url: '{{ route('service.index') }}', // Route to load the form
+            type: 'GET',
+            success: function(response) {
+                $('.master-page').html(response);
+            },
+            error: function() {
+                $('.master-page').html('<p>Error loading form.</p>');
+            }
+        });
+    }
+// ============================ End Of Form Service ====================================
 // ========================= Update Pajak ======================================
     $(document).on('click', '#sidebar_extra_pajak', function(e) {
         e.preventDefault();

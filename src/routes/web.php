@@ -18,6 +18,7 @@ use App\Http\Controllers\RentPendinginController;
 use App\Http\Controllers\RentPendinginInvoiceController;
 use App\Http\Controllers\RentPendinginKwitansiController;
 use App\Http\Controllers\MsupplierController;
+use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\PajakController;
 use App\Http\Controllers\RekeningController;
 use App\Http\Controllers\SignatureController;
@@ -244,6 +245,14 @@ Route::prefix('supplier')->middleware('auth')->group(function () {
     Route::post('/store', [MsupplierController::class, 'store'])->name('msupplier.store');
     Route::get('/show/{id}', [MsupplierController::class, 'show'])->name('msupplier.show');
     Route::delete('/delete/{id}', [MsupplierController::class, 'destroy'])->name('msupplier.destroy');
+});
+
+Route::prefix('service')->middleware('auth')->group(function () {
+    Route::get('/', [ServiceController::class, 'index'])->name('service.index');
+    // Route::get('/data', [MsupplierController::class, 'data'])->name('msupplier.data');
+    // Route::post('/store', [MsupplierController::class, 'store'])->name('msupplier.store');
+    // Route::get('/show/{id}', [MsupplierController::class, 'show'])->name('msupplier.show');
+    // Route::delete('/delete/{id}', [MsupplierController::class, 'destroy'])->name('msupplier.destroy');
 });
 
 Route::prefix('pajak')->middleware('auth')->group(function () {
