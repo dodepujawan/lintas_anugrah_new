@@ -20,18 +20,20 @@
                 + Tambah
             </button>
         </div>
-        <table class="table table-bordered" id="tableService">
-            <thead>
-                <tr>
-                    <th>No Bukti</th>
-                    <th>Supplier</th>
-                    <th>Kendaraan</th>
-                    <th>Nilai Service</th>
-                    <th>Tanggal</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-        </table>
+        <div class="table-responsive">
+            <table class="table table-bordered" id="tableService">
+                <thead>
+                    <tr>
+                        <th>No Bukti</th>
+                        <th>Supplier</th>
+                        <th>Kendaraan</th>
+                        <th>Nilai Service</th>
+                        <th>Tanggal</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+            </table>
+        </div>
     </div>
 
     <div class="card-body d-none" id="formServiceMaster">
@@ -44,7 +46,7 @@
             @csrf
 
             <div class="row">
-                <input type="text" name="id_service" id="id_service">
+                <input type="hidden" name="id_service" id="id_service">
                 <!-- KIRI -->
                 <div class="col-md-7 mt-3">
 
@@ -120,28 +122,28 @@
                     <div class="row mb-2">
                         <label class="col-sm-4 col-form-label">NOMOR FAKTUR</label>
                         <div class="col-sm-7">
-                            <input type="text" class="form-control" name="no_faktur_service">
+                            <input type="text" class="form-control" name="no_faktur_service" id="no_faktur_service">
                         </div>
                     </div>
 
                     <div class="row mb-2">
                         <label class="col-sm-4 col-form-label">TGL.DOCUMENT</label>
                         <div class="col-sm-7">
-                            <input type="date" class="form-control" name="tgl_document_service">
+                            <input type="date" class="form-control" name="tgl_document_service" id="tgl_document_service">
                         </div>
                     </div>
 
                     <div class="row mb-2">
                         <label class="col-sm-4 col-form-label">TGL.JTH.TEMPO</label>
                         <div class="col-sm-7">
-                            <input type="date" class="form-control" name="tgl_jatuh_tempo_service">
+                            <input type="date" class="form-control" name="tgl_jatuh_tempo_service" id="tgl_jatuh_tempo_service">
                         </div>
                     </div>
 
                     <div class="row mb-2">
                         <label class="col-sm-4 col-form-label">NO.JURNAL</label>
                         <div class="col-sm-7">
-                            <input type="text" class="form-control" name="no_jurnal_service">
+                            <input type="text" class="form-control" name="no_jurnal_service" id="no_jurnal_service">
                         </div>
                     </div>
 
@@ -153,8 +155,8 @@
 
             <div class="d-flex gap-3">
                 <button type="submit" class="btn btn-success" id="button_service_submit">💾 SIMPAN</button>
-                <button class="btn btn-secondary">🆕 BARU</button>
-                <button class="btn btn-danger">❌ HAPUS</button>
+                {{-- <button class="btn btn-secondary">🆕 BARU</button>
+                <button class="btn btn-danger">❌ HAPUS</button> --}}
             </div>
 
         </form>
@@ -207,6 +209,10 @@ $(document).ready(function(){
         .removeClass('btn btn-success')
         .addClass('btn btn-primary')
         .html('<i class="bx bx-save"></i> SIMPAN');
+
+        let today = new Date().toISOString().split('T')[0];
+        $('#tgl_document_service').val(today);
+        $('#tgl_jatuh_tempo_service').val(today);
     });
 // ============================== End Of Add Supplier ==================================
 // ============================== Return Table Supplier ==================================
@@ -386,8 +392,9 @@ $(document).ready(function(){
                     $('#keterangan_service').val(data.keterangan);
 
                     $('#no_faktur_service').val(data.no_faktur);
+                    console.log('wcw' + data.no_faktur);
                     $('#tgl_document_service').val(data.tgl_document);
-
+                    console.log('wcw2' + data.tgl_document);
                     $('#tgl_jatuh_tempo_service').val(data.tgl_jatuh_tempo);
                     $('#no_jurnal_service').val(data.no_jurnal);
 
@@ -401,6 +408,51 @@ $(document).ready(function(){
         });
     });
 // ============================== End Of Show Detail Service =============================
+// ================================== Delete Service ================================
+    $(document).on('click','.delete-service',function(){
+        let id = $(this).data('id');
+        Swal.fire({
+            title: 'Hapus Data?',
+            text: "Data service akan dihapus!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Ya, Hapus!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $('#loading_modal').modal('show');
+                $('#loading_modal').one('shown.bs.modal', function () {
+                    $.ajax({
+                        url:"{{ route('service.delete', ':id') }}".replace(':id', id),
+                        type: "DELETE",
+                        data: {
+                            _token: "{{ csrf_token() }}"
+                        },
+                        success: function(response){
+                            $('#loading_modal').modal('hide');
+                            if(response.status){
+                                Swal.fire(
+                                    'Berhasil!',
+                                    response.message,
+                                    'success'
+                                );
+                                // reload datatable kalau ada
+                                $('#tableService').DataTable().ajax.reload();
+                            }else{
+                                Swal.fire(
+                                    'Error!',
+                                    response.message,
+                                    'error'
+                                );
+                            }
+                        }
+                    });
+                });
+            }
+        });
+    });
+// ============================== End Of Delete Service ==============================
 });
 </script>
 

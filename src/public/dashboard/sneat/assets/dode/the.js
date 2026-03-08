@@ -43,6 +43,7 @@ $(document).ready(function() {
 
 
 
+
 // MODE VANILLA JS
 // // Auto close sub-menus when closing sidebar
 // document.getElementById('sneatSidebar').addEventListener('hidden.bs.offcanvas', function () {

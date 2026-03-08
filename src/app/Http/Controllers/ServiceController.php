@@ -53,7 +53,9 @@ class ServiceController extends Controller
                 'FNO_PRK_B' => $request->fno_prk_b_service,
                 'KETERANGAN' => $request->keterangan_service,
                 'NILAI_SERVIS' => $request->nilai_servis,
-                'USER_INPUT' => auth()->user()->id ?? 'admin',
+                'USER_INPUT' => auth()->user()->user_id ?? 'admin',
+                'TGL_TEMPO' => $request->tgl_jatuh_tempo_service,
+                'NO_JURNAL' => $request->no_jurnal_service,
             ];
 
             if ($id) {
@@ -61,6 +63,7 @@ class ServiceController extends Controller
                 DB::table('service')
                     ->where('id', $id)
                     ->update(array_merge($data, [
+                        'USER_EDIT' => auth()->user()->user_id ?? 'admin',
                         'updated_at' => now()
                     ]));
                 $message = 'Data service berhasil diupdate';
@@ -128,8 +131,8 @@ class ServiceController extends Controller
             'no_faktur' => $data->NO_REF,
             'tgl_document' => $data->TGL_SERVIS,
 
-            'tgl_jatuh_tempo' => null,
-            'no_jurnal' => null
+            'tgl_jatuh_tempo' => $data->TGL_TEMPO,
+            'no_jurnal' => $data->NO_JURNAL
         ]);
     }
 
@@ -192,5 +195,25 @@ class ServiceController extends Controller
             })
             ->rawColumns(['action'])
             ->make(true);
+    }
+
+    public function destroy($id)
+    {
+        try {
+
+            DB::table('service')->where('id',$id)->delete();
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Data service berhasil dihapus'
+            ]);
+
+        } catch (\Exception $e) {
+
+            return response()->json([
+                'status' => false,
+                'message' => $e->getMessage()
+            ]);
+        }
     }
 }

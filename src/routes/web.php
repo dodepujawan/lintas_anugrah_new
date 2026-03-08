@@ -254,7 +254,7 @@ Route::prefix('service')->middleware('auth')->group(function () {
     Route::get('/show/{id}', [ServiceController::class, 'show'])->name('service.show');
     Route::get('/data/supplier', [ServiceController::class, 'dataSupplierModal'])->name('service-supplier.data');
     Route::get('/data/kendaraan', [ServiceController::class, 'dataKendaraanModel'])->name('service-kendaraan.data');
-    // Route::delete('/delete/{id}', [MsupplierController::class, 'destroy'])->name('msupplier.destroy');
+    Route::delete('/service/{id}', [ServiceController::class,'destroy'])->name('service.delete');
 });
 
 Route::prefix('pajak')->middleware('auth')->group(function () {
