@@ -44,67 +44,71 @@
             @csrf
 
             <div class="row">
-
+                <input type="text" name="id_service" id="id_service">
                 <!-- KIRI -->
                 <div class="col-md-7 mt-3">
 
                     <div class="row mb-2">
-                        <label class="col-sm-4 col-form-label">AKUN HUTANG</label>
+                        <label class="col-sm-3 col-form-label">AKUN HUTANG</label>
                         <div class="col-sm-3">
                             <input type="text" class="form-control" name="akun_hutang" id="akun_hutang" value="21000">
                         </div>
-                        <div class="col-sm-5">
+                        <div class="col-sm-6">
                             <input type="text" class="form-control" name="akun_hutang_nama" id="akun_hutang_nama" value="HUTANG USAHA">
                         </div>
                     </div>
 
-                    <div class="row mb-2">
-                        <label class="col-sm-4 col-form-label">SUPPLIER</label>
-                        <div class="col-sm-3">
-                            <input type="text" class="form-control" name="supplier" id="supplier">
+                    <div class="row mb-2 align-items-center">
+                        <label class="col-sm-3 col-form-label">SUPPLIER</label>
+
+                        <div class="col-sm-4">
+                            <div class="input-group">
+                                <input type="text" class="form-control" name="supplier" id="supplier">
+                                <button class="btn btn-warning" type="button" id="supplier_service_btn">🔍</button>
+                            </div>
                         </div>
-                        <div class="col-sm-2">
-                            <button type="button" class="btn btn-warning w-100">🔍</button>
-                        </div>
-                        <div class="col-sm-3">
+
+                        <div class="col-sm-5">
                             <input type="text" class="form-control" name="supplier_nama" id="supplier_nama">
                         </div>
                     </div>
 
-                    <div class="row mb-2">
-                        <label class="col-sm-4 col-form-label">KENDARAAN</label>
-                        <div class="col-sm-3">
-                            <input type="text" class="form-control" name="kendaraan_supplier" id="kendaraan_supplier">
-                        </div>
-                        <div class="col-sm-2">
-                            <button type="button" class="btn btn-warning w-100">🔍</button>
-                        </div>
-                        <div class="col-sm-3">
-                            <input type="text" class="form-control" name="kendaraan_supplier_nama" id="kendaraan_supplier_nama">
-                        </div>
-                    </div>
+                    <div class="row mb-2 align-items-center">
+                        <label class="col-sm-3 col-form-label">KENDARAAN</label>
 
-                    <div class="row mb-2">
-                        <label class="col-sm-4 col-form-label">AKUN BIAYA MOBIL</label>
-                        <div class="col-sm-3">
-                            <input type="text" class="form-control" name="fno_prk_b_supplier" id="fno_prk_b_supplier" value="56502">
+                        <div class="col-sm-4">
+                            <div class="input-group">
+                                <input type="text" class="form-control" name="kendaraan_service" id="kendaraan_service">
+                                <button class="btn btn-warning" type="button" id="kendaraan_service_btn">🔍</button>
+                            </div>
                         </div>
+
                         <div class="col-sm-5">
-                            <input type="text" class="form-control" name="fno_prk_b_supplier_nama" id="fno_prk_b_supplier_nama">
+                            <input type="text" class="form-control" name="kendaraan_service_nama" id="kendaraan_service_nama">
                         </div>
                     </div>
 
                     <div class="row mb-2">
-                        <label class="col-sm-4 col-form-label">NILAI SERVICE</label>
+                        <label class="col-sm-3 col-form-label">AKUN BIAYA MOBIL</label>
+                        <div class="col-sm-3">
+                            <input type="text" class="form-control" name="fno_prk_b_service" id="fno_prk_b_service">
+                        </div>
+                        <div class="col-sm-6">
+                            <input type="text" class="form-control" name="fno_prk_b_service_nama" id="fno_prk_b_service_nama" readonly>
+                        </div>
+                    </div>
+
+                    <div class="row mb-2">
+                        <label class="col-sm-3 col-form-label">NILAI SERVICE</label>
                         <div class="col-sm-3">
                             <input type="number" class="form-control text-end" name="nilai_servis" id="nilai_servis" value="0">
                         </div>
                     </div>
 
                     <div class="row mb-2">
-                        <label class="col-sm-4 col-form-label">ITEM BARANG</label>
-                        <div class="col-sm-8">
-                            <textarea class="form-control" rows="3" name="keterangan"></textarea>
+                        <label class="col-sm-3 col-form-label">ITEM BARANG</label>
+                        <div class="col-sm-10">
+                            <textarea class="form-control" rows="3" name="keterangan_service" id="keterangan_service"></textarea>
                         </div>
                     </div>
 
@@ -114,30 +118,30 @@
                 <div class="col-md-5 mt-3">
 
                     <div class="row mb-2">
-                        <label class="col-sm-5 col-form-label">NOMOR FAKTUR</label>
+                        <label class="col-sm-4 col-form-label">NOMOR FAKTUR</label>
                         <div class="col-sm-7">
-                            <input type="text" class="form-control" name="no_faktur">
+                            <input type="text" class="form-control" name="no_faktur_service">
                         </div>
                     </div>
 
                     <div class="row mb-2">
-                        <label class="col-sm-5 col-form-label">TGL.DOCUMENT</label>
+                        <label class="col-sm-4 col-form-label">TGL.DOCUMENT</label>
                         <div class="col-sm-7">
-                            <input type="date" class="form-control" name="tgl_document">
+                            <input type="date" class="form-control" name="tgl_document_service">
                         </div>
                     </div>
 
                     <div class="row mb-2">
-                        <label class="col-sm-5 col-form-label">TGL.JTH.TEMPO</label>
+                        <label class="col-sm-4 col-form-label">TGL.JTH.TEMPO</label>
                         <div class="col-sm-7">
-                            <input type="date" class="form-control" name="tgl_jatuh_tempo">
+                            <input type="date" class="form-control" name="tgl_jatuh_tempo_service">
                         </div>
                     </div>
 
                     <div class="row mb-2">
-                        <label class="col-sm-5 col-form-label">NO.JURNAL</label>
+                        <label class="col-sm-4 col-form-label">NO.JURNAL</label>
                         <div class="col-sm-7">
-                            <input type="text" class="form-control" name="no_jurnal">
+                            <input type="text" class="form-control" name="no_jurnal_service">
                         </div>
                     </div>
 
@@ -160,6 +164,8 @@
 </div>
 ```
 </div>
+{{-- MODAL --}}
+@include('service.service_modal')
 <script>
 $(document).ready(function(){
     // Set CSRF token in AJAX setup
@@ -203,45 +209,198 @@ $(document).ready(function(){
         .html('<i class="bx bx-save"></i> SIMPAN');
     });
 // ============================== End Of Add Supplier ==================================
-// ================================= Return Table Supplier ====================================
+// ============================== Return Table Supplier ==================================
     $('#return_table_service').on('click', function(e){
         $('#formServiceMaster').addClass('d-none');
         $('#tableServiceMaster').removeClass('d-none');
         $('#tableService').DataTable().ajax.reload();
     });
-// ============================== End Of Return Table Supplier =================================
+// =========================== End Of Return Table Supplier =============================
+// ================================= Pilih Supplier =====================================
+    $('#supplier_service_btn').click(function(e) {
+        e.preventDefault();
+        $('#supplierServiceModal').modal('show');
+        // hancurkan datatable jika sudah pernah dipakai
+        if ($.fn.DataTable.isDataTable('#supplierServiceModalTable')) {
+            $('#supplierServiceModalTable').DataTable().destroy();
+        }
+        var table_supplier_service = $('#supplierServiceModalTable').DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: '{{ route("service-supplier.data") }}',
+            // Scroll settings
+            scrollX: true,
+            scrollY: "400px",
+            scrollCollapse: true,
+            // Responsive settings
+            responsive: true,
+            autoWidth: true,
+            columns: [
+                {data: 'SUPPLIER'},
+                {data: 'kategori_label', orderable:false, searchable:false},
+                {data: 'NAMA'},
+                {data: 'KOTA'},
+                {data: 'TELEPON'},
+                {data: 'EMAIL'},
+                {data: 'action', orderable:false, searchable:false}
+            ]
+        });
+
+        // Initialize tooltips
+        // $('[data-bs-toggle="tooltip"]').tooltip();
+    });
+
+    // ### Select Button
+    $(document).on('click', '.btn-pick-supplier-service', function(e) {
+        e.preventDefault();
+        var supplier = $(this).data('supplier');
+        var nama_supplier = $(this).data('nama');
+        // Mengisi nilai ke elemen yang dituju
+        $('#supplier').val(supplier);
+        $('#supplier_nama').val(nama_supplier);
+
+        // Tutup modal
+        $('#supplierServiceModal').modal('hide');
+    });
+// ============================== End Of Pilih Supplier ==============================
+// ================================= Pilih Kendaraan ====================================
+    $('#kendaraan_service_btn').click(function(e) {
+        e.preventDefault();
+        $('#kendaraanServiceModal').modal('show');
+        // hancurkan datatable jika sudah pernah dipakai
+        if ($.fn.DataTable.isDataTable('#kendaraanServiceModalTable')) {
+            $('#kendaraanServiceModalTable').DataTable().destroy();
+        }
+        var table_supplier_service = $('#kendaraanServiceModalTable').DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: '{{ route("service-kendaraan.data") }}',
+            // Scroll settings
+            scrollX: true,
+            scrollY: "400px",
+            scrollCollapse: true,
+            // Responsive settings
+            responsive: true,
+            autoWidth: true,
+            columns: [
+                {data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false},
+                {data: 'KODE', name: 'KODE'},
+                {data: 'NAMA', name: 'NAMA'},
+                {data: 'PLAT', name: 'PLAT'},
+                {data: 'JENIS', name: 'JENIS'},
+                {data: 'FNO_PRK_B', name: 'FNO_PRK_B'},
+                {data: 'FNO_PRK_P', name: 'FNO_PRK_P'},
+                {data: 'FNO_PRK_S', name: 'FNO_PRK_S'},
+                {data: 'FNO_PRK_O', name: 'FNO_PRK_O'},
+                {data: 'FNO_PRK_M', name: 'FNO_PRK_M'},
+                {data: 'action', name: 'action', orderable: false, searchable: false}
+            ]
+        });
+
+        // Initialize tooltips
+        // $('[data-bs-toggle="tooltip"]').tooltip();
+    });
+
+    // ### Select Button
+    $(document).on('click', '.pickKendaraanServiceModel', function(e) {
+        e.preventDefault();
+        var kendaraan_id = $(this).data('kode');
+        var nama_kendaraan = $(this).data('nama');
+        var fno_prk_b = $(this).data('fno');
+        var plat = $(this).data('plat');
+        // Mengisi nilai ke elemen yang dituju
+        $('#kendaraan_service').val(kendaraan_id);
+        $('#kendaraan_service_nama').val(nama_kendaraan);
+        $('#fno_prk_b_service').val(fno_prk_b);
+        $('#fno_prk_b_service_nama').val('By keperluan service ' + plat);
+        // Tutup modal
+        $('#kendaraanServiceModal').modal('hide');
+    });
+// ============================== End Of Pilih Kendaraan ==============================
 // ================================= Submit Service =====================================
     $('#formService').submit(function(e){
         e.preventDefault();
+        // Simpan referensi ke form
+        var form = this;
+        $('#loading_modal').modal('show');
+        $('#loading_modal').one('shown.bs.modal', function () {
+            $.ajax({
+                url: "{{ route('service.store') }}",
+                type: "POST",
+                data: $(form).serialize(),
+                success: function(response){
+                    $('#loading_modal').modal('hide');
+                    if(response.status){
 
-        $.ajax({
-            url: "{{ route('service.store') }}",
-            type: "POST",
-            data: $(this).serialize(),
-            success: function(response){
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Berhasil',
+                            text: 'Service berhasil disimpan, nomer: ' + response.kode,
+                            timer: 1500,
+                            showConfirmButton: false
+                        });
 
-                if(response.status){
+                        $('#formService')[0].reset();
+                        $('#formServiceMaster').addClass('d-none');
+                        $('#tableServiceMaster').removeClass('d-none');
+                        $('#tableService').DataTable().ajax.reload();
 
-                    alert(response.message);
+                    }else{
+                        alert(response.message);
+                    }
 
-                    $('#formService')[0].reset();
+                },
+                error: function(xhr){
+                    alert('Terjadi kesalahan server');
+                }
+            });
+        });
+    });
+// ============================== End Of Submit Service =================================
+// =============================== Show Detail Service =================================
+    $(document).on('click','.edit-service',function(){
+        let id = $(this).data('id');
+        $('#loading_modal').modal('show');
+        $('#loading_modal').one('shown.bs.modal', function () {
+            $.ajax({
+                url:"{{ route('service.show', ':id') }}".replace(':id', id),
+                type:"GET",
+                dataType:"json",
 
-                }else{
+                success:function(data){
+                    $('#loading_modal').modal('hide');
+                    $('#tableServiceMaster').addClass('d-none');
+                    $('#formServiceMaster').removeClass('d-none');
+                    $('#id_service').val(data.id_service);
 
-                    alert(response.message);
+                    $('#supplier').val(data.supplier);
+                    $('#supplier_nama').val(data.supplier_nama);
+                    $('#kendaraan_service').val(data.kendaraan_service);
+                    $('#kendaraan_service_nama').val(data.kendaraan_service_nama);
+
+                    $('#fno_prk_b_service').val(data.fno_prk_b_service);
+                    $('#fno_prk_b_service_nama').val("By keperluan service  " + data.kendaraan_service_plat);
+
+                    $('#nilai_servis').val(data.nilai_servis);
+
+                    $('#keterangan_service').val(data.keterangan);
+
+                    $('#no_faktur_service').val(data.no_faktur);
+                    $('#tgl_document_service').val(data.tgl_document);
+
+                    $('#tgl_jatuh_tempo_service').val(data.tgl_jatuh_tempo);
+                    $('#no_jurnal_service').val(data.no_jurnal);
+
+                    $('#button_service_submit')
+                    .removeClass('btn btn-primary')
+                    .addClass('btn btn-success')
+                    .html('<i class="bx bx-edit"></i> Update');
 
                 }
-
-            },
-            error: function(xhr){
-
-                alert('Terjadi kesalahan server');
-
-            }
+            });
         });
-
     });
-// =============================== End Of Submit Service ==================================
+// ============================== End Of Show Detail Service =============================
 });
 </script>
 
