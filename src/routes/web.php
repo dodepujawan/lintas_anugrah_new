@@ -154,9 +154,11 @@ Route::prefix('expedisi-invoice')->group(function() {
     Route::get('/', [ExpedisiInvoiceController::class, 'index'])->name('expedisiInvoice.index');
     // Route::get('/data/cus', [ExpedisiController::class, 'getDataCustomer'])->name('expedisi-cus.data');
     Route::post('/store', [ExpedisiInvoiceController::class, 'storeGabungInvoice'])->name('expedisiInvoice.store');
-    // Route::get('/data/surjal', [ExpedisiController::class, 'getDataSurjal'])->name('expedisi-surjal.data');
+    Route::post('/update', [ExpedisiInvoiceController::class, 'updateGabungInvoice'])->name('expedisiInvoice.update');
     Route::get('/data', [ExpedisiInvoiceController::class, 'getDataMuat'])->name('expedisiInvoice.data');
     Route::get('/data/gabung', [ExpedisiInvoiceController::class, 'dataGabung'])->name('expedisiInvoiceGabung.data');
+    Route::get('data/invoice/existing', [ExpedisiInvoiceController::class,'getExistingInvoice'])
+    ->name('expedisiInvoiceGabungExisting.data');
     // Route::get('/show/surjal', [ExpedisiController::class, 'showSurjal'])->name('expedisi-surjal.show');
     // Route::get('/show', [ExpedisiController::class, 'showMuat'])->name('expedisi.show');
     // Route::post('/update/{nosj}', [ExpedisiController::class, 'updateSurjal'])->name('expedisi.update');

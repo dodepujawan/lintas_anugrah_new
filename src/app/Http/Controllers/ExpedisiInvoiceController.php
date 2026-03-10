@@ -78,10 +78,20 @@ class ExpedisiInvoiceController extends Controller
         $filterInvoice = $request->filter_invoice ?? 'belum';
 
         if ($filterInvoice === 'belum') {
+
+            // tampilkan yang belum invoice
             $expedisi->where(function ($q) {
                 $q->whereNull('INVOICE')
                 ->orWhere('INVOICE', '');
             });
+
+        } elseif ($filterInvoice === 'sudah') {
+
+            // tampilkan yang sudah invoice
+            // tapi hanya master row (yang punya harga)
+            $expedisi->whereNotNull('INVOICE')
+                    ->where('INVOICE', '!=', '')
+                    ->where('HARGA', '>', 0);
         }
         // kalau 'semua' → TIDAK difilter apa pun
 
@@ -151,6 +161,51 @@ class ExpedisiInvoiceController extends Controller
                 'Rp ' . number_format($r->GRAND ?? 0, 0, ',', '.')
             )
             ->make(true);
+    }
+
+    public function getExistingInvoice(Request $request){
+        $invoice = $request->invoice;
+
+        $rows = Expedisi::where('INVOICE', $invoice)
+            ->orderBy('NOSJ')
+            ->get();
+
+        if ($rows->isEmpty()) {
+            return response()->json([
+                'data' => [],
+                'master' => null
+            ]);
+        }
+
+        // master row = yang punya harga
+        $master = $rows->firstWhere('HARGA', '>', 0);
+
+        $data = $rows->map(function($r,$i){
+
+            return [
+                'DT_RowIndex' => $i + 1,
+                'NOMUAT' => $r->NOMUAT,
+                'TGLMUAT' => $r->TGLMUAT ? date('d-m-Y', strtotime($r->TGLMUAT)) : '-',
+                'NOSJ' => $r->NOSJ,
+                'PESANAN' => $r->PESANAN,
+                'rute' => $r->rute,
+                'NAMA_KENDARAAN' => $r->NAMA_KENDARAAN,
+                'JUMLAH' => number_format($r->JUMLAH ?? 0,0,',','.').' '.$r->UNIT,
+                'harga_formatted' => 'Rp '.number_format($r->HARGA ?? 0,0,',','.'),
+                'gtotal_formatted' => 'Rp '.number_format($r->GRAND ?? 0,0,',','.'),
+                'HARGA' => $r->HARGA,
+                'DISC' => $r->DISC,
+                'DC' => $r->DC,
+                'TOTAL' => $r->TOTAL,
+                'PPN' => $r->PPN
+            ];
+
+        });
+
+        return response()->json([
+            'data' => $data,
+            'master' => $master
+        ]);
     }
 
     public function storeGabungInvoice(Request $request){
@@ -260,6 +315,131 @@ class ExpedisiInvoiceController extends Controller
         } catch (\Throwable $e) {
             return response()->json([
                 'status'  => false,
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function updateGabungInvoice(Request $request){
+        try {
+             // untuk mengambil nilai dalam transaction dibawah supaya bisa kirim ke json respon karna json respon diluar transaction
+            $invoiceNo = null;
+            DB::transaction(function () use ($request, &$invoiceNo) {
+
+                $invoiceNo = $request->no_invoice;
+
+                if (!$invoiceNo) {
+                    throw new Exception('Invoice tidak ditemukan');
+                }
+
+                // =============================
+                // 1. rollback invoice lama
+                // =============================
+                $oldRows = Expedisi::where('INVOICE', $invoiceNo)
+                    ->lockForUpdate()
+                    ->get();
+
+                foreach ($oldRows as $row) {
+
+                    $row->INVOICE = null;
+                    $row->STS = null;
+                    $row->GB = null;
+                    $row->PESANANGB = null;
+
+                    // kembalikan harga lama
+                    $row->HARGA = $row->HARGAAW;
+                    $row->NDISC = $row->NDISCAW;
+                    $row->DC = $row->DCAW;
+
+                    $row->TOTAL = 0;
+                    $row->PPN = 0;
+                    $row->GRAND = 0;
+                    $row->PIUTANG = 0;
+
+                    $row->save();
+                }
+
+                // hapus ARH lama
+                Arh::where('NOFAKTUR', $invoiceNo)->delete();
+
+                // =============================
+                // 2. ambil SJ baru
+                // =============================
+                $rows = Expedisi::whereIn('NOSJ', $request->nosj_list)
+                    ->lockForUpdate()
+                    ->orderBy('NOSJ')
+                    ->get();
+
+                if ($rows->isEmpty()) {
+                    throw new Exception('Data SJ tidak ditemukan');
+                }
+
+                $isFirst = true;
+
+                foreach ($rows as $row) {
+
+                    $row->INVOICE = $invoiceNo;
+                    $row->TGLINVOICE = now();
+                    $row->STS = 'INVOICE';
+                    $row->PESANANGB = $request->item;
+
+                    if ($isFirst) {
+
+                        $row->HARGA = $request->harga;
+                        $row->DISC = $request->diskon;
+                        $row->NDISC = $this->calcNominalDiskon($request);
+                        $row->DC = $request->dc;
+                        $row->TOTAL = $request->total;
+                        $row->PPN = $request->ppn;
+                        $row->GRAND = $request->grand_total;
+                        $row->PIUTANG = $request->grand_total;
+
+                        $isFirst = false;
+
+                    } else {
+
+                        $row->HARGA = 0;
+                        $row->DISC = 0;
+                        $row->NDISC = 0;
+                        $row->DC = 0;
+                        $row->TOTAL = 0;
+                        $row->PPN = 0;
+                        $row->GRAND = 0;
+                        $row->PIUTANG = 0;
+                    }
+
+                    $row->save();
+                }
+
+                // =============================
+                // 3. buat ARH baru
+                // =============================
+                $masterRow = $rows->first();
+
+                Arh::create([
+                    'NOFAKTUR' => $invoiceNo,
+                    'TGLFAKTUR' => now(),
+                    'CUSTOMER' => $masterRow->CUSTOMER,
+                    'PIUTANG' => $request->grand_total,
+                    'DISCOUNT' => $request->diskon,
+                    'SALDO' => 0,
+                    'CABANG' => $masterRow->CABANG ?? '',
+                    'KETERANGAN' => 'UPDATE INVOICE EXPEDISI',
+                    'USER' => auth()->user()->user_id,
+                ]);
+
+            });
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Invoice berhasil diupdate',
+                'redirect' => route('expedisiInvoice.printSuratJalan', ['invoiceNo' => $invoiceNo])
+            ]);
+
+        } catch (\Throwable $e) {
+
+            return response()->json([
+                'status' => false,
                 'message' => $e->getMessage()
             ], 500);
         }
