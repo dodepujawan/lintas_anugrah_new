@@ -70,20 +70,33 @@ class RentPendinginInvoiceController extends Controller
                 $q->where('NOMUAT', 'like', "%{$search}%")
                 ->orWhere('CUSTOMER', 'like', "%{$search}%")
                 ->orWhere('rute', 'like', "%{$search}%")
-                ->orWhere('NOSJ', 'like', "%{$search}%");
+                ->orWhere('NOSJ', 'like', "%{$search}%")
+                ->orWhere('INVOICE', 'like', "%{$search}%");
             });
         }
 
         // 🧾 FILTER INVOICE (DEFAULT: BELUM)
         $filterInvoice = $request->filter_invoice ?? 'belum';
 
+        // 🧾 FILTER INVOICE (DEFAULT: BELUM)
+        $filterInvoice = $request->filter_invoice ?? 'belum';
+
         if ($filterInvoice === 'belum') {
+
+            // tampilkan yang belum invoice
             $expedisi->where(function ($q) {
                 $q->whereNull('INVOICE')
                 ->orWhere('INVOICE', '');
             });
+
+        } elseif ($filterInvoice === 'sudah') {
+
+            // tampilkan yang sudah invoice
+            // tapi hanya master row (yang punya harga)
+            $expedisi->whereNotNull('INVOICE')
+                    ->where('INVOICE', '!=', '')
+                    ->where('HARGA', '>', 0);
         }
-        // kalau 'semua' → TIDAK difilter apa pun
 
         return DataTables::of($expedisi)
             ->addIndexColumn()
@@ -117,10 +130,10 @@ class RentPendinginInvoiceController extends Controller
     public function getDetailByNomuat(Request $request)
     {
         $data = Expedisi::where('NOMUAT', $request->nomuat)
-            ->where(function ($q) {
-                $q->whereNull('INVOICE')
-                ->orWhere('INVOICE', '');
-            })
+            // ->where(function ($q) {
+            //     $q->whereNull('INVOICE')
+            //     ->orWhere('INVOICE', '');
+            // })
             ->first();
 
         if (!$data) {
@@ -204,6 +217,59 @@ class RentPendinginInvoiceController extends Controller
 
             return response()->json([
                 'status'  => false,
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function updateRentDinginInvoice(Request $request){
+        try {
+            $invoiceNo = $request->noinvoice;
+            DB::transaction(function () use ($request, $invoiceNo) {
+
+                $row = Expedisi::where('INVOICE', $invoiceNo)
+                    ->lockForUpdate()
+                    ->first();
+
+                if (!$row) {
+                    throw new \Exception('Invoice tidak ditemukan');
+                }
+
+                // Update nilai invoice
+                $row->HARGA   = $request->harga;
+                $row->DISC    = $request->diskon;
+                $row->NDISC   = $this->calcNominalDiskon($request);
+                $row->DC      = $request->dc;
+                $row->TOTAL   = $request->total;
+                $row->PPN     = $request->ppn;
+                $row->GRAND   = $request->grand_total;
+                $row->PIUTANG = $request->grand_total;
+
+                $row->USERINV = auth()->user()->user_id . '-' . now()->format('d-m-Y h:i:s A');
+
+                $row->save();
+
+                // Update juga tabel ARH
+                Arh::where('NOFAKTUR', $invoiceNo)->update([
+                    'PIUTANG'  => $request->grand_total,
+                    'DISCOUNT' => $this->calcNominalDiskon($request),
+                    'USER'     => auth()->user()->user_id
+                ]);
+
+            });
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Invoice berhasil diupdate',
+                'redirect' => route('expedisiInvoice.printSuratJalan', [
+                    'invoiceNo' => $invoiceNo
+                ])
+            ]);
+
+        } catch (\Throwable $e) {
+
+            return response()->json([
+                'status' => false,
                 'message' => $e->getMessage()
             ], 500);
         }

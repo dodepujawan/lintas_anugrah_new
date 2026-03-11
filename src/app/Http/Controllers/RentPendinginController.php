@@ -25,6 +25,7 @@ class RentPendinginController extends Controller
             ->where('JENIS', 'REN')
             ->whereNotNull('NOMUAT')
             ->whereNull('kwt')
+            ->whereNull('INVOICE')
             ->groupBy('NOMUAT');
 
         $expedisi = Expedisi::select([

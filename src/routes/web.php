@@ -214,7 +214,7 @@ Route::prefix('rent-pendingin-invoice')->group(function() {
     Route::get('/data/muat', [RentPendinginInvoiceController::class, 'getDetailByNomuat'])->name('rentPendinginInv.detail');
     // Route::get('/show/surjal', [ExpedisiController::class, 'showSurjal'])->name('expedisi-surjal.show');
     // Route::get('/show', [ExpedisiController::class, 'showMuat'])->name('expedisi.show');
-    // Route::post('/update/{nosj}', [ExpedisiController::class, 'updateSurjal'])->name('expedisi.update');
+    Route::post('/update', [RentPendinginInvoiceController::class, 'updateRentDinginInvoice'])->name('rentPendinginInv.update');
     // Route::post('/update/muat/{nomuat}', [ExpedisiController::class, 'updateMuat'])->name('expedisi-muat.update');
     // Route::post('/destroy/{id}', [ExpedisiController::class, 'destroySurjal'])->name('expedisi.destroy');
     // Route::post('/destroy/muat/{nomuat}', [ExpedisiController::class, 'destroyMuat'])->name('expedisi-muat.destroy');

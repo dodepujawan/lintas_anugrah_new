@@ -93,7 +93,6 @@ class ExpedisiInvoiceController extends Controller
                     ->where('INVOICE', '!=', '')
                     ->where('HARGA', '>', 0);
         }
-        // kalau 'semua' → TIDAK difilter apa pun
 
         return DataTables::of($expedisi)
             ->addIndexColumn()

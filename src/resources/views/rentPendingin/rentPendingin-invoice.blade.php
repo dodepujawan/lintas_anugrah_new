@@ -2,7 +2,7 @@
     <!-- Header Form -->
     <div class="card-rent_pendingin" id="master_form_dgn_inv">
         <div class="card-rent_pendingin-header">
-            <h5><i class='bx bx-truck me-2'></i>FORM RENT MOBIL PENDINGIN</h5>
+            <h5><i class='bx bx-truck me-2'></i>INVOICE MOBIL PENDINGIN</h5>
         </div>
         <div class="card-body">
             <div class="row mb-3">
@@ -10,16 +10,16 @@
                     <label class="form-label d-block">Filter Invoice</label>
                     <div class="form-check form-check-inline">
                         <input class="form-check-input"
-                            type="radio" name="filter_invoice_dgn" id="radio_belum" value="belum" checked>
-                        <label class="form-check-label" for="radio_belum">
+                            type="radio" name="filter_invoice_dgn" id="radio_belum_dgn" value="belum" checked>
+                        <label class="form-check-label" for="radio_belum_dgn">
                             Belum Invoice
                         </label>
                     </div>
 
                     <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="filter_invoice_dgn" id="radio_semua" value="semua">
-                        <label class="form-check-label" for="radio_semua">
-                            Semua
+                        <input class="form-check-input" type="radio" name="filter_invoice_dgn" id="radio_sudah_dgn" value="sudah">
+                        <label class="form-check-label" for="radio_sudah_dgn">
+                            Sudah Invoice
                         </label>
                     </div>
                 </div>
@@ -84,12 +84,17 @@
                 <!-- INFORMASI MUAT -->
                 <div class="row mb-3">
                     <div class="col-md-4">
+                        <label class="form-label small">Nomor Invoice</label>
+                        <input type="text" class="form-control form-control-sm" name="no_invoice_dgn_inv" id="no_invoice_dgn_inv" readonly>
+                    </div>
+
+                    <div class="col-md-4">
                         <label class="form-label small">Nomor Muat</label>
                         <input type="text" class="form-control form-control-sm"
                             id="no_gabung_dgn_inv" readonly>
                     </div>
 
-                    <div class="col-md-8">
+                    <div class="col-md-4">
                         <label class="form-label small">Customer</label>
                         <input type="hidden" id="customer_kode_gabung_dgn_inv">
                         <input type="text" class="form-control form-control-sm"
@@ -252,6 +257,10 @@ $(document).ready(function() {
         $('#btn_filter_invoice_rent_dgn').click(function () {
             tableInvoiceDgn.ajax.reload();
         });
+
+        $('input[name="filter_invoice_dgn"]').change(function () {
+            tableInvoiceDgn.ajax.reload();
+        });
     // ============================= End Of Tabel No Muat =====================================
     // ============================= End Of Pilih No Muat =====================================
     $('#InvoiceDgnTable').on('click', '.btn-detail-dgn-inv', function () {
@@ -270,6 +279,7 @@ $(document).ready(function() {
                         $('#master_form_dgn_inv').addClass('d-none');
                         $('#form_gabung_inv_exp').removeClass('d-none');
 
+                        $('#no_invoice_dgn_inv').val(d.INVOICE || "");
                         $('#no_gabung_dgn_inv').val(d.NOMUAT);
                         $('#customer_kode_gabung_dgn_inv').val(d.CUSTOMER_KODE);
                         $('#customer_gabung_dgn_inv').val(d.CUSTOMER);
@@ -300,12 +310,12 @@ $(document).ready(function() {
     $('#gabungInvDgnBtnLeft').on('click', function () {
         $('#loading_modal').modal('show');
         $('#loading_modal').one('shown.bs.modal', function () {
+            let url = $('#no_invoice_dgn_inv').val() ? "{{ route('rentPendinginInv.update') }}" : "{{ route('rentPendinginInv.store') }}";
             $.ajax({
-                url: "{{ route('rentPendinginInv.store') }}",
+                url: url,
                 type: "POST",
                 data: {
-                    _token: "{{ csrf_token() }}",
-
+                    noinvoice: $('#no_invoice_dgn_inv').val(),
                     nomuat: $('#no_gabung_dgn_inv').val(),
                     item: $('#item_gabung_dgn_inv').val(),
 
