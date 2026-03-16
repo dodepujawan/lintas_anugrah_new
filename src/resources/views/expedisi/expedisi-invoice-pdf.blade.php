@@ -3,10 +3,15 @@
 <head>
     <meta charset="utf-8">
     <style>
-        body {
+        /* body {
             font-family: Arial, Helvetica, sans-serif;
             font-size: 11px;
             color: #000;
+        } */
+
+        body{
+            font-family: Courier New;
+            font-size: 11px;
         }
 
         .header {

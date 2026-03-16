@@ -22,6 +22,7 @@ use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\PajakController;
 use App\Http\Controllers\RekeningController;
 use App\Http\Controllers\SignatureController;
+use App\Http\Controllers\PrinterController;
 
 Route::get('/', function () {
     return redirect()->route('login');
@@ -167,7 +168,7 @@ Route::prefix('expedisi-invoice')->group(function() {
     // Route::post('/destroy/muat/{nomuat}', [ExpedisiController::class, 'destroyMuat'])->name('expedisi-muat.destroy');
     // Route::post('/store/muat', [ExpedisiController::class, 'storeMuat'])->name('expedisi-muat.store');
     // // PDF
-    Route::get('/expedisi/invoice/pdf/{invoiceNo}', [ExpedisiInvoiceController::class, 'pdfGabungInvoice'])->name('expedisiInvoice.printSuratJalan');
+    Route::get('/expedisi/invoice/pdf/{invoiceNo}', [ExpedisiInvoiceController::class, 'pdfGabungInvoice'])->name('expedisiInvoice.pdfInvoice');
 });
 
 Route::prefix('expedisi-kwitansi')->group(function() {
@@ -274,6 +275,12 @@ Route::prefix('rekening')->middleware('auth')->group(function () {
 Route::prefix('signature')->middleware('auth')->group(function () {
     Route::get('/get-sign', [SignatureController::class, 'get_signature'])->name('get_signature');
     Route::post('/edit/show', [SignatureController::class, 'update_signature'])->name('update_signature');
+});
+
+Route::prefix('printer')->middleware('auth')->group(function () {
+    Route::get('/list', [PrinterController::class, 'list'])->name('printer.list');
+    Route::post('/save', [PrinterController::class, 'save'])->name('printer.save');
+    Route::get('/current', [PrinterController::class, 'current'])->name('printer.current');
 });
 // Route::prefix('register')->group(function () {
 //     Route::get('/users', UsersPage::class)->name('users.page');

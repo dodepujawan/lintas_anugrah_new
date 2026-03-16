@@ -309,7 +309,8 @@ class ExpedisiInvoiceController extends Controller
             return response()->json([
                 'status'  => true,
                 'message' => 'Invoice gabung berhasil disimpan',
-                'redirect' => route('expedisiInvoice.printSuratJalan', ['invoiceNo' => $invoiceNo])
+                'invoiceNo' => $invoiceNo
+                // 'redirect' => route('expedisiInvoice.printInvoice', ['invoiceNo' => $invoiceNo])
             ]);
         } catch (\Throwable $e) {
             return response()->json([
@@ -432,7 +433,8 @@ class ExpedisiInvoiceController extends Controller
             return response()->json([
                 'status' => true,
                 'message' => 'Invoice berhasil diupdate',
-                'redirect' => route('expedisiInvoice.printSuratJalan', ['invoiceNo' => $invoiceNo])
+                'invoiceNo' => $invoiceNo
+                // 'redirect' => route('expedisiInvoice.printInvoice', ['invoiceNo' => $invoiceNo])
             ]);
 
         } catch (\Throwable $e) {
@@ -442,6 +444,36 @@ class ExpedisiInvoiceController extends Controller
                 'message' => $e->getMessage()
             ], 500);
         }
+    }
+
+    public function pdfGabungInvoice($invoiceNo){
+        $rows = Expedisi::where('INVOICE', $invoiceNo)
+            ->orderBy('NOSJ')
+            ->get();
+
+        if ($rows->isEmpty()) {
+            abort(404, 'Invoice tidak ditemukan');
+        }
+
+        $master = $rows->first();
+        // 🔥 ambil rekening aktif
+        $rekening = Rekening::where('AKTIF', 1)->first();
+        $signature = Signature::orderByDesc('id')->first();
+
+        $mpdf = new Mpdf([
+            'mode' => 'utf-8',
+            'format' => 'A4',
+            'margin_top' => 10,
+            'margin_bottom' => 10,
+            'margin_left' => 10,
+            'margin_right' => 10,
+        ]);
+
+        $html = view('expedisi.expedisi-invoice-pdf', compact('rows', 'master', 'rekening', 'signature'))->render();
+
+        $mpdf->WriteHTML($html);
+        return response($mpdf->Output('', 'S'),200)->header('Content-Type','application/pdf');
+        // return $mpdf->Output("INVOICE-{$invoiceNo}.pdf", 'I'); // tampil di browser
     }
 
     private function generateInvoiceOnline(): string{
@@ -483,35 +515,6 @@ class ExpedisiInvoiceController extends Controller
         }
 
         return $total * ($diskon / 100);
-    }
-
-    public function pdfGabungInvoice($invoiceNo){
-        $rows = Expedisi::where('INVOICE', $invoiceNo)
-            ->orderBy('NOSJ')
-            ->get();
-
-        if ($rows->isEmpty()) {
-            abort(404, 'Invoice tidak ditemukan');
-        }
-
-        $master = $rows->first();
-        // 🔥 ambil rekening aktif
-        $rekening = Rekening::where('AKTIF', 1)->first();
-        $signature = Signature::orderByDesc('id')->first();
-
-        $mpdf = new Mpdf([
-            'mode' => 'utf-8',
-            'format' => 'A4',
-            'margin_top' => 10,
-            'margin_bottom' => 10,
-            'margin_left' => 10,
-            'margin_right' => 10,
-        ]);
-
-        $html = view('expedisi.expedisi-invoice-pdf', compact('rows', 'master', 'rekening', 'signature'))->render();
-
-        $mpdf->WriteHTML($html);
-        return $mpdf->Output("INVOICE-{$invoiceNo}.pdf", 'I'); // tampil di browser
     }
 
 }

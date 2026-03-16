@@ -81,7 +81,34 @@
     </div>
 </div>
 {{-- End Of Modal Update Signature --}}
+{{-- Modal Printer --}}
+<div class="modal fade" id="printerModal">
+  <div class="modal-dialog">
+    <div class="modal-content">
 
+      <div class="modal-header">
+        <h5 class="modal-title">Pilih Printer</h5>
+        <button class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+      <div class="modal-body">
+
+        <select id="printerSelect" class="form-select">
+            <option value="">Loading printer...</option>
+        </select>
+
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-primary" id="savePrinter">
+            Simpan
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>
+{{-- End Of Modal Printer --}}
 @endsection
 @section('footer')
 <script>
@@ -544,6 +571,57 @@ $(document).ready(function() {
         });
     });
 // ========================= End Of Update Signature ======================================
+// ==================================== Printer ========================================
+    // Jsprint Reload Inisiator
+    JSPM.JSPrintManager.auto_reconnect = true;
+    JSPM.JSPrintManager.start();
+    // ### Ambil Printer Dari JSPrint Select
+    $('#sidebar_extra_printer').click(function(e){
+        e.preventDefault();
+        loadPrinters();
+        $('#printerModal').modal('show');
+    });
+    // ### Ambil Printer Dari JSPrint Select
+    function loadPrinters(){
+        if (JSPM.JSPrintManager.websocket_status == JSPM.WSStatus.Open){
+            JSPM.JSPrintManager.getPrinters().then(function(printers){
+                let select = $('#printerSelect');
+                select.empty();
+                printers.forEach(function(printer){
+                    select.append(
+                        `<option value="${printer}">${printer}</option>`
+                    );
+                });
+                // ambil printer dari database
+                $.get("{{ route('printer.current') }}", function(res){
+                    if(res.printer){
+                        select.val(res.printer);
+                    }
+                });
+            });
+        }else{
+            alert("JSPrintManager belum aktif");
+        }
+    }
+    // ### Save Printer
+    $('#savePrinter').click(function(){
+        let printer = $('#printerSelect').val();
+        $.ajax({
+            url: "{{ route('printer.save') }}",
+            method:'POST',
+            data:{
+                printer:printer,
+                _token:'{{ csrf_token() }}'
+            },
+            success:function(res){
+                if(res.status){
+                    alert('Printer disimpan');
+                    $('#printerModal').modal('hide');
+                }
+            }
+        });
+    });
+// =============================== End Of Printer ======================================
 // +++++++++++++++++++++++++++ End Of SIDEBAR ROOM ++++++++++++++++++++++++++++++++++++++
 });
 </script>

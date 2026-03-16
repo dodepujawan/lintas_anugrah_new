@@ -383,6 +383,7 @@
     </div>
 </div>
 <script>
+
 $(document).ready(function() {
     // Set CSRF token in AJAX setup
     $.ajaxSetup({
@@ -845,9 +846,13 @@ $(document).ready(function() {
                     $('#GabungExpTableRight').DataTable().ajax.reload();
                     // reset form
                     resetFormGabungInvoice();
-                    // Cetak PDF
+
+                    // if (res.status) {
+                    //     window.open(res.redirect, '_blank');
+                    // }
+                    // Cetak Invoice Hidden Tab
                     if (res.status) {
-                        window.open(res.redirect, '_blank');
+                        printInvoice(res.invoiceNo);
                     }
                 },
                 error: function (xhr) {
@@ -1028,5 +1033,32 @@ $(document).ready(function() {
         btn.html('<i class="bx bx-plus-circle me-1"></i> Proses Invoice');
     }
 
+    // Calling Print JSPrint
+    function printInvoice(invoiceNo){
+        $.get("{{ route('printer.current') }}", function(res){
+            var printerName = res.printer;
+            if(!printerName){
+                alert("Pilih printer dulu");
+                return;
+            }
+            var url = "{{ route('expedisiInvoice.pdfInvoice', ['invoiceNo' => '__INVOICE__']) }}";
+            url = url.replace('__INVOICE__', invoiceNo);
+            if (JSPM.JSPrintManager.websocket_status == JSPM.WSStatus.Open){
+                var cpj = new JSPM.ClientPrintJob();
+                cpj.clientPrinter = new JSPM.InstalledPrinter(printerName);
+                var file = new JSPM.PrintFileURL(
+                    url,
+                    JSPM.FileSourceType.URL,
+                    "invoice-" + invoiceNo + ".pdf",
+                    1
+                );
+                cpj.files.push(file);
+                cpj.sendToClient();
+
+            }else{
+                alert("JSPrintManager belum aktif");
+            }
+        });
+    }
 </script>
 

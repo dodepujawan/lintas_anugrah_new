@@ -194,7 +194,8 @@
       </div>
     </div>
     <!-- / Layout wrapper -->
-
+    {{-- JSprint Bundle --}}
+    <script src="{{ asset('assets/jsprint/scripts/JSPrintManager.js') }}"></script>
     <!-- Core JS -->
     <!-- build:js assets/vendor/js/core.js -->
     <script src="{{ asset('dashboard/sneat/assets/vendor/libs/jquery/jquery.js') }}"></script>
@@ -204,7 +205,8 @@
 
     <script src="{{ asset('dashboard/sneat/assets/vendor/js/menu.js') }}"></script>
     <!-- endbuild -->
-
+    {{-- Build Jsprint --}}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bluebird/3.3.5/bluebird.min.js"></script>
     <!-- Vendors JS -->
 
     <!-- Main JS -->

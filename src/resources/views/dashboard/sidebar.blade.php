@@ -231,6 +231,11 @@
                     <span class="menu-text">Penanggung Jawab</span>
                     </a>
                 </li>
+                <li class="menu-item">
+                    <a href="#" class="menu-link" id="sidebar_extra_printer">
+                    <span class="menu-text">Printer</span>
+                    </a>
+                </li>
                 </ul>
             </li>
             {{-- Extra Spasi --}}
