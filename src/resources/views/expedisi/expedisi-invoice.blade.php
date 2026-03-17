@@ -838,7 +838,6 @@ $(document).ready(function() {
                 type: "POST",
                 data: payload,
                 success: function (res) {
-                    $('#loading_modal').modal('hide');
                     Swal.fire('Success', res.message, 'success');
 
                     // reload table
@@ -853,6 +852,7 @@ $(document).ready(function() {
                     // Cetak Invoice Hidden Tab
                     if (res.status) {
                         printInvoice(res.invoiceNo);
+                        $('#loading_modal').modal('hide');
                     }
                 },
                 error: function (xhr) {

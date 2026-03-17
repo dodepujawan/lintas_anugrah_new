@@ -85,26 +85,26 @@
 <div class="modal fade" id="printerModal">
   <div class="modal-dialog">
     <div class="modal-content">
-
       <div class="modal-header">
         <h5 class="modal-title">Pilih Printer</h5>
-        <button class="btn-close" data-bs-dismiss="modal"></button>
       </div>
-
       <div class="modal-body">
-
-        <select id="printerSelect" class="form-select">
-            <option value="">Loading printer...</option>
-        </select>
-
+        <select id="printerSelect" class="form-select"></select>
+        <hr>
+        <small class="text-muted">
+        Jika printer tidak muncul, install JSPrintManager terlebih dahulu.
+        </small>
       </div>
-
       <div class="modal-footer">
+        <a href="{{ asset('assets/file/jspm8-8.0.26.227.exe') }}"
+           class="btn btn-warning"
+           download>
+           Download JSPrintManager
+        </a>
         <button class="btn btn-primary" id="savePrinter">
             Simpan
         </button>
       </div>
-
     </div>
   </div>
 </div>
