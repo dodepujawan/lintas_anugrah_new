@@ -192,11 +192,13 @@
                     <span class="menu-text">All Users</span>
                     </a>
                 </li>
+                @can('transaksi.create')
                 <li class="menu-item">
                     <a href="#" class="menu-link" id="sidebar_new_user">
                     <span class="menu-text">Add New User</span>
                     </a>
                 </li>
+                @endcan
                 {{-- <li class="menu-item">
                     <a href="#" class="menu-link">
                     <span class="menu-text">User Roles</span>
@@ -245,3 +247,33 @@
     </nav>
     </div>
 </div>
+<script>
+// Fungsi Auto Close Sidebar Sneat
+document.addEventListener('DOMContentLoaded', function() {
+    const sidebar = document.getElementById('sneatSidebar');
+
+    sidebar.addEventListener('click', function(e) {
+        // Cari element menu-link yang diklik
+        const menuLink = e.target.closest('.menu-link');
+
+        if (menuLink) {
+            // Cek apakah ini menu dengan submenu
+            const hasSubmenu = menuLink.hasAttribute('data-bs-toggle') &&
+                              menuLink.getAttribute('data-bs-toggle') === 'collapse';
+
+            // Jika bukan menu dengan submenu
+            if (!hasSubmenu) {
+                // Dapatkan instance offcanvas
+                const offcanvasInstance = bootstrap.Offcanvas.getInstance(sidebar);
+
+                // Beri sedikit delay agar navigasi tetap berjalan
+                setTimeout(() => {
+                    if (offcanvasInstance) {
+                        offcanvasInstance.hide();
+                    }
+                }, 150);
+            }
+        }
+    });
+});
+</script>

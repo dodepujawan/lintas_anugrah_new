@@ -44,7 +44,7 @@ class PricedinginController extends Controller
                 })
 
                 ->addColumn('action', function ($row) {
-                    if (!Auth::check() || Auth::user()->roles != 'admin') {
+                    if (!Auth::check() || Auth::user()->role_old != 'admin') {
                         return '-';
                     }
 

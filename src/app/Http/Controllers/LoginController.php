@@ -31,7 +31,7 @@ class LoginController extends Controller
             session([
                 'id' => $user->id,
                 'name' => $user->name,
-                'roles' => $user->roles,
+                'role_old' => $user->roles,
                 'user_id' => $user->user_id,
             ]);
 
@@ -44,7 +44,7 @@ class LoginController extends Controller
 
     public function actionlogout()
     {
-        session()->forget(['id', 'name', 'roles', 'user_id']);
+        session()->forget(['id', 'name', 'role_old', 'user_id']);
 
         Auth::logout();
         return redirect('/');

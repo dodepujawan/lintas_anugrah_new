@@ -223,7 +223,7 @@ class ExpedisiController extends Controller
         ->orderBy('created_at', 'desc'); ;
 
         // 🔐 FILTER ROLE DRIVER
-        if (auth()->user()->roles === 'driver') {
+        if (auth()->user()->role_old === 'driver') {
             $expedisi->where('user_id', auth()->user()->user_id);
         }
 
@@ -724,7 +724,7 @@ class ExpedisiController extends Controller
         ->orderBy('id', 'desc');
 
         // 🔐 FILTER ROLE DRIVER
-        if (auth()->user()->roles === 'driver') {
+        if (auth()->user()->role_old === 'driver') {
             $expedisi->where('user_id', auth()->user()->user_id);
         }
 
@@ -903,7 +903,7 @@ class ExpedisiController extends Controller
         $user = auth()->user();
 
         // 🔐 CEK AKSES
-        if ($user->roles !== 'admin') {
+        if ($user->role_old !== 'admin') {
             if ($expedisi->user_id !== $user->user_id) {
                 abort(403, 'Anda tidak berhak mencetak surat jalan ini');
             }

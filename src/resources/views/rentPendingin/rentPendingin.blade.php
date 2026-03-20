@@ -448,7 +448,7 @@
 {{-- MODAL --}}
 @include('rentPendingin.rentPendingin_modal')
 <script>
-var userRole = "{{ auth()->user()->roles }}";
+var userRole = "{{ auth()->user()->role_old }}";
 var userId = "{{ auth()->user()->user_id }}";
 $(document).ready(function() {
     // Set CSRF token in AJAX setup

@@ -390,7 +390,7 @@ $(document).ready(function() {
     });
     resetFormExpedisi();
     // ================================= driver Login =====================================
-    const userRole = "{{ auth()->user()->roles }}";
+    const userRole = "{{ auth()->user()->role_old }}";
     const userId = "{{ auth()->user()->user_id }}";
     // console.log(userId);
     if (userRole === 'driver') {

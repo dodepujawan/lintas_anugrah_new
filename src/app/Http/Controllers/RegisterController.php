@@ -33,7 +33,7 @@ class RegisterController extends Controller
             $validatedData = $request->validate([
                 'email' => 'required|email|unique:users',
                 'name' => 'required|string|max:255',
-                'password' => 'required|string|min:8',
+                'password' => 'required|string|min:6',
                 'role' => 'required|string|max:255',
             ]);
 
@@ -61,8 +61,11 @@ class RegisterController extends Controller
                 'email' => $request->email,
                 'name' => $request->name,
                 'password' => Hash::make($request->password),
-                'roles' => $roleName,
+                'role_old' => $roleName,
             ]);
+
+            // 🔥 WAJIB: assign ke Spatie
+            $user->assignRole($roleName);
 
             // Jika role adalah driver (DV), simpan data ke tabel driver
             if ($role === 'DV') {
@@ -128,8 +131,10 @@ class RegisterController extends Controller
             if ($request->password) {
                 $user->password = Hash::make($request->password);
             }
-            $user->roles = $request->roles;
+            $user->role_old = $request->roles;
             $user->save();
+            // 🔥 update role Spatie
+            $user->syncRoles([$request->roles]);
 
             DB::commit();
             $result['pesan'] = 'Update Berhasil.';
@@ -155,7 +160,7 @@ class RegisterController extends Controller
 
         $user = Auth::user();
 
-        if ($user->roles !== 'admin') {
+        if ($user->role_old !== 'admin') {
             return response()->json(['message' => 'Akses ditolak'], 403);
         }
 
@@ -166,7 +171,7 @@ class RegisterController extends Controller
                 'users.user_id',
                 'users.email',
                 'users.name',
-                'users.roles',
+                'users.role_old',
                 DB::raw('DATE(users.created_at) as created_at')
             ]);
 
@@ -181,7 +186,7 @@ class RegisterController extends Controller
                         $sub->where('users.email', 'like', "%$search%")
                             ->orWhere('users.name', 'like', "%$search%")
                             ->orWhere('users.user_id', 'like', "%$search%")
-                            ->orWhere('users.roles', 'like', "%$search%");
+                            ->orWhere('users.role_old', 'like', "%$search%");
                     });
                 }
 
@@ -249,7 +254,7 @@ class RegisterController extends Controller
                 'DV' => 'driver',
             ];
 
-            $roleLama = strtolower(trim($user->roles));
+            $roleLama = strtolower(trim($user->role_old));
             $roleCode = $request->roles_list_reg;
             $roleBaru = $roleMapping[$roleCode] ?? 'customer';
 
@@ -277,7 +282,7 @@ class RegisterController extends Controller
                 }
             }
             // ================= UPDATE ROLE & USER_ID =================
-            if ($user->roles !== $roleBaru) {
+            if ($user->role_old !== $roleBaru) {
                 $oldUserId = $user->user_id;
                 // generate user_id baru
                 $generateRequest = new Request(['role' => $roleCode]);
@@ -285,7 +290,7 @@ class RegisterController extends Controller
                 $newUserId       = $userIdResponse->getData()->user_id;
 
                 $user->user_id = $newUserId;
-                $user->roles   = $roleBaru;
+                $user->role_old   = $roleBaru;
 
                 // ============ DRIVER → NON DRIVER (HAPUS DATA DRIVER) ============
                 if ($roleLama === 'driver' && $roleBaru !== 'driver' && $driverData) {
@@ -348,7 +353,7 @@ class RegisterController extends Controller
             }
 
             // ================= JIKA ROLE DRIVER =================
-            if (strtolower($user->roles) === 'driver') {
+            if (strtolower($user->role_old) === 'driver') {
 
                 $driver = Driver::where('user_id', $user->user_id)->first();
 

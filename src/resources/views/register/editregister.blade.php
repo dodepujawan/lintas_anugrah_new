@@ -25,7 +25,7 @@
                 </div>
                 <div class="mb-3">
                     <label for="roles" class="form-label"><i class="fa fa-address-book"></i> Role</label>
-                    <input type="text" name="roles" id="roles" class="form-control" value="{{ $user->roles }}" readonly>
+                    <input type="text" name="roles" id="roles" class="form-control" value="{{ $user->role_old }}" readonly>
                 </div>
                 <button type="submit" class="btn btn-primary w-100 mt-3"><i class="fa fa-user"></i> Update</button>
                 <hr>

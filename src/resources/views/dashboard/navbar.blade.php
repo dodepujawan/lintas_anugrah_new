@@ -45,7 +45,7 @@
                     </div>
                     <div class="flex-grow-1">
                     <span class="fw-semibold d-block">{{ $user->name }}</span>
-                    <small class="text-muted">{{ $user->roles }}</small>
+                    <small class="text-muted">{{ $user->role_old }}</small>
                     </div>
                 </div>
                 </a>

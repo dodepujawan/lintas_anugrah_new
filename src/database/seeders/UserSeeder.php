@@ -20,7 +20,7 @@ class UserSeeder extends Seeder
                 'name'     => 'dwebpro',
                 'user_id'  => 'AD0001',
                 'password' => Hash::make('admin123'),
-                'roles'    => 'admin',
+                'role_old'    => 'admin',
             ]
         );
         User::updateOrCreate(
@@ -29,7 +29,7 @@ class UserSeeder extends Seeder
                 'name'     => 'Kantor Utama',
                 'user_id'  => 'AD0002',
                 'password' => Hash::make('admin123'),
-                'roles'    => 'admin',
+                'role_old'    => 'admin',
             ]
         );
     }

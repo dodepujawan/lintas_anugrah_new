@@ -114,7 +114,7 @@ $(document).ready(function() {
                 { data: 'user_id' },
                 { data: 'email' },
                 { data: 'name' },
-                { data: 'roles' },
+                { data: 'role_old' },
                 { data: 'created_at' },
                 {
                     data: null,

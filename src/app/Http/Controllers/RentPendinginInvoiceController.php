@@ -50,7 +50,7 @@ class RentPendinginInvoiceController extends Controller
         ->orderByDesc('id');
 
         // 🔐 FILTER DRIVER
-        if (auth()->user()->roles === 'driver') {
+        if (auth()->user()->role_old === 'driver') {
             $expedisi->where('user_id', auth()->user()->user_id);
         }
 
@@ -208,7 +208,7 @@ class RentPendinginInvoiceController extends Controller
             return response()->json([
                 'status'  => true,
                 'message' => 'Invoice berhasil disimpan',
-                'redirect' => route('expedisiInvoice.printSuratJalan', [
+                'redirect' => route('expedisiInvoice.pdfInvoice', [
                     'invoiceNo' => $invoiceNo
                 ])
             ]);
@@ -261,7 +261,7 @@ class RentPendinginInvoiceController extends Controller
             return response()->json([
                 'status' => true,
                 'message' => 'Invoice berhasil diupdate',
-                'redirect' => route('expedisiInvoice.printSuratJalan', [
+                'redirect' => route('expedisiInvoice.pdfInvoice', [
                     'invoiceNo' => $invoiceNo
                 ])
             ]);

@@ -53,7 +53,7 @@ class RentPendinginController extends Controller
         ->orderBy('id', 'desc');
 
         // 🔐 FILTER ROLE DRIVER
-        if (auth()->user()->roles === 'driver') {
+        if (auth()->user()->role_old === 'driver') {
             $expedisi->where('user_id', auth()->user()->user_id);
         }
 
@@ -179,7 +179,7 @@ class RentPendinginController extends Controller
         ->orderBy('created_at', 'desc'); ;
 
         // 🔐 FILTER ROLE DRIVER
-        if (auth()->user()->roles === 'driver') {
+        if (auth()->user()->role_old === 'driver') {
             $expedisi->where('user_id', auth()->user()->user_id);
         }
 
