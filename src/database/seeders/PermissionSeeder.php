@@ -18,7 +18,7 @@ class PermissionSeeder extends Seeder
         Permission::firstOrCreate(['name' => 'transaksi.view']);
         Permission::firstOrCreate(['name' => 'transaksi.create']);
 
-        // ambil role
+        // ambil role (ini versi kalau mau pakai roles sebagai parameters)
         $admin = Role::findByName('admin');
         $staff = Role::findByName('staff');
 

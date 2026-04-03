@@ -8,7 +8,6 @@
 }
 </style>
 <div class="container mt-4">
-```
 <div class="card shadow">
     <div class="card-header bg-success text-white fw-bold">
         SERVICE MOBIL
@@ -122,7 +121,7 @@
                     <div class="row mb-2">
                         <label class="col-sm-4 col-form-label">NOMOR FAKTUR</label>
                         <div class="col-sm-7">
-                            <input type="text" class="form-control" name="no_faktur_service" id="no_faktur_service">
+                            <input type="text" class="form-control" name="no_faktur_service" id="no_faktur_service" readonly>
                         </div>
                     </div>
 
@@ -164,7 +163,6 @@
     </div>
 
 </div>
-```
 </div>
 {{-- MODAL --}}
 @include('service.service_modal')
