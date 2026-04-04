@@ -6,24 +6,68 @@ use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
+use App\Models\User;
 
 class PermissionSeeder extends Seeder
 {
     /**
      * Run the database seeds.
      */
-    public function run(): void
-    {
-        // buat permission
-        Permission::firstOrCreate(['name' => 'transaksi.view']);
-        Permission::firstOrCreate(['name' => 'transaksi.create']);
+    public function run(): void{
+        // ================= PERMISSIONS =================
+        $permissions = [
+            'customer.view',
+            'kendaraan.view',
+            'driver.view',
 
-        // ambil role (ini versi kalau mau pakai roles sebagai parameters)
-        $admin = Role::findByName('admin');
-        $staff = Role::findByName('staff');
+            'price.expedisi',
+            'price.customer',
+            'price.rent',
 
-        // kasih permission ke role
-        $admin->givePermissionTo(['transaksi.view', 'transaksi.create']);
-        $staff->givePermissionTo(['transaksi.view']);
+            'penjualan.expedisi',
+            'penjualan.invoice',
+            'penjualan.kwitansi',
+            'penjualan.rent_dingin',
+            'penjualan.invoice_rent_dingin',
+            'penjualan.kwitansi_rent_dingin',
+
+            'supplier.view',
+            'service.view',
+
+            'user.view',
+            'user.create',
+
+            'extra.pajak',
+            'extra.rekening',
+            'extra.signature',
+            'extra.printer',
+            // 🔥 TAMBAHAN BARU
+            'extra.permissions',
+        ];
+
+        foreach ($permissions as $perm) {
+            Permission::firstOrCreate(['name' => $perm]);
+        }
+
+        // ================= ROLES =================
+        $admin = Role::firstOrCreate(['name' => 'admin']);
+        $staff = Role::firstOrCreate(['name' => 'staff']);
+
+        // ================= ASSIGN PERMISSION KE ROLE =================
+        $admin->syncPermissions($permissions);
+
+        $staff->syncPermissions([
+            'customer.view',
+            'kendaraan.view',
+            'driver.view',
+            'penjualan.expedisi',
+        ]);
+
+        // ================= SUPER ADMIN (USER ID 1) =================
+        $user = User::find(1);
+
+        if ($user) {
+            $user->assignRole('admin');
+        }
     }
 }

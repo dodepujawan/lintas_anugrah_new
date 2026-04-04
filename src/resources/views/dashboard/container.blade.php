@@ -622,6 +622,24 @@ $(document).ready(function() {
         });
     });
 // =============================== End Of Printer ======================================
+// =============================== Hak Akses ========================================
+    $(document).on('click', '#sidebar_extra_permissions', function(e) {
+        e.preventDefault();
+        loadDataPermissions();
+        function loadDataPermissions(){
+            $.ajax({
+                url: '{{ route('index.permissions') }}',
+                type: 'GET',
+                success: function(response) {
+                    $('.master-page').html(response);
+                },
+                error: function() {
+                   $('.master-page').html('<p>Error loading form.</p>');
+                }
+            });
+        }
+    });
+// ============================== End Of Hak Akses =======================================
 // +++++++++++++++++++++++++++ End Of SIDEBAR ROOM ++++++++++++++++++++++++++++++++++++++
 });
 </script>

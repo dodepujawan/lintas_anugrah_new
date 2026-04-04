@@ -23,6 +23,7 @@ use App\Http\Controllers\PajakController;
 use App\Http\Controllers\RekeningController;
 use App\Http\Controllers\SignatureController;
 use App\Http\Controllers\PrinterController;
+use App\Http\Controllers\UserPermissionController;
 
 Route::get('/', function () {
     return redirect()->route('login');
@@ -153,38 +154,22 @@ Route::prefix('expedisi')->group(function() {
 
 Route::prefix('expedisi-invoice')->group(function() {
     Route::get('/', [ExpedisiInvoiceController::class, 'index'])->name('expedisiInvoice.index');
-    // Route::get('/data/cus', [ExpedisiController::class, 'getDataCustomer'])->name('expedisi-cus.data');
     Route::post('/store', [ExpedisiInvoiceController::class, 'storeGabungInvoice'])->name('expedisiInvoice.store');
     Route::post('/update', [ExpedisiInvoiceController::class, 'updateGabungInvoice'])->name('expedisiInvoice.update');
     Route::get('/data', [ExpedisiInvoiceController::class, 'getDataMuat'])->name('expedisiInvoice.data');
     Route::get('/data/gabung', [ExpedisiInvoiceController::class, 'dataGabung'])->name('expedisiInvoiceGabung.data');
     Route::get('data/invoice/existing', [ExpedisiInvoiceController::class,'getExistingInvoice'])
     ->name('expedisiInvoiceGabungExisting.data');
-    // Route::get('/show/surjal', [ExpedisiController::class, 'showSurjal'])->name('expedisi-surjal.show');
-    // Route::get('/show', [ExpedisiController::class, 'showMuat'])->name('expedisi.show');
-    // Route::post('/update/{nosj}', [ExpedisiController::class, 'updateSurjal'])->name('expedisi.update');
-    // Route::post('/update/muat/{nomuat}', [ExpedisiController::class, 'updateMuat'])->name('expedisi-muat.update');
-    // Route::post('/destroy/{id}', [ExpedisiController::class, 'destroySurjal'])->name('expedisi.destroy');
-    // Route::post('/destroy/muat/{nomuat}', [ExpedisiController::class, 'destroyMuat'])->name('expedisi-muat.destroy');
-    // Route::post('/store/muat', [ExpedisiController::class, 'storeMuat'])->name('expedisi-muat.store');
     // // PDF
     Route::get('/expedisi/invoice/pdf/{invoiceNo}', [ExpedisiInvoiceController::class, 'pdfGabungInvoice'])->name('expedisiInvoice.pdfInvoice');
 });
 
 Route::prefix('expedisi-kwitansi')->group(function() {
     Route::get('/', [ExpedisiKwitansiController::class, 'index'])->name('expedisiKwitansi.index');
-    // Route::get('/data/cus', [ExpedisiController::class, 'getDataCustomer'])->name('expedisi-cus.data');
     Route::post('/store', [ExpedisiKwitansiController::class, 'prosesKwitansiStore'])->name('expedisiKwitansi.store');
-    // Route::get('/data/surjal', [ExpedisiController::class, 'getDataSurjal'])->name('expedisi-surjal.data');
     Route::get('/data', [ExpedisiKwitansiController::class, 'getDataInvoiceKwt'])->name('expedisiKwitansi.data');
-    // Route::get('/data/gabung', [ExpedisiInvoiceController::class, 'dataGabung'])->name('expedisiInvoiceGabung.data');
-    // Route::get('/show/surjal', [ExpedisiController::class, 'showSurjal'])->name('expedisi-surjal.show');
     Route::get('/show/{invoice}', [ExpedisiKwitansiController::class, 'showInvoiceGabung'])->name('expedisiKwitansi.show');
-    // Route::post('/update/{nosj}', [ExpedisiController::class, 'updateSurjal'])->name('expedisi.update');
-    // Route::post('/update/muat/{nomuat}', [ExpedisiController::class, 'updateMuat'])->name('expedisi-muat.update');
     Route::post('/destroy', [ExpedisiKwitansiController::class, 'prosesKwitansiDelete'])->name('expedisiKwitansi.destroy');
-    // Route::post('/destroy/muat/{nomuat}', [ExpedisiController::class, 'destroyMuat'])->name('expedisi-muat.destroy');
-    // Route::post('/store/muat', [ExpedisiController::class, 'storeMuat'])->name('expedisi-muat.store');
     // // PDF
     Route::get('/kwitansi/invoice/pdf/{invoiceNo}', [ExpedisiKwitansiController::class, 'pdfInvoiceKwitansi'])->name('expedisiKwitansi.pdfKwitansi');
 });
@@ -208,38 +193,18 @@ Route::prefix('rent-pendingin')->group(function() {
 
 Route::prefix('rent-pendingin-invoice')->group(function() {
     Route::get('/', [RentPendinginInvoiceController::class, 'index'])->name('rentPendinginInv.index');
-    // Route::get('/data/cus', [ExpedisiController::class, 'getDataCustomer'])->name('expedisi-cus.data');
     Route::post('/store', [RentPendinginInvoiceController::class, 'storeRentDinginInvoice'])->name('rentPendinginInv.store');
-    // Route::get('/data/surjal', [ExpedisiController::class, 'getDataSurjal'])->name('expedisi-surjal.data');
     Route::get('/data', [RentPendinginInvoiceController::class, 'getDataMuat'])->name('rentPendinginInv.data');
     Route::get('/data/muat', [RentPendinginInvoiceController::class, 'getDetailByNomuat'])->name('rentPendinginInv.detail');
-    // Route::get('/show/surjal', [ExpedisiController::class, 'showSurjal'])->name('expedisi-surjal.show');
-    // Route::get('/show', [ExpedisiController::class, 'showMuat'])->name('expedisi.show');
     Route::post('/update', [RentPendinginInvoiceController::class, 'updateRentDinginInvoice'])->name('rentPendinginInv.update');
-    // Route::post('/update/muat/{nomuat}', [ExpedisiController::class, 'updateMuat'])->name('expedisi-muat.update');
-    // Route::post('/destroy/{id}', [ExpedisiController::class, 'destroySurjal'])->name('expedisi.destroy');
-    // Route::post('/destroy/muat/{nomuat}', [ExpedisiController::class, 'destroyMuat'])->name('expedisi-muat.destroy');
-    // Route::post('/store/muat', [ExpedisiController::class, 'storeMuat'])->name('expedisi-muat.store');
-    // // PDF
-    // Route::get('/expedisi/invoice/pdf/{invoiceNo}', [ExpedisiInvoiceController::class, 'pdfGabungInvoice'])->name('expedisiInvoice.printSuratJalan');
 });
 
 Route::prefix('rent-pendingin-kwitansi')->group(function() {
     Route::get('/', [RentPendinginKwitansiController::class, 'index'])->name('rentPendinginKwitansi.index');
-    // Route::get('/data/cus', [ExpedisiController::class, 'getDataCustomer'])->name('expedisi-cus.data');
     Route::post('/store', [RentPendinginKwitansiController::class, 'prosesKwitansiStore'])->name('rentPendinginKwitansi.store');
-    // Route::get('/data/surjal', [ExpedisiController::class, 'getDataSurjal'])->name('expedisi-surjal.data');
     Route::get('/data', [RentPendinginKwitansiController::class, 'getDataInvoiceKwt'])->name('rentPendinginKwitansi.data');
-    // Route::get('/data/gabung', [RentPendinginKwitansiController::class, 'showInvoiceDetail'])->name('rentPendinginKwitansi.detail');
-    // Route::get('/show/surjal', [ExpedisiController::class, 'showSurjal'])->name('expedisi-surjal.show');
     Route::get('/show/{invoice}', [RentPendinginKwitansiController::class, 'showInvoiceDetail'])->name('rentPendinginKwitansi.show');
-    // Route::post('/update/{nosj}', [ExpedisiController::class, 'updateSurjal'])->name('expedisi.update');
-    // Route::post('/update/muat/{nomuat}', [ExpedisiController::class, 'updateMuat'])->name('expedisi-muat.update');
     Route::post('/destroy', [RentPendinginKwitansiController::class, 'prosesKwitansiDelete'])->name('rentPendinginKwitansi.destroy');
-    // Route::post('/destroy/muat/{nomuat}', [ExpedisiController::class, 'destroyMuat'])->name('expedisi-muat.destroy');
-    // Route::post('/store/muat', [ExpedisiController::class, 'storeMuat'])->name('expedisi-muat.store');
-    // // PDF
-    // Route::get('/kwitansi/invoice/pdf/{invoiceNo}', [ExpedisiKwitansiController::class, 'pdfInvoiceKwitansi'])->name('expedisiKwitansi.pdfKwitansi');
 });
 
 Route::prefix('supplier')->middleware('auth')->group(function () {
@@ -282,6 +247,13 @@ Route::prefix('printer')->middleware('auth')->group(function () {
     Route::post('/save', [PrinterController::class, 'save'])->name('printer.save');
     Route::get('/current', [PrinterController::class, 'current'])->name('printer.current');
 });
+
+Route::prefix('permissions')->middleware('auth')->group(function () {
+    Route::get('/index', [UserPermissionController::class, 'index'])->name('index.permissions');
+    Route::get('/user-permissions/{id}', [UserPermissionController::class, 'getPermissions'])->name('user.permissions');
+    Route::post('/save-permissions', [UserPermissionController::class, 'update'])->name('update.permissions');
+});
+
 // Route::prefix('register')->group(function () {
 //     Route::get('/users', UsersPage::class)->name('users.page');
 // });

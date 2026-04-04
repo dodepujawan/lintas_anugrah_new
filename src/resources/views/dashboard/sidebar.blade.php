@@ -238,6 +238,11 @@
                     <span class="menu-text">Printer</span>
                     </a>
                 </li>
+                <li class="menu-item">
+                    <a href="#" class="menu-link" id="sidebar_extra_permissions">
+                    <span class="menu-text">Hak Akses</span>
+                    </a>
+                </li>
                 </ul>
             </li>
             {{-- Extra Spasi --}}
