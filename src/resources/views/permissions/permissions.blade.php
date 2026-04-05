@@ -61,6 +61,10 @@
                         <input class="form-check-input perm" type="checkbox" value="price.rent">
                         <label class="form-check-label">Rent</label>
                     </div>
+                    <div class="form-check">
+                        <input class="form-check-input perm" type="checkbox" value="price.customer_rent">
+                        <label class="form-check-label">Rent Customer</label>
+                    </div>
                 </div>
 
                 {{-- ================= PENJUALAN ================= --}}

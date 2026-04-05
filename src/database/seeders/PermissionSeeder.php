@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Permission;
+use Spatie\Permission\PermissionRegistrar;
 use Spatie\Permission\Models\Role;
 use App\Models\User;
 
@@ -14,6 +15,9 @@ class PermissionSeeder extends Seeder
      * Run the database seeds.
      */
     public function run(): void{
+        // 🔥 RESET CACHE WAJIB
+        app()[PermissionRegistrar::class]->forgetCachedPermissions();
+
         // ================= PERMISSIONS =================
         $permissions = [
             'customer.view',
@@ -23,6 +27,7 @@ class PermissionSeeder extends Seeder
             'price.expedisi',
             'price.customer',
             'price.rent',
+            'price.customer_rent',
 
             'penjualan.expedisi',
             'penjualan.invoice',
@@ -46,7 +51,10 @@ class PermissionSeeder extends Seeder
         ];
 
         foreach ($permissions as $perm) {
-            Permission::firstOrCreate(['name' => $perm]);
+            Permission::firstOrCreate([
+                'name' => $perm,
+                'guard_name' => 'web'
+            ]);
         }
 
         // ================= ROLES =================
@@ -54,14 +62,15 @@ class PermissionSeeder extends Seeder
         $staff = Role::firstOrCreate(['name' => 'staff']);
 
         // ================= ASSIGN PERMISSION KE ROLE =================
-        $admin->syncPermissions($permissions);
+        // ### Fungsinya agar role bisa akses permission tertentu
+        // $admin->syncPermissions($permissions);
 
-        $staff->syncPermissions([
-            'customer.view',
-            'kendaraan.view',
-            'driver.view',
-            'penjualan.expedisi',
-        ]);
+        // $staff->syncPermissions([
+        //     'customer.view',
+        //     'kendaraan.view',
+        //     'driver.view',
+        //     'penjualan.expedisi',
+        // ]);
 
         // ================= SUPER ADMIN (USER ID 1) =================
         $user = User::find(1);

@@ -34,11 +34,13 @@
                 <i class="menu-arrow bx bx-chevron-right"></i>
                 </a>
                 <ul class="sub-menu collapse" id="customerMenu">
+                @can('customer.view')
                 <li class="menu-item">
                     <a href="#" class="menu-link" id="sidebar_register_customer">
                     <span class="menu-text">Customer</span>
                     </a>
                 </li>
+                @endcan
                 </ul>
             </li>
 
@@ -49,11 +51,13 @@
                 <i class="menu-arrow bx bx-chevron-right"></i>
                 </a>
                 <ul class="sub-menu collapse" id="kendaraanMenu">
+                @can('kendaraan.view')
                 <li class="menu-item">
                     <a href="#" class="menu-link" id="sidebar_new_kendaraan">
                     <span class="menu-text">Kendaraan</span>
                     </a>
                 </li>
+                @endcan
                 </ul>
             </li>
 
@@ -64,11 +68,13 @@
                 <i class="menu-arrow bx bx-chevron-right"></i>
                 </a>
                 <ul class="sub-menu collapse" id="driverMenu">
+                @can('driver.view')
                 <li class="menu-item">
                     <a href="#" class="menu-link" id="sidebar_new_driver">
                     <span class="menu-text">Driver</span>
                     </a>
                 </li>
+                @endcan
                 </ul>
             </li>
 
@@ -79,29 +85,37 @@
                 <i class="menu-arrow bx bx-chevron-right"></i>
                 </a>
                 <ul class="sub-menu collapse" id="priceMenu">
+                @can('price.expedisi')
                 <li class="menu-item">
                     <a href="#" class="menu-link" id="sidebar_new_prices">
                     <span class="menu-text">Ekspedisi</span>
                     </a>
                 </li>
+                @endcan
+                @can('price.customer')
                 <li class="menu-item">
                     <a href="#" class="menu-link" id="sidebar_prices_customer">
                     <span class="menu-text">Ekspedisi Customer</span>
                     </a>
                 </li>
+                @endcan
                    <li class="menu-item">
                         <div class="dropdown-divider my-2"></div>
                     </li>
+                @can('price.rent_dingin')
                 <li class="menu-item">
                     <a href="#" class="menu-link" id="sidebar_new_rent">
                     <span class="menu-text">Rent</span>
                     </a>
                 </li>
+                @endcan
+                @can('price.customer_rent')
                 <li class="menu-item">
                     <a href="#" class="menu-link" id="sidebar_rent_customer">
                     <span class="menu-text">Rent Customer</span>
                     </a>
                 </li>
+                @endcan
                 </ul>
             </li>
 
@@ -112,39 +126,51 @@
                 <i class="menu-arrow bx bx-chevron-right"></i>
                 </a>
                 <ul class="sub-menu collapse" id="penjualanMenu">
+                @can('penjualan.expedisi')
                 <li class="menu-item">
                     <a href="#" class="menu-link" id="sidebar_new_expedisi">
                     <span class="menu-text">Ekspedisi</span>
                     </a>
                 </li>
+                @endcan
+                @can('penjualan.invoice')
                 <li class="menu-item">
                     <a href="#" class="menu-link" id="sidebar_invoice_expedisi">
                     <span class="menu-text">Invoice Ekspedisi</span>
                     </a>
                 </li>
+                @endcan
+                @can('penjualan.kwitansi')
                 <li class="menu-item">
                     <a href="#" class="menu-link" id="sidebar_kwitansi_expedisi">
                     <span class="menu-text">Kwitansi Ekspedisi</span>
                     </a>
                 </li>
+                @endcan
                 <li class="menu-item">
                     <div class="dropdown-divider my-2"></div>
                 </li>
+                @can('penjualan.rent_dingin')
                 <li class="menu-item">
                     <a href="#" class="menu-link" id="sidebar_new_rent_dingin">
                     <span class="menu-text">Sewa Mobil Pendingin</span>
                     </a>
                 </li>
+                @endcan
+                @can('penjualan.invoice_rent_dingin')
                 <li class="menu-item">
                     <a href="#" class="menu-link" id="sidebar_invoice_rent_dingin">
                     <span class="menu-text">Invoice Sewa Mobil Pendingin</span>
                     </a>
                 </li>
+                @endcan
+                @can('penjualan.kwitansi.rent_dingin')
                 <li class="menu-item">
                     <a href="#" class="menu-link" id="sidebar_kwitansi_rent_dingin">
                     <span class="menu-text">Kwitansi Sewa Mobil Pendingin</span>
                     </a>
                 </li>
+                @endcan
                 {{-- <li class="menu-item">
                     <a href="#" class="menu-link" id="sidebar_new_rent">
                     <span class="menu-text">Rent</span>
@@ -159,11 +185,13 @@
                 <i class="menu-arrow bx bx-chevron-right"></i>
                 </a>
                 <ul class="sub-menu collapse" id="supplierMenu">
+                @can('supplier.view')
                 <li class="menu-item">
                     <a href="#" class="menu-link" id="sidebar_new_supplier">
                     <span class="menu-text">Supplier</span>
                     </a>
                 </li>
+                @endcan
                 </ul>
             </li>
             <li class="menu-item">
@@ -173,11 +201,13 @@
                 <i class="menu-arrow bx bx-chevron-right"></i>
                 </a>
                 <ul class="sub-menu collapse" id="serviceMenu">
+                @can('service.view')
                 <li class="menu-item">
                     <a href="#" class="menu-link" id="sidebar_new_service">
                     <span class="menu-text">Service</span>
                     </a>
                 </li>
+                @endcan
                 </ul>
             </li>
              <li class="menu-item">
@@ -187,12 +217,14 @@
                 <i class="menu-arrow bx bx-chevron-right"></i>
                 </a>
                 <ul class="sub-menu collapse" id="userMenu">
+                @can('user.view')
                 <li class="menu-item">
                     <a href="#" class="menu-link active" id="sidebar_list_user">
                     <span class="menu-text">All Users</span>
                     </a>
                 </li>
-                @can('transaksi.create')
+                @endcan
+                @can('user.create')
                 <li class="menu-item">
                     <a href="#" class="menu-link" id="sidebar_new_user">
                     <span class="menu-text">Add New User</span>
@@ -211,6 +243,13 @@
                 </li> --}}
                 </ul>
             </li>
+            @canany([
+                'extra.pajak',
+                'extra.rekening',
+                'extra.signature',
+                'extra.printer',
+                'extra.permissions'
+            ])
             <li class="menu-item">
                 <a class="menu-link" data-bs-toggle="collapse" href="#extraMenu" role="button" aria-expanded="false">
                 <i class="menu-icon bx-slider-alt"></i>
@@ -218,33 +257,44 @@
                 <i class="menu-arrow bx bx-chevron-right"></i>
                 </a>
                 <ul class="sub-menu collapse" id="extraMenu">
+                @can('extra.pajak')
                 <li class="menu-item">
                     <a href="#" class="menu-link" id="sidebar_extra_pajak">
                     <span class="menu-text">Pajak</span>
                     </a>
                 </li>
+                @endcan
+                @can('extra.rekening')
                 <li class="menu-item">
                     <a href="#" class="menu-link" id="sidebar_extra_rekening">
                     <span class="menu-text">Rekening</span>
                     </a>
                 </li>
+                @endcan
+                @can('extra.signature')
                 <li class="menu-item">
                     <a href="#" class="menu-link" id="sidebar_extra_signature">
                     <span class="menu-text">Penanggung Jawab</span>
                     </a>
                 </li>
+                @endcan
+                @can('extra.printer')
                 <li class="menu-item">
                     <a href="#" class="menu-link" id="sidebar_extra_printer">
                     <span class="menu-text">Printer</span>
                     </a>
                 </li>
+                @endcan
+                @can('extra.permissions')
                 <li class="menu-item">
                     <a href="#" class="menu-link" id="sidebar_extra_permissions">
                     <span class="menu-text">Hak Akses</span>
                     </a>
                 </li>
+                @endcan
                 </ul>
             </li>
+            @endcanany
             {{-- Extra Spasi --}}
             <li><br></li>
             {{-- End Of Extra Spasi --}}
