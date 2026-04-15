@@ -698,6 +698,11 @@ class ExpedisiController extends Controller
             ->select(DB::raw('MIN(id) as id'))
             ->where('JENIS', 'EKS')
             ->whereNotNull('NOMUAT')
+            // Tambahan Biar Yang SUdah Ivoice Tidak Tampil
+            ->where(function ($query) {
+                $query->whereNull('INVOICE')
+                    ->orWhere('INVOICE', '=', '');
+            })
             ->groupBy('NOMUAT');
 
         $expedisi = Expedisi::select([

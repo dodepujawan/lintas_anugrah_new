@@ -1035,30 +1035,103 @@ $(document).ready(function() {
 
     // Calling Print JSPrint
     function printInvoice(invoiceNo){
-        $.get("{{ route('printer.current') }}", function(res){
+        console.log("=== START PRINT DEBUG ===");
+        console.log("Invoice No:", invoiceNo);
+        // cek JSPM global
+        console.log("JSPM object:", JSPM);
+        if(typeof JSPM === "undefined"){
+            console.error("❌ JSPM belum ke-load!");
+            return;
+        }
+        console.log("WebSocket Status:", JSPM.JSPrintManager.websocket_status);
+
+        $.get("{{ route('printer.current') }}")
+        .done(function(res){
+            console.log("Response printer:", res);
             var printerName = res.printer;
             if(!printerName){
+                console.warn("⚠️ Printer belum dipilih");
                 alert("Pilih printer dulu");
                 return;
             }
+            console.log("Printer dipakai:", printerName);
             var url = "{{ route('expedisiInvoice.pdfInvoice', ['invoiceNo' => '__INVOICE__']) }}";
             url = url.replace('__INVOICE__', invoiceNo);
-            if (JSPM.JSPrintManager.websocket_status == JSPM.WSStatus.Open){
-                var cpj = new JSPM.ClientPrintJob();
-                cpj.clientPrinter = new JSPM.InstalledPrinter(printerName);
-                var file = new JSPM.PrintFileURL(
-                    url,
-                    JSPM.FileSourceType.URL,
-                    "invoice-" + invoiceNo + ".pdf",
-                    1
-                );
-                cpj.files.push(file);
-                cpj.sendToClient();
+            console.log("URL PDF:", url);
 
-            }else{
+            // test buka URL
+            fetch(url)
+                .then(r => {
+                    console.log("Fetch PDF status:", r.status);
+                    if(!r.ok){
+                        console.error("❌ PDF tidak bisa diakses!");
+                    }
+                })
+                .catch(err => console.error("❌ Error fetch PDF:", err));
+
+            if (JSPM.JSPrintManager.websocket_status == JSPM.WSStatus.Open){
+
+                try {
+                    var cpj = new JSPM.ClientPrintJob();
+                    console.log("ClientPrintJob OK");
+
+                    cpj.clientPrinter = new JSPM.InstalledPrinter(printerName);
+                    console.log("Printer OK");
+
+                    var file = new JSPM.PrintFile(
+                        url,
+                        JSPM.FileSourceType.URL,
+                        "invoice-" + invoiceNo + ".pdf",
+                        1
+                    );
+
+                    console.log("PrintFile OK:", file);
+
+                    cpj.files.push(file);
+                    console.log("File masuk queue");
+
+                    cpj.sendToClient();
+                    console.log("✅ Print dikirim ke client");
+
+                } catch(e){
+                    console.error("❌ Error saat print:", e);
+                }
+
+            } else {
+                console.error("❌ WebSocket tidak OPEN");
                 alert("JSPrintManager belum aktif");
             }
+
+        })
+        .fail(function(err){
+            console.error("❌ Gagal ambil printer:", err);
         });
     }
+    // function printInvoice(invoiceNo){
+    //     $.get("{{ route('printer.current') }}", function(res){
+    //         var printerName = res.printer;
+    //         if(!printerName){
+    //             alert("Pilih printer dulu");
+    //             return;
+    //         }
+    //         var url = "{{ route('expedisiInvoice.pdfInvoice', ['invoiceNo' => '__INVOICE__']) }}";
+    //         url = url.replace('__INVOICE__', invoiceNo);
+    //         if (JSPM.JSPrintManager.websocket_status == JSPM.WSStatus.Open){
+    //             var cpj = new JSPM.ClientPrintJob();
+    //             cpj.clientPrinter = new JSPM.InstalledPrinter(printerName);
+    //             var file = new JSPM.PrintFileURL(
+    //                 url,
+    //                 JSPM.FileSourceType.URL,
+    //                 "invoice-" + invoiceNo + ".pdf",
+    //                 1
+    //             );
+    //             cpj.files.push(file);
+    //             cpj.sendToClient();
+
+    //         }else{
+    //             alert("JSPrintManager belum aktif");
+    //         }
+    //     });
+    // }
 </script>
 

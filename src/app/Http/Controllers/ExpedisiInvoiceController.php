@@ -341,6 +341,7 @@ class ExpedisiInvoiceController extends Controller
 
                 foreach ($oldRows as $row) {
 
+                    $row->TGLINVOICE = null;
                     $row->INVOICE = null;
                     $row->STS = null;
                     $row->GB = null;
