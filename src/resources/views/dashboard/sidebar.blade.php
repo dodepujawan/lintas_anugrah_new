@@ -164,7 +164,7 @@
                     </a>
                 </li>
                 @endcan
-                @can('penjualan.kwitansi.rent_dingin')
+                @can('penjualan.kwitansi_rent_dingin')
                 <li class="menu-item">
                     <a href="#" class="menu-link" id="sidebar_kwitansi_rent_dingin">
                     <span class="menu-text">Kwitansi Sewa Mobil Pendingin</span>
