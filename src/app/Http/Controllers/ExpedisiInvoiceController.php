@@ -461,6 +461,12 @@ class ExpedisiInvoiceController extends Controller
         $rekening = Rekening::where('AKTIF', 1)->first();
         $signature = Signature::orderByDesc('id')->first();
 
+        // membuat folder tempPath
+        $tempPath = storage_path('app/mpdf-temp');
+        if (!is_dir($tempPath)) {
+            mkdir($tempPath, 0775, true);
+        }
+
         $mpdf = new Mpdf([
             'mode' => 'utf-8',
             'format' => 'A4',
@@ -468,6 +474,7 @@ class ExpedisiInvoiceController extends Controller
             'margin_bottom' => 10,
             'margin_left' => 10,
             'margin_right' => 10,
+            'tempDir' => $tempPath,
         ]);
 
         $html = view('expedisi.expedisi-invoice-pdf', compact('rows', 'master', 'rekening', 'signature'))->render();
