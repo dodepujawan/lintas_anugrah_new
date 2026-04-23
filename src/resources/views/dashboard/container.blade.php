@@ -572,9 +572,7 @@ $(document).ready(function() {
     });
 // ========================= End Of Update Signature ======================================
 // ==================================== Printer ========================================
-    // Jsprint Reload Inisiator
-    JSPM.JSPrintManager.auto_reconnect = true;
-    JSPM.JSPrintManager.start();
+
     // ### Ambil Printer Dari JSPrint Select
     $('#sidebar_extra_printer').click(function(e){
         e.preventDefault();
@@ -583,25 +581,28 @@ $(document).ready(function() {
     });
     // ### Ambil Printer Dari JSPrint Select
     function loadPrinters(){
-        if (JSPM.JSPrintManager.websocket_status == JSPM.WSStatus.Open){
-            JSPM.JSPrintManager.getPrinters().then(function(printers){
-                let select = $('#printerSelect');
-                select.empty();
-                printers.forEach(function(printer){
-                    select.append(
-                        `<option value="${printer}">${printer}</option>`
-                    );
-                });
-                // ambil printer dari database
-                $.get("{{ route('printer.current') }}", function(res){
-                    if(res.printer){
-                        select.val(res.printer);
-                    }
-                });
+        fetch('http://localhost:3000/printers')
+        .then(res => res.json())
+        .then(printers => {
+            let select = $('#printerSelect');
+            select.empty();
+            printers.forEach(function(printer){
+                select.append(
+                    `<option value="${printer}">${printer}</option>`
+                );
+                // console.log('nig: ' + printer);
             });
-        }else{
-            alert("JSPrintManager belum aktif");
-        }
+            // 🔥 ambil dari database (TETAP SAMA)
+            $.get("{{ route('printer.current') }}", function(res){
+                if(res.printer){
+                    select.val(res.printer);
+                }
+            });
+        })
+        .catch(err => {
+            alert("Print service tidak aktif");
+            console.log(err);
+        });
     }
     // ### Save Printer
     $('#savePrinter').click(function(){

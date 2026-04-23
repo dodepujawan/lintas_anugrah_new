@@ -1033,10 +1033,9 @@ $(document).ready(function() {
         btn.html('<i class="bx bx-plus-circle me-1"></i> Proses Invoice');
     }
 
-    // Calling Print JSPrint
+    // Fungsi Print Electron JS
     function printInvoice(invoiceNo){
         $.get("{{ route('printer.current') }}", function(res){
-
             var printerName = res.printer;
             console.log("🖨 Printer:", printerName);
 
@@ -1044,55 +1043,37 @@ $(document).ready(function() {
                 alert("Pilih printer dulu");
                 return;
             }
-
             var url = "{{ route('expedisiInvoice.pdfInvoice', ['invoiceNo' => '__INVOICE__']) }}";
             url = url.replace('__INVOICE__', invoiceNo);
-
             console.log("📄 URL PDF:", url);
-            console.log("🔌 JSPM Status:", JSPM.JSPrintManager.websocket_status);
-
-            // 🔥 tambahan: cek URL bisa diakses
+            // 🔥 cek PDF bisa diakses
             fetch(url)
-                .then(res => {
-                    if(!res.ok) throw new Error("PDF tidak bisa diakses");
-                    console.log("✅ PDF accessible");
+            .then(res => {
+                if(!res.ok) throw new Error("PDF tidak bisa diakses");
+                console.log("✅ PDF accessible");
+            })
+            .catch(err => {
+                console.log("❌ PDF ERROR:", err);
+            });
+            // 🔥 KIRIM KE ELECTRON
+            fetch('http://localhost:3000/print', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    url: url,
+                    printer: printerName
                 })
-                .catch(err => {
-                    console.log("❌ PDF ERROR:", err);
-                });
-
-            if (JSPM.JSPrintManager.websocket_status == JSPM.WSStatus.Open){
-
-                var cpj = new JSPM.ClientPrintJob();
-
-                cpj.clientPrinter = new JSPM.InstalledPrinter(printerName);
-
-                var file = new JSPM.PrintFile(
-                    url,
-                    JSPM.FileSourceType.URL,
-                    "invoice-" + invoiceNo + ".pdf",
-                    1
-                );
-
-                cpj.files.push(file);
-
-                // 🔥 lebih jelas error handling
-                cpj.onError = function (e) {
-                    console.log("❌ ERROR PRINT:", e);
-                    alert("Print gagal: " + e);
-                };
-
-                cpj.onFinished = function () {
-                    console.log("✅ PRINT SELESAI");
-                    alert("Print berhasil dikirim!");
-                };
-
-                console.log("🚀 Sending to printer...");
-                cpj.sendToClient();
-
-            } else {
-                alert("JSPrintManager belum aktif / belum connect");
-            }
+            })
+            .then(res => res.json())
+            .then(res => {
+                console.log("🚀 PRINT RESPONSE:", res);
+            })
+            .catch(err => {
+                console.log("❌ PRINT ERROR:", err);
+                alert("Print service tidak aktif");
+            });
         });
     }
     // function printInvoice(invoiceNo){
