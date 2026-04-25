@@ -1035,47 +1035,92 @@ $(document).ready(function() {
 
     // Fungsi Print Electron JS
     function printInvoice(invoiceNo){
-        $.get("{{ route('printer.current') }}", function(res){
-            var printerName = res.printer;
-            console.log("🖨 Printer:", printerName);
+
+        // ambil printer dari database
+        $.get("{{ route('printer.current') }}", function(p){
+
+            var printerName = p.printer;
 
             if(!printerName){
                 alert("Pilih printer dulu");
                 return;
             }
-            var url = "{{ route('expedisiInvoice.pdfInvoice', ['invoiceNo' => '__INVOICE__']) }}";
+
+            // 🔥 pakai route name (AMAN)
+            var url = "{{ route('expedisiInvoice.text', ['invoiceNo' => '__INVOICE__']) }}";
             url = url.replace('__INVOICE__', invoiceNo);
-            console.log("📄 URL PDF:", url);
-            // 🔥 cek PDF bisa diakses
-            fetch(url)
-            .then(res => {
-                if(!res.ok) throw new Error("PDF tidak bisa diakses");
-                console.log("✅ PDF accessible");
-            })
-            .catch(err => {
-                console.log("❌ PDF ERROR:", err);
-            });
-            // 🔥 KIRIM KE ELECTRON
-            fetch('http://localhost:3000/print', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    url: url,
-                    printer: printerName
+
+            // ambil TEXT dari Laravel
+            $.get(url, function(res){
+
+                var text = res.text;
+
+                // kirim ke Electron
+                fetch('http://localhost:3000/print-text', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        printer: printerName,
+                        text: text
+                    })
                 })
-            })
-            .then(res => res.json())
-            .then(res => {
-                console.log("🚀 PRINT RESPONSE:", res);
-            })
-            .catch(err => {
-                console.log("❌ PRINT ERROR:", err);
-                alert("Print service tidak aktif");
+                .then(res => res.json())
+                .then(res => {
+                    console.log("🚀 PRINT TEXT:", res);
+                })
+                .catch(err => {
+                    console.log("❌ ERROR:", err);
+                    alert("Print service tidak aktif");
+                });
+
             });
+
         });
     }
+    // function printInvoice(invoiceNo){
+    //     $.get("{{ route('printer.current') }}", function(res){
+    //         var printerName = res.printer;
+    //         console.log("🖨 Printer:", printerName);
+
+    //         if(!printerName){
+    //             alert("Pilih printer dulu");
+    //             return;
+    //         }
+    //         var url = "{{ route('expedisiInvoice.pdfInvoice', ['invoiceNo' => '__INVOICE__']) }}";
+    //         url = url.replace('__INVOICE__', invoiceNo);
+    //         console.log("📄 URL PDF:", url);
+    //         // 🔥 cek PDF bisa diakses
+    //         fetch(url)
+    //         .then(res => {
+    //             if(!res.ok) throw new Error("PDF tidak bisa diakses");
+    //             console.log("✅ PDF accessible");
+    //         })
+    //         .catch(err => {
+    //             console.log("❌ PDF ERROR:", err);
+    //         });
+    //         // 🔥 KIRIM KE ELECTRON
+    //         fetch('http://localhost:3000/print', {
+    //             method: 'POST',
+    //             headers: {
+    //                 'Content-Type': 'application/json'
+    //             },
+    //             body: JSON.stringify({
+    //                 url: url,
+    //                 printer: printerName
+    //             })
+    //         })
+    //         .then(res => res.json())
+    //         .then(res => {
+    //             console.log("🚀 PRINT RESPONSE:", res);
+    //         })
+    //         .catch(err => {
+    //             console.log("❌ PRINT ERROR:", err);
+    //             alert("Print service tidak aktif");
+    //         });
+    //     });
+    // }
     // function printInvoice(invoiceNo){
     //     $.get("{{ route('printer.current') }}", function(res){
     //         var printerName = res.printer;

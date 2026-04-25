@@ -447,6 +447,51 @@ class ExpedisiInvoiceController extends Controller
         }
     }
 
+    public function printInvoiceText($invoiceNo){
+        $rows = Expedisi::where('INVOICE', $invoiceNo)
+            ->orderBy('NOSJ')
+            ->get();
+
+        if ($rows->isEmpty()) {
+            abort(404);
+        }
+
+        $master = $rows->first();
+
+        $text = "";
+        $text .= "PT. LINTAS ANUGERAH SEJATI\n";
+        $text .= "==========================================\n";
+        $text .= "INVOICE : {$master->INVOICE}\n";
+        $text .= "TGL     : " . date('d-m-Y', strtotime($master->TGLINVOICE)) . "\n";
+        $text .= "CUSTOMER: {$master->CUSTOMER}\n";
+        $text .= "==========================================\n";
+
+        $text .= "NO  SJ        NAMA BARANG        QTY   TOTAL\n";
+        $text .= "------------------------------------------\n";
+
+        $no = 1;
+
+        foreach ($rows as $r) {
+            $nama = trim($r->PESANANGB) !== '' ? $r->PESANANGB : $r->PESANAN;
+
+            $text .= str_pad($no, 3);
+            $text .= str_pad($r->NOSJ, 10);
+            $text .= str_pad(substr($nama, 0, 18), 20);
+            $text .= str_pad('KG', 6);
+            $text .= str_pad(number_format($r->TOTAL, 0, ',', '.'), 10, ' ', STR_PAD_LEFT);
+            $text .= "\n";
+
+            $no++;
+        }
+
+        $text .= "==========================================\n";
+        $text .= "TOTAL : " . number_format($master->GRAND, 0, ',', '.') . "\n";
+
+        return response()->json([
+            'text' => $text
+        ]);
+    }
+
     public function pdfGabungInvoice($invoiceNo){
         $rows = Expedisi::where('INVOICE', $invoiceNo)
             ->orderBy('NOSJ')

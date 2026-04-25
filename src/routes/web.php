@@ -162,6 +162,7 @@ Route::prefix('expedisi-invoice')->group(function() {
     ->name('expedisiInvoiceGabungExisting.data');
     // // PDF
     Route::get('/expedisi/invoice/pdf/{invoiceNo}', [ExpedisiInvoiceController::class, 'pdfGabungInvoice'])->name('expedisiInvoice.pdfInvoice');
+    Route::get('/print-invoice-text/{invoiceNo}', [ExpedisiInvoiceController::class, 'printInvoiceText'])->name('expedisiInvoice.text');
 });
 
 Route::prefix('expedisi-kwitansi')->group(function() {

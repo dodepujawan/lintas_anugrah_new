@@ -96,10 +96,10 @@
         </small>
       </div>
       <div class="modal-footer">
-        <a href="{{ asset('assets/file/jspm8-8.0.26.227.exe') }}"
+        <a href="{{ asset('assets/print/PrintService Setup 1.0.0.exe') }}"
            class="btn btn-warning"
            download>
-           Download JSPrintManager
+           Download Print Manager
         </a>
         <button class="btn btn-primary" id="savePrinter">
             Simpan
