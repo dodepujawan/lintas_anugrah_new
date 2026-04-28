@@ -458,34 +458,64 @@ class ExpedisiInvoiceController extends Controller
 
         $master = $rows->first();
 
-        $text = "";
-        $text .= "PT. LINTAS ANUGERAH SEJATI\n";
-        $text .= "==========================================\n";
-        $text .= "INVOICE : {$master->INVOICE}\n";
-        $text .= "TGL     : " . date('d-m-Y', strtotime($master->TGLINVOICE)) . "\n";
-        $text .= "CUSTOMER: {$master->CUSTOMER}\n";
-        $text .= "==========================================\n";
+        $lines = [];
 
-        $text .= "NO  SJ        NAMA BARANG        QTY   TOTAL\n";
-        $text .= "------------------------------------------\n";
+        // HEADER
+        $lines[] = str_pad("PT. LINTAS ANUGERAH SEJATI", 80, " ", STR_PAD_BOTH);
+        $lines[] = str_repeat("=", 80);
+        $lines[] = "INVOICE : {$master->INVOICE}";
+        $lines[] = "TANGGAL : " . date('d-m-Y', strtotime($master->TGLINVOICE));
+        $lines[] = "CUSTOMER: {$master->CUSTOMER}";
+        $lines[] = str_repeat("=", 80);
 
+        // TABLE HEADER
+        $lines[] = sprintf(
+            "%-3s %-10s %-30s %-5s %10s",
+            "NO", "SJ", "NAMA BARANG", "QTY", "TOTAL"
+        );
+
+        $lines[] = str_repeat("-", 80);
+
+        // DATA
         $no = 1;
-
         foreach ($rows as $r) {
             $nama = trim($r->PESANANGB) !== '' ? $r->PESANANGB : $r->PESANAN;
 
-            $text .= str_pad($no, 3);
-            $text .= str_pad($r->NOSJ, 10);
-            $text .= str_pad(substr($nama, 0, 18), 20);
-            $text .= str_pad('KG', 6);
-            $text .= str_pad(number_format($r->TOTAL, 0, ',', '.'), 10, ' ', STR_PAD_LEFT);
-            $text .= "\n";
+            $lines[] = sprintf(
+                "%-3s %-10s %-30s %-5s %10s",
+                $no,
+                $r->NOSJ,
+                substr($nama, 0, 30),
+                "KG",
+                number_format($r->TOTAL, 0, ',', '.')
+            );
 
             $no++;
         }
 
-        $text .= "==========================================\n";
-        $text .= "TOTAL : " . number_format($master->GRAND, 0, ',', '.') . "\n";
+        $lines[] = str_repeat("=", 80);
+        $lines[] = str_pad(
+            "TOTAL : " . number_format($master->GRAND, 0, ',', '.'),
+            80,
+            " ",
+            STR_PAD_LEFT
+        );
+
+        // FOOTER
+        $lines[] = "";
+        $lines[] = "";
+        $lines[] = str_pad("PENERIMA", 40) . str_pad("HORMAT KAMI", 40);
+        $lines[] = "";
+        $lines[] = "";
+        $lines[] = str_pad("(...................)", 40) . str_pad("LINTAS ANUGERAH", 40);
+
+        // 🔥 FIX HEIGHT (60 BARIS)
+        $maxLines = 60;
+        while (count($lines) < $maxLines) {
+            $lines[] = "";
+        }
+
+        $text = implode("\n", $lines);
 
         return response()->json([
             'text' => $text
