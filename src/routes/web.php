@@ -158,7 +158,7 @@ Route::prefix('expedisi-invoice')->group(function() {
     Route::post('/update', [ExpedisiInvoiceController::class, 'updateGabungInvoice'])->name('expedisiInvoice.update');
     Route::get('/data', [ExpedisiInvoiceController::class, 'getDataMuat'])->name('expedisiInvoice.data');
     Route::get('/data/gabung', [ExpedisiInvoiceController::class, 'dataGabung'])->name('expedisiInvoiceGabung.data');
-    Route::get('data/invoice/existing', [ExpedisiInvoiceController::class,'getExistingInvoice'])
+    Route::get('data/invoice/existing', [ExpedisiInvoiceController::class,'getExistingGabung'])
     ->name('expedisiInvoiceGabungExisting.data');
     // // PDF
     Route::get('/expedisi/invoice/pdf/{invoiceNo}', [ExpedisiInvoiceController::class, 'pdfGabungInvoice'])->name('expedisiInvoice.pdfInvoice');

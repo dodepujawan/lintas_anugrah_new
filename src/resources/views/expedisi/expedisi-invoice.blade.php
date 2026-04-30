@@ -122,24 +122,24 @@
     <!-- Header Form -->
     <div class="card-expedisi" id="master_form_exp_inv">
         <div class="card-expedisi-header">
-            <h5><i class='bx bx-truck me-2'></i>FORM INVOICE EXPEDISI</h5>
+            <h5><i class='bx bx-truck me-2'></i>FORM GABUNG EXPEDISI</h5>
         </div>
         <div class="card-body">
             <div class="row mb-3">
                 <div class="col-md-6">
-                    <label class="form-label d-block">Filter Invoice</label>
+                    <label class="form-label d-block">Filter Gabung</label>
                     <div class="form-check form-check-inline">
                         <input class="form-check-input"
                             type="radio" name="filter_invoice" id="radio_belum" value="belum" checked>
                         <label class="form-check-label" for="radio_belum">
-                            Belum Invoice
+                            Belum Gabung
                         </label>
                     </div>
 
                     <div class="form-check form-check-inline">
                         <input class="form-check-input" type="radio" name="filter_invoice" id="radio_sudah" value="sudah">
                         <label class="form-check-label" for="radio_sudah">
-                            Sudah Invoice
+                            Sudah Gabung
                         </label>
                     </div>
                 </div>
@@ -185,7 +185,6 @@
                         <th>DEL CHARGE</th>
                         <th>TOTAL</th>
                         <th>NO SJ</th>
-                        <th>NO INVOICE</th>
                     </tr>
                     </thead>
                     <tbody></tbody>
@@ -213,7 +212,7 @@
                         <!-- FORM INPUT -->
                         <div class="row g-2">
                             <div class="col-md-4">
-                                <label class="form-label small">Nomor Invoice</label>
+                                <label class="form-label small">Nomor Gabung</label>
                                 <input type="text" class="form-control form-control-sm" id="no_gabung_exp_inv" readonly>
                             </div>
 
@@ -434,7 +433,7 @@ $(document).ready(function() {
                 { data: 'dc_formatted' },
                 { data: 'total_formatted' },
                 { data: 'NOSJ' },
-                { data: 'INVOICE' },
+                // { data: 'GB' },
             ]
         });
 
@@ -486,16 +485,16 @@ $(document).ready(function() {
         //     return;
         // }
         let customerKode = selectedRowData.CUSTOMER_KODE;
-        let invoiceExist = selectedRowData.INVOICE;
+        let gbExist = selectedRowData.GB;
         console.log('ngah :' + customerKode);
-        console.log('nama :' + invoiceExist);
+        console.log('nama :' + gbExist);
         // 🔥 ambil semua NOMUAT customer tsb yg invoice kosong
         $('#loading_modal').modal('show');
         $('#loading_modal').one('shown.bs.modal', function () {
-            loadDataGabung(customerKode, invoiceExist);
+            loadDataGabung(customerKode, gbExist);
         });
     });
-    function loadDataGabung(customerKode, invoiceExist) {
+    function loadDataGabung(customerKode, gbExist) {
         // destroy dulu kalau sudah ada
         if ($.fn.DataTable.isDataTable('#GabungExpTableRight')) {
             $('#GabungExpTableRight').DataTable().destroy();
@@ -532,14 +531,14 @@ $(document).ready(function() {
                 if (json.data && json.data.length > 0) {
                     let row = json.data[0];
                         console.log("kode" +row.CUSTOMER_KODE);
-                        console.log("kode inv " +invoiceExist);
+                        console.log("kode inv " +gbExist);
                     $('#customer_kode_gabung_exp_inv').val(row.CUSTOMER_KODE);
                     $('#customer_gabung_exp_inv').val(row.CUSTOMER);
                 }
                 // 🔥 cek radio invoice untuk tau mode simpan atau edit
                 let filterMode = $('input[name="filter_invoice"]:checked').val();
                 if (filterMode === 'sudah') {
-                    loadExistingInvoice(invoiceExist);
+                    loadExistingInvoice(gbExist);
                 }
                 $('#loading_modal').modal('hide');
                 $('#master_form_exp_inv').addClass('d-none');
@@ -851,7 +850,7 @@ $(document).ready(function() {
                     // }
                     // Cetak Invoice Hidden Tab
                     if (res.status) {
-                        printInvoice(res.invoiceNo);
+                        // printInvoice(res.invoiceNo);
                         $('#loading_modal').modal('hide');
                     }
                 },
@@ -944,12 +943,12 @@ $(document).ready(function() {
     }
 
     // Function untuk mode edit mengisi table left
-    function loadExistingInvoice(invoiceNo){
+    function loadExistingInvoice(gbExist){
         $.ajax({
             url: "{{ route('expedisiInvoiceGabungExisting.data') }}",
             type: "GET",
             data: {
-                invoice: invoiceNo
+                gbExist: gbExist
             },
             success: function(res)
             {
@@ -965,7 +964,7 @@ $(document).ready(function() {
 
                 // isi form dari master row
                 if(res.master){
-                    $('#no_gabung_exp_inv').val(invoiceNo);
+                    $('#no_gabung_exp_inv').val(gbExist);
                     $('#customer_kode_gabung_exp_inv').val(res.master.CUSTOMER_KODE);
                     $('#customer_gabung_exp_inv').val(res.master.CUSTOMER);
                     $('#item_gabung_exp_inv').val(res.master.PESANAN);
