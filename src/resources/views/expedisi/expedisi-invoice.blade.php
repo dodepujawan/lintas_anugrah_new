@@ -201,7 +201,11 @@
     {{-- Bagian Show Detail Invoice --}}
     <div class="d-none" id="form_gabung_inv_exp">
         <div class="row g-3">
-
+            <div class="col-12 d-flex justify-content-start">
+                <button class="btn btn-link text-decoration-none p-0" id="returnInvExpBtn" style="color: #107af3;">
+                    <i class='bx bx-chevron-left'></i> Kembali ke Daftar
+                </button>
+            </div>
             <!-- KIRI -->
             <div class="col-md-7">
                 <div class="card shadow-sm h-100">
@@ -547,6 +551,13 @@ $(document).ready(function() {
         });
     }
     // ============================ End Of Pilih No Muat ==================================
+    // =============================== Return Table Expedisi =====================================
+    $('#returnInvExpBtn').on('click', function () {
+        $('#form_gabung_inv_exp').addClass('d-none');
+        $('#master_form_exp_inv').removeClass('d-none');
+        tableInvoiceExp.ajax.reload();
+    });
+    // ============================ End Of Return Table Expedisi ==================================
     // ============================ Highlight Tabel Gabung ==================================
     let selectedGabungRows = [];
     $('#GabungExpTableRight tbody').on('click', 'tr', function () {
@@ -832,6 +843,8 @@ $(document).ready(function() {
 
         $('#loading_modal').one('shown.bs.modal', function () {
             let url = $('#no_gabung_exp_inv').val() ? "{{ route('expedisiInvoice.update') }}" : "{{ route('expedisiInvoice.store') }}";
+            var nyobagb = $('#no_gabung_exp_inv').val();
+            console.log('nomer gb: ' + nyobagb);
             $.ajax({
                 url: url,
                 type: "POST",

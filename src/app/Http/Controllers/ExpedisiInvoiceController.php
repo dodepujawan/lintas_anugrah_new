@@ -140,8 +140,8 @@ class ExpedisiInvoiceController extends Controller
         ->where('JENIS', 'EKS')
         ->whereNotNull('NOMUAT')
         ->where(function ($q) {
-            $q->whereNull('INVOICE')
-            ->orWhere('INVOICE', '');
+            $q->whereNull('GB')
+            ->orWhere('GB', '');
         })
         ->orderBy('TGLMUAT');
 
@@ -278,45 +278,44 @@ class ExpedisiInvoiceController extends Controller
 
     public function updateGabungInvoice(Request $request){
         try {
-            $gb = $request->gb;
+            // akai no_invoice karna memngikuti sistem lama sebelumnya langsung membentuk no_invoice
+            $gb = $request->no_invoice;
             DB::transaction(function () use ($request, $gb) {
                 if (!$gb) {
                     throw new Exception('GB tidak ditemukan');
                 }
-
                 // =============================
-                // 1. rollback GB lama
+                // rollback semua isi GB lama
                 // =============================
                 $oldRows = Expedisi::where('GB', $gb)
                     ->lockForUpdate()
                     ->get();
-
                 foreach ($oldRows as $row) {
                     $row->GB = null;
                     $row->PESANANGB = null;
-                    $row->STS = 'GABUNG';
+                    $row->STS = null;
                     $row->save();
                 }
-
                 // =============================
-                // 2. ambil SJ baru
+                // ambil SJ baru
                 // =============================
                 $rows = Expedisi::whereIn('NOSJ', $request->nosj_list)
                     ->lockForUpdate()
                     ->orderBy('NOSJ')
                     ->get();
-
                 if ($rows->isEmpty()) {
                     throw new Exception('Data SJ tidak ditemukan');
                 }
-
                 if ($rows->count() < 2) {
                     throw new Exception('Gabung minimal 2 SJ');
                 }
-
                 foreach ($rows as $row) {
                     if ($row->STS === 'INVOICE') {
                         throw new Exception("SJ {$row->NOSJ} sudah di-invoice");
+                    }
+                    // tidak boleh ambil dari GB lain
+                    if ($row->GB && $row->GB !== $gb) {
+                        throw new Exception("SJ {$row->NOSJ} sudah ada di GB lain");
                     }
                     $row->GB = $gb;
                     $row->PESANANGB = $request->item;
