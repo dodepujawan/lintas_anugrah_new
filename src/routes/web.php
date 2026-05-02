@@ -13,7 +13,7 @@ use App\Http\Controllers\PricedinginController;
 use App\Http\Controllers\PricedinginCustomerController;
 use App\Http\Controllers\ExpedisiController;
 use App\Http\Controllers\ExpedisiInvoiceController;
-use App\Http\Controllers\ExpedisiKwitansiController;
+use App\Http\Controllers\ExpedisiGenerateInvoiceController;
 use App\Http\Controllers\RentPendinginController;
 use App\Http\Controllers\RentPendinginInvoiceController;
 use App\Http\Controllers\RentPendinginKwitansiController;
@@ -165,14 +165,14 @@ Route::prefix('expedisi-invoice')->group(function() {
     Route::get('/print-invoice-text/{invoiceNo}', [ExpedisiInvoiceController::class, 'printInvoiceText'])->name('expedisiInvoice.text');
 });
 
-Route::prefix('expedisi-kwitansi')->group(function() {
-    Route::get('/', [ExpedisiKwitansiController::class, 'index'])->name('expedisiKwitansi.index');
-    Route::post('/store', [ExpedisiKwitansiController::class, 'prosesKwitansiStore'])->name('expedisiKwitansi.store');
-    Route::get('/data', [ExpedisiKwitansiController::class, 'getDataInvoiceKwt'])->name('expedisiKwitansi.data');
-    Route::get('/show/{invoice}', [ExpedisiKwitansiController::class, 'showInvoiceGabung'])->name('expedisiKwitansi.show');
-    Route::post('/destroy', [ExpedisiKwitansiController::class, 'prosesKwitansiDelete'])->name('expedisiKwitansi.destroy');
+Route::prefix('expedisi-generate-invoice')->group(function() {
+    Route::get('/', [ExpedisiGenerateInvoiceController::class, 'index'])->name('expedisiInvoiceGenerate.index');
+    Route::post('/store', [ExpedisiGenerateInvoiceController::class, 'prosesKwitansiStore'])->name('expedisiKwitansi.store');
+    Route::get('/data', [ExpedisiGenerateInvoiceController::class, 'getDataInvoiceGen'])->name('expedisiInvoiceGenerate.data');
+    Route::get('/show/{invoice}', [ExpedisiGenerateInvoiceController::class, 'showInvoiceGabung'])->name('expedisiKwitansi.show');
+    Route::post('/destroy', [ExpedisiGenerateInvoiceController::class, 'prosesKwitansiDelete'])->name('expedisiKwitansi.destroy');
     // // PDF
-    Route::get('/kwitansi/invoice/pdf/{invoiceNo}', [ExpedisiKwitansiController::class, 'pdfInvoiceKwitansi'])->name('expedisiKwitansi.pdfKwitansi');
+    Route::get('/kwitansi/invoice/pdf/{invoiceNo}', [ExpedisiGenerateInvoiceController::class, 'pdfInvoiceKwitansi'])->name('expedisiKwitansi.pdfKwitansi');
 });
 
 Route::prefix('rent-pendingin')->group(function() {

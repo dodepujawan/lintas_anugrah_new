@@ -189,6 +189,7 @@ class ExpedisiInvoiceController extends Controller
                 'NOSJ' => $r->NOSJ,
                 'PESANAN' => $r->PESANAN,
                 'rute' => $r->rute,
+                'JENISHRG' => $r->JENISHRG,
                 'NAMA_KENDARAAN' => $r->NAMA_KENDARAAN,
                 'JUMLAH' => number_format($r->JUMLAH ?? 0,0,',','.').' '.$r->UNIT,
 
@@ -213,6 +214,7 @@ class ExpedisiInvoiceController extends Controller
 
     public function storeGabungInvoice(Request $request){
         try {
+
             $gb = null;
 
             DB::transaction(function () use ($request, &$gb) {
@@ -227,20 +229,28 @@ class ExpedisiInvoiceController extends Controller
                     throw new Exception('Data SJ tidak ditemukan');
                 }
 
-                // ❌ Harus lebih dari 1 (gabung)
+                // ❌ Minimal 2 SJ
                 if ($rows->count() < 2) {
-                    throw new Exception('Gabung invoice minimal 2 SJ');
+                    throw new Exception('Gabung minimal 2 SJ');
                 }
 
-                // ❌ Cek sudah pernah invoice
+                // ❌ Validasi
                 foreach ($rows as $row) {
+
                     if ($row->STS === 'INVOICE') {
                         throw new Exception("SJ {$row->NOSJ} sudah di-invoice");
                     }
+
+                    // 🔥 optional tapi sangat disarankan
+                    if ($row->GB) {
+                        throw new Exception("SJ {$row->NOSJ} sudah tergabung di GB {$row->GB}");
+                    }
                 }
 
-                // ✅ Hanya generate GB
+                // ✅ Generate GB
                 $gb = $this->generateGB();
+
+                $isFirst = true;
 
                 foreach ($rows as $row) {
 
@@ -249,12 +259,37 @@ class ExpedisiInvoiceController extends Controller
                     $row->NDISCAW  = $row->NDISC;
                     $row->DCAW     = $row->DC;
 
-                    // ❗ Fokus ke GB saja
+                    // assign GB
                     $row->GB        = $gb;
                     $row->PESANANGB = $request->item;
+                    $row->STS       = 'GABUNG';
 
-                    // ❗ Status jangan INVOICE (opsional tergantung flow kamu)
-                    $row->STS = 'GABUNG';
+                    if ($isFirst) {
+
+                        // 🔥 MASTER (nilai dari admin)
+                        $row->HARGA   = $request->harga;
+                        $row->DISC    = $request->diskon;
+                        $row->NDISC   = $this->calcNominalDiskon($request);
+                        $row->DC      = $request->dc;
+                        $row->TOTAL   = $request->total;
+                        $row->PPN     = $request->ppn;
+                        $row->GRAND   = $request->grand_total;
+                        $row->PIUTANG = $request->grand_total;
+
+                        $isFirst = false;
+
+                    } else {
+
+                        // 🔹 DETAIL
+                        $row->HARGA   = 0;
+                        $row->DISC    = 0;
+                        $row->NDISC   = 0;
+                        $row->DC      = 0;
+                        $row->TOTAL   = 0;
+                        $row->PPN     = 0;
+                        $row->GRAND   = 0;
+                        $row->PIUTANG = 0;
+                    }
 
                     $row->USERINV = auth()->user()->user_id . '-' . now()->format('d-m-Y h:i:s A');
 
@@ -264,11 +299,12 @@ class ExpedisiInvoiceController extends Controller
 
             return response()->json([
                 'status'  => true,
-                'message' => 'Gabung SJ berhasil',
+                'message' => 'Gabung SJ berhasil disimpan',
                 'gb'      => $gb
             ]);
 
         } catch (\Throwable $e) {
+
             return response()->json([
                 'status'  => false,
                 'message' => $e->getMessage()
@@ -278,48 +314,107 @@ class ExpedisiInvoiceController extends Controller
 
     public function updateGabungInvoice(Request $request){
         try {
-            // akai no_invoice karna memngikuti sistem lama sebelumnya langsung membentuk no_invoice
-            $gb = $request->no_invoice;
+
+            $gb = $request->no_invoice; // tetap pakai ini kalau legacy
+
             DB::transaction(function () use ($request, $gb) {
+
                 if (!$gb) {
                     throw new Exception('GB tidak ditemukan');
                 }
+
                 // =============================
-                // rollback semua isi GB lama
+                // 1. rollback semua isi lama
                 // =============================
                 $oldRows = Expedisi::where('GB', $gb)
                     ->lockForUpdate()
                     ->get();
+
                 foreach ($oldRows as $row) {
+
+                    // restore nilai awal
+                    $row->HARGA = $row->HARGAAW;
+                    $row->NDISC = $row->NDISCAW;
+                    $row->DC    = $row->DCAW;
+
+                    $row->TOTAL   = 0;
+                    $row->PPN     = 0;
+                    $row->GRAND   = 0;
+                    $row->PIUTANG = 0;
+
                     $row->GB = null;
                     $row->PESANANGB = null;
                     $row->STS = null;
+
                     $row->save();
                 }
+
                 // =============================
-                // ambil SJ baru
+                // 2. ambil SJ baru
                 // =============================
                 $rows = Expedisi::whereIn('NOSJ', $request->nosj_list)
                     ->lockForUpdate()
                     ->orderBy('NOSJ')
                     ->get();
+
                 if ($rows->isEmpty()) {
                     throw new Exception('Data SJ tidak ditemukan');
                 }
+
                 if ($rows->count() < 2) {
                     throw new Exception('Gabung minimal 2 SJ');
                 }
+
+                $isFirst = true;
+
                 foreach ($rows as $row) {
+
                     if ($row->STS === 'INVOICE') {
                         throw new Exception("SJ {$row->NOSJ} sudah di-invoice");
                     }
-                    // tidak boleh ambil dari GB lain
+
                     if ($row->GB && $row->GB !== $gb) {
                         throw new Exception("SJ {$row->NOSJ} sudah ada di GB lain");
                     }
-                    $row->GB = $gb;
+
+                    // backup ulang
+                    $row->HARGAAW  = $row->HARGA;
+                    $row->NDISCAW  = $row->NDISC;
+                    $row->DCAW     = $row->DC;
+
+                    $row->GB        = $gb;
                     $row->PESANANGB = $request->item;
-                    $row->STS = 'GABUNG';
+                    $row->STS       = 'GABUNG';
+
+                    if ($isFirst) {
+
+                        // 🔥 MASTER
+                        $row->HARGA   = $request->harga;
+                        $row->DISC    = $request->diskon;
+                        $row->NDISC   = $this->calcNominalDiskon($request);
+                        $row->DC      = $request->dc;
+                        $row->TOTAL   = $request->total;
+                        $row->PPN     = $request->ppn;
+                        $row->GRAND   = $request->grand_total;
+                        $row->PIUTANG = $request->grand_total;
+
+                        $isFirst = false;
+
+                    } else {
+
+                        // 🔹 DETAIL
+                        $row->HARGA   = 0;
+                        $row->DISC    = 0;
+                        $row->NDISC   = 0;
+                        $row->DC      = 0;
+                        $row->TOTAL   = 0;
+                        $row->PPN     = 0;
+                        $row->GRAND   = 0;
+                        $row->PIUTANG = 0;
+                    }
+
+                    $row->USERINV = auth()->user()->user_id . '-' . now()->format('d-m-Y h:i:s A');
+
                     $row->save();
                 }
             });

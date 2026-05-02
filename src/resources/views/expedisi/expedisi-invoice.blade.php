@@ -490,15 +490,17 @@ $(document).ready(function() {
         // }
         let customerKode = selectedRowData.CUSTOMER_KODE;
         let gbExist = selectedRowData.GB;
+        let noSJ = selectedRowData.NOSJ;
         console.log('ngah :' + customerKode);
         console.log('nama :' + gbExist);
+        console.log('nosurjal :' + noSJ);
         // 🔥 ambil semua NOMUAT customer tsb yg invoice kosong
         $('#loading_modal').modal('show');
         $('#loading_modal').one('shown.bs.modal', function () {
             loadDataGabung(customerKode, gbExist);
         });
     });
-    function loadDataGabung(customerKode, gbExist) {
+    function loadDataGabung(customerKode, gbExist, noSJ) {
         // destroy dulu kalau sudah ada
         if ($.fn.DataTable.isDataTable('#GabungExpTableRight')) {
             $('#GabungExpTableRight').DataTable().destroy();
@@ -513,7 +515,8 @@ $(document).ready(function() {
             ajax: {
                 url: "{{ route('expedisiInvoiceGabung.data') }}",
                 data: {
-                    customer_kode: customerKode
+                    customer_kode: customerKode,
+                    noSJ: noSJ
                 }
             },
             columns: [
@@ -553,6 +556,11 @@ $(document).ready(function() {
     // ============================ End Of Pilih No Muat ==================================
     // =============================== Return Table Expedisi =====================================
     $('#returnInvExpBtn').on('click', function () {
+        // reload table
+        $('#GabungExpTableLeft').DataTable().clear().draw();
+        $('#GabungExpTableRight').DataTable().ajax.reload();
+        // reset form
+        resetFormGabungInvoice();
         $('#form_gabung_inv_exp').addClass('d-none');
         $('#master_form_exp_inv').removeClass('d-none');
         tableInvoiceExp.ajax.reload();
@@ -989,6 +997,7 @@ $(document).ready(function() {
                     $('#dpp_gabung_exp_inv').val(res.master.TOTAL);
                     $('#grand_total_gabung_exp_inv').val(res.master.GRAND);
                     $('#ppn_gabung_exp_inv').val(parseFloat(res.master.PPN));
+                    $('#jenis_hrg_exp_inv').val(parseFloat(res.master.JENISHRG));
                 }
                 setModeUpdate();
                 updateGrandTotalGabung();
@@ -999,6 +1008,7 @@ $(document).ready(function() {
     // Reset Form Tabel Kiri
     function resetFormGabungInvoice() {
         $('#no_gabung_exp_inv').val('');
+        $('#customer_kode_gabung_exp_inv').val('');
         $('#item_gabung_exp_inv').val('');
         $('#jumlah_gabung_exp_inv').val('');
         $('#harga_gabung_exp_inv').val('');

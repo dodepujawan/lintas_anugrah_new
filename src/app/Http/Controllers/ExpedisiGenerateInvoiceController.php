@@ -15,32 +15,52 @@ use Illuminate\Support\Facades\Log;
 use Mpdf\Mpdf;
 use Carbon\Carbon;
 
-class ExpedisiKwitansiController extends Controller
+class ExpedisiGenerateInvoiceController extends Controller
 {
     public function index()
     {
-        return view('expedisiKwitansi.expedisi-kwitansi');
+        return view('expedisiInvoieGen.expedisi-invoice-gen');
     }
 
-    public function getDataInvoiceKwt(Request $request)
-    {
+    public function getDataInvoiceGen(Request $request){
         $query = Expedisi::select([
                 'INVOICE',
                 'TGLINVOICE',
                 'CUSTOMER',
                 'GRAND',
                 'PIUTANG',
-                'kwt'
+                'kwt',
+                'GB',
+                'NOMUAT',
+                'TGLMUAT'
             ])
-            ->where('JENIS', 'EKS')
-            ->whereNotNull('INVOICE')
-            ->where('GRAND', '>', 0);
+            ->where('JENIS', 'EKS');
 
-        if($request->status_kwt == 'belum'){
+        // =============================
+        // FILTER STATUS INVOICE (PATOKAN UTAMA)
+        // =============================
+        if ($request->status_invoice == 'belum') {
+            $query->where(function($q){
+                $q->whereNull('INVOICE')
+                ->orWhere('INVOICE', '');
+            });
+        }
+        if ($request->status_invoice == 'sudah') {
+            $query->where(function($q){
+                $q->whereNotNull('INVOICE')
+                ->where('INVOICE', '!=', '');
+            })
+            ->where('GRAND', '>', 0);
+        }
+
+        // =============================
+        // FILTER KWITANSI
+        // =============================
+        if ($request->status_kwt == 'belum') {
             $query->whereNull('kwt');
         }
 
-        if($request->status_kwt == 'sudah'){
+        if ($request->status_kwt == 'sudah') {
             $query->whereNotNull('kwt');
         }
 
@@ -49,38 +69,62 @@ class ExpedisiKwitansiController extends Controller
             ->addIndexColumn()
 
             ->editColumn('TGLINVOICE', function ($row) {
-                return \Carbon\Carbon::parse($row->TGLINVOICE)
-                    ->format('d-m-Y');
+                return $row->TGLINVOICE
+                    ? \Carbon\Carbon::parse($row->TGLINVOICE)->format('d-m-Y')
+                    : '-';
             })
 
             ->editColumn('GRAND', function ($row) {
-                return number_format($row->GRAND, 0, ',', '.');
+                return number_format($row->GRAND ?? 0, 0, ',', '.');
             })
 
             ->addColumn('no_kwt', function($row){
                 return $row->kwt ?? '-';
             })
 
+            ->addColumn('gb', function($row){
+                return $row->GB ?: '-'; // 🔥 boleh kosong
+            })
+
             ->addColumn('action', function ($row) use ($request) {
 
-                if($request->status_kwt == 'sudah'){
+                // =============================
+                // SUDAH INVOICE
+                // =============================
+                if ($request->status_invoice == 'sudah') {
+
+                    if ($request->status_kwt == 'sudah') {
+                        return '
+                            <div class="d-flex justify-content-end gap-2">
+                                <button class="btn btn-sm btn-warning btn-edit-kwt-exp"
+                                    data-invoice="'.$row->INVOICE.'">
+                                    <i class="bx bx-pencil"></i>
+                                </button>
+                                <button class="btn btn-sm btn-danger btn-hapus-kwt-exp"
+                                    data-invoice="'.$row->INVOICE.'">
+                                    <i class="bx bx-trash"></i>
+                                </button>
+                            </div>
+                        ';
+                    }
+
                     return '
-                        <div class="d-flex justify-content-end gap-2">
-                            <button class="btn btn-sm btn-warning d-flex align-items-center justify-content-center btn-edit-kwt-exp" style="width:32px;height:32px;" title="Edit" data-invoice="'.$row->INVOICE.'">
-                                <i class="bx bx-pencil"></i>
-                            </button>
-                            <button class="btn btn-sm btn-danger d-flex align-items-center justify-content-center btn-hapus-kwt-exp" style="width:32px;height:32px;" title="Hapus" data-invoice="'.$row->INVOICE.'">
-                                <i class="bx bx-trash"></i>
-                            </button>
-                        </div>
+                        <button
+                            class="btn btn-sm btn-primary btn-show-invoice-kwt"
+                            data-invoice="'.$row->INVOICE.'">
+                            Proses
+                        </button>
                     ';
                 }
 
+                // =============================
+                // BELUM INVOICE
+                // =============================
                 return '
                     <button
-                        class="btn btn-sm btn-primary btn-show-invoice-kwt"
-                        data-invoice="'.$row->INVOICE.'">
-                        Proses
+                        class="btn btn-sm btn-success btn-buat-invoice"
+                        data-nosj="'.$row->NOSJ.'">
+                        Buat Invoice
                     </button>
                 ';
             })

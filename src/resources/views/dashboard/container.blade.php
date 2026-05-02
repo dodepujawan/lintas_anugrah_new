@@ -345,15 +345,15 @@ $(document).ready(function() {
         });
     }
 // ======================= End Of New Expedisi Invoice ====================================
-// ========================= New Expedisi Kwitansi ======================================
-    $(document).on('click', '#sidebar_kwitansi_expedisi', function(e) {
+// ========================= New Expedisi Invoice Generate ======================================
+    $(document).on('click', '#sidebar_Invoice_gen_expedisi', function(e) {
         e.preventDefault();
-        loadKwitansiExpedisiForm();
+        loadInvoiceExpedisiGenForm();
     });
 
-    function loadKwitansiExpedisiForm() {
+    function loadInvoiceExpedisiGenForm() {
         $.ajax({
-            url: '{{ route('expedisiKwitansi.index') }}', // Route to load the form
+            url: '{{ route('expedisiInvoiceGenerate.index') }}', // Route to load the form
             type: 'GET',
             success: function(response) {
                 $('.master-page').html(response);
@@ -363,7 +363,7 @@ $(document).ready(function() {
             }
         });
     }
-// ======================= End Of New Expedisi Kwitansi ====================================
+// ======================= End Of New Expedisi Invoice Generate ====================================
 // ========================= New Rent Dingin ======================================
     $(document).on('click', '#sidebar_new_rent_dingin', function(e) {
         e.preventDefault();

@@ -136,14 +136,14 @@
                 @can('penjualan.invoice')
                 <li class="menu-item">
                     <a href="#" class="menu-link" id="sidebar_invoice_expedisi">
-                    <span class="menu-text">Invoice Ekspedisi</span>
+                    <span class="menu-text">Gabung Muatan Expedisi</span>
                     </a>
                 </li>
                 @endcan
                 @can('penjualan.kwitansi')
                 <li class="menu-item">
-                    <a href="#" class="menu-link" id="sidebar_kwitansi_expedisi">
-                    <span class="menu-text">Kwitansi Ekspedisi</span>
+                    <a href="#" class="menu-link" id="sidebar_Invoice_gen_expedisi">
+                    <span class="menu-text">Invoice Ekspedisi</span>
                     </a>
                 </li>
                 @endcan

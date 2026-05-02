@@ -1,27 +1,28 @@
-{{-- Bagian Tabel Expedisi Kwitansi --}}
+{{-- Bagian Tabel Expedisi Invoice Generate (Foremerly Kwitansi) --}}
 <div class="container mt-3" id="table_kwt_exp">
     <div class="card p-3">
         <h5 class="text-center mb-3">FORM PROSES INVOICE EXPEDISI</h5>
         <div class="mb-3">
             <label>
-                <input type="radio" name="filter_kwt_exp" value="belum" checked>
-                Belum Kwitansi
+                <input type="radio" name="filter_inv_gen" value="belum" checked>
+                Belum Invoice
             </label>
             <label class="ms-3">
-                <input type="radio" name="filter_kwt_exp" value="sudah">
-                Sudah Kwitansi
+                <input type="radio" name="filter_inv_gen" value="sudah">
+                Sudah Invoice
             </label>
         </div>
         <div class="table-responsive">
-            <table id="ExpKwtTable" class="table table-bordered table-striped w-100">
+            <table id="ExpInvGenTable" class="table table-bordered table-striped w-100">
                 <thead>
                     <tr>
                         <th>No</th>
-                        <th>No Invoice</th>
+                        <th>No GB</th>
                         <th>Tanggal</th>
                         <th>Customer</th>
                         <th>Grand Total</th>
                         <th>No Kwitansi</th>
+                        <th>No Invoice</th>
                         <th>Aksi</th>
                     </tr>
                 </thead>
@@ -171,16 +172,16 @@ $(document).ready(function() {
         }
     });
 // ================================= Tabel Kwitansi Expedisi =====================================
-    if ($.fn.DataTable.isDataTable('#ExpKwtTable')) {
-        $('#ExpKwtTable').DataTable().destroy();
+    if ($.fn.DataTable.isDataTable('#ExpInvGenTable')) {
+        $('#ExpInvGenTable').DataTable().destroy();
     }
-    let table_kwt = $('#ExpKwtTable').DataTable({
+    let table_kwt = $('#ExpInvGenTable').DataTable({
         processing: true,
         serverSide: true,
         ajax:{
-            url: "{{ route('expedisiKwitansi.data') }}",
+            url: "{{ route('expedisiInvoiceGenerate.data') }}",
             data: function (d) {
-                d.status_kwt = $('input[name="filter_kwt_exp"]:checked').val();
+                d.status_kwt = $('input[name="filter_inv_gen"]:checked').val();
             }
         },
         columns: [
@@ -196,7 +197,7 @@ $(document).ready(function() {
     });
 
     // Mengubah Radio Status Kwitansi
-    $('input[name="filter_kwt_exp"]').on('change', function() {
+    $('input[name="filter_inv_gen"]').on('change', function() {
 
         let status = $(this).val();
 
@@ -317,7 +318,7 @@ $(document).ready(function() {
                         });
                         $('#form_kwt_exp').addClass('d-none');
                         $('#table_kwt_exp').removeClass('d-none');
-                        $('#ExpKwtTable').DataTable().ajax.reload();
+                        $('#ExpInvGenTable').DataTable().ajax.reload();
                         // Cetak PDF
                         window.open(response.redirect, '_blank');
                     } else {
@@ -436,7 +437,7 @@ $(document).ready(function() {
                         success: function(response) {
                             $('#loading_modal').modal('hide');
                             Swal.fire('Terhapus!', response.success, 'success');
-                            $('#ExpKwtTable').DataTable().ajax.reload();
+                            $('#ExpInvGenTable').DataTable().ajax.reload();
                         }
                     });
                 });
@@ -448,7 +449,7 @@ $(document).ready(function() {
 $(document).on('click', '#keluar_kwt_exp', function() {
     $('#form_kwt_exp').addClass('d-none');
     $('#table_kwt_exp').removeClass('d-none');
-    $('#ExpKwtTable').DataTable().ajax.reload();
+    $('#ExpInvGenTable').DataTable().ajax.reload();
 });
 // ============================== End Of Click Return ================================
 });
