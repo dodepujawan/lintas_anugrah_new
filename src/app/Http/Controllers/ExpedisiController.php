@@ -570,6 +570,10 @@ class ExpedisiController extends Controller
             // 🔹 Ambil SEMUA baris dengan NOMUAT yang sama
             $expedisi = Expedisi::where('NOMUAT', $nomuat)
                 ->where('JENIS', 'EKS')
+                ->where(function($q) {
+                    $q->where('INVOICE', '')
+                            ->orWhereNull('INVOICE');
+                })
                 ->orderBy('id', 'desc')
                 ->get();
 
@@ -809,6 +813,30 @@ class ExpedisiController extends Controller
     }
 
     public function destroyMuat($nomuat){
+        // =============================
+        // 🔥 GUARD: CEK GB / INVOICE
+        // =============================
+        $locked = Expedisi::where('NOMUAT', $nomuat)
+            ->where(function ($q) {
+                $q->where(function ($q2) {
+                    $q2->whereNotNull('GB')->where('GB', '!=', '');
+                })
+                ->orWhere(function ($q2) {
+                    $q2->whereNotNull('INVOICE')->where('INVOICE', '!=', '');
+                });
+            })
+            ->exists();
+
+        if ($locked) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Muatan tidak bisa dibatalkan karena sudah tergabung / sudah invoice'
+            ], 400);
+        }
+
+        // =============================
+        // PROSES HAPUS
+        // =============================
         $updated = Expedisi::where('NOMUAT', $nomuat)
             ->update([
                 'NOMUAT' => null,

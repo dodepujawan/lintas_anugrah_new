@@ -169,7 +169,7 @@ Route::prefix('expedisi-generate-invoice')->group(function() {
     Route::get('/', [ExpedisiGenerateInvoiceController::class, 'index'])->name('expedisiInvoiceGenerate.index');
     Route::post('/store', [ExpedisiGenerateInvoiceController::class, 'prosesKwitansiStore'])->name('expedisiKwitansi.store');
     Route::get('/data', [ExpedisiGenerateInvoiceController::class, 'getDataInvoiceGen'])->name('expedisiInvoiceGenerate.data');
-    Route::get('/show/{invoice}', [ExpedisiGenerateInvoiceController::class, 'showInvoiceGabung'])->name('expedisiKwitansi.show');
+    Route::get('/show/{muatNo}', [ExpedisiGenerateInvoiceController::class, 'showInvoiceGabung'])->name('expedisiInvoiceGenerate.show');
     Route::post('/destroy', [ExpedisiGenerateInvoiceController::class, 'prosesKwitansiDelete'])->name('expedisiKwitansi.destroy');
     // // PDF
     Route::get('/kwitansi/invoice/pdf/{invoiceNo}', [ExpedisiGenerateInvoiceController::class, 'pdfInvoiceKwitansi'])->name('expedisiKwitansi.pdfKwitansi');

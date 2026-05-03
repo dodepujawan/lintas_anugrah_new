@@ -29,15 +29,19 @@ class ExpedisiGenerateInvoiceController extends Controller
                 'CUSTOMER',
                 'GRAND',
                 'PIUTANG',
-                'kwt',
                 'GB',
                 'NOMUAT',
-                'TGLMUAT'
+                'TGLMUAT',
+                'NOSJ'
             ])
-            ->where('JENIS', 'EKS');
+            ->where('JENIS', 'EKS')
+            ->where(function($q){
+                $q->whereNotNull('NOMUAT')
+                ->orWhere('NOMUAT', '!=', '');
+            });
 
         // =============================
-        // FILTER STATUS INVOICE (PATOKAN UTAMA)
+        // FILTER STATUS INVOICE
         // =============================
         if ($request->status_invoice == 'belum') {
             $query->where(function($q){
@@ -45,23 +49,13 @@ class ExpedisiGenerateInvoiceController extends Controller
                 ->orWhere('INVOICE', '');
             });
         }
+
         if ($request->status_invoice == 'sudah') {
             $query->where(function($q){
                 $q->whereNotNull('INVOICE')
                 ->where('INVOICE', '!=', '');
             })
             ->where('GRAND', '>', 0);
-        }
-
-        // =============================
-        // FILTER KWITANSI
-        // =============================
-        if ($request->status_kwt == 'belum') {
-            $query->whereNull('kwt');
-        }
-
-        if ($request->status_kwt == 'sudah') {
-            $query->whereNotNull('kwt');
         }
 
         return DataTables::of($query)
@@ -78,12 +72,8 @@ class ExpedisiGenerateInvoiceController extends Controller
                 return number_format($row->GRAND ?? 0, 0, ',', '.');
             })
 
-            ->addColumn('no_kwt', function($row){
-                return $row->kwt ?? '-';
-            })
-
             ->addColumn('gb', function($row){
-                return $row->GB ?: '-'; // 🔥 boleh kosong
+                return $row->GB ?: '-';
             })
 
             ->addColumn('action', function ($row) use ($request) {
@@ -92,27 +82,11 @@ class ExpedisiGenerateInvoiceController extends Controller
                 // SUDAH INVOICE
                 // =============================
                 if ($request->status_invoice == 'sudah') {
-
-                    if ($request->status_kwt == 'sudah') {
-                        return '
-                            <div class="d-flex justify-content-end gap-2">
-                                <button class="btn btn-sm btn-warning btn-edit-kwt-exp"
-                                    data-invoice="'.$row->INVOICE.'">
-                                    <i class="bx bx-pencil"></i>
-                                </button>
-                                <button class="btn btn-sm btn-danger btn-hapus-kwt-exp"
-                                    data-invoice="'.$row->INVOICE.'">
-                                    <i class="bx bx-trash"></i>
-                                </button>
-                            </div>
-                        ';
-                    }
-
                     return '
                         <button
-                            class="btn btn-sm btn-primary btn-show-invoice-kwt"
+                            class="btn btn-sm btn-primary btn-show-invoice"
                             data-invoice="'.$row->INVOICE.'">
-                            Proses
+                            Lihat
                         </button>
                     ';
                 }
@@ -123,7 +97,7 @@ class ExpedisiGenerateInvoiceController extends Controller
                 return '
                     <button
                         class="btn btn-sm btn-success btn-buat-invoice"
-                        data-nosj="'.$row->NOSJ.'">
+                        data-nomuat="'.$row->NOMUAT.'">
                         Buat Invoice
                     </button>
                 ';
@@ -133,37 +107,54 @@ class ExpedisiGenerateInvoiceController extends Controller
             ->make(true);
     }
 
-    public function showInvoiceGabung($invoice)
-    {
-        $master = Expedisi::where('INVOICE', $invoice)
-            ->where('GRAND', '>', 0)
-            ->first();
+    public function showInvoiceGabung($muatNo){
+        $rows = Expedisi::where('NOMUAT', $muatNo)->get();
+
+        if ($rows->isEmpty()) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Data tidak ditemukan'
+            ]);
+        }
+
+        // 🔥 ambil baris pertama (untuk identitas)
+        $firstRow = $rows->first();
+
+        // =============================
+        // DETEKSI GB ATAU TIDAK
+        // =============================
+        $hasGB = $rows->whereNotNull('GB')->where('GB', '!=', '')->count() > 0;
+
+        if ($hasGB) {
+            $master = $rows->firstWhere('GRAND', '>', 0);
+        } else {
+            $master = $firstRow;
+        }
 
         if (!$master) {
             return response()->json([
                 'status' => false,
-                'message' => 'Invoice tidak ditemukan'
+                'message' => 'Data master tidak ditemukan'
             ]);
         }
 
-        // ambil semua SJ yang tergabung
-        $details = Expedisi::where('INVOICE', $invoice)
-            ->orderBy('NOSJ')
-            ->get();
+        // =============================
+        // DETAIL
+        // =============================
+        $details = $rows->sortBy('NOSJ');
 
         // =============================
-        // Tambahan untuk mode edit ambil nilai arh
+        // ARH
         // =============================
-
-        $arh = Arh::where('NOFAKTUR', $invoice)->first();
+        $arh = null;
+        if (!empty($master->INVOICE)) {
+            $arh = Arh::where('NOFAKTUR', $master->INVOICE)->first();
+        }
 
         // =============================
-        // HITUNG TGL JATUH TEMPO
+        // JATUH TEMPO
         // =============================
-
-        // ambil kode customer dari expedisi
-        $kodeCustomer = $master->CUSTOMER_KODE ?? null;
-
+        $kodeCustomer = $firstRow->CUSTOMER_KODE ?? null;
         $topKredit = 0;
 
         if ($kodeCustomer) {
@@ -171,33 +162,36 @@ class ExpedisiGenerateInvoiceController extends Controller
             $topKredit = $customer->TOPKREDIT ?? 0;
         }
 
-        // hitung jatuh tempo dari TGLINVOICE
-        $tglInvoice = Carbon::parse($master->TGLINVOICE);
+        $tglInvoice = $master->TGLINVOICE
+            ? Carbon::parse($master->TGLINVOICE)
+            : now();
+
         $tglJatuhTempo = $tglInvoice->copy()->addDays((int)$topKredit);
 
         return response()->json([
             'status' => true,
             'data' => [
-                'invoice'      => $master->INVOICE,
+                'invoice'      => $master->INVOICE ?? '',
                 'tgl_invoice'  => $master->TGLINVOICE,
-                'customer'     => $master->CUSTOMER,
-                'nomor_muat'   => $master->NOMUAT ?? '',
-                'kendaraan'    => $master->NAMA_KENDARAAN ?? '',
 
-                'sub_total'    => $master->HARGA,
-                'disc_persen'  => $master->DISC,
-                'disc_rp'      => $master->NDISC,
-                'd_charge'     => $master->DC,
-                'total'        => $master->TOTAL,
-                'ppn'          => $master->PPN,
-                'grand'        => $master->GRAND,
-                // 'piutang'      => $master->PIUTANG,
-                // dikarenakan tipe data double jadi yang tersimpan malah isi koma
-                'piutang' => (int) ceil($master->PIUTANG),
+                // 🔥 IDENTITAS dari firstRow
+                'customer'     => $firstRow->CUSTOMER,
+                'nomor_muat'   => $firstRow->NOMUAT ?? '',
+                'kendaraan'    => $firstRow->NAMA_KENDARAAN ?? '',
+
+                // 🔥 NILAI dari master
+                'sub_total'    => $master->HARGA ?? 0,
+                'disc_persen'  => $master->DISC ?? 0,
+                'disc_rp'      => $master->NDISC ?? 0,
+                'd_charge'     => $master->DC ?? 0,
+                'total'        => $master->TOTAL ?? 0,
+                'ppn'          => $master->PPN ?? 0,
+                'grand'        => $master->GRAND ?? 0,
+                'piutang'      => (int) ceil($master->PIUTANG ?? 0),
 
                 'nomor_sj'     => $details->pluck('NOSJ')->implode(', '),
 
-                // ========= DATA ARH =========
+                // ARH
                 'tgl_jt'       => $arh->TGLJT ?? $tglJatuhTempo->format('Y-m-d'),
                 'piutang_arh'  => $arh->PIUTANG ?? null,
                 'bayar'        => $arh->BAYAR ?? null,

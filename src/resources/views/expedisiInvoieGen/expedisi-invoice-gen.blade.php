@@ -17,12 +17,13 @@
                 <thead>
                     <tr>
                         <th>No</th>
+                        <th>No Muat</th>
+                        <th>Tgl Muat</th>
+                        <th>No SJ</th>
                         <th>No GB</th>
-                        <th>Tanggal</th>
                         <th>Customer</th>
-                        <th>Grand Total</th>
-                        <th>No Kwitansi</th>
                         <th>No Invoice</th>
+                        <th>Tgl Invoice</th>
                         <th>Aksi</th>
                     </tr>
                 </thead>
@@ -171,7 +172,7 @@ $(document).ready(function() {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
         }
     });
-// ================================= Tabel Kwitansi Expedisi =====================================
+// ================================= Tabel Invoice Generate Expedisi =====================================
     if ($.fn.DataTable.isDataTable('#ExpInvGenTable')) {
         $('#ExpInvGenTable').DataTable().destroy();
     }
@@ -181,17 +182,19 @@ $(document).ready(function() {
         ajax:{
             url: "{{ route('expedisiInvoiceGenerate.data') }}",
             data: function (d) {
-                d.status_kwt = $('input[name="filter_inv_gen"]:checked').val();
+                d.status_invoice = $('input[name="filter_inv_gen"]:checked').val();
             }
         },
         columns: [
             { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false },
+            { data: 'NOMUAT', name: 'NOMUAT' },
+            { data: 'TGLMUAT', name: 'TGLMUAT' },
+            { data: 'NOSJ', name: 'NOSJ' },
+            { data: 'GB', name: 'GB' },
+            { data: 'CUSTOMER', name: 'CUSTOMER' },
+            // { data: 'PIUTANG', name: 'PIUTANG', className: 'text-end' },
             { data: 'INVOICE', name: 'INVOICE' },
             { data: 'TGLINVOICE', name: 'TGLINVOICE' },
-            { data: 'CUSTOMER', name: 'CUSTOMER' },
-            { data: 'GRAND', name: 'GRAND', className: 'text-end' },
-            // { data: 'PIUTANG', name: 'PIUTANG', className: 'text-end' },
-            { data: 'no_kwt', name: 'kwt', visible: false },
             { data: 'action', name: 'action', orderable: false, searchable: false }
         ]
     });
@@ -199,27 +202,27 @@ $(document).ready(function() {
     // Mengubah Radio Status Kwitansi
     $('input[name="filter_inv_gen"]').on('change', function() {
 
-        let status = $(this).val();
+        // let status = $(this).val();
 
-        if(status === 'sudah'){
-            table_kwt.column(5).visible(true); // tampilkan kolom No Kwitansi
-        } else {
-            table_kwt.column(5).visible(false);
-        }
+        // if(status === 'sudah'){
+        //     table_kwt.column(5).visible(true); // tampilkan kolom No Kwitansi
+        // } else {
+        //     table_kwt.column(5).visible(false);
+        // }
 
         table_kwt.ajax.reload();
     });
-// ============================== End Of Tabel Kwitansi Expedisi ==================================
-// =============================== Form Detail Kwitansi Expedisi ===================================
-    $(document).on('click', '.btn-show-invoice-kwt', function() {
+// ============================ End Of Tabel Invoice Generate Expedisi ================================
+// ============================= Form Detail Invoice Generate Expedisi =================================
+    $(document).on('click', '.btn-buat-invoice', function() {
 
-        let invoiceNo = $(this).data('invoice');
+        let muatNo = $(this).data('nomuat');
 
         // bisa ajax ambil detail invoice juga kalau mau
         $('#loading_modal').modal('show');
         $('#loading_modal').one('shown.bs.modal', function () {
             $.ajax({
-                url: "{{ route('expedisiKwitansi.show', ':kode') }}".replace(':kode', invoiceNo),
+                url: "{{ route('expedisiInvoiceGenerate.show', ':kode') }}".replace(':kode', muatNo),
                 type: "GET",
                 success: function(response) {
 
@@ -233,7 +236,17 @@ $(document).ready(function() {
                     // Clear Form Dulu
                     clearAllKwtExp();
 
+                    console.log('FULL RESPONSE:', response);
+                    console.log('DATA ONLY:', response.data);
+
                     let d = response.data;
+
+                    console.log('DETAIL FIELDS:', {
+                        customer: d.customer,
+                        kendaraan: d.kendaraan,
+                        nomor_muat: d.nomor_muat,
+                        nomor_sj: d.nomor_sj
+                    });
                     // ===== LEFT SIDE =====
                     $('#sub_total_kwt_exp').val(formatRupiah(d.sub_total));
                     $('#d_charge_kwt_exp').val(formatRupiah(d.d_charge));
@@ -246,12 +259,12 @@ $(document).ready(function() {
                     $('#ppn_persen_kwt_exp').val(formatRupiah(d.ppn));
                     $('#grand_kwt_exp').val(formatRupiah(d.grand));
 
-                    $('#tgl_invoice_kwt_exp').val(
-                        d.tgl_invoice.substring(0,10)
-                    );
+                    // $('#tgl_invoice_kwt_exp').val(
+                    //     d.tgl_muat.substring(0,10)
+                    // );
 
                     // ===== RIGHT SIDE =====
-                    $('#no_faktur_kwt_exp').val(d.invoice);
+                    $('#no_faktur_kwt_exp').val('');
                     $('#nomor_muat_kwt_exp').val(d.nomor_muat);
                     $('#nomor_sj_kwt_exp').val(d.nomor_sj);
                     $('#kendaraan_kwt_exp').val(d.kendaraan);
@@ -274,7 +287,7 @@ $(document).ready(function() {
         });
     });
 
-// ============================ End Of Form Detail Kwitansi Expedisi ===============================
+// ============================ End Of Form Invoice Generate Expedisi ===============================
 // =============================== Submit Kwitansi Expedisi ===================================
     $('#proses_kwt_exp').on('click', function() {
         let bayar = parseFloat($('#bayar_kwt_exp').val());
@@ -347,13 +360,13 @@ $(document).ready(function() {
 // =========================== Form Detail Edit Kwitansi Expedisi ==============================
     $(document).on('click', '.btn-edit-kwt-exp', function() {
 
-        let invoiceNo = $(this).data('invoice');
+        let muatNo = $(this).data('invoice');
 
         // bisa ajax ambil detail invoice juga kalau mau
         $('#loading_modal').modal('show');
         $('#loading_modal').one('shown.bs.modal', function () {
             $.ajax({
-                url: "{{ route('expedisiKwitansi.show', ':kode') }}".replace(':kode', invoiceNo),
+                url: "{{ route('expedisiInvoiceGenerate.show', ':kode') }}".replace(':kode', muatNo),
                 type: "GET",
                 success: function(response) {
 
