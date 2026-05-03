@@ -33,6 +33,11 @@
 </div>
 {{-- Bagian Form Expedisi Kwitansi --}}
 <div class="container mt-3 d-none" id="form_kwt_exp">
+    <div class="col-12 d-flex justify-content-start">
+        <button class="btn btn-link text-decoration-none p-0" id="returnInvExpGenBtn" style="color: #107af3;">
+            <i class='bx bx-chevron-left'></i> Kembali ke Daftar
+        </button>
+    </div>
     <div class="card p-3" style="background-color:#b7e1b0;">
         <h5 class="text-center mb-3">FORM PROSES INVOICE EXPEDISI</h5>
         <div class="row">
@@ -87,7 +92,7 @@
                 </div>
 
                 <div class="mb-2">
-                    <label>TGL INVOICE</label>
+                    <label>TGL MUAT</label>
                     <input type="date" id="tgl_invoice_kwt_exp" class="form-control" readonly>
                 </div>
 
@@ -236,17 +241,7 @@ $(document).ready(function() {
                     // Clear Form Dulu
                     clearAllKwtExp();
 
-                    console.log('FULL RESPONSE:', response);
-                    console.log('DATA ONLY:', response.data);
-
                     let d = response.data;
-
-                    console.log('DETAIL FIELDS:', {
-                        customer: d.customer,
-                        kendaraan: d.kendaraan,
-                        nomor_muat: d.nomor_muat,
-                        nomor_sj: d.nomor_sj
-                    });
                     // ===== LEFT SIDE =====
                     $('#sub_total_kwt_exp').val(formatRupiah(d.sub_total));
                     $('#d_charge_kwt_exp').val(formatRupiah(d.d_charge));
@@ -259,12 +254,12 @@ $(document).ready(function() {
                     $('#ppn_persen_kwt_exp').val(formatRupiah(d.ppn));
                     $('#grand_kwt_exp').val(formatRupiah(d.grand));
 
-                    // $('#tgl_invoice_kwt_exp').val(
-                    //     d.tgl_muat.substring(0,10)
-                    // );
+                    $('#tgl_invoice_kwt_exp').val(
+                        d.tgl_muat.substring(0,10)
+                    );
 
                     // ===== RIGHT SIDE =====
-                    $('#no_faktur_kwt_exp').val('');
+                    $('#no_faktur_kwt_exp').val(d.invoice);
                     $('#nomor_muat_kwt_exp').val(d.nomor_muat);
                     $('#nomor_sj_kwt_exp').val(d.nomor_sj);
                     $('#kendaraan_kwt_exp').val(d.kendaraan);
@@ -272,10 +267,10 @@ $(document).ready(function() {
 
                     // ===== BAYAR SECTION =====
                     $('#kwt_exp_flag').val(0);
-                    $('#bayar_kwt_exp').val(0);
-                    $('#top_kwt_exp').val(0);
-                    $('#tgl_jtp_kwt_exp').val(d.tgl_jt);
-                    $('#piutang_kwt_exp').val(formatRupiah(d.piutang));
+                    $('#bayar_kwt_exp').val(formatRupiah(d.bayar));
+                    $('#top_kwt_exp').val(formatRupiah(d.saldo));
+                    $('#tgl_jtp_kwt_exp').val(d.tgl_jt ? d.tgl_jt.substring(0,10) : '');
+                    $('#piutang_kwt_exp').val(formatRupiah(d.piutang_arh));
 
                     // $('#modalKwitansiExp').modal('show');
                 },
@@ -294,11 +289,11 @@ $(document).ready(function() {
         let top   = parseFloat($('#top_kwt_exp').val());
 
         // Validasi BAYAR
-        if (isNaN(bayar) || bayar <= 0) {
-            alert('Nominal bayar harus angka dan lebih dari 0');
-            $('#bayar_kwt_exp').focus();
-            return false;
-        }
+        // if (isNaN(bayar) || bayar <= 0) {
+        //     alert('Nominal bayar harus angka dan lebih dari 0');
+        //     $('#bayar_kwt_exp').focus();
+        //     return false;
+        // }
 
         // Validasi TOP
         if (isNaN(top) || top < 0) {
@@ -309,6 +304,7 @@ $(document).ready(function() {
 
         let data = {
             invoice: $('#no_faktur_kwt_exp').val(),
+            nomuat: $('#nomor_muat_kwt_exp').val(),
             bayar: $('#bayar_kwt_exp').val(),
             top: $('#top_kwt_exp').val(),
             tgl_jtp: $('#tgl_jtp_kwt_exp').val(),
@@ -316,8 +312,13 @@ $(document).ready(function() {
         };
         $('#loading_modal').modal('show');
         $('#loading_modal').one('shown.bs.modal', function () {
+            if ($('#no_faktur_kwt_exp').val() === '') {
+                url = "{{ route('expedisiInvoiceGenerate.store') }}";
+            } else {
+                url = "{{ route('expedisiInvoiceGenerate.update') }}";
+            }
             $.ajax({
-                url: "{{ route('expedisiKwitansi.store') }}",
+                url: url,
                 type: "POST",
                 data: data,
                 success: function(response) {
@@ -357,7 +358,16 @@ $(document).ready(function() {
 
     });
 // ============================ End Of Submit Kwitansi Expedisi ===============================
-// =========================== Form Detail Edit Kwitansi Expedisi ==============================
+// =============================== Return Table Expedisi Generate =====================================
+    $('#returnInvExpGenBtn').on('click', function () {
+        // reset form
+        clearAllKwtExp();
+        $('#form_kwt_exp').addClass('d-none');
+        $('#table_kwt_exp').removeClass('d-none');
+        table_kwt.ajax.reload();
+    });
+    // ============================ End Of Return Table Expedisi Generate ==================================
+// =========================== Form Detail Edit Kwitansi Expedisi (Expired) ==============================
     $(document).on('click', '.btn-edit-kwt-exp', function() {
 
         let muatNo = $(this).data('invoice');
@@ -424,7 +434,7 @@ $(document).ready(function() {
     });
 
 // ======================== End Of Form Detail Edit Kwitansi Expedisi ============================
-// ============================== Delete Kwitansi ================================
+// ============================== Delete Kwitansi (Expired) ================================
     $(document).on('click', '.btn-hapus-kwt-exp', function() {
         var invoice = $(this).data('invoice');
 

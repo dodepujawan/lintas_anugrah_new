@@ -167,7 +167,8 @@ Route::prefix('expedisi-invoice')->group(function() {
 
 Route::prefix('expedisi-generate-invoice')->group(function() {
     Route::get('/', [ExpedisiGenerateInvoiceController::class, 'index'])->name('expedisiInvoiceGenerate.index');
-    Route::post('/store', [ExpedisiGenerateInvoiceController::class, 'prosesKwitansiStore'])->name('expedisiKwitansi.store');
+    Route::post('/store', [ExpedisiGenerateInvoiceController::class, 'prosesInvoiceStore'])->name('expedisiInvoiceGenerate.store');
+    Route::post('/update', [ExpedisiGenerateInvoiceController::class, 'updateInvoice'])->name('expedisiInvoiceGenerate.update');
     Route::get('/data', [ExpedisiGenerateInvoiceController::class, 'getDataInvoiceGen'])->name('expedisiInvoiceGenerate.data');
     Route::get('/show/{muatNo}', [ExpedisiGenerateInvoiceController::class, 'showInvoiceGabung'])->name('expedisiInvoiceGenerate.show');
     Route::post('/destroy', [ExpedisiGenerateInvoiceController::class, 'prosesKwitansiDelete'])->name('expedisiKwitansi.destroy');

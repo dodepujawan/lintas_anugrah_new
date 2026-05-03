@@ -546,21 +546,6 @@ class ExpedisiInvoiceController extends Controller
         // return $mpdf->Output("INVOICE-{$invoiceNo}.pdf", 'I'); // tampil di browser
     }
 
-    private function generateInvoiceOnline(): string{
-        $tahun = now()->format('Y');
-
-        $last = Expedisi::where('INVOICE', 'like', "FJO{$tahun}%")
-            ->orderBy('INVOICE', 'desc')
-            ->lockForUpdate()
-            ->first();
-
-        $lastNo = $last
-            ? intval(substr($last->INVOICE, -6))
-            : 0;
-
-        return 'FJO' . $tahun . str_pad($lastNo + 1, 6, '0', STR_PAD_LEFT);
-    }
-
     private function generateGB(): string{
         $date = now()->format('Ymd');
 
