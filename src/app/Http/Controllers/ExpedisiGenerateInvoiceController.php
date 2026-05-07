@@ -322,7 +322,7 @@ class ExpedisiGenerateInvoiceController extends Controller
             return response()->json([
                 'status' => true,
                 'message' => 'Invoice berhasil dibuat',
-                'invoice' => $invoiceNo
+                'invoiceNo' => $invoiceNo
             ]);
 
         } catch (\Throwable $e) {
@@ -336,11 +336,8 @@ class ExpedisiGenerateInvoiceController extends Controller
 
     public function updateInvoice(Request $request){
         try {
-
-            DB::transaction(function () use ($request) {
-
-                $invoice = $request->invoice;
-
+            $invoice = $request->invoice;
+            DB::transaction(function () use ($request, $invoice) {
                 if (!$invoice) {
                     throw new \Exception('Invoice tidak ditemukan');
                 }
@@ -403,7 +400,8 @@ class ExpedisiGenerateInvoiceController extends Controller
 
             return response()->json([
                 'status' => true,
-                'message' => 'Invoice berhasil diupdate'
+                'message' => 'Invoice berhasil diupdate',
+                'invoiceNo' => $invoice
             ]);
 
         } catch (\Throwable $e) {

@@ -334,7 +334,9 @@ $(document).ready(function() {
                         $('#table_kwt_exp').removeClass('d-none');
                         $('#ExpInvGenTable').DataTable().ajax.reload();
                         // Cetak PDF
-                        window.open(response.redirect, '_blank');
+                        // window.open(response.redirect, '_blank');
+                        console.log('nilainya :' + response.invoiceNo)
+                        printInvoice(response.invoiceNo);
                     } else {
                         $('#loading_modal').modal('hide');
                         Swal.fire({
@@ -367,106 +369,152 @@ $(document).ready(function() {
         table_kwt.ajax.reload();
     });
     // ============================ End Of Return Table Expedisi Generate ==================================
-// =========================== Form Detail Edit Kwitansi Expedisi (Expired) ==============================
-    $(document).on('click', '.btn-edit-kwt-exp', function() {
+    // Fungsi Print Electron JS
+    function printInvoice(invoiceNo){
 
-        let muatNo = $(this).data('invoice');
+        // ambil printer dari database
+        $.get("{{ route('printer.current') }}", function(p){
 
-        // bisa ajax ambil detail invoice juga kalau mau
-        $('#loading_modal').modal('show');
-        $('#loading_modal').one('shown.bs.modal', function () {
-            $.ajax({
-                url: "{{ route('expedisiInvoiceGenerate.show', ':kode') }}".replace(':kode', muatNo),
-                type: "GET",
-                success: function(response) {
+            var printerName = p.printer;
 
-                    if (!response.status) {
-                        alert(response.message);
-                        return;
-                    }
-                    $('#loading_modal').modal('hide');
-                    $('#table_kwt_exp').addClass('d-none');
-                    $('#form_kwt_exp').removeClass('d-none');
-                    // Clear Form Dulu
-                    clearAllKwtExp();
+            if(!printerName){
+                alert("Pilih printer dulu");
+                return;
+            }
 
-                    let d = response.data;
-                    // ===== LEFT SIDE =====
-                    $('#sub_total_kwt_exp').val(formatRupiah(d.sub_total));
-                    $('#d_charge_kwt_exp').val(formatRupiah(d.d_charge));
-                    $('#total_kwt_exp').val(formatRupiah(d.total));
+            // 🔥 pakai route name (AMAN)
+            var url = "{{ route('expedisiInvoice.text', ['invoiceNo' => '__INVOICE__']) }}";
+            url = url.replace('__INVOICE__', invoiceNo);
 
-                    $('#disc_persen_kwt_exp').val(d.disc_persen);
-                    $('#disc_rp_kwt_exp').val(formatRupiah(d.disc_rp));
+            // ambil TEXT dari Laravel
+            $.get(url, function(res){
 
-                    $('#dpp_kwt_exp').val(formatRupiah(d.total - d.disc_rp));
-                    $('#ppn_persen_kwt_exp').val(formatRupiah(d.ppn));
-                    $('#grand_kwt_exp').val(formatRupiah(d.grand));
+                var text = res.text;
 
-                    $('#tgl_invoice_kwt_exp').val(
-                        d.tgl_invoice.substring(0,10)
-                    );
+                // kirim ke Electron
+                fetch('http://localhost:3000/print-text', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        printer: printerName,
+                        text: text
+                    })
+                })
+                .then(res => res.json())
+                .then(res => {
+                    console.log("🚀 PRINT TEXT:", res);
+                })
+                .catch(err => {
+                    console.log("❌ ERROR:", err);
+                    alert("Print service tidak aktif");
+                });
 
-                    // ===== RIGHT SIDE =====
-                    $('#no_faktur_kwt_exp').val(d.invoice);
-                    $('#nomor_muat_kwt_exp').val(d.nomor_muat);
-                    $('#nomor_sj_kwt_exp').val(d.nomor_sj);
-                    $('#kendaraan_kwt_exp').val(d.kendaraan);
-                    $('#customer_kwt_exp').val(d.customer);
-
-                    // ===== BAYAR SECTION =====
-                    $('#edit_mode_alert').fadeIn();
-                    $('#kwt_exp_flag').val(1);
-                    $('#bayar_kwt_exp').val(formatRupiah(d.bayar));
-                    $('#top_kwt_exp').val(formatRupiah(d.saldo));
-                    $('#tgl_jtp_kwt_exp').val(d.tgl_jt);
-                    $('#piutang_kwt_exp').val(formatRupiah(d.piutang));
-                    // console.log('nyoba' + d.bayar + d.saldo);
-
-                    // $('#modalKwitansiExp').modal('show');
-                },
-                error: function(xhr) {
-                    $('#loading_modal').modal('hide');
-                    alert('Terjadi kesalahan server');
-                }
             });
+
         });
-    });
+    }
+// =========================== Form Detail Edit Kwitansi Expedisi (Expired) ==============================
+    // $(document).on('click', '.btn-edit-kwt-exp', function() {
+
+    //     let muatNo = $(this).data('invoice');
+
+    //     // bisa ajax ambil detail invoice juga kalau mau
+    //     $('#loading_modal').modal('show');
+    //     $('#loading_modal').one('shown.bs.modal', function () {
+    //         $.ajax({
+    //             url: "{{ route('expedisiInvoiceGenerate.show', ':kode') }}".replace(':kode', muatNo),
+    //             type: "GET",
+    //             success: function(response) {
+
+    //                 if (!response.status) {
+    //                     alert(response.message);
+    //                     return;
+    //                 }
+    //                 $('#loading_modal').modal('hide');
+    //                 $('#table_kwt_exp').addClass('d-none');
+    //                 $('#form_kwt_exp').removeClass('d-none');
+    //                 // Clear Form Dulu
+    //                 clearAllKwtExp();
+
+    //                 let d = response.data;
+    //                 // ===== LEFT SIDE =====
+    //                 $('#sub_total_kwt_exp').val(formatRupiah(d.sub_total));
+    //                 $('#d_charge_kwt_exp').val(formatRupiah(d.d_charge));
+    //                 $('#total_kwt_exp').val(formatRupiah(d.total));
+
+    //                 $('#disc_persen_kwt_exp').val(d.disc_persen);
+    //                 $('#disc_rp_kwt_exp').val(formatRupiah(d.disc_rp));
+
+    //                 $('#dpp_kwt_exp').val(formatRupiah(d.total - d.disc_rp));
+    //                 $('#ppn_persen_kwt_exp').val(formatRupiah(d.ppn));
+    //                 $('#grand_kwt_exp').val(formatRupiah(d.grand));
+
+    //                 $('#tgl_invoice_kwt_exp').val(
+    //                     d.tgl_invoice.substring(0,10)
+    //                 );
+
+    //                 // ===== RIGHT SIDE =====
+    //                 $('#no_faktur_kwt_exp').val(d.invoice);
+    //                 $('#nomor_muat_kwt_exp').val(d.nomor_muat);
+    //                 $('#nomor_sj_kwt_exp').val(d.nomor_sj);
+    //                 $('#kendaraan_kwt_exp').val(d.kendaraan);
+    //                 $('#customer_kwt_exp').val(d.customer);
+
+    //                 // ===== BAYAR SECTION =====
+    //                 $('#edit_mode_alert').fadeIn();
+    //                 $('#kwt_exp_flag').val(1);
+    //                 $('#bayar_kwt_exp').val(formatRupiah(d.bayar));
+    //                 $('#top_kwt_exp').val(formatRupiah(d.saldo));
+    //                 $('#tgl_jtp_kwt_exp').val(d.tgl_jt);
+    //                 $('#piutang_kwt_exp').val(formatRupiah(d.piutang));
+    //                 // console.log('nyoba' + d.bayar + d.saldo);
+
+    //                 // $('#modalKwitansiExp').modal('show');
+    //             },
+    //             error: function(xhr) {
+    //                 $('#loading_modal').modal('hide');
+    //                 alert('Terjadi kesalahan server');
+    //             }
+    //         });
+    //     });
+    // });
 
 // ======================== End Of Form Detail Edit Kwitansi Expedisi ============================
 // ============================== Delete Kwitansi (Expired) ================================
-    $(document).on('click', '.btn-hapus-kwt-exp', function() {
-        var invoice = $(this).data('invoice');
+    // $(document).on('click', '.btn-hapus-kwt-exp', function() {
+    //     var invoice = $(this).data('invoice');
 
-        Swal.fire({
-            title: 'Apakah Anda yakin?',
-            text: "Kwitansi Akan Dihapus!",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#d33',
-            cancelButtonColor: '#3085d6',
-            confirmButtonText: 'Ya, hapus!',
-            cancelButtonText: 'Batal'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                $('#loading_modal').modal('show');
-                $('#loading_modal').one('shown.bs.modal', function () {
-                    $.ajax({
-                        url: "{{ route('expedisiKwitansi.destroy') }}",
-                        type: 'POST',
-                        data: {
-                            invoice: invoice
-                        },
-                        success: function(response) {
-                            $('#loading_modal').modal('hide');
-                            Swal.fire('Terhapus!', response.success, 'success');
-                            $('#ExpInvGenTable').DataTable().ajax.reload();
-                        }
-                    });
-                });
-            }
-        });
-    });
+    //     Swal.fire({
+    //         title: 'Apakah Anda yakin?',
+    //         text: "Kwitansi Akan Dihapus!",
+    //         icon: 'warning',
+    //         showCancelButton: true,
+    //         confirmButtonColor: '#d33',
+    //         cancelButtonColor: '#3085d6',
+    //         confirmButtonText: 'Ya, hapus!',
+    //         cancelButtonText: 'Batal'
+    //     }).then((result) => {
+    //         if (result.isConfirmed) {
+    //             $('#loading_modal').modal('show');
+    //             $('#loading_modal').one('shown.bs.modal', function () {
+    //                 $.ajax({
+    //                     url: "{{ route('expedisiKwitansi.destroy') }}",
+    //                     type: 'POST',
+    //                     data: {
+    //                         invoice: invoice
+    //                     },
+    //                     success: function(response) {
+    //                         $('#loading_modal').modal('hide');
+    //                         Swal.fire('Terhapus!', response.success, 'success');
+    //                         $('#ExpInvGenTable').DataTable().ajax.reload();
+    //                     }
+    //                 });
+    //             });
+    //         }
+    //     });
+    // });
 // ============================== End Of Delete Kwitansi ================================
 // ============================== Click Return ================================
 $(document).on('click', '#keluar_kwt_exp', function() {
