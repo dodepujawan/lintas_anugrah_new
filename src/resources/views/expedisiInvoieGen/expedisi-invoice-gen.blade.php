@@ -114,6 +114,7 @@
                 <div class="mb-2">
                     <label>NOMOR SJ</label>
                     <input type="text" id="nomor_sj_kwt_exp" class="form-control" readonly>
+                    <input type="hidden" id="nosj_kwt_exp">
                 </div>
 
                 <div class="mb-2">
@@ -221,13 +222,13 @@ $(document).ready(function() {
 // ============================= Form Detail Invoice Generate Expedisi =================================
     $(document).on('click', '.btn-buat-invoice', function() {
 
-        let muatNo = $(this).data('nomuat');
+        let surjalNo = $(this).data('surjal');
 
         // bisa ajax ambil detail invoice juga kalau mau
         $('#loading_modal').modal('show');
         $('#loading_modal').one('shown.bs.modal', function () {
             $.ajax({
-                url: "{{ route('expedisiInvoiceGenerate.show', ':kode') }}".replace(':kode', muatNo),
+                url: "{{ route('expedisiInvoiceGenerate.show', ':kode') }}".replace(':kode', surjalNo),
                 type: "GET",
                 success: function(response) {
 
@@ -262,6 +263,7 @@ $(document).ready(function() {
                     $('#no_faktur_kwt_exp').val(d.invoice);
                     $('#nomor_muat_kwt_exp').val(d.nomor_muat);
                     $('#nomor_sj_kwt_exp').val(d.nomor_sj);
+                    $('#nosj_kwt_exp').val(d.master_nosj);
                     $('#kendaraan_kwt_exp').val(d.kendaraan);
                     $('#customer_kwt_exp').val(d.customer);
 
@@ -270,7 +272,7 @@ $(document).ready(function() {
                     $('#bayar_kwt_exp').val(formatRupiah(d.bayar));
                     $('#top_kwt_exp').val(formatRupiah(d.saldo));
                     $('#tgl_jtp_kwt_exp').val(d.tgl_jt ? d.tgl_jt.substring(0,10) : '');
-                    $('#piutang_kwt_exp').val(formatRupiah(d.piutang_arh));
+                    $('#piutang_kwt_exp').val(formatRupiah(d.grand));
 
                     // $('#modalKwitansiExp').modal('show');
                 },
@@ -304,7 +306,7 @@ $(document).ready(function() {
 
         let data = {
             invoice: $('#no_faktur_kwt_exp').val(),
-            nomuat: $('#nomor_muat_kwt_exp').val(),
+            nosj: $('#nosj_kwt_exp').val(),
             bayar: $('#bayar_kwt_exp').val(),
             top: $('#top_kwt_exp').val(),
             tgl_jtp: $('#tgl_jtp_kwt_exp').val(),
@@ -553,6 +555,7 @@ function clearAllKwtExp() {
     $('#no_faktur_kwt_exp').val('');
     $('#nomor_muat_kwt_exp').val('');
     $('#nomor_sj_kwt_exp').val('');
+    $('#nosj_kwt_exp').val(''),
     $('#kendaraan_kwt_exp').val('');
     $('#customer_kwt_exp').val('');
 

@@ -86,7 +86,7 @@ class ExpedisiGenerateInvoiceController extends Controller
                     return '
                         <button
                             class="btn btn-sm btn-primary btn-buat-invoice"
-                            data-nomuat="'.$row->NOMUAT.'">
+                            data-surjal="'.$row->NOSJ.'">
                             Edit
                         </button>
                     ';
@@ -98,7 +98,7 @@ class ExpedisiGenerateInvoiceController extends Controller
                 return '
                     <button
                         class="btn btn-sm btn-success btn-buat-invoice"
-                        data-nomuat="'.$row->NOMUAT.'">
+                        data-surjal="'.$row->NOSJ.'">
                         Buat Invoice
                     </button>
                 ';
@@ -108,30 +108,35 @@ class ExpedisiGenerateInvoiceController extends Controller
             ->make(true);
     }
 
-    public function showInvoiceGabung($muatNo){
-        $rows = Expedisi::where('NOMUAT', $muatNo)->get();
+    public function showInvoiceGabung($surjalNo){
+        // =====================================
+        // 1. AMBIL SJ YANG DIPILIH
+        // =====================================
+        $row = Expedisi::where('NOSJ', $surjalNo)->first();
+        if (!$row) {
 
-        if ($rows->isEmpty()) {
             return response()->json([
                 'status' => false,
-                'message' => 'Data tidak ditemukan'
+                'message' => 'Data SJ tidak ditemukan'
             ]);
         }
-
-        // 🔥 ambil baris pertama (untuk identitas)
-        $firstRow = $rows->first();
-
-        // =============================
-        // DETEKSI GB ATAU TIDAK
-        // =============================
-        $hasGB = $rows->whereNotNull('GB')->where('GB', '!=', '')->count() > 0;
-
-        if ($hasGB) {
-            $master = $rows->firstWhere('GRAND', '>', 0);
+        // =====================================
+        // 2. CEK APAKAH PUNYA GB
+        // =====================================
+        if (!empty($row->GB)) {
+            // 🔥 kalau punya GB ambil semua member GB
+            $rows = Expedisi::where('GB', $row->GB)
+                ->orderBy('NOSJ')
+                ->get();
         } else {
-            $master = $firstRow;
+            // 🔥 single SJ
+            $rows = collect([$row]);
         }
-
+        // =====================================
+        // 3. CARI MASTER
+        // =====================================
+        $master = $rows->firstWhere('GRAND', '>', 0)
+                ?? $rows->first();
         if (!$master) {
             return response()->json([
                 'status' => false,
@@ -139,49 +144,60 @@ class ExpedisiGenerateInvoiceController extends Controller
             ]);
         }
 
-        // =============================
-        // DETAIL
-        // =============================
+        // =====================================
+        // 4. DETAIL SJ
+        // =====================================
         $details = $rows->sortBy('NOSJ');
-
-        // =============================
-        // ARH
-        // =============================
+        // =====================================
+        // 5. ARH
+        // =====================================
         $arh = null;
         if (!empty($master->INVOICE)) {
-            $arh = Arh::where('NOFAKTUR', $master->INVOICE)->first();
+            $arh = Arh::where('NOFAKTUR', $master->INVOICE)
+                ->first();
         }
-
-        // =============================
-        // JATUH TEMPO
-        // =============================
-        $kodeCustomer = $firstRow->CUSTOMER_KODE ?? null;
+        // =====================================
+        // 6. TOP KREDIT CUSTOMER
+        // =====================================
+        $kodeCustomer = $master->CUSTOMER_KODE ?? null;
         $topKredit = 0;
-
         if ($kodeCustomer) {
-            $customer = Mcustomer::where('kode_cus', $kodeCustomer)->first();
+            $customer = Mcustomer::where('kode_cus', $kodeCustomer)
+                ->first();
             $topKredit = $customer->TOPKREDIT ?? 0;
         }
 
+        // =====================================
+        // 7. HITUNG JATUH TEMPO
+        // =====================================
         $tglInvoice = $master->TGLINVOICE
             ? Carbon::parse($master->TGLINVOICE)
             : now();
-
-        $tglJatuhTempo = $tglInvoice->copy()->addDays((int)$topKredit);
-
+        $tglJatuhTempo = $tglInvoice
+            ->copy()
+            ->addDays((int) $topKredit);
+        // =====================================
+        // 8. RESPONSE
+        // =====================================
         return response()->json([
             'status' => true,
             'data' => [
+                // =============================
+                // IDENTITAS
+                // =============================
+                'gb'           => $master->GB ?? '',
+
                 'invoice'      => $master->INVOICE ?? '',
                 'tgl_invoice'  => $master->TGLINVOICE,
 
-                // 🔥 IDENTITAS dari firstRow
-                'customer'     => $firstRow->CUSTOMER,
-                'nomor_muat'   => $firstRow->NOMUAT ?? '',
-                'tgl_muat'   => $firstRow->TGLMUAT ?? '',
-                'kendaraan'    => $firstRow->NAMA_KENDARAAN ?? '',
+                'customer'     => $master->CUSTOMER,
+                'nomor_muat'   => $master->NOMUAT ?? '',
+                'tgl_muat'     => $master->TGLMUAT ?? '',
+                'kendaraan'    => $master->NAMA_KENDARAAN ?? '',
 
-                // 🔥 NILAI dari master
+                // =============================
+                // NILAI INVOICE (MASTER)
+                // =============================
                 'sub_total'    => $master->HARGA ?? 0,
                 'disc_persen'  => $master->DISC ?? 0,
                 'disc_rp'      => $master->NDISC ?? 0,
@@ -189,14 +205,24 @@ class ExpedisiGenerateInvoiceController extends Controller
                 'total'        => $master->TOTAL ?? 0,
                 'ppn'          => $master->PPN ?? 0,
                 'grand'        => $master->GRAND ?? 0,
+
+                // =============================
+                // PEMBAYARAN
+                // =============================
+                'bayar'        => $master->BAYAR ?? 0,
                 'piutang'      => (int) ceil($master->PIUTANG ?? 0),
 
+                // =============================
+                // DETAIL SJ GABUNGAN
+                // =============================
                 'nomor_sj'     => $details->pluck('NOSJ')->implode(', '),
+                'master_nosj' => $master->NOSJ,
 
-                // ARH
+                // =============================
+                // DATA ARH
+                // =============================
                 'tgl_jt'       => $arh->TGLJT ?? $tglJatuhTempo->format('Y-m-d'),
                 'piutang_arh'  => $arh->PIUTANG ?? 0,
-                'bayar'        => $arh->BAYAR ?? 0,
                 'saldo'        => $arh->SALDO ?? 0,
             ]
         ]);
@@ -204,105 +230,102 @@ class ExpedisiGenerateInvoiceController extends Controller
 
     public function prosesInvoiceStore(Request $request){
         try {
-
             $invoiceNo = null;
-
             DB::transaction(function () use ($request, &$invoiceNo) {
-
                 // =============================
-                // 🔥 AMBIL NOMUAT DARI REQUEST
+                // 1. VALIDASI BASIC
                 // =============================
-                $nomuat = $request->nomuat;
-
-                if (!$nomuat) {
-                    throw new \Exception('Nomor muat tidak ditemukan');
+                $nosj = $request->nosj;
+                if (!$nosj) {
+                    throw new \Exception('Nomor SJ tidak ditemukan');
                 }
-
-                // parsing angka
+                // parsing nominal
                 $bayar = (int) preg_replace('/[^0-9]/', '', $request->bayar);
                 $top   = (int) preg_replace('/[^0-9]/', '', $request->top);
                 $tglJtp = $request->tgl_jtp;
-
                 // =============================
-                // 1. Ambil data berdasarkan NOMUAT
+                // 2. AMBIL SJ YANG DIPILIH
                 // =============================
-                $rows = Expedisi::where('NOMUAT', $nomuat)
+                $row = Expedisi::where('NOSJ', $nosj)
                     ->lockForUpdate()
-                    ->get();
-
-                if ($rows->isEmpty()) {
-                    throw new \Exception('Data tidak ditemukan');
+                    ->first();
+                if (!$row) {
+                    throw new \Exception('Data SJ tidak ditemukan');
                 }
-
                 // =============================
-                // 2. Cek GB
+                // 3. CEK APAKAH PUNYA GB
                 // =============================
-                $hasGB = $rows->whereNotNull('GB')
-                            ->where('GB', '!=', '')
-                            ->count() > 0;
-
-                if ($hasGB) {
-                    $gb = $rows->firstWhere('GB', '!=', '')->GB;
-
-                    $targetRows = Expedisi::where('GB', $gb)
+                if (!empty($row->GB)) {
+                    // 🔥 ambil semua member GB
+                    $targetRows = Expedisi::where('GB', $row->GB)
                         ->lockForUpdate()
+                        ->orderBy('NOSJ')
                         ->get();
                 } else {
-                    $targetRows = $rows;
+                    // 🔥 single SJ
+                    $targetRows = collect([$row]);
                 }
-
                 // =============================
-                // 3. Validasi (sudah invoice?)
+                // 4. VALIDASI SUDAH INVOICE?
                 // =============================
-                foreach ($targetRows as $row) {
-                    if (!is_null($row->INVOICE) && trim($row->INVOICE) !== '') {
-                        throw new \Exception("Sudah ada invoice pada data ini");
+                foreach ($targetRows as $item) {
+                    if (!is_null($item->INVOICE) && trim($item->INVOICE) !== '') {
+                        throw new \Exception("SJ {$item->NOSJ} sudah memiliki invoice");
                     }
                 }
-
                 // =============================
-                // 4. Ambil MASTER (yang GRAND > 0)
+                // 5. CARI MASTER
                 // =============================
                 $master = $targetRows->firstWhere('GRAND', '>', 0)
                         ?? $targetRows->first();
-
-                $grand = (int) ($master->GRAND ?? 0);
-
+                if (!$master) {
+                    throw new \Exception('Master invoice tidak ditemukan');
+                }
                 // =============================
-                // 5. Validasi bayar
+                // 6. AMBIL TOTAL GRAND
+                // =============================
+                $grand = (int) ($master->GRAND ?? 0);
+                // =============================
+                // 7. VALIDASI BAYAR
                 // =============================
                 if ($bayar < 0) {
                     throw new \Exception('Nominal bayar tidak valid');
                 }
-
                 if ($bayar > $grand) {
                     throw new \Exception('Bayar tidak boleh lebih besar dari total');
                 }
-
-                $piutang = $grand - $bayar;
-
                 // =============================
-                // 6. Generate INVOICE
+                // 8. HITUNG PIUTANG
+                // =============================
+                $piutang = $grand - $bayar;
+                // =============================
+                // 9. GENERATE INVOICE
                 // =============================
                 $invoiceNo = $this->generateInvoiceOnline();
-
                 // =============================
-                // 7. Update EXPEDISI
+                // 10. UPDATE EXPEDISI
                 // =============================
-                foreach ($targetRows as $row) {
-
-                    $row->INVOICE    = $invoiceNo;
-                    $row->TGLINVOICE = now();
-                    $row->STS        = 'INVOICE';
-                    $row->TGLJT      = $tglJtp;
-
-                    $row->USERINV = auth()->user()->user_id . '-' . now()->format('d-m-Y h:i:s A');
-
-                    $row->save();
+                foreach ($targetRows as $item) {
+                    $item->INVOICE    = $invoiceNo;
+                    $item->TGLINVOICE = now();
+                    $item->STS        = 'INVOICE';
+                    $item->TGLJT      = $tglJtp;
+                    // ====================================
+                    // HANYA MASTER YANG SIMPAN PEMBAYARAN
+                    // ====================================
+                    if ($item->id == $master->id) {
+                        $item->BAYAR   = $bayar;
+                        $item->PIUTANG = $piutang;
+                    } else {
+                        // DETAIL GB
+                        $item->BAYAR   = 0;
+                        $item->PIUTANG = 0;
+                    }
+                    $item->USERINV = auth()->user()->user_id. '-' .now()->format('d-m-Y h:i:s A');
+                    $item->save();
                 }
-
                 // =============================
-                // 8. INSERT ARH
+                // 11. INSERT ARH
                 // =============================
                 Arh::create([
                     'NOFAKTUR'   => $invoiceNo,
@@ -310,7 +333,9 @@ class ExpedisiGenerateInvoiceController extends Controller
                     'CUSTOMER'   => $master->CUSTOMER,
                     'PIUTANG'    => $piutang,
                     'DISCOUNT'   => $master->NDISC ?? 0,
-                    'BAYAR'      => $bayar,
+
+                    // pembayaran dihandle modul lain
+                    // 'BAYAR' => 0,
                     'SALDO'      => $top,
                     'TGLJT'      => $tglJtp,
                     'CABANG'     => $master->CABANG ?? '',
@@ -320,16 +345,19 @@ class ExpedisiGenerateInvoiceController extends Controller
             });
 
             return response()->json([
-                'status' => true,
-                'message' => 'Invoice berhasil dibuat',
+
+                'status'    => true,
+                'message'   => 'Invoice berhasil dibuat',
                 'invoiceNo' => $invoiceNo
             ]);
 
         } catch (\Throwable $e) {
 
             return response()->json([
-                'status' => false,
+
+                'status'  => false,
                 'message' => $e->getMessage()
+
             ], 500);
         }
     }
@@ -350,9 +378,10 @@ class ExpedisiGenerateInvoiceController extends Controller
                 // =============================
                 // 1. Ambil MASTER dari EXPEDISI
                 // =============================
-                $master = Expedisi::where('INVOICE', $invoice)
-                    ->where('GRAND', '>', 0)
-                    ->first();
+                $rows = Expedisi::where('INVOICE', $invoice)->get();
+
+                $master = $rows->firstWhere('GRAND', '>', 0)
+                        ?? $rows->first();
 
                 if (!$master) {
                     throw new \Exception('Data invoice tidak ditemukan');
@@ -367,34 +396,38 @@ class ExpedisiGenerateInvoiceController extends Controller
                     throw new \Exception('Nominal bayar tidak valid');
                 }
 
-                if ($bayar > $grand) {
-                    throw new \Exception('Bayar tidak boleh lebih besar dari total');
-                }
+                // if ($bayar > $grand) {
+                //     throw new \Exception('Bayar tidak boleh lebih besar dari total');
+                // }
 
                 // =============================
-                // 3. HITUNG PIUTANG
+                // 3. HITUNG PIUTANG DAN UPDATE EXPEDISI BAYAR DAN PIUTANG
                 // =============================
                 $piutang = $grand - $bayar;
+
+                foreach ($rows as $row) {
+                    $row->TGLJT = $tglJtp;
+                    if ($row->id == $master->id) {
+                        $row->BAYAR   = $bayar;
+                        $row->PIUTANG = $piutang;
+                    } else {
+                        $row->BAYAR   = 0;
+                        $row->PIUTANG = 0;
+                    }
+                    $row->save();
+                }
 
                 // =============================
                 // 4. UPDATE ARH
                 // =============================
                 Arh::where('NOFAKTUR', $invoice)
                     ->update([
-                        'BAYAR'       => $bayar,
+                        // 'BAYAR'       => $bayar,
                         'PIUTANG'     => $piutang,
                         'SALDO'       => $top,
                         'TGLJT'       => $tglJtp,
                         'USER_UPDATE' => auth()->user()->user_id,
                         'updated_at'  => now()
-                    ]);
-
-                // =============================
-                // 5. UPDATE EXPEDISI
-                // =============================
-                Expedisi::where('INVOICE', $invoice)
-                    ->update([
-                        'TGLJT' => $tglJtp
                     ]);
             });
 

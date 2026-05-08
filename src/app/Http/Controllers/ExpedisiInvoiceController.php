@@ -78,20 +78,28 @@ class ExpedisiInvoiceController extends Controller
         $filterInvoice = $request->filter_invoice ?? 'belum';
 
         if ($filterInvoice === 'belum') {
-
             // tampilkan yang belum invoice
             $expedisi->where(function ($q) {
-                $q->whereNull('GB')
-                ->orWhere('GB', '');
+                // non GB
+                $q->where(function ($sub) {
+                    $sub->whereNull('GB')
+                        ->orWhere('GB', '');
+                });
+            })
+            ->where(function ($q) {
+                // invoice masih kosong
+                $q->whereNull('INVOICE')
+                    ->orWhere('INVOICE', '');
             });
-
         } elseif ($filterInvoice === 'sudah') {
 
             // tampilkan yang sudah invoice
             // tapi hanya master row (yang punya harga)
             $expedisi->whereNotNull('GB')
-                    ->where('GB', '!=', '')
-                    ->where('HARGA', '>', 0);
+            ->where('GB', '!=', '')
+            ->where('HARGA', '>', 0)
+            ->whereNotNull('INVOICE')
+            ->where('INVOICE', '!=', '');
         }
 
         return DataTables::of($expedisi)
