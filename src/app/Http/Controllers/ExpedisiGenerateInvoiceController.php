@@ -25,21 +25,21 @@ class ExpedisiGenerateInvoiceController extends Controller
 
     public function getDataInvoiceGen(Request $request){
         $query = Expedisi::select([
-                'INVOICE',
-                'TGLINVOICE',
-                'CUSTOMER',
-                'GRAND',
-                'PIUTANG',
-                'GB',
-                'NOMUAT',
-                'TGLMUAT',
-                'NOSJ'
-            ])
-            ->where('JENIS', 'EKS')
-            ->where(function($q){
-                $q->whereNotNull('NOMUAT')
-                ->orWhere('NOMUAT', '!=', '');
-            });
+            'INVOICE',
+            'TGLINVOICE',
+            'CUSTOMER',
+            'GRAND',
+            'PIUTANG',
+            'GB',
+            'NOMUAT',
+            'TGLMUAT',
+            'NOSJ'
+        ])
+        ->where('JENIS', 'EKS')
+        ->where(function($q){
+            $q->whereNotNull('NOMUAT')
+            ->orWhere('NOMUAT', '!=', '');
+        });
 
         // =============================
         // FILTER STATUS INVOICE
@@ -55,6 +55,9 @@ class ExpedisiGenerateInvoiceController extends Controller
             $query->where(function($q){
                 $q->whereNotNull('INVOICE')
                 ->where('INVOICE', '!=', '');
+            })->where(function($q){
+                $q->whereNull('kwt')
+                ->orWhere('kwt', '');
             })
             ->where('GRAND', '>', 0);
         }
@@ -446,90 +449,6 @@ class ExpedisiGenerateInvoiceController extends Controller
         }
     }
 
-    public function prosesKwitansiDelete(Request $request){
-        try {
-
-            DB::transaction(function () use ($request) {
-
-                $invoice = $request->invoice;
-
-                $expedisi = Expedisi::where('INVOICE', $invoice)->first();
-
-                if (!$expedisi) {
-                    throw new \Exception('Invoice tidak ditemukan');
-                }
-
-                $grand = $expedisi->GRAND;
-
-                // ===============================
-                // Reverse ARH
-                // ===============================
-                Arh::where('NOFAKTUR', $invoice)
-                    ->update([
-                        'BAYAR'       => 0,
-                        'SALDO'       => 0,
-                        'PIUTANG'     => $grand, // kembali seperti awal
-                        'TGLJT'       => null,
-                        'USER_UPDATE' => auth()->user()->user_id,
-                        'updated_at'  => now()
-                    ]);
-
-                // ===============================
-                // Reverse EXPEDISI
-                // ===============================
-                Expedisi::where('INVOICE', $invoice)
-                    ->update([
-                        'kwt'   => null,
-                        'TGLKW' => null,
-                        'TGLJT' => null
-                    ]);
-            });
-
-            return response()->json([
-                'status' => true,
-                'message' => 'Kwitansi berhasil dihapus / direverse'
-            ]);
-
-        } catch (\Throwable $e) {
-
-            return response()->json([
-                'status' => false,
-                'message' => $e->getMessage()
-            ], 500);
-        }
-    }
-
-    public function pdfInvoiceKwitansi($invoice){
-        $master = Expedisi::where('INVOICE', $invoice)
-            ->where('GRAND', '>', 0)
-            ->firstOrFail();
-
-        $details = Expedisi::where('INVOICE', $invoice)
-            ->orderBy('NOSJ')
-            ->get();
-
-        $arh = Arh::where('NOFAKTUR', $invoice)
-            ->first();
-
-        $signature = Signature::orderByDesc('id')->first();
-
-        $html = view('expedisiKwitansi.expedisi-kwitansi-pdf', compact('master','details','arh','signature'))->render();
-
-        $mpdf = new Mpdf([
-            'mode' => 'utf-8',
-            'format' => 'A4',
-            'margin_top' => 20,
-            'margin_bottom' => 15,
-            'margin_left' => 15,
-            'margin_right' => 15,
-        ]);
-
-        $mpdf->WriteHTML($html);
-
-        return response($mpdf->Output('Invoice-'.$invoice.'.pdf', 'I'))
-            ->header('Content-Type', 'application/pdf');
-    }
-
     private function generateInvoiceOnline(): string{
         $tahun = now()->format('Y');
 
@@ -544,24 +463,4 @@ class ExpedisiGenerateInvoiceController extends Controller
 
         return 'FJO' . $tahun . str_pad($lastNo + 1, 6, '0', STR_PAD_LEFT);
     }
-
-    private function generateKW()
-    {
-        $year = now()->format('Y');
-
-        $last = Expedisi::where('kwt', 'like', 'KW'.$year.'%')
-            ->lockForUpdate()
-            ->orderByDesc('kwt')
-            ->value('kwt');
-
-        if (!$last) {
-            return 'KW' . $year . '0000001';
-        }
-
-        $number = (int) substr($last, 7);
-        $number++;
-
-        return 'KW' . $year . str_pad($number, 7, '0', STR_PAD_LEFT);
-    }
-
 }

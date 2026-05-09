@@ -76,7 +76,11 @@
                     </div>
                     <div class="form-check">
                         <input class="form-check-input perm" type="checkbox" value="penjualan.invoice">
-                        <label class="form-check-label">Invoice Ekspedisi</label>
+                        <label class="form-check-label">Ekspedisi Gabung</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input perm" type="checkbox" value="penjualan.invoice_generate">
+                        <label class="form-check-label">Generate Invoice Ekspedisi</label>
                     </div>
                     <div class="form-check">
                         <input class="form-check-input perm" type="checkbox" value="penjualan.kwitansi">

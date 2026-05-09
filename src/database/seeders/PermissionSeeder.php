@@ -31,6 +31,7 @@ class PermissionSeeder extends Seeder
 
             'penjualan.expedisi',
             'penjualan.invoice',
+            'penjualan.invoice_generate',
             'penjualan.kwitansi',
             'penjualan.rent_dingin',
             'penjualan.invoice_rent_dingin',

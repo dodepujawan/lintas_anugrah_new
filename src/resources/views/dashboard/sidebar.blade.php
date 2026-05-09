@@ -140,10 +140,17 @@
                     </a>
                 </li>
                 @endcan
-                @can('penjualan.kwitansi')
+                @can('penjualan.invoice_generate')
                 <li class="menu-item">
                     <a href="#" class="menu-link" id="sidebar_Invoice_gen_expedisi">
                     <span class="menu-text">Invoice Ekspedisi</span>
+                    </a>
+                </li>
+                @endcan
+                @can('penjualan.kwitansi')
+                <li class="menu-item">
+                    <a href="#" class="menu-link" id="sidebar_Invoice_kwt_expedisi">
+                    <span class="menu-text">Kwitansi Ekspedisi</span>
                     </a>
                 </li>
                 @endcan

@@ -14,6 +14,7 @@ use App\Http\Controllers\PricedinginCustomerController;
 use App\Http\Controllers\ExpedisiController;
 use App\Http\Controllers\ExpedisiInvoiceController;
 use App\Http\Controllers\ExpedisiGenerateInvoiceController;
+use App\Http\Controllers\ExpedisiKwitansiController;
 use App\Http\Controllers\RentPendinginController;
 use App\Http\Controllers\RentPendinginInvoiceController;
 use App\Http\Controllers\RentPendinginKwitansiController;
@@ -171,9 +172,15 @@ Route::prefix('expedisi-generate-invoice')->group(function() {
     Route::post('/update', [ExpedisiGenerateInvoiceController::class, 'updateInvoice'])->name('expedisiInvoiceGenerate.update');
     Route::get('/data', [ExpedisiGenerateInvoiceController::class, 'getDataInvoiceGen'])->name('expedisiInvoiceGenerate.data');
     Route::get('/show/{surjalNo}', [ExpedisiGenerateInvoiceController::class, 'showInvoiceGabung'])->name('expedisiInvoiceGenerate.show');
-    Route::post('/destroy', [ExpedisiGenerateInvoiceController::class, 'prosesKwitansiDelete'])->name('expedisiKwitansi.destroy');
+});
+
+Route::prefix('expedisi-kwitansi')->group(function() {
+    Route::get('/', [ExpedisiKwitansiController::class, 'index'])->name('expedisiKwitansi.index');
+    Route::get('/data', [ExpedisiKwitansiController::class, 'getDataKwitansi'])->name('expedisiKwitansi.data');
+    Route::post('/proses', [ExpedisiKwitansiController::class, 'prosesKwitansi'])->name('expedisiKwitansi.proses');
+    Route::post('/destroy', [ExpedisiKwitansiController::class, 'deleteKwitansi'])->name('expedisiKwitansi.destroy');
     // // PDF
-    Route::get('/kwitansi/invoice/pdf/{invoiceNo}', [ExpedisiGenerateInvoiceController::class, 'pdfInvoiceKwitansi'])->name('expedisiKwitansi.pdfKwitansi');
+    Route::get('/invoice/pdf/{invoiceNo}', [ExpedisiKwitansiController::class, 'pdfInvoiceKwitansi'])->name('expedisiKwitansi.pdfKwitansi');
 });
 
 Route::prefix('rent-pendingin')->group(function() {
