@@ -164,13 +164,13 @@
                     </a>
                 </li>
                 @endcan
-                @can('penjualan.invoice_rent_dingin')
+                {{-- @can('penjualan.invoice_rent_dingin')
                 <li class="menu-item">
                     <a href="#" class="menu-link" id="sidebar_invoice_rent_dingin">
                     <span class="menu-text">Invoice Sewa Mobil Pendingin</span>
                     </a>
                 </li>
-                @endcan
+                @endcan --}}
                 @can('penjualan.kwitansi_rent_dingin')
                 <li class="menu-item">
                     <a href="#" class="menu-link" id="sidebar_generate_rent_dingin">

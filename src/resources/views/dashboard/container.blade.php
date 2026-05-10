@@ -403,23 +403,23 @@ $(document).ready(function() {
     }
 // ========================= End Of New Rent Dingin ======================================
 // ========================= Invoice Rent Dingin ======================================
-    $(document).on('click', '#sidebar_invoice_rent_dingin', function(e) {
-        e.preventDefault();
-        loadInvPendinginForm();
-    });
+    // $(document).on('click', '#sidebar_invoice_rent_dingin', function(e) {
+    //     e.preventDefault();
+    //     loadInvPendinginForm();
+    // });
 
-    function loadInvPendinginForm() {
-        $.ajax({
-            url: '{{ route('rentPendinginInv.index') }}', // Route to load the form
-            type: 'GET',
-            success: function(response) {
-                $('.master-page').html(response);
-            },
-            error: function() {
-                $('.master-page').html('<p>Error loading form.</p>');
-            }
-        });
-    }
+    // function loadInvPendinginForm() {
+    //     $.ajax({
+    //         url: '{{ route('rentPendinginInv.index') }}', // Route to load the form
+    //         type: 'GET',
+    //         success: function(response) {
+    //             $('.master-page').html(response);
+    //         },
+    //         error: function() {
+    //             $('.master-page').html('<p>Error loading form.</p>');
+    //         }
+    //     });
+    // }
 // ========================= End Of Invoice Rent Dingin ======================================
 // ========================= Kwitansi Rent Dingin ======================================
     $(document).on('click', '#sidebar_generate_rent_dingin', function(e) {
