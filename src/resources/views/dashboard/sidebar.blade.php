@@ -173,8 +173,8 @@
                 @endcan
                 @can('penjualan.kwitansi_rent_dingin')
                 <li class="menu-item">
-                    <a href="#" class="menu-link" id="sidebar_kwitansi_rent_dingin">
-                    <span class="menu-text">Kwitansi Sewa Mobil Pendingin</span>
+                    <a href="#" class="menu-link" id="sidebar_generate_rent_dingin">
+                    <span class="menu-text">Generate Invoice Sewa Mobil Pendingin</span>
                     </a>
                 </li>
                 @endcan

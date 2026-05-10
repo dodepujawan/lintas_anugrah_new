@@ -5,11 +5,11 @@
         <div class="mb-3">
             <label>
                 <input type="radio" name="filter_kwt_dgn" value="belum" checked>
-                Belum Kwitansi
+                Belum Invoice
             </label>
             <label class="ms-3">
                 <input type="radio" name="filter_kwt_dgn" value="sudah">
-                Sudah Kwitansi
+                Sudah Invoice
             </label>
         </div>
         <div class="table-responsive">
@@ -21,7 +21,7 @@
                         <th>Tanggal</th>
                         <th>Customer</th>
                         <th>Grand Total</th>
-                        <th>No Kwitansi</th>
+                        <th>No Surat Jalan</th>
                         <th>Aksi</th>
                     </tr>
                 </thead>
@@ -176,9 +176,9 @@ $(document).ready(function() {
         processing: true,
         serverSide: true,
         ajax:{
-            url: "{{ route('rentPendinginKwitansi.data') }}",
+            url: "{{ route('rentPendinginInvGen.data') }}",
             data: function (d) {
-                d.status_kwt = $('input[name="filter_kwt_dgn"]:checked').val();
+                d.status_inv_gen = $('input[name="filter_kwt_dgn"]:checked').val();
             }
         },
         columns: [
@@ -188,7 +188,7 @@ $(document).ready(function() {
             { data: 'CUSTOMER', name: 'CUSTOMER' },
             { data: 'GRAND', name: 'GRAND', className: 'text-end' },
             // { data: 'PIUTANG', name: 'PIUTANG', className: 'text-end' },
-            { data: 'no_kwt', name: 'kwt', visible: false },
+            { data: 'NOSJ', name: 'NOSJ', visible: false },
             { data: 'action', name: 'action', orderable: false, searchable: false }
         ]
     });
@@ -208,15 +208,15 @@ $(document).ready(function() {
     });
 // ============================== End Of Tabel Kwitansi Dingin ==================================
 // =============================== Form Detail Kwitansi Dingin ===================================
-    $(document).on('click', '.btn-show-invoice-dgn-kwt', function() {
+    $(document).on('click', '.btn-show-invoice-dgn-gen', function() {
 
-        let invoiceNo = $(this).data('invoice');
+        let nosj = $(this).data('nosj');
 
         // bisa ajax ambil detail invoice juga kalau mau
         $('#loading_modal').modal('show');
         $('#loading_modal').one('shown.bs.modal', function () {
             $.ajax({
-                url: "{{ route('rentPendinginKwitansi.show', ':kode') }}".replace(':kode', invoiceNo),
+                url: "{{ route('rentPendinginInvGen.show', ':kode') }}".replace(':kode', nosj),
                 type: "GET",
                 success: function(response) {
 
@@ -243,9 +243,9 @@ $(document).ready(function() {
                     $('#ppn_persen_kwt_dgn').val(formatRupiah(d.ppn));
                     $('#grand_kwt_dgn').val(formatRupiah(d.grand));
 
-                    $('#tgl_invoice_kwt_dgn').val(
-                        d.tgl_invoice.substring(0,10)
-                    );
+                    // $('#tgl_invoice_kwt_dgn').val(
+                    //     d.tgl_invoice.substring(0,10)
+                    // );
 
                     // ===== RIGHT SIDE =====
                     $('#no_faktur_kwt_dgn').val(d.invoice);
@@ -258,7 +258,8 @@ $(document).ready(function() {
                     $('#kwt_exp_flag_dgn').val(0);
                     $('#bayar_kwt_dgn').val(0);
                     $('#top_kwt_dgn').val(0);
-                    $('#piutang_kwt_dgn').val(formatRupiah(d.piutang));
+                    $('#tgl_jtp_kwt_dgn').val(d.tgl_jt ? d.tgl_jt.substring(0,10) : '');
+                    $('#piutang_kwt_dgn').val(formatRupiah(d.grand));
                 },
                 error: function(xhr) {
                     $('#loading_modal').modal('hide');
@@ -275,11 +276,11 @@ $(document).ready(function() {
         let top   = parseFloat($('#top_kwt_dgn').val());
 
         // Validasi BAYAR
-        if (isNaN(bayar) || bayar <= 0) {
-            alert('Nominal bayar harus angka dan lebih dari 0');
-            $('#bayar_kwt_dgn').focus();
-            return false;
-        }
+        // if (isNaN(bayar) || bayar > 0) {
+        //     alert('Nominal bayar harus angka dan lebih dari 0');
+        //     $('#bayar_kwt_dgn').focus();
+        //     return false;
+        // }
 
         // Validasi TOP
         if (isNaN(top) || top < 0) {
@@ -290,6 +291,7 @@ $(document).ready(function() {
 
         let data = {
             invoice: $('#no_faktur_kwt_dgn').val(),
+            nosj: $('#nomor_sj_kwt_dgn').val(),
             bayar: $('#bayar_kwt_dgn').val(),
             top: $('#top_kwt_dgn').val(),
             tgl_jtp: $('#tgl_jtp_kwt_dgn').val()
@@ -297,7 +299,7 @@ $(document).ready(function() {
         $('#loading_modal').modal('show');
         $('#loading_modal').one('shown.bs.modal', function () {
             $.ajax({
-                url: "{{ route('rentPendinginKwitansi.store') }}",
+                url: "{{ route('rentPendinginInvGen.store') }}",
                 type: "POST",
                 data: data,
                 success: function(response) {
@@ -338,7 +340,7 @@ $(document).ready(function() {
     });
 // ============================ End Of Submit Kwitansi Dingin ===============================
 // ============================== Delete Kwitansi ================================
-    $(document).on('click', '.btn-hapus-kwt-dgn', function() {
+    $(document).on('click', '.btn-hapus-inv-gen-dgn', function() {
         var invoice = $(this).data('invoice');
 
         Swal.fire({
@@ -372,15 +374,15 @@ $(document).ready(function() {
     });
 // ============================== End Of Delete Kwitansi ================================
 // ============================= Form Detail Edit Kwitansi Dingin ===============================
-    $(document).on('click', '.btn-edit-kwt-dgn', function() {
+    $(document).on('click', '.btn-edit-inv-gen-dgn', function() {
 
-        let invoiceNo = $(this).data('invoice');
+        let nosj = $(this).data('nosj');
 
         // bisa ajax ambil detail invoice juga kalau mau
         $('#loading_modal').modal('show');
         $('#loading_modal').one('shown.bs.modal', function () {
             $.ajax({
-                url: "{{ route('rentPendinginKwitansi.show', ':kode') }}".replace(':kode', invoiceNo),
+                url: "{{ route('rentPendinginInvGen.show', ':kode') }}".replace(':kode', nosj),
                 type: "GET",
                 success: function(response) {
 
@@ -423,8 +425,8 @@ $(document).ready(function() {
                     $('#kwt_exp_flag_dgn').val(1);
                     $('#bayar_kwt_dgn').val(formatRupiah(d.bayar));
                     $('#top_kwt_dgn').val(formatRupiah(d.saldo));
-                    $('#tgl_jtp_kwt_dgn').val(d.tgl_jt);
-                    $('#piutang_kwt_dgn').val(formatRupiah(d.piutang));
+                    $('#tgl_jtp_kwt_dgn').val(d.tgl_jt ? d.tgl_jt.substring(0,10) : '');
+                    $('#piutang_kwt_dgn').val(formatRupiah(d.grand));
                 },
                 error: function(xhr) {
                     $('#loading_modal').modal('hide');

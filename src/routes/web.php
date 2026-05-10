@@ -17,7 +17,7 @@ use App\Http\Controllers\ExpedisiGenerateInvoiceController;
 use App\Http\Controllers\ExpedisiKwitansiController;
 use App\Http\Controllers\RentPendinginController;
 use App\Http\Controllers\RentPendinginInvoiceController;
-use App\Http\Controllers\RentPendinginKwitansiController;
+use App\Http\Controllers\RentPendinginGenerateInvoiceController;
 use App\Http\Controllers\MsupplierController;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\PajakController;
@@ -208,12 +208,12 @@ Route::prefix('rent-pendingin-invoice')->group(function() {
     Route::post('/update', [RentPendinginInvoiceController::class, 'updateRentDinginInvoice'])->name('rentPendinginInv.update');
 });
 
-Route::prefix('rent-pendingin-kwitansi')->group(function() {
-    Route::get('/', [RentPendinginKwitansiController::class, 'index'])->name('rentPendinginKwitansi.index');
-    Route::post('/store', [RentPendinginKwitansiController::class, 'prosesKwitansiStore'])->name('rentPendinginKwitansi.store');
-    Route::get('/data', [RentPendinginKwitansiController::class, 'getDataInvoiceKwt'])->name('rentPendinginKwitansi.data');
-    Route::get('/show/{invoice}', [RentPendinginKwitansiController::class, 'showInvoiceDetail'])->name('rentPendinginKwitansi.show');
-    Route::post('/destroy', [RentPendinginKwitansiController::class, 'prosesKwitansiDelete'])->name('rentPendinginKwitansi.destroy');
+Route::prefix('rent-pendingin-invoice-gen')->group(function() {
+    Route::get('/', [RentPendinginGenerateInvoiceController::class, 'index'])->name('rentPendinginInvGen.index');
+    Route::post('/store', [RentPendinginGenerateInvoiceController::class, 'prosesInvoicePembayaran'])->name('rentPendinginInvGen.store');
+    Route::get('/data', [RentPendinginGenerateInvoiceController::class, 'getDataInvoiceGen'])->name('rentPendinginInvGen.data');
+    Route::get('/show/{nosj}', [RentPendinginGenerateInvoiceController::class, 'showInvoiceDetail'])->name('rentPendinginInvGen.show');
+    Route::post('/destroy', [RentPendinginGenerateInvoiceController::class, 'prosesKwitansiDelete'])->name('rentPendinginKwitansi.destroy');
 });
 
 Route::prefix('supplier')->middleware('auth')->group(function () {

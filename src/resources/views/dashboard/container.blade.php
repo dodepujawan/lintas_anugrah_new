@@ -422,14 +422,14 @@ $(document).ready(function() {
     }
 // ========================= End Of Invoice Rent Dingin ======================================
 // ========================= Kwitansi Rent Dingin ======================================
-    $(document).on('click', '#sidebar_kwitansi_rent_dingin', function(e) {
+    $(document).on('click', '#sidebar_generate_rent_dingin', function(e) {
         e.preventDefault();
-        loadKwtPendinginForm();
+        loadGenPendinginForm();
     });
 
-    function loadKwtPendinginForm() {
+    function loadGenPendinginForm() {
         $.ajax({
-            url: '{{ route('rentPendinginKwitansi.index') }}', // Route to load the form
+            url: '{{ route('rentPendinginInvGen.index') }}', // Route to load the form
             type: 'GET',
             success: function(response) {
                 $('.master-page').html(response);
