@@ -18,6 +18,7 @@ use App\Http\Controllers\ExpedisiKwitansiController;
 use App\Http\Controllers\RentPendinginController;
 use App\Http\Controllers\RentPendinginInvoiceController;
 use App\Http\Controllers\RentPendinginGenerateInvoiceController;
+use App\Http\Controllers\RentPendinginKwitansiController;
 use App\Http\Controllers\MsupplierController;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\PajakController;
@@ -200,6 +201,7 @@ Route::prefix('rent-pendingin')->group(function() {
     Route::get('/rent/pendingin/{nosj}/print-surat-jalan', [RentPendinginController::class, 'printSurjalRent'])->name('rentPendingin.printSuratJalan');
 });
 
+// ### Expired
 Route::prefix('rent-pendingin-invoice')->group(function() {
     Route::get('/', [RentPendinginInvoiceController::class, 'index'])->name('rentPendinginInv.index');
     Route::post('/store', [RentPendinginInvoiceController::class, 'storeRentDinginInvoice'])->name('rentPendinginInv.store');
@@ -214,6 +216,17 @@ Route::prefix('rent-pendingin-invoice-gen')->group(function() {
     Route::get('/data', [RentPendinginGenerateInvoiceController::class, 'getDataInvoiceGen'])->name('rentPendinginInvGen.data');
     Route::get('/show/{nosj}', [RentPendinginGenerateInvoiceController::class, 'showInvoiceDetail'])->name('rentPendinginInvGen.show');
     Route::post('/destroy', [RentPendinginGenerateInvoiceController::class, 'prosesKwitansiDelete'])->name('rentPendinginKwitansi.destroy');
+    // // PDF
+    Route::get('/invoice/pdf/{invoiceNo}', [RentPendinginGenerateInvoiceController::class, 'pdfInvoiceGenerate'])->name('rentPendinginGenerate.pdfGenerate');
+});
+
+Route::prefix('rent-pendingin-kwitansi')->group(function() {
+    Route::get('/', [RentPendinginKwitansiController::class, 'index'])->name('pendinginKwitansi.index');
+    Route::get('/data', [RentPendinginKwitansiController::class, 'getDataKwitansi'])->name('pendinginKwitansi.data');
+    Route::post('/proses', [RentPendinginKwitansiController::class, 'prosesKwitansi'])->name('pendinginKwitansi.proses');
+    Route::post('/destroy', [RentPendinginKwitansiController::class, 'deleteKwitansi'])->name('pendinginKwitansi.destroy');
+    // // PDF
+    Route::get('/invoice/pdf/{invoiceNo}', [RentPendinginKwitansiController::class, 'pdfInvoiceKwitansi'])->name('pendinginKwitansi.pdfKwitansi');
 });
 
 Route::prefix('supplier')->middleware('auth')->group(function () {

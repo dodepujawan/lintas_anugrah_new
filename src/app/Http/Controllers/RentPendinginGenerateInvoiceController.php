@@ -265,7 +265,7 @@ class RentPendinginGenerateInvoiceController extends Controller
                 'status' => true,
                 'message' => 'Invoice berhasil diproses',
                 'redirect' => route(
-                    'expedisiKwitansi.pdfKwitansi',
+                    'rentPendinginGenerate.pdfGenerate',
                     [
                         'invoiceNo' => $invoice
                     ]
@@ -345,6 +345,37 @@ class RentPendinginGenerateInvoiceController extends Controller
             : 0;
 
         return 'FJO' . $tahun . str_pad($lastNo + 1, 6, '0', STR_PAD_LEFT);
+    }
+
+    public function pdfInvoiceGenerate($invoice){
+        $master = Expedisi::where('INVOICE', $invoice)
+            ->where('GRAND', '>', 0)
+            ->firstOrFail();
+
+        $details = Expedisi::where('INVOICE', $invoice)
+            ->orderBy('NOSJ')
+            ->get();
+
+        $arh = Arh::where('NOFAKTUR', $invoice)
+            ->first();
+
+        $signature = Signature::orderByDesc('id')->first();
+
+        $html = view('rentPendinginInvoiceGen.rentPendingin-gen-pdf', compact('master','details','arh','signature'))->render();
+
+        $mpdf = new Mpdf([
+            'mode' => 'utf-8',
+            'format' => 'A4',
+            'margin_top' => 20,
+            'margin_bottom' => 15,
+            'margin_left' => 15,
+            'margin_right' => 15,
+        ]);
+
+        $mpdf->WriteHTML($html);
+
+        return response($mpdf->Output('Invoice-'.$invoice.'.pdf', 'I'))
+            ->header('Content-Type', 'application/pdf');
     }
 
     private function generateKW()

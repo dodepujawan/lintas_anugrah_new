@@ -421,7 +421,7 @@ $(document).ready(function() {
     //     });
     // }
 // ========================= End Of Invoice Rent Dingin ======================================
-// ========================= Kwitansi Rent Dingin ======================================
+// ========================= Generate Invoice Rent Dingin ======================================
     $(document).on('click', '#sidebar_generate_rent_dingin', function(e) {
         e.preventDefault();
         loadGenPendinginForm();
@@ -430,6 +430,25 @@ $(document).ready(function() {
     function loadGenPendinginForm() {
         $.ajax({
             url: '{{ route('rentPendinginInvGen.index') }}', // Route to load the form
+            type: 'GET',
+            success: function(response) {
+                $('.master-page').html(response);
+            },
+            error: function() {
+                $('.master-page').html('<p>Error loading form.</p>');
+            }
+        });
+    }
+// ========================= End Of Generate Invoice Rent Dingin =================================
+// ========================= Kwitansi Rent Dingin ======================================
+    $(document).on('click', '#sidebar_generate_kwt_dingin', function(e) {
+        e.preventDefault();
+        loadKwtPendinginForm();
+    });
+
+    function loadKwtPendinginForm() {
+        $.ajax({
+            url: '{{ route('pendinginKwitansi.index') }}', // Route to load the form
             type: 'GET',
             success: function(response) {
                 $('.master-page').html(response);
