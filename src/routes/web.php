@@ -240,6 +240,7 @@ Route::prefix('supplier')->middleware('auth')->group(function () {
 Route::prefix('service')->middleware('auth')->group(function () {
     Route::get('/', [ServiceController::class, 'index'])->name('service.index');
     Route::get('/data', [ServiceController::class, 'data'])->name('service.data');
+    Route::get('/perkiraan', [ServiceController::class, 'ajaxPerkiraan'])->name('service.perkiraan');
     Route::post('/store', [ServiceController::class, 'store'])->name('service.store');
     Route::get('/show/{id}', [ServiceController::class, 'show'])->name('service.show');
     Route::get('/data/supplier', [ServiceController::class, 'dataSupplierModal'])->name('service-supplier.data');

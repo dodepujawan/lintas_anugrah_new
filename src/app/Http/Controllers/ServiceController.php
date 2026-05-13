@@ -38,6 +38,23 @@ class ServiceController extends Controller
             ->make(true);
     }
 
+    public function ajaxPerkiraan(Request $request){
+        $search = $request->search;
+        $data = DB::table('msklas')
+            ->select('FNO_PRK', 'FNM_PRK')
+            ->where('FTINGKAT', 3)
+            ->when($search, function ($q) use ($search) {
+                $q->where(function ($qq) use ($search) {
+                    $qq->where('FNO_PRK', 'like', "%{$search}%")
+                    ->orWhere('FNM_PRK', 'like', "%{$search}%");
+                });
+            })
+            ->orderBy('FNO_PRK')
+            ->limit(20)
+            ->get();
+        return response()->json($data);
+    }
+
     public function store(Request $request){
         try {
             DB::beginTransaction();
@@ -50,12 +67,16 @@ class ServiceController extends Controller
                 'TGL_SERVIS'    => $request->tgl_document_service,
                 'KODE_MOBIL'    => $request->kendaraan_service,
                 'KODE_SUPPLIER' => $request->supplier,
+                // FNO_PRK_B ini merujuk ke kendaraan
                 'FNO_PRK_B'     => $request->fno_prk_b_service,
                 'KETERANGAN'    => $request->keterangan_service,
                 'NILAI_SERVIS'  => $request->nilai_servis,
                 'USER_INPUT'    => auth()->user()->user_id ?? 'admin',
                 'TGL_TEMPO'     => $request->tgl_jatuh_tempo_service,
                 'NO_JURNAL'     => $request->no_jurnal_service,
+                // FRO_PRK ini merujuk ke msklas
+                'FNO_PRK'     => $request->akun_hutang,
+                'FNM_PRK'     => $request->akun_hutang_nama,
             ];
 
             if ($id) {

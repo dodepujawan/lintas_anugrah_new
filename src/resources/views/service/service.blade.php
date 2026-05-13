@@ -48,16 +48,15 @@
                 <input type="hidden" name="id_service" id="id_service">
                 <!-- KIRI -->
                 <div class="col-md-7 mt-3">
-
                     <div class="row mb-2">
-                        <label class="col-sm-3 col-form-label">AKUN HUTANG</label>
                         <div class="col-sm-3">
-                            <input type="text" class="form-control" name="akun_hutang" id="akun_hutang" value="21000">
+                            <input type="text" class="form-control" name="akun_hutang" id="akun_hutang" list="list_akun_hutang" autocomplete="off" value="{{ old('akun_hutang', '20110001') }}">
                         </div>
                         <div class="col-sm-6">
-                            <input type="text" class="form-control" name="akun_hutang_nama" id="akun_hutang_nama" value="HUTANG USAHA">
+                            <input type="text" class="form-control" name="akun_hutang_nama" id="akun_hutang_nama" value="{{ old('akun_hutang_nama', 'HUTANG USAHA') }}" readonly>
                         </div>
                     </div>
+                    <datalist id="list_akun_hutang"></datalist>
 
                     <div class="row mb-2 align-items-center">
                         <label class="col-sm-3 col-form-label">SUPPLIER</label>
@@ -198,6 +197,48 @@ $(document).ready(function(){
 
     });
 // ============================== End Of Table Service ==================================
+// ================================== Perkirann FNO_PRK =====================================
+    $('#akun_hutang').on('keyup', function () {
+        let search = $(this).val();
+        $.ajax({
+            url: "{{ route('service.perkiraan') }}",
+            type: "GET",
+            data: {
+                search: search
+            },
+            success: function (data) {
+                let option = '';
+                data.forEach(function (item) {
+                    option += `
+                        <option
+                            value="${item.FNO_PRK}"
+                            data-nama="${item.FNM_PRK}">
+                            ${item.FNM_PRK}
+                        </option>
+                    `;
+                });
+                $('#list_akun_hutang').html(option);
+            }
+        });
+    });
+    $('#akun_hutang').on('change', function () {
+        let kode = $(this).val();
+        $.ajax({
+            url: "{{ route('service.perkiraan') }}",
+            type: "GET",
+            data: {
+                search: kode
+            },
+            success: function (data) {
+                if (data.length > 0) {
+                    $('#akun_hutang_nama').val(data[0].FNM_PRK);
+                } else {
+                    $('#akun_hutang_nama').val('');
+                }
+            }
+        });
+    });
+// ============================== End Of Perkirann FNO_PRK ==================================
 // ================================= Add Supplier ====================================
     $('#add_service').on('click', function(e){
         $('#tableServiceMaster').addClass('d-none');
