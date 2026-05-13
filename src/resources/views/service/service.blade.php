@@ -423,6 +423,9 @@ $(document).ready(function(){
                     $('#kendaraan_service').val(data.kendaraan_service);
                     $('#kendaraan_service_nama').val(data.kendaraan_service_nama);
 
+                    $('#akun_hutang').val(data.fno_prk_id);
+                    $('#akun_hutang_nama').val(data.fno_prk_nama);
+
                     $('#fno_prk_b_service').val(data.fno_prk_b_service);
                     $('#fno_prk_b_service_nama').val("By keperluan service  " + data.kendaraan_service_plat);
 

@@ -163,6 +163,9 @@ class ServiceController extends Controller
             'kendaraan_service_nama' => $data->kendaraan_nama,
             'kendaraan_service_plat' => $data->kendaraan_plat,
 
+            'fno_prk_id' => $data->FNO_PRK,
+            'fno_prk_nama' => $data->FNM_PRK,
+
             'fno_prk_b_service' => $data->FNO_PRK_B,
 
             'nilai_servis' => $data->NILAI_SERVIS,
