@@ -305,6 +305,7 @@
                     <i class='bx bx-trash me-1'></i>Clear
                 </button>
             </div>
+            @role('admin')
             <div class="col-md-3 col-sm-6" style="display:none" id="divButtonAppendExp">
                 <button class="btn btn-warning btn-action w-100" id="buttonAppendExp">
                     <i class='bx bx-plus-circle me-1'></i>Tambah Muatan
@@ -315,9 +316,11 @@
                     <i class="bx bx-printer me-1"></i> Print Surat Jalan
                 </button>
             </div>
+            @endrole
         </div>
     </div>
 
+    @role('admin')
     <!-- Tabel Data SJ -->
     <div class="card-expedisi tabel-surat-jalan">
         <div class="row">
@@ -338,7 +341,6 @@
         <div class="card-expedisi-header mt-3">
             <h5><i class='bx bx-table me-2'></i>DATA SURAT JALAN</h5>
         </div>
-
         <div class="table-responsive">
             <table class="table table-bordered table-sm table-hover" id="tableProsesExpedisi">
                 <thead>
@@ -377,6 +379,8 @@
             </button>
         </div>
     </div>
+    @endrole
+
 </div>
 {{-- MODAL --}}
 @include('expedisi.expedisi_modal')

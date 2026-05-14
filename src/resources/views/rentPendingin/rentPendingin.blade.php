@@ -157,6 +157,7 @@
                 </div>
 
                 <!-- Informasi Nomor Muat -->
+                @role('admin')
                 <div class="row mb-4">
                     <div class="col-md-12">
                         <div class="row align-items-center">
@@ -181,7 +182,7 @@
                         </div>
                     </div>
                 </div>
-
+                @endrole
                 <!-- Informasi Nomor Surjal -->
                 <div class="row mb-4">
                     <div class="col-md-12">
@@ -416,13 +417,13 @@
                                     <i class='bx bx-save me-1'></i>SIMPAN
                                 </button>
                             </div>
-
+                            @role('admin')
                             <div class="col-md-3 col-sm-6 d-none" id="btnMuatRentPendinginDiv">
                                 <button class="btn btn-primary btn-sm w-100 py-2 fw-semibold" id="btnMuatRentPendingin">
                                     <i class='bx bx-car me-1'></i>PROSES NOMUAT
                                 </button>
                             </div>
-
+                            @endrole
                             <div class="col-md-3 col-sm-6 d-none" id="divPrintSuratJalanRent">
                                 <button class="btn btn-warning btn-sm w-100 py-2 fw-semibold" id="btnPrintSuratJalanRent" data-id="">
                                     <i class="bx bx-printer me-1"></i> Print Surat Jalan

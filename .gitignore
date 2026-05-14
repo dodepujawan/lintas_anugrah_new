@@ -27,3 +27,6 @@ Thumbs.db
 *.swo
 
 npm_data/database.sqlite
+
+# TAMBAHAN TERBARU 13-5-2026
+npm_data/logs/

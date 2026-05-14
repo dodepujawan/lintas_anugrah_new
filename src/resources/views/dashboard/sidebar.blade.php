@@ -27,6 +27,9 @@
 
             <li class="menu-header">Management</li>
 
+            @canany([
+                'customer.view'
+            ])
             <li class="menu-item">
                 <a class="menu-link" data-bs-toggle="collapse" href="#customerMenu" role="button" aria-expanded="false">
                 <i class="menu-icon bx bx-user-circle"></i>
@@ -43,7 +46,11 @@
                 @endcan
                 </ul>
             </li>
+            @endcanany
 
+            @canany([
+                'kendaraan.view'
+            ])
             <li class="menu-item">
                 <a class="menu-link" data-bs-toggle="collapse" href="#kendaraanMenu" role="button" aria-expanded="false">
                 <i class="menu-icon bx bx-car"></i>
@@ -60,7 +67,11 @@
                 @endcan
                 </ul>
             </li>
+            @endcanany
 
+            @canany([
+                'driver.view'
+            ])
             <li class="menu-item">
                 <a class="menu-link" data-bs-toggle="collapse" href="#driverMenu" role="button" aria-expanded="false">
                 <i class="menu-icon bx bx-user-pin"></i>
@@ -77,7 +88,14 @@
                 @endcan
                 </ul>
             </li>
+            @endcanany
 
+            @canany([
+                'price.expedisi',
+                'price.customer',
+                'price.rent_dingin',
+                'price.customer_rent'
+            ])
             <li class="menu-item">
                 <a class="menu-link" data-bs-toggle="collapse" href="#priceMenu" role="button" aria-expanded="false">
                 <i class="menu-icon bx bx-purchase-tag"></i>
@@ -118,7 +136,18 @@
                 @endcan
                 </ul>
             </li>
+            @endcanany
 
+            @canany([
+                'penjualan.expedisi',
+                'penjualan.invoice',
+                'penjualan.invoice',
+                'penjualan.invoice_generate',
+                'penjualan.kwitansi',
+                'penjualan.rent_dingin',
+                'penjualan.invoice_rent_dingin',
+                'penjualan.kwitansi_rent_dingin'
+            ])
             <li class="menu-item">
                 <a class="menu-link" data-bs-toggle="collapse" href="#penjualanMenu" role="button" aria-expanded="false">
                 <i class="menu-icon bx bx-cart"></i>
@@ -192,6 +221,12 @@
                 </li> --}}
                 </ul>
             </li>
+            @endcanany
+
+            @canany([
+                'supplier.view',
+                'service.view'
+            ])
             <li class="menu-item">
                 <a class="menu-link" data-bs-toggle="collapse" href="#supplierMenu" role="button" aria-expanded="false">
                 <i class="menu-icon bx bx-package"></i>
@@ -224,7 +259,13 @@
                 @endcan
                 </ul>
             </li>
-             <li class="menu-item">
+            @endcanany
+
+            @canany([
+                'user.view',
+                'user.create'
+            ])
+            <li class="menu-item">
                 <a class="menu-link" data-bs-toggle="collapse" href="#userMenu" role="button" aria-expanded="false">
                 <i class="menu-icon bx bx-user"></i>
                 <span class="menu-text">User Management</span>
@@ -257,6 +298,8 @@
                 </li> --}}
                 </ul>
             </li>
+            @endcanany
+
             @canany([
                 'extra.pajak',
                 'extra.rekening',
