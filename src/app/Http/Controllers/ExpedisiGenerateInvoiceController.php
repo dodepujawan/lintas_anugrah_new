@@ -15,6 +15,8 @@ use Illuminate\Support\Facades\Log;
 use Mpdf\Mpdf;
 use Carbon\Carbon;
 use Exception;
+use App\Exports\InvoiceExport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class ExpedisiGenerateInvoiceController extends Controller
 {
@@ -447,6 +449,24 @@ class ExpedisiGenerateInvoiceController extends Controller
                 'message' => $e->getMessage()
             ], 500);
         }
+    }
+
+    public function export(Request $request)
+    {
+        $request->validate([
+            'tahun' => 'required|digits:4',
+            'filter_inv_gen' => 'required'
+        ]);
+
+        $tahun = $request->tahun;
+        $status = $request->filter_inv_gen;
+
+        $filename = 'laporan_invoice_expedisi'.$status.'_'.$tahun.'.xlsx';
+
+        return Excel::download(
+            new InvoiceExport($tahun, $status),
+            $filename
+        );
     }
 
     private function generateInvoiceOnline(): string{

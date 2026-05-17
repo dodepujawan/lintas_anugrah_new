@@ -173,6 +173,8 @@ Route::prefix('expedisi-generate-invoice')->group(function() {
     Route::post('/update', [ExpedisiGenerateInvoiceController::class, 'updateInvoice'])->name('expedisiInvoiceGenerate.update');
     Route::get('/data', [ExpedisiGenerateInvoiceController::class, 'getDataInvoiceGen'])->name('expedisiInvoiceGenerate.data');
     Route::get('/show/{surjalNo}', [ExpedisiGenerateInvoiceController::class, 'showInvoiceGabung'])->name('expedisiInvoiceGenerate.show');
+    // generate excel
+    Route::post('/laporan/excel/export', [ExpedisiGenerateInvoiceController::class, 'export'])->name('laporan.expedisiInvoiceGenerate.export');
 });
 
 Route::prefix('expedisi-kwitansi')->group(function() {
@@ -218,6 +220,8 @@ Route::prefix('rent-pendingin-invoice-gen')->group(function() {
     Route::post('/destroy', [RentPendinginGenerateInvoiceController::class, 'prosesKwitansiDelete'])->name('rentPendinginKwitansi.destroy');
     // // PDF
     Route::get('/invoice/pdf/{invoiceNo}', [RentPendinginGenerateInvoiceController::class, 'pdfInvoiceGenerate'])->name('rentPendinginGenerate.pdfGenerate');
+    // generate excel
+    Route::post('/laporan/excel/export', [RentPendinginGenerateInvoiceController::class, 'export'])->name('laporan.rentPendinginGenerate.export');
 });
 
 Route::prefix('rent-pendingin-kwitansi')->group(function() {

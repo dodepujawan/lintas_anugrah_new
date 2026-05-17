@@ -14,6 +14,8 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Log;
 use Mpdf\Mpdf;
 use Carbon\Carbon;
+use App\Exports\InvoiceDgnExport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class RentPendinginGenerateInvoiceController extends Controller
 {
@@ -345,6 +347,24 @@ class RentPendinginGenerateInvoiceController extends Controller
             : 0;
 
         return 'FJO' . $tahun . str_pad($lastNo + 1, 6, '0', STR_PAD_LEFT);
+    }
+
+    public function export(Request $request)
+    {
+        $request->validate([
+            'tahun' => 'required|digits:4',
+            'filter_kwt_dgn' => 'required'
+        ]);
+
+        $tahun = $request->tahun;
+        $status = $request->filter_kwt_dgn;
+
+        $filename = 'laporan_invoice_pendingin'.$status.'_'.$tahun.'.xlsx';
+
+        return Excel::download(
+            new InvoiceDgnExport($tahun, $status),
+            $filename
+        );
     }
 
     public function pdfInvoiceGenerate($invoice){

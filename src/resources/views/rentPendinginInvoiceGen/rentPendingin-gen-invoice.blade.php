@@ -3,15 +3,37 @@
     <div class="card p-3">
         <h5 class="text-center mb-3">FORM PROSES INVOICE MOBIL PENDINGIN</h5>
         <div class="mb-3">
-            <label>
-                <input type="radio" name="filter_kwt_dgn" value="belum" checked>
-                Belum Invoice
-            </label>
-            <label class="ms-3">
-                <input type="radio" name="filter_kwt_dgn" value="sudah">
-                Sudah Invoice
-            </label>
+            <form id="form-export-excel" action="{{ route('laporan.rentPendinginGenerate.export') }}" method="POST">
+                @csrf
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label d-block">
+                            Status Invoice
+                        </label>
+                        <label>
+                            <input type="radio" name="filter_kwt_dgn" value="belum" checked>
+                            Belum Invoice
+                        </label>
+                        <label class="ms-3">
+                            <input type="radio" name="filter_kwt_dgn" value="sudah">
+                            Sudah Invoice
+                        </label>
+                    </div>
+
+                    <label class="form-label">Export Laporan Excel</label>
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label">Tahun</label>
+                        <input type="number" name="tahun" class="form-control" value="{{ date('Y') }}" id="date-exp-excel" required>
+                    </div>
+                    <div class="col-md-3 mb-3 d-flex align-items-end">
+                        <button type="submit" class="btn btn-success">
+                            Export Excel
+                        </button>
+                    </div>
+                </div>
+            </form>
         </div>
+
         <div class="table-responsive">
             <table id="DgnKwtTable" class="table table-bordered table-striped w-100">
                 <thead>
