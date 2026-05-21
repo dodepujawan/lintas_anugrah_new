@@ -148,7 +148,7 @@
         <div id="edit_mode_alert_dgn"
             class="alert alert-warning text-center fw-bold"
             style="display: none; font-size: 16px;">
-            ⚠ MODE EDIT KWITANSI !
+            ⚠ MODE EDIT INVOICE MOBIL PENDINGIN !
         </div>
         <!-- BAYAR SECTION -->
         <div class="card p-3 mt-3" style="background-color:#e6e6e6;">

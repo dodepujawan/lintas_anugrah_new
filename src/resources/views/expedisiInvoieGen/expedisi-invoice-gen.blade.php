@@ -3,7 +3,7 @@
     <div class="card p-3">
         <h5 class="text-center mb-3">FORM PROSES INVOICE EXPEDISI</h5>
         <form id="form-export-excel" action="{{ route('laporan.expedisiInvoiceGenerate.export') }}" method="POST">
-            @csrf
+        @csrf
             <div class="row">
                 <div class="col-md-4 mb-3">
                     <label class="form-label d-block">
@@ -18,13 +18,16 @@
                         Sudah Invoice
                     </label>
                 </div>
-
                 <label class="form-label">Export Laporan Excel</label>
                 <div class="col-md-3 mb-3">
-                    <label class="form-label">Tahun</label>
-                    <input type="number" name="tahun" class="form-control" value="{{ date('Y') }}" id="date-exp-excel" required>
+                    <label class="form-label">Tanggal Dari</label>
+                    <input type="date" name="tanggal_dari" class="form-control" value="{{ date('Y-m-01') }}" required>
                 </div>
-                <div class="col-md-3 mb-3 d-flex align-items-end">
+                <div class="col-md-3 mb-3">
+                    <label class="form-label">Tanggal Sampai</label>
+                    <input type="date" name="tanggal_sampai" class="form-control" value="{{ date('Y-m-d') }}" required>
+                </div>
+                <div class="col-md-2 mb-3 d-flex align-items-end">
                     <button type="submit" class="btn btn-success">
                         Export Excel
                     </button>
@@ -176,7 +179,7 @@
                 </div>
 
                 <div class="col-md-4">
-                    <label>TOTAL</label>
+                    <label>Piutang</label>
                     <input type="text" id="piutang_kwt_exp" class="form-control text-end"  readonly>
                 </div>
             </div>
@@ -291,7 +294,7 @@ $(document).ready(function() {
                     $('#bayar_kwt_exp').val(formatRupiah(d.bayar));
                     $('#top_kwt_exp').val(formatRupiah(d.saldo));
                     $('#tgl_jtp_kwt_exp').val(d.tgl_jt ? d.tgl_jt.substring(0,10) : '');
-                    $('#piutang_kwt_exp').val(formatRupiah(d.grand));
+                    $('#piutang_kwt_exp').val(formatRupiah(d.grand - d.bayar));
 
                     // $('#modalKwitansiExp').modal('show');
                 },
@@ -389,7 +392,22 @@ $(document).ready(function() {
         $('#table_kwt_exp').removeClass('d-none');
         table_kwt.ajax.reload();
     });
-    // ============================ End Of Return Table Expedisi Generate ==================================
+    // ========================== End Of Return Table Expedisi Generate ==============================
+    // ============================= Trigger Hitung Piutang ================================
+    $(document).on('keyup change', '#bayar_kwt_exp', function () {
+        let bayar = unformatRupiah(
+            $('#bayar_kwt_exp').val()
+        );
+        let grand = unformatRupiah(
+            $('#grand_kwt_exp').val()
+        );
+        let piutang = grand - bayar;
+        $('#piutang_kwt_exp').val(
+            formatRupiah(piutang)
+        );
+    });
+    // ========================== ENd Of Trigger Hitung Piutang ==============================
+    // ========================== End Of Return Table Expedisi Generate ==============================
     // Fungsi Print Electron JS
     function printInvoice(invoiceNo){
 
@@ -554,6 +572,16 @@ function formatRupiah(angka) {
 
     return parseFloat(angka)
         .toLocaleString('id-ID');
+}
+
+// Unformat Angka
+function unformatRupiah(angka) {
+
+    if (!angka) return 0;
+
+    return parseInt(
+        angka.toString().replace(/\./g, '')
+    ) || 0;
 }
 
 // Clear Form

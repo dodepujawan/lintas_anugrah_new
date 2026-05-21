@@ -21,13 +21,15 @@ class InvoiceExport implements
     WithStyles,
     WithEvents
 {
-    protected $tahun;
+    protected $tanggalDari;
+    protected $tanggalSampai;
     protected $status;
     protected $grandTotal = 0;
 
-    public function __construct($tahun, $status)
+    public function __construct($tanggalDari, $tanggalSampai, $status)
     {
-        $this->tahun = $tahun;
+        $this->tanggalDari = $tanggalDari;
+        $this->tanggalSampai = $tanggalSampai;
         $this->status = $status;
     }
 
@@ -52,7 +54,10 @@ class InvoiceExport implements
                 'TGLINVOICE',
                 'STS',
             ])
-            ->whereYear('TGLMUAT', $this->tahun)
+            ->whereBetween('TGLMUAT', [
+                $this->tanggalDari,
+                $this->tanggalSampai
+            ])
             ->where('JENIS', 'EKS');
 
         // BELUM INVOICE

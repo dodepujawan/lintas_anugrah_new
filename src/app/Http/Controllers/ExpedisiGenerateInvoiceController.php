@@ -38,11 +38,8 @@ class ExpedisiGenerateInvoiceController extends Controller
             'NOSJ'
         ])
         ->where('JENIS', 'EKS')
-        ->where(function($q){
-            $q->whereNotNull('NOMUAT')
-            ->orWhere('NOMUAT', '!=', '');
-        });
-
+        ->whereNotNull('NOMUAT')
+        ->where('NOMUAT', '!=', '');
         // =============================
         // FILTER STATUS INVOICE
         // =============================
@@ -57,10 +54,11 @@ class ExpedisiGenerateInvoiceController extends Controller
             $query->where(function($q){
                 $q->whereNotNull('INVOICE')
                 ->where('INVOICE', '!=', '');
-            })->where(function($q){
-                $q->whereNull('kwt')
-                ->orWhere('kwt', '');
             })
+            // ->where(function($q){
+            //     $q->whereNull('kwt')
+            //     ->orWhere('kwt', '');
+            // })
             ->where('GRAND', '>', 0);
         }
 
@@ -331,22 +329,24 @@ class ExpedisiGenerateInvoiceController extends Controller
                 }
                 // =============================
                 // 11. INSERT ARH
+                // Hanya Jika Piutang Tidak 0
                 // =============================
-                Arh::create([
-                    'NOFAKTUR'   => $invoiceNo,
-                    'TGLFAKTUR'  => now(),
-                    'CUSTOMER'   => $master->CUSTOMER,
-                    'PIUTANG'    => $piutang,
-                    'DISCOUNT'   => $master->NDISC ?? 0,
-
-                    // pembayaran dihandle modul lain
-                    // 'BAYAR' => 0,
-                    'SALDO'      => $top,
-                    'TGLJT'      => $tglJtp,
-                    'CABANG'     => $master->CABANG ?? '',
-                    'KETERANGAN' => 'INVOICE DARI EXPEDISI',
-                    'USER'       => auth()->user()->user_id,
-                ]);
+                if ($piutang > 0) {
+                    Arh::create([
+                        'NOFAKTUR'   => $invoiceNo,
+                        'TGLFAKTUR'  => now(),
+                        'CUSTOMER'   => $master->CUSTOMER,
+                        'PIUTANG'    => $piutang,
+                        'DISCOUNT'   => $master->NDISC ?? 0,
+                        // pembayaran dihandle modul lain
+                        // 'BAYAR' => 0,
+                        'SALDO'      => $top,
+                        'TGLJT'      => $tglJtp,
+                        'CABANG'     => $master->CABANG ?? '',
+                        'KETERANGAN' => 'INVOICE DARI EXPEDISI',
+                        'USER'       => auth()->user()->user_id,
+                    ]);
+                }
             });
 
             return response()->json([
@@ -421,19 +421,28 @@ class ExpedisiGenerateInvoiceController extends Controller
                     }
                     $row->save();
                 }
-
                 // =============================
                 // 4. UPDATE ARH
                 // =============================
-                Arh::where('NOFAKTUR', $invoice)
-                    ->update([
-                        // 'BAYAR'       => $bayar,
-                        'PIUTANG'     => $piutang,
-                        'SALDO'       => $top,
-                        'TGLJT'       => $tglJtp,
-                        'USER_UPDATE' => auth()->user()->user_id,
-                        'updated_at'  => now()
-                    ]);
+                if ($piutang > 0) {
+                    // kalau masih ada piutang
+                    Arh::updateOrCreate(
+                        ['NOFAKTUR' => $invoice],
+                        [
+                            'TGLFAKTUR'  => $master->TGLINVOICE ?? now(),
+                            'CUSTOMER'   => $master->CUSTOMER,
+                            'PIUTANG'    => $piutang,
+                            'SALDO'      => $top,
+                            'TGLJT'      => $tglJtp,
+                            'CABANG'     => $master->CABANG ?? '',
+                            'USER_UPDATE'=> auth()->user()->user_id,
+                            'updated_at' => now()
+                        ]
+                    );
+                } else {
+                    // kalau lunas hapus dari ARH
+                    Arh::where('NOFAKTUR', $invoice)->delete();
+                }
             });
 
             return response()->json([
@@ -454,17 +463,26 @@ class ExpedisiGenerateInvoiceController extends Controller
     public function export(Request $request)
     {
         $request->validate([
-            'tahun' => 'required|digits:4',
+            'tanggal_dari'   => 'required|date',
+            'tanggal_sampai' => 'required|date|after_or_equal:tanggal_dari',
             'filter_inv_gen' => 'required'
         ]);
 
-        $tahun = $request->tahun;
-        $status = $request->filter_inv_gen;
+        $tanggalDari   = $request->tanggal_dari;
+        $tanggalSampai = $request->tanggal_sampai;
+        $status        = $request->filter_inv_gen;
 
-        $filename = 'laporan_invoice_expedisi'.$status.'_'.$tahun.'.xlsx';
+        $filename = 'laporan_invoice_expedisi_' .
+            $status . '_' .
+            $tanggalDari . '_sd_' .
+            $tanggalSampai . '.xlsx';
 
         return Excel::download(
-            new InvoiceExport($tahun, $status),
+            new InvoiceExport(
+                $tanggalDari,
+                $tanggalSampai,
+                $status
+            ),
             $filename
         );
     }

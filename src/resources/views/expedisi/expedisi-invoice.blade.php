@@ -311,7 +311,7 @@
                     <div class="card-footer text-end">
                         <button class="btn btn-primary" id="gabungInvExpBtnLeft">
                             <i class="bx bx-plus-circle me-1"></i>
-                            Proses Invoice
+                            Gabung Surat Jalan
                         </button>
                     </div>
                 </div>
@@ -343,7 +343,7 @@
                         </table>
                     </div>
                     <button class="btn btn-success w-100" id="addToInvExpBtn">
-                        <i class="bx bx-arrow-from-right"></i> Tambahkan ke Invoice
+                        <i class="bx bx-arrow-from-right"></i> Tambah Surat Jalan
                     </button>
                 </div>
             </div>
@@ -1042,7 +1042,7 @@ $(document).ready(function() {
         btn.removeClass('btn btn-primary');
         btn.addClass('btn btn-success');
 
-        btn.html('<i class="bx bx-save me-1"></i> Update Invoice');
+        btn.html('<i class="bx bx-save me-1"></i> Update Surat Jalan');
     }
 
     // Ubah Button Store
@@ -1052,7 +1052,7 @@ $(document).ready(function() {
         btn.removeClass('btn btn-success');
         btn.addClass('btn btn-primary');
 
-        btn.html('<i class="bx bx-plus-circle me-1"></i> Proses Invoice');
+        btn.html('<i class="bx bx-plus-circle me-1"></i> Gabung Surat Jalan');
     }
 
     // Fungsi Print Electron JS
