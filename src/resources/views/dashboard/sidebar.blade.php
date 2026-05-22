@@ -219,6 +219,14 @@
                     <span class="menu-text">Rent</span>
                     </a>
                 </li> --}}
+                <li class="menu-item">
+                    <div class="dropdown-divider my-2"></div>
+                </li>
+                <li class="menu-item">
+                    <a href="#" class="menu-link" id="sidebar_coolroom">
+                    <span class="menu-text">Coolroom</span>
+                    </a>
+                </li>
                 </ul>
             </li>
             @endcanany

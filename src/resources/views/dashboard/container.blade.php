@@ -459,6 +459,25 @@ $(document).ready(function() {
         });
     }
 // ========================= End Of Kwitansi Rent Dingin ======================================
+// ================================== Coolroom ======================================
+    $(document).on('click', '#sidebar_coolroom', function(e) {
+        e.preventDefault();
+        loadCoolRoomForm();
+    });
+
+    function loadCoolRoomForm() {
+        $.ajax({
+            url: '{{ route('coolroom.index') }}', // Route to load the form
+            type: 'GET',
+            success: function(response) {
+                $('.master-page').html(response);
+            },
+            error: function() {
+                $('.master-page').html('<p>Error loading form.</p>');
+            }
+        });
+    }
+// =================================== End Of Coolroom ======================================
 // ================================ Form Supplier ======================================
     $(document).on('click', '#sidebar_new_supplier', function(e) {
         e.preventDefault();

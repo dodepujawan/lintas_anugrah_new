@@ -19,6 +19,7 @@ use App\Http\Controllers\RentPendinginController;
 use App\Http\Controllers\RentPendinginInvoiceController;
 use App\Http\Controllers\RentPendinginGenerateInvoiceController;
 use App\Http\Controllers\RentPendinginKwitansiController;
+use App\Http\Controllers\CoolroomController;
 use App\Http\Controllers\MsupplierController;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\PajakController;
@@ -231,6 +232,10 @@ Route::prefix('rent-pendingin-kwitansi')->group(function() {
     Route::post('/destroy', [RentPendinginKwitansiController::class, 'deleteKwitansi'])->name('pendinginKwitansi.destroy');
     // // PDF
     Route::get('/invoice/pdf/{invoiceNo}', [RentPendinginKwitansiController::class, 'pdfInvoiceKwitansi'])->name('pendinginKwitansi.pdfKwitansi');
+});
+
+Route::prefix('coolroom')->group(function() {
+    Route::get('/', [CoolroomController::class, 'index'])->name('coolroom.index');
 });
 
 Route::prefix('supplier')->middleware('auth')->group(function () {
