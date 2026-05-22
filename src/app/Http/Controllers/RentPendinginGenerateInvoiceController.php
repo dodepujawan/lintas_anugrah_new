@@ -185,10 +185,18 @@ class RentPendinginGenerateInvoiceController extends Controller
                 // =====================================
                 // PARSING
                 // =====================================
-                $bayar = (int) preg_replace('/[^0-9]/','',$request->bayar);
-                $top = (int) preg_replace('/[^0-9]/','',$request->top);
+                $bayar = (int) preg_replace(
+                    '/[^0-9]/',
+                    '',
+                    $request->bayar
+                );
+                $top = (int) preg_replace(
+                    '/[^0-9]/',
+                    '',
+                    $request->top
+                );
                 $tglJtp = $request->tgl_jtp;
-                $nosj = $request->nosj;
+                $nosj   = $request->nosj;
                 // =====================================
                 // STORE BARU
                 // =====================================
@@ -203,9 +211,9 @@ class RentPendinginGenerateInvoiceController extends Controller
                         throw new \Exception('SJ tidak ditemukan');
                     }
                     // assign invoice baru
-                    $row->INVOICE = $invoice;
+                    $row->INVOICE    = $invoice;
                     $row->TGLINVOICE = now();
-                    $row->STS = 'INVOICE';
+                    $row->STS        = 'INVOICE';
                 } else {
                     // =================================
                     // UPDATE EXISTING
@@ -223,12 +231,18 @@ class RentPendinginGenerateInvoiceController extends Controller
                 // GRAND
                 // =====================================
                 $grand = (int) ($row->GRAND ?? 0);
-
                 // =====================================
                 // VALIDASI
                 // =====================================
                 if ($bayar < 0) {
-                    throw new \Exception('Nominal bayar tidak valid');
+                    throw new \Exception(
+                        'Nominal bayar tidak valid'
+                    );
+                }
+                if ($bayar > $grand) {
+                    throw new \Exception(
+                        'Bayar tidak boleh lebih besar dari total'
+                    );
                 }
                 // =====================================
                 // HITUNG PIUTANG
@@ -242,29 +256,41 @@ class RentPendinginGenerateInvoiceController extends Controller
                 $row->TGLJT   = $tglJtp;
                 $row->save();
                 // =====================================
-                // UPDATE ARH
+                // HANDLE ARH
                 // =====================================
-                Arh::updateOrCreate(
-                    [
-                        'NOFAKTUR' => $invoice
-                    ],
-                    [
-                        'TGLFAKTUR'  => now(),
-                        'CUSTOMER'   => $row->CUSTOMER,
-                        'SALDO'      => $top,
-                        'PIUTANG'    => $piutangBaru,
-                        'DISCOUNT'   => $row->NDISC ?? 0,
-                        'TGLJT'      => $tglJtp,
-                        'CABANG'     => $row->CABANG ?? '',
-                        'KETERANGAN' => 'INVOICE DARI EXPEDISI',
-                        'USER'       => auth()->user()->user_id,
-                        'USER_UPDATE' => auth()->user()->user_id,
-                        'updated_at' => now()
-                    ]
-                );
+
+                // MASIH ADA PIUTANG
+                if ($piutangBaru > 0) {
+                    Arh::updateOrCreate(
+                        [
+                            'NOFAKTUR' => $invoice
+                        ],
+                        [
+                            'TGLFAKTUR'   => $row->TGLINVOICE ?? now(),
+                            'CUSTOMER'    => $row->CUSTOMER,
+                            'SALDO'       => $top,
+                            'PIUTANG'     => $piutangBaru,
+                            'DISCOUNT'    => $row->NDISC ?? 0,
+                            'TGLJT'       => $tglJtp,
+                            'CABANG'      => $row->CABANG ?? '',
+                            'KETERANGAN'  => 'INVOICE DARI EXPEDISI',
+                            'USER'        => auth()->user()->user_id,
+                            'USER_UPDATE' => auth()->user()->user_id,
+                            'updated_at'  => now()
+                        ]
+                    );
+                } else {
+                    // =================================
+                    // LUNAS -> HAPUS ARH
+                    // =================================
+                    Arh::where(
+                        'NOFAKTUR',
+                        $invoice
+                    )->delete();
+                }
             });
             return response()->json([
-                'status' => true,
+                'status'  => true,
                 'message' => 'Invoice berhasil diproses',
                 'redirect' => route(
                     'rentPendinginGenerate.pdfGenerate',
@@ -275,7 +301,7 @@ class RentPendinginGenerateInvoiceController extends Controller
             ]);
         } catch (\Throwable $e) {
             return response()->json([
-                'status' => false,
+                'status'  => false,
                 'message' => $e->getMessage()
             ], 500);
         }
@@ -352,17 +378,30 @@ class RentPendinginGenerateInvoiceController extends Controller
     public function export(Request $request)
     {
         $request->validate([
-            'tahun' => 'required|digits:4',
+            'tanggal_dari'   => 'required|date',
+            'tanggal_sampai' => 'required|date|after_or_equal:tanggal_dari',
             'filter_kwt_dgn' => 'required'
         ]);
 
-        $tahun = $request->tahun;
-        $status = $request->filter_kwt_dgn;
+        $tanggalDari   = $request->tanggal_dari;
+        $tanggalSampai = $request->tanggal_sampai;
+        $status        = $request->filter_kwt_dgn;
 
-        $filename = 'laporan_invoice_pendingin'.$status.'_'.$tahun.'.xlsx';
+        $filename =
+            'laporan_invoice_pendingin_' .
+            $status . '_' .
+            $tanggalDari . '_sd_' .
+            $tanggalSampai .
+            '.xlsx';
 
         return Excel::download(
-            new InvoiceDgnExport($tahun, $status),
+
+            new InvoiceDgnExport(
+                $tanggalDari,
+                $tanggalSampai,
+                $status
+            ),
+
             $filename
         );
     }

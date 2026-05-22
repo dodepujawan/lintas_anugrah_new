@@ -86,7 +86,7 @@ KWITANSI NO : {{ $master->kwt }}
 <td>:</td>
 <td>
     <div class="box">
-        {{ ucwords(terbilang($arh->BAYAR)) }} Rupiah
+        {{ ucwords(terbilang(optional($arh)->BAYAR ?? 0)) }} Rupiah
     </div>
 </td>
 </tr>
@@ -132,7 +132,7 @@ Denpasar {{ \Carbon\Carbon::parse($master->TGLKW)->format('d-m-Y') }}
 <td width="50%">
 <b>JUMLAH</b>
 <div class="box" style="width:200px;">
-    RP. {{ number_format($arh->BAYAR,0,',','.') }}
+    RP. {{ number_format(optional($arh)->BAYAR ?? 0, 0, ',', '.') }}
 </div>
 </td>
 

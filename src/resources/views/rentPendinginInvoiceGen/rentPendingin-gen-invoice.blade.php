@@ -19,13 +19,23 @@
                             Sudah Invoice
                         </label>
                     </div>
-
-                    <label class="form-label">Export Laporan Excel</label>
+                    <label class="form-label">
+                        Export Laporan Excel
+                    </label>
                     <div class="col-md-3 mb-3">
-                        <label class="form-label">Tahun</label>
-                        <input type="number" name="tahun" class="form-control" value="{{ date('Y') }}" id="date-exp-excel" required>
+                        <label class="form-label">
+                            Tanggal Dari
+                        </label>
+                        <input type="date" name="tanggal_dari" class="form-control" value="{{ ('Y-m-01') }}" required>
                     </div>
-                    <div class="col-md-3 mb-3 d-flex align-items-end">
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label">
+                            Tanggal Sampai
+                        </label>
+                        <input type="date" name="tanggal_sampai" class="form-control" value="{{ date('Y-m-d') }}" required>
+                    </div>
+
+                    <div class="col-md-2 mb-3 d-flex align-items-end">
                         <button type="submit" class="btn btn-success">
                             Export Excel
                         </button>
@@ -33,7 +43,6 @@
                 </div>
             </form>
         </div>
-
         <div class="table-responsive">
             <table id="DgnKwtTable" class="table table-bordered table-striped w-100">
                 <thead>
@@ -52,134 +61,181 @@
     </div>
 </div>
 {{-- Bagian Form Dingin Kwitansi --}}
-<div class="container mt-3 d-none" id="form_kwt_dgn">
-    <div class="card p-3" style="background-color:#b7e1b0;">
-        <h5 class="text-center mb-3">FORM PROSES INVOICE MOBIL PENDINGIN</h5>
-        <div class="row">
-            <!-- LEFT SIDE -->
-            <div class="col-md-5">
-                <input type="hidden" id="kwt_exp_flag_dgn">
-                <div class="mb-2">
-                    <label>SUB TOTAL</label>
-                    <input type="text" id="sub_total_kwt_dgn" class="form-control text-end" readonly>
-                </div>
-
-                <div class="mb-2">
-                    <label>D.CHARGE</label>
-                    <input type="text" id="d_charge_kwt_dgn" class="form-control text-end" readonly>
-                </div>
-
-                <div class="mb-2">
-                    <label>TOTAL</label>
-                    <input type="text" id="total_kwt_dgn" class="form-control text-end" readonly>
-                </div>
-
-                <div class="mb-2 row">
-                    <div class="col-6">
-                        <label>DISC %</label>
-                        <input type="text" id="disc_persen_kwt_dgn" class="form-control text-end" readonly>
-                    </div>
-                    <div class="col-6">
-                        <label>DISC Rp</label>
-                        <input type="text" id="disc_rp_kwt_dgn" class="form-control text-end" readonly>
-                    </div>
-                </div>
-
-                <div class="mb-2">
-                    <label>DPP</label>
-                    <input type="text" id="dpp_kwt_dgn" class="form-control text-end" readonly>
-                </div>
-
-                <div class="mb-2 row">
-                    <div class="col-6">
-                        <label>PPN %</label>
-                        <input type="text" id="ppn_persen_kwt_dgn" class="form-control text-end" readonly>
-                    </div>
-                    {{-- <div class="col-6">
-                        <label>PPN Rp</label>
-                        <input type="text" id="ppn_rp_kwt_exp" class="form-control text-end" >
-                    </div> --}}
-                </div>
-
-                <div class="mb-2">
-                    <label>GRAND</label>
-                    <input type="text" id="grand_kwt_dgn" class="form-control text-end" readonly>
-                </div>
-
-                <div class="mb-2">
-                    <label>TGL INVOICE</label>
-                    <input type="date" id="tgl_invoice_kwt_dgn" class="form-control" readonly>
-                </div>
-
+<div class="container-fluid mt-2 d-none" id="form_kwt_dgn">
+    <div class="card shadow-sm border-0">
+        <!-- HEADER -->
+        <div class="card-header py-2 d-flex justify-content-between align-items-center" style="background-color:#b7e1b0;">
+            <button class="btn btn-sm btn-link text-decoration-none p-0" id="returnInvDgnGenBtn" style="color: #107af3;">
+                <i class='bx bx-chevron-left'></i>
+                Kembali
+            </button>
+            <h5 class="mb-0 fw-bold">
+                FORM PROSES INVOICE MOBIL PENDINGIN
+            </h5>
+            <div style="width:80px"></div>
+        </div>
+        <div class="card-body p-3">
+            <input type="hidden" id="kwt_exp_flag_dgn">
+            <!-- ALERT -->
+            <div id="edit_mode_alert_dgn" class="alert alert-warning text-center fw-bold py-2 mb-3" style="display:none;">
+                ⚠ MODE EDIT INVOICE MOBIL PENDINGIN
             </div>
 
-            <!-- RIGHT SIDE -->
-            <div class="col-md-7">
+            <!-- TOP SECTION -->
+            <div class="row g-3">
+                <!-- LEFT -->
+                <div class="col-lg-6">
+                    <div class="card border-0 bg-light h-100">
+                        <div class="card-body py-3">
+                            <div class="row g-2">
 
-                <div class="mb-2">
-                    <label>NO FAKTUR</label>
-                    <input type="text" id="no_faktur_kwt_dgn" class="form-control" readonly>
+                                <div class="col-6">
+                                    <label class="small fw-bold">
+                                        SUB TOTAL
+                                    </label>
+                                    <input type="text" id="sub_total_kwt_dgn" class="form-control form-control-sm text-end" readonly>
+                                </div>
+
+                                <div class="col-6">
+                                    <label class="small fw-bold">
+                                        D.CHARGE
+                                    </label>
+
+                                    <input type="text" id="d_charge_kwt_dgn" class="form-control form-control-sm text-end" readonly>
+                                </div>
+                                <div class="col-6">
+                                    <label class="small fw-bold">
+                                        TOTAL
+                                    </label>
+
+                                    <input type="text" id="total_kwt_dgn" class="form-control form-control-sm text-end" readonly>
+                                </div>
+
+                                <div class="col-3">
+                                    <label class="small fw-bold">
+                                        DISC %
+                                    </label>
+
+                                    <input type="text" id="disc_persen_kwt_dgn" class="form-control form-control-sm text-end" readonly>
+                                </div>
+                                <div class="col-3">
+                                    <label class="small fw-bold">
+                                        DISC Rp
+                                    </label>
+                                    <input type="text" id="disc_rp_kwt_dgn" class="form-control form-control-sm text-end" readonly>
+                                </div>
+                                <div class="col-6">
+                                    <label class="small fw-bold">
+                                        DPP
+                                    </label>
+
+                                    <input type="text" id="dpp_kwt_dgn" class="form-control form-control-sm text-end" readonly>
+                                </div>
+
+                                <div class="col-6">
+                                    <label class="small fw-bold">
+                                        PPN %
+                                    </label>
+
+                                    <input type="text" id="ppn_persen_kwt_dgn" class="form-control form-control-sm text-end" readonly>
+                                </div>
+                                <div class="col-12">
+                                    <label class="small fw-bold">
+                                        GRAND TOTAL
+                                    </label>
+                                    <input type="text" id="grand_kwt_dgn" class="form-control form-control-sm text-end fw-bold" readonly>
+                                </div>
+
+                                <div class="col-12">
+                                    <label class="small fw-bold">
+                                        TGL INVOICE
+                                    </label>
+
+                                    <input type="date" id="tgl_invoice_kwt_dgn" class="form-control form-control-sm" readonly>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="mb-2">
-                    <label>NOMOR MUAT</label>
-                    <input type="text" id="nomor_muat_kwt_dgn" class="form-control" readonly>
-                </div>
+                <!-- RIGHT -->
+                <div class="col-lg-6">
+                    <div class="card border-0 bg-light h-100">
+                        <div class="card-body py-3">
+                            <div class="row g-2">
+                                <div class="col-12">
+                                    <label class="small fw-bold">
+                                        NO FAKTUR
+                                    </label>
+                                    <input type="text" id="no_faktur_kwt_dgn" class="form-control form-control-sm" readonly>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="small fw-bold">
+                                        NOMOR MUAT
+                                    </label>
+                                    <input type="text" id="nomor_muat_kwt_dgn" class="form-control form-control-sm" readonly>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="small fw-bold">
+                                        NOMOR SJ
+                                    </label>
+                                    <input type="text" id="nomor_sj_kwt_dgn" class="form-control form-control-sm" readonly>
+                                </div>
+                                <div class="col-12">
+                                    <label class="small fw-bold">
+                                        KENDARAAN
+                                    </label>
+                                    <input type="text" id="kendaraan_kwt_dgn" class="form-control form-control-sm" readonly>
+                                </div>
 
-                <div class="mb-2">
-                    <label>NOMOR SJ</label>
-                    <input type="text" id="nomor_sj_kwt_dgn" class="form-control" readonly>
+                                <div class="col-12">
+                                    <label class="small fw-bold">
+                                        CUSTOMER
+                                    </label>
+                                    <input type="text" id="customer_kwt_dgn" class="form-control form-control-sm" readonly>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-
-                <div class="mb-2">
-                    <label>KENDARAAN</label>
-                    <input type="text" id="kendaraan_kwt_dgn" class="form-control" readonly>
+            </div>
+            <!-- PAYMENT -->
+            <div class="card border-0 bg-secondary-subtle mt-3">
+                <div class="card-body py-3">
+                    <div class="row g-2 align-items-end">
+                        <div class="col-lg-3">
+                            <label class="small fw-bold">
+                                BAYAR
+                            </label>
+                            <input type="text" id="bayar_kwt_dgn" class="form-control form-control-sm text-end">
+                        </div>
+                        <div class="col-lg-2">
+                            <label class="small fw-bold">
+                                TOP
+                            </label>
+                            <input type="number" id="top_kwt_dgn" class="form-control form-control-sm">
+                        </div>
+                        <div class="col-lg-3">
+                            <label class="small fw-bold">
+                                TGL JTP
+                            </label>
+                            <input type="date" id="tgl_jtp_kwt_dgn" class="form-control form-control-sm">
+                        </div>
+                        <div class="col-lg-4">
+                            <label class="small fw-bold">
+                                PIUTANG
+                            </label>
+                            <input type="text" id="piutang_kwt_dgn" class="form-control form-control-sm text-end fw-bold" readonly>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-end gap-2 mt-3">
+                        <button class="btn btn-sm btn-primary" id="proses_kwt_dgn">PROSES
+                        </button>
+                        <button class="btn btn-sm btn-secondary" id="kembali_kwt_dgn">KEMBALI</button>
+                    </div>
                 </div>
-
-                <div class="mb-2">
-                    <label>CUSTOMER</label>
-                    <input type="text" id="customer_kwt_dgn" class="form-control" readonly>
-                </div>
-
             </div>
         </div>
-
-        <hr>
-        <div id="edit_mode_alert_dgn"
-            class="alert alert-warning text-center fw-bold"
-            style="display: none; font-size: 16px;">
-            ⚠ MODE EDIT INVOICE MOBIL PENDINGIN !
-        </div>
-        <!-- BAYAR SECTION -->
-        <div class="card p-3 mt-3" style="background-color:#e6e6e6;">
-            <div class="row">
-                <div class="col-md-3">
-                    <label>BAYAR</label>
-                    <input type="text" id="bayar_kwt_dgn" class="form-control text-end">
-                </div>
-
-                <div class="col-md-2">
-                    <label>TOP (HARI)</label>
-                    <input type="number" id="top_kwt_dgn" class="form-control" >
-                </div>
-
-                <div class="col-md-3">
-                    <label>TGL JTP</label>
-                    <input type="date" id="tgl_jtp_kwt_dgn" class="form-control">
-                </div>
-
-                <div class="col-md-4">
-                    <label>PIUTANG</label>
-                    <input type="text" id="piutang_kwt_dgn" class="form-control text-end"  readonly>
-                </div>
-            </div>
-
-            <div class="text-end mt-3">
-                <button class="btn btn-primary" id="proses_kwt_dgn">PROSES</button>
-                <button class="btn btn-secondary" id="keluar_kwt_dgn">KELUAR</button>
-            </div>
-        </div>
-
     </div>
 </div>
 <script>
@@ -292,6 +348,24 @@ $(document).ready(function() {
     });
 
 // ============================ End Of Form Detail Kwitansi Dingin ===============================
+// ============================ Jumlah Bayar Invoice Dingin ===============================
+    $(document).on('keyup change', '#bayar_kwt_dgn', function () {
+        let bayar = unformatRupiah(
+            $('#bayar_kwt_dgn').val()
+        );
+        let grand = unformatRupiah(
+            $('#grand_kwt_dgn').val()
+        );
+        let piutang = grand - bayar;
+        // biar gak minus
+        if (piutang < 0) {
+            piutang = 0;
+        }
+        $('#piutang_kwt_dgn').val(
+            formatRupiah(piutang)
+        );
+    });
+// ============================ End Of Jumlah Bayar Invoice Dingin ===============================
 // =============================== Submit Kwitansi Dingin ===================================
     $('#proses_kwt_dgn').on('click', function() {
         let bayar = parseFloat($('#bayar_kwt_dgn').val());
@@ -361,6 +435,15 @@ $(document).ready(function() {
 
     });
 // ============================ End Of Submit Kwitansi Dingin ===============================
+// =============================== Return Table Expedisi Generate =====================================
+    $('#kembali_kwt_dgn, #returnInvDgnGenBtn').on('click', function () {
+        // reset form
+        clearAllKwtDgn();
+        $('#form_kwt_dgn').addClass('d-none');
+        $('#table_kwt_dgn').removeClass('d-none');
+        table_kwt_dgn.ajax.reload();
+    });
+// ============================= End Of Return Table Expedisi Generate ================================
 // ============================== Delete Kwitansi ================================
     $(document).on('click', '.btn-hapus-inv-gen-dgn', function() {
         var invoice = $(this).data('invoice');
@@ -448,7 +531,7 @@ $(document).ready(function() {
                     $('#bayar_kwt_dgn').val(formatRupiah(d.bayar));
                     $('#top_kwt_dgn').val(formatRupiah(d.saldo));
                     $('#tgl_jtp_kwt_dgn').val(d.tgl_jt ? d.tgl_jt.substring(0,10) : '');
-                    $('#piutang_kwt_dgn').val(formatRupiah(d.grand));
+                    $('#piutang_kwt_dgn').val(formatRupiah(d.grand - d.bayar));
                 },
                 error: function(xhr) {
                     $('#loading_modal').modal('hide');
@@ -469,6 +552,15 @@ function formatRupiah(angka) {
 
     return parseFloat(angka)
         .toLocaleString('id-ID');
+}
+// Unformat Angka
+function unformatRupiah(angka) {
+
+    if (!angka) return 0;
+
+    return parseInt(
+        angka.toString().replace(/\./g, '')
+    ) || 0;
 }
 // Clear Form
 function clearAllKwtDgn() {

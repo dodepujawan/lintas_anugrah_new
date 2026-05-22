@@ -54,142 +54,133 @@
     </div>
 </div>
 {{-- Bagian Form Expedisi Kwitansi --}}
-<div class="container mt-3 d-none" id="form_kwt_exp">
-    <div class="col-12 d-flex justify-content-start">
-        <button class="btn btn-link text-decoration-none p-0" id="returnInvExpGenBtn" style="color: #107af3;">
-            <i class='bx bx-chevron-left'></i> Kembali ke Daftar
-        </button>
-    </div>
-    <div class="card p-3" style="background-color:#b7e1b0;">
-        <h5 class="text-center mb-3">FORM PROSES INVOICE EXPEDISI</h5>
-        <div class="row">
-            <!-- LEFT SIDE -->
-            <div class="col-md-5">
-
-                <div class="mb-2">
-                    <label>SUB TOTAL</label>
-                    <input type="text" id="sub_total_kwt_exp" class="form-control text-end" readonly>
-                </div>
-
-                <div class="mb-2">
-                    <label>D.CHARGE</label>
-                    <input type="text" id="d_charge_kwt_exp" class="form-control text-end" readonly>
-                </div>
-
-                <div class="mb-2">
-                    <label>TOTAL</label>
-                    <input type="text" id="total_kwt_exp" class="form-control text-end" readonly>
-                </div>
-
-                <div class="mb-2 row">
-                    <div class="col-6">
-                        <label>DISC %</label>
-                        <input type="text" id="disc_persen_kwt_exp" class="form-control text-end" readonly>
+<div class="container-fluid mt-2 d-none" id="form_kwt_exp">
+    <div class="card shadow-sm border-0">
+        <!-- HEADER -->
+        <div class="card-header py-2 d-flex justify-content-between align-items-center" style="background-color:#b7e1b0;">
+            <button class="btn btn-sm btn-link text-decoration-none p-0" id="returnInvExpGenBtn" style="color:#107af3;">
+                <i class='bx bx-chevron-left'></i> Kembali
+            </button>
+            <h5 class="mb-0 fw-bold">FORM PROSES INVOICE EXPEDISI</h5>
+            <div style="width:80px"></div>
+        </div>
+        <div class="card-body p-3">
+            <input type="hidden" id="kwt_exp_flag">
+            <!-- ALERT -->
+            <div id="edit_mode_alert" class="alert alert-warning text-center fw-bold py-2 mb-3" style="display:none;">
+                ⚠ MODE EDIT KWITANSI !
+            </div>
+            <div class="row g-3">
+                <!-- LEFT -->
+                <div class="col-lg-6">
+                    <div class="card border-0 bg-light h-100">
+                        <div class="card-body py-3">
+                            <div class="row g-2">
+                                <div class="col-6">
+                                    <label class="small fw-bold">SUB TOTAL</label>
+                                    <input type="text" id="sub_total_kwt_exp" class="form-control form-control-sm text-end" readonly>
+                                </div>
+                                <div class="col-6">
+                                    <label class="small fw-bold">D.CHARGE</label>
+                                    <input type="text" id="d_charge_kwt_exp" class="form-control form-control-sm text-end" readonly>
+                                </div>
+                                <div class="col-6">
+                                    <label class="small fw-bold">TOTAL</label>
+                                    <input type="text" id="total_kwt_exp" class="form-control form-control-sm text-end" readonly>
+                                </div>
+                                <div class="col-3">
+                                    <label class="small fw-bold">DISC %</label>
+                                    <input type="text" id="disc_persen_kwt_exp" class="form-control form-control-sm text-end" readonly>
+                                </div>
+                                <div class="col-3">
+                                    <label class="small fw-bold">DISC Rp</label>
+                                    <input type="text" id="disc_rp_kwt_exp" class="form-control form-control-sm text-end" readonly>
+                                </div>
+                                <div class="col-6">
+                                    <label class="small fw-bold">DPP</label>
+                                    <input type="text" id="dpp_kwt_exp" class="form-control form-control-sm text-end" readonly>
+                                </div>
+                                <div class="col-6">
+                                    <label class="small fw-bold">PPN %</label>
+                                    <input type="text" id="ppn_persen_kwt_exp" class="form-control form-control-sm text-end" readonly>
+                                </div>
+                                <div class="col-12">
+                                    <label class="small fw-bold">GRAND TOTAL</label>
+                                    <input type="text" id="grand_kwt_exp" class="form-control form-control-sm text-end fw-bold" readonly>
+                                </div>
+                                <div class="col-12">
+                                    <label class="small fw-bold">TGL MUAT</label>
+                                    <input type="date" id="tgl_invoice_kwt_exp" class="form-control form-control-sm" readonly>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="col-6">
-                        <label>DISC Rp</label>
-                        <input type="text" id="disc_rp_kwt_exp" class="form-control text-end" readonly>
+                </div>
+
+                <!-- RIGHT -->
+                <div class="col-lg-6">
+                    <div class="card border-0 bg-light h-100">
+                        <div class="card-body py-3">
+                            <div class="row g-2">
+                                <div class="col-12">
+                                    <label class="small fw-bold">NO FAKTUR</label>
+                                    <input type="text" id="no_faktur_kwt_exp" class="form-control form-control-sm" readonly>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="small fw-bold">NOMOR MUAT</label>
+                                    <input type="text" id="nomor_muat_kwt_exp" class="form-control form-control-sm" readonly>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="small fw-bold">NOMOR SJ</label>
+                                    <input type="text" id="nomor_sj_kwt_exp" class="form-control form-control-sm" readonly>
+                                    <input type="hidden" id="nosj_kwt_exp">
+                                </div>
+                                <div class="col-12">
+                                    <label class="small fw-bold">KENDARAAN</label>
+                                    <input type="text" id="kendaraan_kwt_exp" class="form-control form-control-sm" readonly>
+                                </div>
+                                <div class="col-12">
+                                    <label class="small fw-bold">CUSTOMER</label>
+                                    <input type="text" id="customer_kwt_exp" class="form-control form-control-sm" readonly>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-
-                <div class="mb-2">
-                    <label>DPP</label>
-                    <input type="text" id="dpp_kwt_exp" class="form-control text-end" readonly>
-                </div>
-
-                <div class="mb-2 row">
-                    <div class="col-6">
-                        <label>PPN %</label>
-                        <input type="text" id="ppn_persen_kwt_exp" class="form-control text-end" readonly>
-                    </div>
-                    {{-- <div class="col-6">
-                        <label>PPN Rp</label>
-                        <input type="text" id="ppn_rp_kwt_exp" class="form-control text-end" >
-                    </div> --}}
-                </div>
-
-                <div class="mb-2">
-                    <label>GRAND</label>
-                    <input type="text" id="grand_kwt_exp" class="form-control text-end" readonly>
-                </div>
-
-                <div class="mb-2">
-                    <label>TGL MUAT</label>
-                    <input type="date" id="tgl_invoice_kwt_exp" class="form-control" readonly>
-                </div>
-
             </div>
 
-            <!-- RIGHT SIDE -->
-            <div class="col-md-7">
-
-                <div class="mb-2">
-                    <label>NO FAKTUR</label>
-                    <input type="text" id="no_faktur_kwt_exp" class="form-control" readonly>
+            <!-- PAYMENT -->
+            <div class="card border-0 bg-secondary-subtle mt-3">
+                <div class="card-body py-3">
+                    <div class="row g-2 align-items-end">
+                        <div class="col-lg-3">
+                            <label class="small fw-bold">BAYAR</label>
+                            <input type="text" id="bayar_kwt_exp" class="form-control form-control-sm text-end">
+                        </div>
+                        <div class="col-lg-2">
+                            <label class="small fw-bold">TOP (HARI)</label>
+                            <input type="number" id="top_kwt_exp" class="form-control form-control-sm">
+                        </div>
+                        <div class="col-lg-3">
+                            <label class="small fw-bold">TGL JTP</label>
+                            <input type="date" id="tgl_jtp_kwt_exp" class="form-control form-control-sm">
+                        </div>
+                        <div class="col-lg-4">
+                            <label class="small fw-bold">PIUTANG</label>
+                            <input type="text" id="piutang_kwt_exp" class="form-control form-control-sm text-end fw-bold" readonly>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-end gap-2 mt-3">
+                        <button class="btn btn-sm btn-primary" id="proses_kwt_exp">
+                            PROSES
+                        </button>
+                        <button class="btn btn-sm btn-secondary" id="keluar_kwt_exp">
+                            KELUAR
+                        </button>
+                    </div>
                 </div>
-
-                <div class="mb-2">
-                    <label>NOMOR MUAT</label>
-                    <input type="text" id="nomor_muat_kwt_exp" class="form-control" readonly>
-                </div>
-
-                <div class="mb-2">
-                    <label>NOMOR SJ</label>
-                    <input type="text" id="nomor_sj_kwt_exp" class="form-control" readonly>
-                    <input type="hidden" id="nosj_kwt_exp">
-                </div>
-
-                <div class="mb-2">
-                    <label>KENDARAAN</label>
-                    <input type="text" id="kendaraan_kwt_exp" class="form-control" readonly>
-                </div>
-
-                <div class="mb-2">
-                    <label>CUSTOMER</label>
-                    <input type="text" id="customer_kwt_exp" class="form-control" readonly>
-                </div>
-
             </div>
         </div>
-
-        <hr>
-        <div id="edit_mode_alert"
-            class="alert alert-warning text-center fw-bold"
-            style="display: none; font-size: 16px;">
-            ⚠ MODE EDIT KWITANSI !
-        </div>
-
-        <!-- BAYAR SECTION -->
-        <div class="card p-3 mt-3" style="background-color:#e6e6e6;">
-            <div class="row">
-                <input type="hidden" id="kwt_exp_flag">
-                <div class="col-md-3">
-                    <label>BAYAR</label>
-                    <input type="text" id="bayar_kwt_exp" class="form-control text-end">
-                </div>
-
-                <div class="col-md-2">
-                    <label>TOP (HARI)</label>
-                    <input type="number" id="top_kwt_exp" class="form-control" >
-                </div>
-
-                <div class="col-md-3">
-                    <label>TGL JTP</label>
-                    <input type="date" id="tgl_jtp_kwt_exp" class="form-control">
-                </div>
-
-                <div class="col-md-4">
-                    <label>Piutang</label>
-                    <input type="text" id="piutang_kwt_exp" class="form-control text-end"  readonly>
-                </div>
-            </div>
-
-            <div class="text-end mt-3">
-                <button class="btn btn-primary" id="proses_kwt_exp">PROSES</button>
-                <button class="btn btn-secondary" id="keluar_kwt_exp">KELUAR</button>
-            </div>
-        </div>
-
     </div>
 </div>
 <script>

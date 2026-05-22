@@ -10,6 +10,7 @@ use App\Models\Rekening;
 use App\Models\Signature;
 use App\Models\Mcustomer;
 use App\Models\Arh;
+use App\Models\Kwitansi;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Log;
 use Mpdf\Mpdf;
@@ -118,7 +119,8 @@ class ExpedisiKwitansiController extends Controller
             ->make(true);
     }
 
-    public function prosesKwitansi(Request $request){
+    public function prosesKwitansi(Request $request)
+    {
         try {
             $invoice = $request->invoice;
             DB::transaction(function () use ($invoice) {
@@ -126,7 +128,9 @@ class ExpedisiKwitansiController extends Controller
                 // VALIDASI
                 // =====================================
                 if (!$invoice) {
-                    throw new \Exception('Invoice tidak ditemukan');
+                    throw new \Exception(
+                        'Invoice tidak ditemukan'
+                    );
                 }
                 // =====================================
                 // AMBIL DATA EXPEDISI
@@ -135,7 +139,11 @@ class ExpedisiKwitansiController extends Controller
                     ->lockForUpdate()
                     ->get();
                 if ($rows->isEmpty()) {
-                    throw new \Exception('Data invoice tidak ditemukan');
+
+                    throw new \Exception(
+                        'Data invoice tidak ditemukan'
+                    );
+
                 }
                 // =====================================
                 // CEK SUDAH KWITANSI?
@@ -144,32 +152,77 @@ class ExpedisiKwitansiController extends Controller
                     return !empty($row->kwt);
                 });
                 if ($alreadyKwt) {
-                    throw new \Exception('Invoice sudah memiliki kwitansi');
+                    throw new \Exception(
+                        'Invoice sudah memiliki kwitansi'
+                    );
                 }
                 // =====================================
                 // GENERATE NOMOR KWITANSI
                 // =====================================
                 $kwt = $this->generateKW();
                 // =====================================
+                // MASTER
+                // =====================================
+                $master = $rows->firstWhere('GRAND', '>', 0)
+                        ?? $rows->first();
+                if (!$master) {
+                    throw new \Exception(
+                        'Master invoice tidak ditemukan'
+                    );
+                }
+                // =====================================
+                // AMBIL NAMA CUSTOMER
+                // =====================================
+                $mcustomer = Mcustomer::where(
+                    'KODE_CUS',
+                    $master->CUSTOMER_KODE
+                )->first();
+                $namaCust = $mcustomer->NAMACUST
+                    ?? $master->CUSTOMER;
+                // =====================================
                 // UPDATE EXPEDISI
                 // =====================================
                 foreach ($rows as $row) {
                     $row->kwt   = $kwt;
-                    // tanggal proses kwitansi
                     $row->TGLKW = now();
                     $row->save();
                 }
+                // =====================================
+                // INSERT KWITANSI
+                // =====================================
+                Kwitansi::create([
+                    'NOKWT' => $kwt,
+                    'TGL' => now(),
+                    'FDOK_TRANS' => $invoice,
+                    'TGL_TRANS' => $master->TGLINVOICE,
+                    'CUSTOMER' => $master->CUSTOMER,
+                    'NOSJ' => $rows
+                        ->pluck('NOSJ')
+                        ->implode(','),
+                    'FKETERANG' =>
+                        'PENJUALAN EXPEDISI PADA '
+                        .$namaCust
+                        .', INVOICE : '
+                        .$invoice,
+                    'FNAMA' => $namaCust,
+                    'FNIL_DOK' => $master->GRAND ?? 0,
+                    'USERINPUT' => auth()->user()->user_id,
+                    'TOTAL' => $master->TOTAL ?? 0,
+                    'PPN' => $master->PPN ?? 0,
+                    'DISC' => $master->DISC ?? 0,
+                    'NDISC' => $master->NDISC ?? 0,
+                    'JENIS' => $master->JENIS ?? 'EKS',
+                ]);
             });
             return response()->json([
-
                 'status'  => true,
                 'message' => 'Kwitansi berhasil diproses'
+
             ]);
         } catch (\Throwable $e) {
             return response()->json([
                 'status'  => false,
                 'message' => $e->getMessage()
-
             ], 500);
         }
     }
@@ -183,7 +236,9 @@ class ExpedisiKwitansiController extends Controller
                 // VALIDASI
                 // =====================================
                 if (!$kwt) {
-                    throw new \Exception('Nomor kwitansi tidak ditemukan');
+                    throw new \Exception(
+                        'Nomor kwitansi tidak ditemukan'
+                    );
                 }
                 // =====================================
                 // AMBIL DATA
@@ -192,10 +247,13 @@ class ExpedisiKwitansiController extends Controller
                     ->lockForUpdate()
                     ->get();
                 if ($rows->isEmpty()) {
-                    throw new \Exception('Data kwitansi tidak ditemukan');
+                    throw new \Exception(
+                        'Data kwitansi tidak ditemukan'
+                    );
                 }
+
                 // =====================================
-                // REVERSE KWITANSI
+                // REVERSE KWITANSI EXPEDISI
                 // =====================================
                 foreach ($rows as $row) {
                     $row->kwt   = null;
@@ -203,11 +261,21 @@ class ExpedisiKwitansiController extends Controller
                     $row->TGLKW = null;
                     $row->save();
                 }
+
+                // =====================================
+                // DELETE TABEL KWITANSI
+                // =====================================
+                Kwitansi::where(
+                    'NOKWT',
+                    $kwt
+                )->delete();
             });
+
             return response()->json([
                 'status'  => true,
                 'message' => 'Kwitansi berhasil dibatalkan'
             ]);
+
         } catch (\Throwable $e) {
             return response()->json([
                 'status'  => false,

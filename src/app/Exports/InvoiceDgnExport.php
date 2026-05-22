@@ -21,14 +21,16 @@ class InvoiceDgnExport implements
     WithStyles,
     WithEvents
 {
-    protected $tahun;
+    protected $tanggalDari;
+    protected $tanggalSampai;
     protected $status;
     protected $grandTotal = 0;
 
-    public function __construct($tahun, $status)
+    public function __construct($tanggalDari, $tanggalSampai, $status)
     {
-        $this->tahun = $tahun;
-        $this->status = $status;
+        $this->tanggalDari   = $tanggalDari;
+        $this->tanggalSampai = $tanggalSampai;
+        $this->status        = $status;
     }
 
     public function collection()
@@ -52,10 +54,17 @@ class InvoiceDgnExport implements
                 'TGLINVOICE',
                 'STS',
             ])
-            ->whereYear('TGLMUAT', $this->tahun)
+
+            ->whereBetween('TGLMUAT', [
+                $this->tanggalDari,
+                $this->tanggalSampai
+            ])
+
             ->where('JENIS', 'REN');
 
+        // =============================
         // BELUM INVOICE
+        // =============================
         if ($this->status == 'belum') {
 
             $query->where(function ($q) {
@@ -67,7 +76,9 @@ class InvoiceDgnExport implements
 
         } else {
 
+            // =============================
             // SUDAH INVOICE
+            // =============================
             $query->whereNotNull('INVOICE')
                 ->where('INVOICE', '!=', '');
 
@@ -77,7 +88,9 @@ class InvoiceDgnExport implements
             ->orderBy('TGLMUAT')
             ->get();
 
+        // =============================
         // TOTAL GRAND
+        // =============================
         $this->grandTotal = $data->sum('GRAND');
 
         return $data;
@@ -86,6 +99,7 @@ class InvoiceDgnExport implements
     public function headings(): array
     {
         return [
+
             'Tanggal Muat',
             'No SJ',
             'No Jalan',
@@ -100,10 +114,13 @@ class InvoiceDgnExport implements
             'Invoice',
             'Tgl Invoice',
             'Status',
+
         ];
     }
 
+    // =============================
     // STYLE HEADER
+    // =============================
     public function styles(Worksheet $sheet)
     {
         return [
@@ -111,23 +128,31 @@ class InvoiceDgnExport implements
             1 => [
 
                 'font' => [
+
                     'bold' => true,
                     'size' => 12,
+
                     'color' => [
                         'rgb' => 'FFFFFF'
                     ]
+
                 ],
 
                 'alignment' => [
+
                     'horizontal' => 'center',
                     'vertical' => 'center',
+
                 ],
 
                 'fill' => [
+
                     'fillType' => 'solid',
+
                     'startColor' => [
                         'rgb' => '1F4E78'
                     ]
+
                 ]
 
             ]
@@ -145,31 +170,46 @@ class InvoiceDgnExport implements
 
                 $lastRow = $sheet->getHighestRow();
 
+                // =============================
                 // BORDER
+                // =============================
                 $sheet->getStyle('A1:N'.$lastRow)
                     ->applyFromArray([
+
                         'borders' => [
+
                             'allBorders' => [
                                 'borderStyle' => 'thin',
                             ],
+
                         ],
+
                     ]);
 
+                // =============================
                 // FORMAT RUPIAH
+                // =============================
                 $sheet->getStyle('K2:K'.($lastRow + 2))
                     ->getNumberFormat()
                     ->setFormatCode('#,##0');
 
+                // =============================
                 // WRAP TEXT
+                // =============================
                 $sheet->getStyle('A1:N'.$lastRow)
                     ->getAlignment()
                     ->setWrapText(true);
 
+                // =============================
                 // TOTAL ROW
+                // =============================
                 $totalRow = $lastRow + 2;
 
                 // LABEL TOTAL
-                $sheet->setCellValue('J'.$totalRow, 'TOTAL');
+                $sheet->setCellValue(
+                    'J'.$totalRow,
+                    'TOTAL'
+                );
 
                 // TOTAL GRAND
                 $sheet->setCellValue(
@@ -177,25 +217,34 @@ class InvoiceDgnExport implements
                     $this->grandTotal
                 );
 
+                // =============================
                 // STYLE TOTAL
+                // =============================
                 $sheet->getStyle('J'.$totalRow.':K'.$totalRow)
                     ->applyFromArray([
 
                         'font' => [
+
                             'bold' => true,
                             'size' => 12,
+
                         ],
 
                         'fill' => [
+
                             'fillType' => 'solid',
+
                             'startColor' => [
                                 'rgb' => 'D9EAF7'
                             ]
+
                         ]
 
                     ]);
 
+                // =============================
                 // CENTER VERTICAL
+                // =============================
                 $sheet->getStyle('A1:N'.$lastRow)
                     ->getAlignment()
                     ->setVertical('center');
