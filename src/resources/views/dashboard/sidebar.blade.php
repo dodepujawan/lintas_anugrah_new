@@ -227,6 +227,11 @@
                     <span class="menu-text">Coolroom</span>
                     </a>
                 </li>
+                <li class="menu-item">
+                    <a href="#" class="menu-link" id="sidebar_coolroom_inv">
+                    <span class="menu-text">Generate Invoice Coolroom</span>
+                    </a>
+                </li>
                 </ul>
             </li>
             @endcanany

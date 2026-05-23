@@ -478,6 +478,25 @@ $(document).ready(function() {
         });
     }
 // =================================== End Of Coolroom ======================================
+// ================================== Coolroom Invoice ======================================
+    $(document).on('click', '#sidebar_coolroom_inv', function(e) {
+        e.preventDefault();
+        loadCoolRoomInvForm();
+    });
+
+    function loadCoolRoomInvForm() {
+        $.ajax({
+            url: '{{ route('coolroomInv.index') }}', // Route to load the form
+            type: 'GET',
+            success: function(response) {
+                $('.master-page').html(response);
+            },
+            error: function() {
+                $('.master-page').html('<p>Error loading form.</p>');
+            }
+        });
+    }
+// ================================= End Of CoolroomInvoice ====================================
 // ================================ Form Supplier ======================================
     $(document).on('click', '#sidebar_new_supplier', function(e) {
         e.preventDefault();

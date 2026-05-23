@@ -131,7 +131,7 @@
                                 </div>
                                 <div class="col-md-3">
                                     <label class="small fw-bold">PPN %</label>
-                                    <input type="number" id="ppn_coolroom" class="form-control form-control-sm text-end" readonly>
+                                    <input type="number" id="ppn_coolroom" class="form-control form-control-sm text-end">
                                 </div>
                                 <div class="col-md-3">
                                     <label class="small fw-bold">PPN Rp</label>

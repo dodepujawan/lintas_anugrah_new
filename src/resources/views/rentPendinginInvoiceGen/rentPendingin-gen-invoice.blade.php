@@ -26,7 +26,7 @@
                         <label class="form-label">
                             Tanggal Dari
                         </label>
-                        <input type="date" name="tanggal_dari" class="form-control" value="{{ ('Y-m-01') }}" required>
+                        <input type="date" name="tanggal_dari" class="form-control" value="{{ date('Y-m-01') }}" required>
                     </div>
                     <div class="col-md-3 mb-3">
                         <label class="form-label">
