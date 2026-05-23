@@ -236,6 +236,13 @@ Route::prefix('rent-pendingin-kwitansi')->group(function() {
 
 Route::prefix('coolroom')->group(function() {
     Route::get('/', [CoolroomController::class, 'index'])->name('coolroom.index');
+    Route::get('/get-data', [CoolroomController::class, 'getData'])->name('coolroom.getData');
+    Route::get('/data/cus', [CoolroomController::class, 'getDataCustomer'])->name('coolroom-cus.data');
+    Route::post('/store', [CoolroomController::class, 'store'])->name('coolroom.store');
+    Route::get('/pdf/{nosj}', [CoolroomController::class,'pdf'])->name('coolroom.pdf');
+    Route::get('/edit/{id}', [CoolroomController::class,'edit'])->name('coolroom.edit');
+    Route::post('/update/{id}', [CoolroomController::class,'update'])->name('coolroom.update');
+    Route::delete('/coolroom/delete/{id}', [CoolroomController::class,'destroy'])->name('coolroom.destroy');
 });
 
 Route::prefix('supplier')->middleware('auth')->group(function () {

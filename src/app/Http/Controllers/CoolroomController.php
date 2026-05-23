@@ -5,9 +5,12 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 
 use App\Models\Coolroom;
+use App\Models\Signature;
 use App\Models\Arh;
 use App\Models\Kwitansi;
 use App\Models\Mcustomer;
+use Yajra\DataTables\Facades\DataTables;
+use Carbon\Carbon;
 
 use Illuminate\Support\Facades\DB;
 
@@ -21,125 +24,328 @@ class CoolroomController extends Controller
         return view('coolroom.coolroom');
     }
 
+    public function getData(Request $request)
+    {
+        $query = Coolroom::query();
+        return DataTables::of($query)
+            ->addIndexColumn()
+            ->editColumn('TGL', function ($row) {
+                return $row->TGL
+                    ? \Carbon\Carbon::parse($row->TGL)
+                        ->format('d-m-Y')
+                    : '-';
+            })
+            ->editColumn('JUMLAH', function ($row) {
+                return number_format(
+                    $row->JUMLAH ?? 0,
+                    3,
+                    ',',
+                    '.'
+                );
+            })
+            ->editColumn('HARGA', function ($row) {
+                return number_format(
+                    $row->HARGA ?? 0,
+                    0,
+                    ',',
+                    '.'
+                );
+            })
+            ->editColumn('GRAND', function ($row) {
+                return number_format(
+                    $row->GRAND ?? 0,
+                    0,
+                    ',',
+                    '.'
+                );
+            })
+            ->addColumn('action', function ($row) {
+                return '
+                    <button
+                        class="btn btn-sm btn-primary btn-edit-coolroom"
+                        data-id="'.$row->id.'">
+                        Edit
+                    </button>
+                    <button
+                        class="btn btn-sm btn-danger btn-delete-coolroom"
+                        data-id="'.$row->id.'">
+                        Hapus
+                    </button>
+                ';
+            })
+            ->rawColumns([
+                'action'
+            ])
+            ->make(true);
+    }
+
+    public function getDataCustomer(){
+        $customers = Mcustomer::select(['id', 'kode_cus','CUSTOMER', 'NAMACUST', 'TYPECUST', 'TELEPON', 'EMAIL', 'created_at']);
+
+        return DataTables::of($customers)
+            ->addIndexColumn()
+            ->addColumn('action', function($customer) {
+                return '
+                    <div class="btn-group">
+                        <button class="btn btn-sm btn-info view-btn-customer-coolroom" data-id="'.$customer->kode_cus.'" data-name="'.$customer->NAMACUST.'" data-customer="'.$customer->CUSTOMER.'" data-bs-toggle="tooltip" title="View">
+                            <i class="bx bx-check"></i>
+                        </button>
+                    </div>
+                ';
+            })
+            ->rawColumns(['action'])
+            ->make(true);
+    }
+
     /**
      * Store transaksi coolroom.
      */
     public function store(Request $request)
     {
         try {
-
-            DB::transaction(function () use ($request) {
-
-                // ======================
-                // PARSING
-                // ======================
-                $jumlah = (float) $request->jumlah;
-
-                $harga = (int) preg_replace(
-                    '/[^0-9]/',
-                    '',
-                    $request->harga
-                );
-
-                $discPersen = (float) $request->disc;
-
-                $ppnPersen = (float) $request->ppn;
-
-                $boxing = $request->boxing ? true : false;
-
-                // ======================
+            $nosj=null;
+            DB::transaction(function () use ($request,&$nosj) {
+                $jumlah=(float)$request->jumlah;
+                $harga=(int)preg_replace('/[^0-9]/','',$request->harga);
+                $discPersen=(float)$request->disc;
+                $ppnPersen=(float)$request->ppn;
+                $boxing=$request->boxing ? true : false;
+                // =====================
                 // SUBTOTAL
-                // ======================
-                if ($boxing) {
-
-                    // harga flat
-                    $subtotal = $harga;
-
-                } else {
-
-                    // qty x harga
-                    $subtotal = $jumlah * $harga;
-
+                // =====================
+                if($boxing){
+                    $subtotal=$harga;
+                }else{
+                    $subtotal=$jumlah*$harga;
                 }
-
-                // ======================
-                // DISCOUNT
-                // ======================
-                $ndisc = ($subtotal * $discPersen) / 100;
-
-                // ======================
+                // =====================
+                // DISC
+                // =====================
+                $ndisc=$subtotal*$discPersen/100;
+                // =====================
                 // DPP
-                // ======================
-                $dpp = $subtotal - $ndisc;
-
-                // ======================
+                // =====================
+                $dpp=$subtotal-$ndisc;
+                // =====================
                 // PPN
-                // ======================
-                $nppn = ($dpp * $ppnPersen) / 100;
-
-                // ======================
-                // GRAND TOTAL
-                // ======================
-                $grand = $dpp + $nppn;
-
-                // ======================
-                // SIMPAN
-                // ======================
+                // =====================
+                $nppn=$dpp*$ppnPersen/100;
+                // =====================
+                // GRAND
+                // =====================
+                $grand=$dpp+$nppn;
+                // =====================
+                // GENERATE SJ
+                // =====================
+                $nosj=$this->generateSjCoolroom();
+                // =====================
+                // STORE
+                // =====================
                 Coolroom::create([
-
-                    'CUSTOMER_KODE' => $request->customer_kode,
-                    'CUSTOMER'      => $request->customer,
-
-                    'TGL'           => now(),
-
-                    'JUMLAH'        => $jumlah,
-                    'UNIT'          => 'KG',
-
-                    'HARGA'         => $harga,
-
-                    'BOXING'        => $boxing,
-
-                    'SUBTOTAL'      => $subtotal,
-
-                    'DISC'          => $discPersen,
-                    'NDISC'         => $ndisc,
-
-                    'DPP'           => $dpp,
-
-                    'PPN'           => $ppnPersen,
-                    'NPPN'          => $nppn,
-
-                    'TOTAL'         => $dpp,
-                    'GRAND'         => $grand,
-
-                    'KETERANGAN'    => $request->keterangan,
-
-                    'STS'           => 'OPEN',
-
-                    'USERINPUT'     => auth()->user()->user_id,
-
-                    'CABANG'        => auth()->user()->cabang ?? null,
-
+                    'NOSJ'=>$nosj,
+                    'TGLSJ'=>$request->tglsj,
+                    'CUSTOMER_KODE'=>$request->customer_kode,
+                    'CUSTOMER'=>$request->customer,
+                    'JUMLAH'=>$jumlah,
+                    'UNIT'=>'KG',
+                    'HARGA'=>$harga,
+                    'BOXING'=>$boxing,
+                    'SUBTOTAL'=>$subtotal,
+                    'DISC'=>$discPersen,
+                    'NDISC'=>$ndisc,
+                    'DPP'=>$dpp,
+                    'PPN'=>$ppnPersen,
+                    'NPPN'=>$nppn,
+                    'TOTAL'=>$dpp,
+                    'GRAND'=>$grand,
+                    'KETERANGAN'=>$request->keterangan,
+                    'USERINPUT'=>auth()->user()->user_id,
+                    'CABANG'=>auth()->user()->cabang ?? null
                 ]);
-
             });
-
             return response()->json([
-
-                'status' => true,
-                'message' => 'Transaksi coolroom berhasil disimpan'
-
+                'status'=>true,
+                'message'=>'Transaksi coolroom berhasil disimpan',
+                'nosj'=>$nosj
             ]);
-
         } catch (\Throwable $e) {
-
             return response()->json([
+                'status'=>false,
+                'message'=>$e->getMessage()
+            ],500);
+        }
+    }
 
-                'status' => false,
-                'message' => $e->getMessage()
+    public function edit($id)
+    {
+        $coolroom=Coolroom::findOrFail($id);
+        return response()->json([
+            'id'=>$coolroom->id,
+            'NOSJ'=>$coolroom->NOSJ,
+            'TGLSJ'=>$coolroom->TGLSJ ? Carbon::parse($coolroom->TGLSJ)->format('Y-m-d'): null,
+            'CUSTOMER'=>$coolroom->CUSTOMER,
+            'CUSTOMER_KODE'=>$coolroom->CUSTOMER_KODE,
+            'JUMLAH'=>$coolroom->JUMLAH,
+            'HARGA'=>$coolroom->HARGA,
+            'BOXING'=>$coolroom->BOXING,
+            'DISC'=>$coolroom->DISC,
+            'PPN'=>$coolroom->PPN,
+            'KETERANGAN'=>$coolroom->KETERANGAN,
+            'SUBTOTAL'=>$coolroom->SUBTOTAL,
+            'NDISC'=>$coolroom->NDISC,
+            'DPP'=>$coolroom->DPP,
+            'NPPN'=>$coolroom->NPPN,
+            'GRAND'=>$coolroom->GRAND
+        ]);
+    }
 
-            ], 500);
+    public function update(Request $request,$id)
+    {
+        try {
+            $nosj=null;
+            DB::transaction(function () use ($request,$id,&$nosj) {
+                $coolroom=Coolroom::findOrFail($id);
+                $jumlah=(float)$request->jumlah;
+                $harga=(int)preg_replace('/[^0-9]/','',$request->harga);
+                $discPersen=(float)$request->disc;
+                $ppnPersen=(float)$request->ppn;
+                $boxing=$request->boxing ? true : false;
+                // =====================
+                // SUBTOTAL
+                // =====================
+                if($boxing){
+                    $subtotal=$harga;
+                }else{
+                    $subtotal=$jumlah*$harga;
+                }
+                // =====================
+                // DISC
+                // =====================
+                $ndisc=$subtotal*$discPersen/100;
+                // =====================
+                // DPP
+                // =====================
+                $dpp=$subtotal-$ndisc;
+                // =====================
+                // PPN
+                // =====================
+                $nppn=$dpp*$ppnPersen/100;
+                // =====================
+                // GRAND
+                // =====================
+                $grand=$dpp+$nppn;
+                // =====================
+                // UPDATE
+                // =====================
+                $coolroom->update([
+                    'TGLSJ'=>$request->tglsj,
+                    'CUSTOMER_KODE'=>$request->customer_kode,
+                    'CUSTOMER'=>$request->customer,
+                    'JUMLAH'=>$jumlah,
+                    'HARGA'=>$harga,
+                    'BOXING'=>$boxing,
+                    'SUBTOTAL'=>$subtotal,
+                    'DISC'=>$discPersen,
+                    'NDISC'=>$ndisc,
+                    'DPP'=>$dpp,
+                    'PPN'=>$ppnPersen,
+                    'NPPN'=>$nppn,
+                    'TOTAL'=>$dpp,
+                    'GRAND'=>$grand,
+                    'KETERANGAN'=>$request->keterangan,
+                    'USEREDIT'=>auth()->user()->user_id
+                ]);
+                 $nosj=$coolroom->NOSJ;
+            });
+            return response()->json([
+                'status'=>true,
+                'message'=>'Transaksi coolroom berhasil diupdate',
+                'nosj'=>$nosj
+            ]);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'status'=>false,
+                'message'=>$e->getMessage()
+            ],500);
 
         }
+    }
+
+    public function destroy($id)
+    {
+        try {
+            DB::transaction(function () use ($id) {
+                $coolroom=Coolroom::findOrFail($id);
+                // =====================
+                // VALIDASI
+                // =====================
+                if(!empty($coolroom->INVOICE)){
+                    throw new \Exception(
+                        'Data sudah invoice dan tidak bisa dihapus'
+                    );
+                }
+                // =====================
+                // DELETE
+                // =====================
+                $coolroom->delete();
+
+            });
+            return response()->json([
+                'status'=>true,
+                'message'=>'Data coolroom berhasil dihapus'
+            ]);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'status'=>false,
+                'message'=>$e->getMessage()
+            ],500);
+        }
+    }
+
+    public function pdf($nosj)
+    {
+        $coolroom=Coolroom::where('NOSJ',$nosj)->firstOrFail();
+        $signature=Signature::latest()->first();
+        $user=DB::table('users')
+            ->where('user_id',$coolroom->USERINPUT)
+            ->first();
+        $pdf=new \Mpdf\Mpdf([
+            'mode'=>'utf-8',
+            'format'=>'A4'
+        ]);
+        $html=view(
+            'coolroom.coolroom-pdf',
+            compact(
+                'coolroom',
+                'signature',
+                'user'
+            )
+        )->render();
+        $pdf->WriteHTML($html);
+        return response(
+            $pdf->Output('SJ-'.$coolroom->NOSJ.'.pdf','I'),
+            200,
+            [
+                'Content-Type'=>'application/pdf'
+            ]
+        );
+    }
+
+    private function generateSjCoolroom(){
+        $bulan=now()->format('m');
+        $tahun=now()->format('y');
+        $prefix='SC'.$bulan.$tahun;
+        $last=Coolroom::where('NOSJ','like',$prefix.'%')
+            ->lockForUpdate()
+            ->orderBy('NOSJ','desc')
+            ->first();
+        if($last){
+            $lastNumber=(int)substr($last->NOSJ,-5);
+            $nextNumber=$lastNumber+1;
+        }else{
+            $nextNumber=1;
+        }
+        $number=str_pad($nextNumber,5,'0',STR_PAD_LEFT);
+        return $prefix.$number;
     }
 }

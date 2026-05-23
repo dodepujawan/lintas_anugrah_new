@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Coolroom extends Model
 {
-    protected $table = 'coolroom';
+    protected $table = 'coolrooms';
 
     protected $guarded = [];
 
@@ -20,6 +20,7 @@ class Coolroom extends Model
         // DATE
         // ======================
         'TGL'        => 'date',
+        'TGLSJ'=>'date',
         'TGLINVOICE' => 'date',
         'TGLJT'      => 'date',
         'TGLKW'      => 'date',
