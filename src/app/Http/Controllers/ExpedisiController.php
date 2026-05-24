@@ -216,11 +216,18 @@ class ExpedisiController extends Controller
             'JENISHRG',
             'created_at'
         ])->where('JENIS', 'EKS')
+        // BELUM MUAT
         ->where(function($query) {
             $query->where('NOMUAT', '')
-                    ->orWhereNull('NOMUAT');
+                ->orWhereNull('NOMUAT');
         })
-        ->orderBy('created_at', 'desc'); ;
+
+        // BELUM INVOICE
+        ->where(function($query) {
+            $query->where('INVOICE', '')
+                ->orWhereNull('INVOICE');
+        })
+        ->orderBy('created_at', 'desc');
 
         // 🔐 FILTER ROLE DRIVER
         if (auth()->user()->role_old === 'driver') {
@@ -586,23 +593,40 @@ class ExpedisiController extends Controller
 
             // 🔹 Mapping data ke format frontend
             $rows = $expedisi->map(function ($row) {
-                return [
-                    'id'        => $row->id,
-                    'nomuat'      => $row->NOMUAT,
-                    'tglmuat'      => $row->TGLMUAT,
-                    'nosj'      => $row->NOSJ,
-                    'tgl_sj'    => $row->tglsj,
-                    'dc'        => $row->DC,
-                    'jumlah'    => $row->JUMLAH,
-                    'unit'      => $row->UNIT,
-                    'jenis'     => $row->JENIS,
-                    'jenishrg'  => $row->JENISHRG,
-                    'harga'     => $row->HARGA,
-                    'disc'      => $row->DISC,
-                    'ppn'       => $row->PPN,
-                    'total'     => $row->GRAND,
-                ];
-            });
+            return [
+                'id'                    => $row->id,
+                'nomuat'                => $row->NOMUAT,
+                'tglmuat'               => $row->TGLMUAT,
+                'rute'                  => $row->rute,
+                'plat_nomor'            => $row->PLAT_NOMOR,
+                'driver1_kode'          => $row->DRIVER,
+                'driver1'               => $row->NAMA_DRIVER,
+                'driver2_kode'          => $row->DRIVER2,
+                'driver2'               => $row->NAMA_DRIVER2,
+                'kendaraan_kode'        => $row->KENDARAAN,
+                'kendaraan'             => $row->NAMA_KENDARAAN,
+                'km_awal'               => $row->KM_AWAL,
+                'km_akhir'              => $row->KM_AKHIR,
+                'uang_jalan'            => $row->UANG_JALAN,
+                'uang_driver_makan'     => $row->UANG_DRIVER_MAKAN,
+                'uang_lain_lain'        => $row->UANG_LAIN_LAIN,
+                'pengirim'              => $row->PENGIRIM,
+
+                'ac_kendaraan'          => $row->AC_KENDARAAN,
+
+                'nosj'                  => $row->NOSJ,
+                'tgl_sj'                => $row->tglsj,
+                'dc'                    => $row->DC,
+                'jumlah'                => $row->JUMLAH,
+                'unit'                  => $row->UNIT,
+                'jenis'                 => $row->JENIS,
+                'jenishrg'              => $row->JENISHRG,
+                'harga'                 => $row->HARGA,
+                'disc'                  => $row->DISC,
+                'ppn'                   => $row->PPN,
+                'total'                 => $row->GRAND,
+            ];
+        });
 
             return response()->json([
                 'success' => true,
@@ -620,73 +644,172 @@ class ExpedisiController extends Controller
         }
     }
 
-    public function storeMuat(Request $request){
+    public function storeMuat(Request $request)
+    {
         $request->validate([
             'nosj' => 'required|array|min:1',
         ]);
-
-        DB::transaction(function () use ($request) {
-
-            // 🔐 Generate NOMUAT aman (lock)
+        $nomuat = null;
+        DB::transaction(function () use ($request, &$nomuat) {
             $nomuat = $this->generateNomuatWithLock();
             $nojalan = $this->generateNoJalan();
-
-            // ⏱️ Waktu muat
-            $tglMuat = Carbon::now();
+            $tglMuat = $request->tglmuat ?? now();
 
             DB::table('expedisi')
                 ->whereIn('NOSJ', $request->nosj)
                 ->update([
-                    'NOMUAT'  => $nomuat,
-                    'TGLMUAT' => $tglMuat,
-                    'NOJALAN' => $nojalan,
-                    'updated_at' => now()
+                    'NOMUAT'               => $nomuat,
+                    'TGLMUAT'              => $tglMuat,
+                    'NOJALAN'              => $nojalan,
+                    'rute'                 => $request->rute,
+                    'NAMA_DRIVER'          => $request->driver1,
+                    'NAMA_DRIVER2'         => $request->driver2,
+                    'NAMA_KENDARAAN'       => $request->kendaraan,
+                    'PLAT_NOMOR'           => $request->plat_nomor,
+                    'DRIVER'               => $request->driver1_kode,
+                    'DRIVER2'              => $request->driver2_kode,
+                    'KENDARAAN'            => $request->kendaraan_kode,
+                    'KM_AWAL'              => $request->km_awal,
+                    'KM_AKHIR'             => $request->km_akhir,
+                    'UANG_JALAN'           => $request->uang_jalan,
+                    'UANG_DRIVER_MAKAN'    => $request->uang_driver_makan,
+                    'UANG_LAIN_LAIN'       => $request->uang_lain_lain,
+                    'updated_at'           => now()
                 ]);
+
+            // ==========================
+            // UPDATE PENGIRIM PER ROW
+            // ==========================
+
+            $pengirimData = $request->pengirim ?? [];
+            if (!empty($pengirimData)) {
+                foreach ($pengirimData as $row) {
+                    if (!empty($row['nosj'])) {
+                        DB::table('expedisi')
+                            ->where('NOSJ', $row['nosj'])
+                            ->update([
+                                'PENGIRIM' => $row['pengirim'] ?? ''
+                            ]);
+                    }
+                }
+            }
         });
 
         return response()->json([
             'status' => true,
-            'message' => 'Data expedisi berhasil disimpan'
+            'message' => 'Data expedisi berhasil disimpan',
+            'nomuat' => $nomuat
         ]);
     }
 
-    public function updateMuat(Request $request, $nomuat){
+    public function updateMuat(Request $request, $nomuat)
+    {
         $request->validate([
             'nosj' => 'required|array|min:1',
         ]);
-
         DB::transaction(function () use ($request, $nomuat) {
-
             $nosjBaru = $request->nosj;
-
-            // NOSJ lama di DB
+            // =========================
+            // NOSJ LAMA
+            // =========================
             $nosjLama = DB::table('expedisi')
                 ->where('NOMUAT', $nomuat)
                 ->pluck('NOSJ')
                 ->toArray();
-
-            // Tambah & hapus
+            // =========================
+            // SELISIH DATA
+            // =========================
             $nosjTambah = array_diff($nosjBaru, $nosjLama);
             $nosjHapus  = array_diff($nosjLama, $nosjBaru);
+            // =========================
+            // UPDATE HEADER SEMUA ROW
+            // =========================
+            DB::table('expedisi')
+                ->where('NOMUAT', $nomuat)
+                ->update([
+                    'TGLMUAT'              => $request->tglmuat,
+                    'rute'                 => $request->rute,
+                    'PLAT_NOMOR'           => $request->plat_nomor,
+                    'DRIVER'               => $request->driver1_kode,
+                    'NAMA_DRIVER'          => $request->driver1,
+                    'DRIVER2'              => $request->driver2_kode,
+                    'NAMA_DRIVER2'         => $request->driver2,
+                    'KENDARAAN'            => $request->kendaraan_kode,
+                    'NAMA_KENDARAAN'       => $request->kendaraan,
+                    'KM_AWAL'              => $request->km_awal,
+                    'KM_AKHIR'             => $request->km_akhir,
+                    'UANG_JALAN'           => $request->uang_jalan,
+                    'UANG_DRIVER_MAKAN'    => $request->uang_driver_makan,
+                    'UANG_LAIN_LAIN'       => $request->uang_lain_lain,
+                    'updated_at'           => now()
+                ]);
 
+            // =========================
+            // TAMBAH SJ BARU
+            // =========================
             if (!empty($nosjTambah)) {
+
                 DB::table('expedisi')
                     ->whereIn('NOSJ', $nosjTambah)
                     ->update([
-                        'NOMUAT' => $nomuat,
-                        'TGLMUAT' => now(),
-                        'updated_at' => now()
+                        'NOMUAT'               => $nomuat,
+                        'TGLMUAT'              => $request->tglmuat,
+                        'rute'                 => $request->rute,
+                        'PLAT_NOMOR'           => $request->plat_nomor,
+                        'DRIVER'               => $request->driver1_kode,
+                        'NAMA_DRIVER'          => $request->driver1,
+                        'DRIVER2'              => $request->driver2_kode,
+                        'NAMA_DRIVER2'         => $request->driver2,
+                        'KENDARAAN'            => $request->kendaraan_kode,
+                        'NAMA_KENDARAAN'       => $request->kendaraan,
+                        'KM_AWAL'              => $request->km_awal,
+                        'KM_AKHIR'             => $request->km_akhir,
+                        'UANG_JALAN'           => $request->uang_jalan,
+                        'UANG_DRIVER_MAKAN'    => $request->uang_driver_makan,
+                        'UANG_LAIN_LAIN'       => $request->uang_lain_lain,
+                        'updated_at'           => now()
                     ]);
             }
 
+            // =========================
+            // HAPUS DARI MUATAN
+            // =========================
             if (!empty($nosjHapus)) {
                 DB::table('expedisi')
                     ->whereIn('NOSJ', $nosjHapus)
                     ->update([
-                        'NOMUAT' => null,
-                        'TGLMUAT' => null,
-                        'updated_at' => now()
+                        'NOMUAT'               => null,
+                        'TGLMUAT'              => null,
+                        'rute'                 => null,
+                        'PLAT_NOMOR'           => null,
+                        'DRIVER'               => null,
+                        'NAMA_DRIVER'          => null,
+                        'DRIVER2'              => null,
+                        'NAMA_DRIVER2'         => null,
+                        'KENDARAAN'            => null,
+                        'NAMA_KENDARAAN'       => null,
+                        'KM_AWAL'              => null,
+                        'KM_AKHIR'             => null,
+                        'UANG_JALAN'           => null,
+                        'UANG_DRIVER_MAKAN'    => null,
+                        'UANG_LAIN_LAIN'       => null,
+                        'updated_at'           => now()
                     ]);
+            }
+            // =========================
+            // UPDATE PENGIRIM PER ROW
+            // =========================
+            $pengirimData = $request->pengirim ?? [];
+            if (!empty($pengirimData)) {
+                foreach ($pengirimData as $row) {
+                    if (!empty($row['nosj'])) {
+                        DB::table('expedisi')
+                            ->where('NOSJ', $row['nosj'])
+                            ->update([
+                                'PENGIRIM' => $row['pengirim'] ?? ''
+                            ]);
+                    }
+                }
             }
         });
 
@@ -812,50 +935,94 @@ class ExpedisiController extends Controller
             ->make(true);
     }
 
-    public function destroyMuat($nomuat){
+    public function destroyMuat($nomuat)
+    {
         // =============================
-        // 🔥 GUARD: CEK GB / INVOICE
+        // GUARD CEK GB / INVOICE
         // =============================
         $locked = Expedisi::where('NOMUAT', $nomuat)
             ->where(function ($q) {
                 $q->where(function ($q2) {
-                    $q2->whereNotNull('GB')->where('GB', '!=', '');
+                    $q2->whereNotNull('GB')
+                    ->where('GB', '!=', '');
                 })
                 ->orWhere(function ($q2) {
-                    $q2->whereNotNull('INVOICE')->where('INVOICE', '!=', '');
+                    $q2->whereNotNull('INVOICE')
+                    ->where('INVOICE', '!=', '');
                 });
             })
             ->exists();
-
         if ($locked) {
             return response()->json([
                 'success' => false,
                 'message' => 'Muatan tidak bisa dibatalkan karena sudah tergabung / sudah invoice'
             ], 400);
         }
-
         // =============================
-        // PROSES HAPUS
+        // RESET MUATAN
         // =============================
         $updated = Expedisi::where('NOMUAT', $nomuat)
             ->update([
-                'NOMUAT' => null,
-                'TGLMUAT' => null,
-                'NOJALAN' => null,
-                'updated_at' => now()
+                'NOMUAT'               => null,
+                'TGLMUAT'              => null,
+                'NOJALAN'              => null,
+                'rute'                 => null,
+                'PLAT_NOMOR'           => null,
+                'DRIVER'               => null,
+                'NAMA_DRIVER'          => null,
+                'DRIVER2'              => null,
+                'NAMA_DRIVER2'         => null,
+                'KENDARAAN'            => null,
+                'NAMA_KENDARAAN'       => null,
+                'KM_AWAL'              => null,
+                'KM_AKHIR'             => null,
+                'UANG_JALAN'           => null,
+                'UANG_DRIVER_MAKAN'    => null,
+                'UANG_LAIN_LAIN'       => null,
+                // pengirim ikut reset kalau mau bersih total
+                // kalau mau tetap simpan history pengirim, hapus bagian ini
+                'PENGIRIM'             => null,
+                'updated_at'           => now()
             ]);
-
         if ($updated === 0) {
             return response()->json([
                 'success' => false,
                 'message' => 'Data tidak ditemukan'
             ], 404);
         }
-
         return response()->json([
             'success' => true,
             'message' => 'Muatan berhasil dibatalkan'
         ]);
+    }
+
+    public function pdfMuat($nomuat)
+    {
+        $data = Expedisi::where('NOMUAT', $nomuat)
+            ->orderBy('id')
+            ->get();
+
+        if ($data->isEmpty()) {
+            abort(404);
+        }
+
+        $header = $data->first();
+
+        $mpdf = new \Mpdf\Mpdf([
+            'format' => 'A4'
+        ]);
+
+        $html = view('expedisi.expedisi-muat-pdf', compact(
+            'data',
+            'header'
+        ))->render();
+
+        $mpdf->WriteHTML($html);
+
+        return response($mpdf->Output(
+            "Laporan-Muat-$nomuat.pdf",
+            'I'
+        ))->header('Content-Type', 'application/pdf');
     }
 
     private function generateNomuatWithLock(){

@@ -154,6 +154,7 @@ Route::prefix('expedisi')->group(function() {
     Route::post('/store/muat', [ExpedisiController::class, 'storeMuat'])->name('expedisi-muat.store');
     // PDF
     Route::get('/expedisi/{id}/print-surat-jalan', [ExpedisiController::class, 'printSuratJalan'])->name('expedisi.printSuratJalan');
+    Route::get('/expedisi/{nomuat}/print-nomuat', [ExpedisiController::class, 'pdfMuat'])->name('expedisi.pdfMuat');
 });
 
 Route::prefix('expedisi-invoice')->group(function() {
