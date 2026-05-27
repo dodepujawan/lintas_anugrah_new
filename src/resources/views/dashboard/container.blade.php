@@ -109,6 +109,53 @@
   </div>
 </div>
 {{-- End Of Modal Printer --}}
+{{-- Modal Area --}}
+<!-- ===================== MODAL AREA ===================== -->
+<div class="modal fade" id="areaModal" tabindex="-1" aria-labelledby="areaModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <form id="areaForm">
+            <div class="modal-content">
+                <!-- HEADER -->
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="areaModalLabel">Master Area</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <!-- BODY -->
+                <div class="modal-body">
+                    <!-- AREA -->
+                    <div class="mb-3">
+                        <label class="form-label">Nama Area</label>
+                        <input type="text" class="form-control" id="modal-area" name="area" placeholder="Contoh : Denpasar">
+                        <div class="form-text">
+                            Nama cabang / area
+                        </div>
+                    </div>
+
+                    <!-- ALAMAT -->
+                    <div class="mb-3">
+                        <label class="form-label">Alamat</label>
+                        <textarea class="form-control" id="modal-alamat" name="alamat" rows="3" placeholder="Masukan alamat area"></textarea>
+                        <div class="form-text">
+                            Alamat lengkap cabang
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- FOOTER -->
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        Batal
+                    </button>
+                    <button type="submit" class="btn btn-primary" id="submit_area">
+                        Simpan
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{{-- End Of Modal Area --}}
 @endsection
 @section('footer')
 <script>
@@ -736,6 +783,95 @@ $(document).ready(function() {
         }
     });
 // ============================== End Of Hak Akses =======================================
+// ==================================== Area ==========================================
+    function loadAreaSelect(selectedId = '') {
+        $.ajax({
+            url: '{{ route('get_area') }}',
+            type: 'GET',
+            success: function(response) {
+                let html = '<option value="">-- Pilih Area --</option>';
+                $.each(response.data, function(i, item) {
+                    let selected =
+                        selectedId == item.id
+                        ? 'selected'
+                        : '';
+                    html += `
+                        <option value="${item.id}"
+                                data-alamat="${item.alamat}"
+                                ${selected}>
+                            ${item.area}
+                        </option>
+                    `;
+                });
+                $('#select_area').html(html);
+            }
+        });
+    }
+
+    // ======================================
+    // BUKA MODAL
+    // ======================================
+    $(document).on('click', '#sidebar_extra_area', function(e) {
+        e.preventDefault();
+        $('#modal-area').val('');
+        $('#modal-alamat').val('');
+        $('#areaModal').modal('show');
+    });
+
+    // ======================================
+    // SUBMIT AREA
+    // ======================================
+
+    $('#areaForm').on('submit', function(e) {
+        e.preventDefault();
+        $.ajax({
+            url: '{{ route('store_area') }}',
+            type: 'POST',
+            data: {
+                _token: $('meta[name="csrf-token"]').attr('content'),
+                area: $('#modal-area').val(),
+                alamat: $('#modal-alamat').val(),
+            },
+            success: function(response) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Sukses!',
+                    text: response.message,
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+                $('#areaModal').modal('hide');
+                // reload select
+                loadAreaSelect();
+            },
+            error: function(xhr) {
+                console.error(xhr.responseText);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Gagal menyimpan area'
+                });
+            }
+        });
+    });
+
+    // ======================================
+    // AUTO TAMPILKAN ALAMAT
+    // ======================================
+    $(document).on('change', '#select_area', function() {
+        let alamat =
+            $(this)
+            .find(':selected')
+            .data('alamat');
+        $('#alamat_area').val(alamat ?? '');
+    });
+
+    // ======================================
+    // AUTO LOAD PAS HALAMAN DIBUKA
+    // ======================================
+
+    loadAreaSelect();
+// =============================== End Of Area ========================================
 // +++++++++++++++++++++++++++ End Of SIDEBAR ROOM ++++++++++++++++++++++++++++++++++++++
 });
 </script>

@@ -510,7 +510,8 @@ class ExpedisiInvoiceController extends Controller
             $lines[] = "";
         }
 
-        $text = implode("\n", $lines);
+        $text = implode("\r\n", $lines);
+        $text = iconv('UTF-8', 'CP437//TRANSLIT', $text);
 
         return response()->json([
             'text' => $text

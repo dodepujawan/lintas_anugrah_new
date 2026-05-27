@@ -99,6 +99,18 @@
                         <input class="form-check-input perm" type="checkbox" value="penjualan.kwitansi_rent_dingin">
                         <label class="form-check-label">Kwitansi Rent Dingin</label>
                     </div>
+                    <div class="form-check">
+                        <input class="form-check-input perm" type="checkbox" value="penjualan.coolroom">
+                        <label class="form-check-label">Coolroom</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input perm" type="checkbox" value="penjualan.coolroom_invoice">
+                        <label class="form-check-label">Invoice Coolroom</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input perm" type="checkbox" value="penjualan.coolroom_kwitansi">
+                        <label class="form-check-label">Kwitansi Coolroom</label>
+                    </div>
                 </div>
 
                 {{-- ================= SUPPLIER ================= --}}
@@ -155,6 +167,10 @@
                     <div class="form-check">
                         <input class="form-check-input perm" type="checkbox" value="extra.permissions">
                         <label class="form-check-label">Hak Akses/Permissions</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input perm" type="checkbox" value="extra.area">
+                        <label class="form-check-label">Area</label>
                     </div>
                 </div>
             </div>

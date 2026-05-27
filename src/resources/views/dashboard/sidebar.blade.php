@@ -141,12 +141,14 @@
             @canany([
                 'penjualan.expedisi',
                 'penjualan.invoice',
-                'penjualan.invoice',
                 'penjualan.invoice_generate',
                 'penjualan.kwitansi',
                 'penjualan.rent_dingin',
                 'penjualan.invoice_rent_dingin',
-                'penjualan.kwitansi_rent_dingin'
+                'penjualan.kwitansi_rent_dingin',
+                'penjualan.coolroom',
+                'penjualan.coolroom_invoice',
+                'penjualan.coolroom_kwitansi',
             ])
             <li class="menu-item">
                 <a class="menu-link" data-bs-toggle="collapse" href="#penjualanMenu" role="button" aria-expanded="false">
@@ -222,21 +224,27 @@
                 <li class="menu-item">
                     <div class="dropdown-divider my-2"></div>
                 </li>
+                @can('penjualan.coolroom')
                 <li class="menu-item">
                     <a href="#" class="menu-link" id="sidebar_coolroom">
                     <span class="menu-text">Coolroom</span>
                     </a>
                 </li>
+                @endcan
+                @can('penjualan.coolroom_kwitansi')
                 <li class="menu-item">
                     <a href="#" class="menu-link" id="sidebar_coolroom_inv">
                     <span class="menu-text">Generate Invoice Coolroom</span>
                     </a>
                 </li>
+                @endcan
+                @can('penjualan.kwitansi_rent_dingin')
                 <li class="menu-item">
                     <a href="#" class="menu-link" id="sidebar_coolroom_kwt">
                     <span class="menu-text">Kwitansi Coolroom</span>
                     </a>
                 </li>
+                @endcan
                 </ul>
             </li>
             @endcanany
@@ -323,7 +331,8 @@
                 'extra.rekening',
                 'extra.signature',
                 'extra.printer',
-                'extra.permissions'
+                'extra.permissions',
+                'extra.area',
             ])
             <li class="menu-item">
                 <a class="menu-link" data-bs-toggle="collapse" href="#extraMenu" role="button" aria-expanded="false">
@@ -364,6 +373,13 @@
                 <li class="menu-item">
                     <a href="#" class="menu-link" id="sidebar_extra_permissions">
                     <span class="menu-text">Hak Akses</span>
+                    </a>
+                </li>
+                @endcan
+                @can('extra.area')
+                <li class="menu-item">
+                    <a href="#" class="menu-link" id="sidebar_extra_area">
+                    <span class="menu-text">Area</span>
                     </a>
                 </li>
                 @endcan

@@ -36,6 +36,9 @@ class PermissionSeeder extends Seeder
             'penjualan.rent_dingin',
             'penjualan.invoice_rent_dingin',
             'penjualan.kwitansi_rent_dingin',
+            'penjualan.coolroom',
+            'penjualan.coolroom_invoice',
+            'penjualan.coolroom_kwitansi',
 
             'supplier.view',
             'service.view',
@@ -49,6 +52,7 @@ class PermissionSeeder extends Seeder
             'extra.printer',
             // 🔥 TAMBAHAN BARU
             'extra.permissions',
+            'extra.area',
         ];
 
         foreach ($permissions as $perm) {

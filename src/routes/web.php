@@ -29,6 +29,7 @@ use App\Http\Controllers\PrinterController;
 use App\Http\Controllers\UserPermissionController;
 use App\Http\Controllers\CoolroomGenerateInvoiceController;
 use App\Http\Controllers\CoolroomKwitansiController;
+use App\Http\Controllers\AreaController;
 
 Route::get('/', function () {
     return redirect()->route('login');
@@ -313,6 +314,13 @@ Route::prefix('permissions')->middleware('auth')->group(function () {
     Route::get('/user-permissions/{id}', [UserPermissionController::class, 'getPermissions'])->name('user.permissions');
     Route::post('/save-permissions', [UserPermissionController::class, 'update'])->name('update.permissions');
 });
+
+Route::prefix('area')->middleware('auth')->group(function () {
+    Route::get('/get-area', [AreaController::class, 'getArea'])->name('get_area');
+    Route::post('/store-area', [AreaController::class, 'store'])->name('store_area');
+});
+
+
 
 // Route::prefix('register')->group(function () {
 //     Route::get('/users', UsersPage::class)->name('users.page');
