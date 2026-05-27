@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\DB;
-use App\Models\Expedisi;
+use App\Models\Coolroom;
 use App\Models\Rekening;
 use App\Models\Signature;
 use App\Models\Mcustomer;
@@ -17,16 +17,16 @@ use Mpdf\Mpdf;
 use Carbon\Carbon;
 use Exception;
 
-class RentPendinginKwitansiController extends Controller
+class CoolroomKwitansiController extends Controller
 {
-     public function index()
+    public function index()
     {
-        return view('rentPendinginKwitansi.rentPendingin-kwt');
+        return view('coolroomKwitansi.coolroom-kwt');
     }
 
     public function getDataKwitansi(Request $request)
     {
-        $query = Expedisi::select([
+        $query = Coolroom::select([
                 'INVOICE',
                 'TGLINVOICE',
                 'CUSTOMER',
@@ -34,41 +34,32 @@ class RentPendinginKwitansiController extends Controller
                 'PIUTANG',
                 'kwt'
             ])
-            ->where('JENIS', 'REN')
-            // hanya yang sudah invoice
             ->whereNotNull('INVOICE')
             ->where('INVOICE', '!=', '')
-            // hanya master GB / single SJ
             ->where('GRAND', '>', 0)
-            // invoice sama berdempetan
             ->orderBy('INVOICE')
-            // master di atas
             ->orderByDesc('GRAND');
-        // ==========================================
-        // FILTER STATUS KWITANSI
-        // ==========================================
+
         if ($request->status_kwt == 'belum') {
             $query->where(function ($q) {
                 $q->whereNull('kwt')
-                    ->orWhere('kwt', '');
+                ->orWhere('kwt', '');
             });
         }
+
         if ($request->status_kwt == 'sudah') {
             $query->whereNotNull('kwt')
                 ->where('kwt', '!=', '');
         }
+
         return DataTables::of($query)
             ->addIndexColumn()
-            // ==========================================
-            // FORMAT TANGGAL
-            // ==========================================
             ->editColumn('TGLINVOICE', function ($row) {
                 return $row->TGLINVOICE
-                    ? \Carbon\Carbon::parse($row->TGLINVOICE)->format('d-m-Y') : '-';
+                    ? \Carbon\Carbon::parse($row->TGLINVOICE)
+                        ->format('d-m-Y')
+                    : '-';
             })
-            // ==========================================
-            // FORMAT GRAND
-            // ==========================================
             ->editColumn('GRAND', function ($row) {
                 return number_format(
                     $row->GRAND ?? 0,
@@ -77,9 +68,6 @@ class RentPendinginKwitansiController extends Controller
                     '.'
                 );
             })
-            // ==========================================
-            // FORMAT PIUTANG
-            // ==========================================
             ->editColumn('PIUTANG', function ($row) {
                 return number_format(
                     $row->PIUTANG ?? 0,
@@ -88,29 +76,26 @@ class RentPendinginKwitansiController extends Controller
                     '.'
                 );
             })
-            // ==========================================
-            // ACTION
-            // ==========================================
             ->addColumn('action', function ($row) use ($request) {
-                // ==============================
-                // BELUM KWITANSI
-                // ==============================
                 if ($request->status_kwt == 'belum') {
                     return '
                         <button
-                            class="btn btn-sm btn-success btn-proses-kwt-dgn"
+                            class="btn btn-sm btn-success btn-proses-kwt-coolroom"
                             data-invoice="'.$row->INVOICE.'">
                             Proses
                         </button>
                     ';
                 }
-                // ==============================
-                // SUDAH KWITANSI
-                // ==============================
                 return '
+                    <a
+                        href="'.route('coolroomKwt.pdf', $row->INVOICE).'"
+                        target="_blank"
+                        class="btn btn-sm btn-primary">
+                        PDF
+                    </a>
                     <button
-                        class="btn btn-sm btn-danger btn-delete-kwt-dgn"
-                        data-kwitansi="'.$row->kwt.'">
+                        class="btn btn-sm btn-danger btn-delete-kwt-coolroom"
+                        data-kwt="'.$row->kwt.'">
                         Delete
                     </button>
                 ';
@@ -123,7 +108,7 @@ class RentPendinginKwitansiController extends Controller
     {
         try {
             $invoice = $request->invoice;
-            DB::transaction(function () use ($invoice) {
+            DB::transaction(function () use ($invoice, &$kwt) {
                 // =====================================
                 // VALIDASI
                 // =====================================
@@ -133,10 +118,9 @@ class RentPendinginKwitansiController extends Controller
                     );
                 }
                 // =====================================
-                // AMBIL DATA EXPEDISI
+                // AMBIL DATA COOLROOM
                 // =====================================
-                $rows = Expedisi::where('INVOICE', $invoice)
-                    ->where('JENIS', 'REN')
+                $rows = Coolroom::where('INVOICE', $invoice)
                     ->lockForUpdate()
                     ->get();
                 if ($rows->isEmpty()) {
@@ -148,7 +132,7 @@ class RentPendinginKwitansiController extends Controller
                 // CEK SUDAH KWITANSI?
                 // =====================================
                 $alreadyKwt = $rows->first(function ($row) {
-                    return !empty($row->kwt);
+                    return !empty($row->KWT);
                 });
                 if ($alreadyKwt) {
                     throw new \Exception(
@@ -170,25 +154,19 @@ class RentPendinginKwitansiController extends Controller
                     );
                 }
                 // =====================================
-                // AMBIL NAMA CUSTOMER
+                // NAMA CUSTOMER
                 // =====================================
-                $mcustomer = Mcustomer::where(
-                    'KODE_CUS',
-                    $master->CUSTOMER_KODE
-                )->first();
-                $namaCust = $mcustomer->NAMACUST
-                    ?? $master->CUSTOMER;
+                $namaCust = $master->CUSTOMER;
                 // =====================================
-                // UPDATE EXPEDISI
+                // UPDATE COOLROOM
                 // =====================================
                 foreach ($rows as $row) {
-                    $row->kwt   = $kwt;
+                    $row->KWT   = $kwt;
                     $row->TGLKW = now();
                     $row->save();
                 }
-
                 // =====================================
-                // INSERT KWITANSI
+                // INSERT TABEL KWITANSI
                 // =====================================
                 Kwitansi::create([
                     'NOKWT' => $kwt,
@@ -200,7 +178,7 @@ class RentPendinginKwitansiController extends Controller
                         ->pluck('NOSJ')
                         ->implode(','),
                     'FKETERANG' =>
-                        'PENYEWAAN MOBIL PENDINGIN PADA '
+                        'SEWA RUANG DINGIN PADA '
                         .$namaCust
                         .', INVOICE : '
                         .$invoice,
@@ -211,12 +189,15 @@ class RentPendinginKwitansiController extends Controller
                     'PPN' => $master->PPN ?? 0,
                     'DISC' => $master->DISC ?? 0,
                     'NDISC' => $master->NDISC ?? 0,
-                    'JENIS' => 'REN',
+                    'JENIS' => 'COL',
                 ]);
             });
             return response()->json([
                 'status'  => true,
-                'message' => 'Kwitansi berhasil diproses'
+                'message' => 'Kwitansi berhasil diproses',
+                'pdf_url' => route(
+                'coolroomKwt.pdf',$invoice
+            )
             ]);
         } catch (\Throwable $e) {
             return response()->json([
@@ -229,8 +210,11 @@ class RentPendinginKwitansiController extends Controller
     public function deleteKwitansi(Request $request)
     {
         try {
+
             $kwt = $request->kwt;
+
             DB::transaction(function () use ($kwt) {
+
                 // =====================================
                 // VALIDASI
                 // =====================================
@@ -239,40 +223,45 @@ class RentPendinginKwitansiController extends Controller
                         'Nomor kwitansi tidak ditemukan'
                     );
                 }
+
                 // =====================================
-                // AMBIL DATA
+                // AMBIL DATA COOLROOM
                 // =====================================
-                $rows = Expedisi::where('kwt', $kwt)
-                    ->where('JENIS', 'REN')
+                $rows = Coolroom::where('KWT', $kwt)
                     ->lockForUpdate()
                     ->get();
+
                 if ($rows->isEmpty()) {
                     throw new \Exception(
                         'Data kwitansi tidak ditemukan'
                     );
                 }
+
                 // =====================================
-                // REVERSE KWITANSI
+                // RESET KWITANSI
                 // =====================================
                 foreach ($rows as $row) {
-                    $row->kwt   = null;
-                    // reset tanggal kwitansi
+
+                    $row->KWT   = null;
                     $row->TGLKW = null;
                     $row->save();
                 }
+
                 // =====================================
                 // DELETE TABEL KWITANSI
                 // =====================================
-                Kwitansi::where(
-                    'NOKWT',
-                    $kwt
-                )->delete();
+                Kwitansi::where('NOKWT', $kwt)
+                    ->where('JENIS', 'COL')
+                    ->delete();
             });
+
             return response()->json([
                 'status'  => true,
                 'message' => 'Kwitansi berhasil dibatalkan'
             ]);
+
         } catch (\Throwable $e) {
+
             return response()->json([
                 'status'  => false,
                 'message' => $e->getMessage()
@@ -280,25 +269,50 @@ class RentPendinginKwitansiController extends Controller
         }
     }
 
-    public function pdfInvoiceKwitansi($invoice){
-        $master = Expedisi::where('INVOICE', $invoice)
+    public function pdfInvoiceKwitansi($invoice)
+    {
+        // ==========================================
+        // MASTER COOLROOM
+        // ==========================================
+        $master = Coolroom::where('INVOICE', $invoice)
             ->where('GRAND', '>', 0)
             ->firstOrFail();
-
-        $details = Expedisi::where('INVOICE', $invoice)
+        // ==========================================
+        // DETAIL COOLROOM
+        // ==========================================
+        $details = Coolroom::where('INVOICE', $invoice)
             ->orderBy('NOSJ')
             ->get();
-
+        // ==========================================
+        // PEMBAYARAN ARH
+        // ==========================================
         $arh = Arh::where('NOFAKTUR', $invoice)
             ->first();
+        // ==========================================
+        // SIGNATURE
+        // ==========================================
+        $signature = Signature::orderByDesc('id')
+            ->first();
+        // ==========================================
+        // RENDER VIEW PDF
+        // ==========================================
+        $html = view(
+            'coolroomKwitansi.coolroom-kwt-pdf',
+            compact(
+                'master',
+                'details',
+                'arh',
+                'signature'
+            )
+        )->render();
 
-        $signature = Signature::orderByDesc('id')->first();
-
-        $html = view('expedisiKwitansi.expedisi-kwitansi-pdf', compact('master','details','arh','signature'))->render();
-
+        // ==========================================
+        // MPDF
+        // ==========================================
         $mpdf = new Mpdf([
             'mode' => 'utf-8',
             'format' => 'A4',
+
             'margin_top' => 20,
             'margin_bottom' => 15,
             'margin_left' => 15,
@@ -307,8 +321,18 @@ class RentPendinginKwitansiController extends Controller
 
         $mpdf->WriteHTML($html);
 
-        return response($mpdf->Output('Invoice-'.$invoice.'.pdf', 'I'))
-            ->header('Content-Type', 'application/pdf');
+        // ==========================================
+        // OUTPUT PDF
+        // ==========================================
+        return response(
+            $mpdf->Output(
+                'Kwitansi-Coolroom-'.$invoice.'.pdf',
+                'I'
+            )
+        )->header(
+            'Content-Type',
+            'application/pdf'
+        );
     }
 
     private function generateKW()

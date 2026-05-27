@@ -319,10 +319,10 @@ class ExpedisiKwitansiController extends Controller
     {
         $year = now()->format('Y');
 
-        $last = Expedisi::where('kwt', 'like', 'KW'.$year.'%')
+        $last = Kwitansi::where('NOKWT', 'like', 'KW'.$year.'%')
             ->lockForUpdate()
-            ->orderByDesc('kwt')
-            ->value('kwt');
+            ->orderByDesc('NOKWT')
+            ->value('NOKWT');
 
         if (!$last) {
             return 'KW' . $year . '0000001';

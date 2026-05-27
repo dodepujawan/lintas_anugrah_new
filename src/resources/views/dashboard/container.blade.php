@@ -497,6 +497,25 @@ $(document).ready(function() {
         });
     }
 // ================================= End Of CoolroomInvoice ====================================
+// ================================== Coolroom Invoice ======================================
+    $(document).on('click', '#sidebar_coolroom_kwt', function(e) {
+        e.preventDefault();
+        loadCoolRoomKwtForm();
+    });
+
+    function loadCoolRoomKwtForm() {
+        $.ajax({
+            url: '{{ route('coolroomKwt.index') }}', // Route to load the form
+            type: 'GET',
+            success: function(response) {
+                $('.master-page').html(response);
+            },
+            error: function() {
+                $('.master-page').html('<p>Error loading form.</p>');
+            }
+        });
+    }
+// ================================= End Of CoolroomInvoice ====================================
 // ================================ Form Supplier ======================================
     $(document).on('click', '#sidebar_new_supplier', function(e) {
         e.preventDefault();

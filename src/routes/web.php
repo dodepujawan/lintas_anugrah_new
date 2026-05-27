@@ -28,6 +28,7 @@ use App\Http\Controllers\SignatureController;
 use App\Http\Controllers\PrinterController;
 use App\Http\Controllers\UserPermissionController;
 use App\Http\Controllers\CoolroomGenerateInvoiceController;
+use App\Http\Controllers\CoolroomKwitansiController;
 
 Route::get('/', function () {
     return redirect()->route('login');
@@ -254,6 +255,15 @@ Route::prefix('coolroom-invoice')->group(function() {
     Route::post('/proses', [CoolroomGenerateInvoiceController::class, 'prosesInvoice'])->name('coolroomInv.proses');
     Route::get('/pdf/{invoice}', [CoolroomGenerateInvoiceController::class,'pdfGenerate'])->name('coolroomInv.pdf');
     Route::post('/laporan/excel/export', [CoolroomGenerateInvoiceController::class, 'export'])->name('coolroomInv.export');
+});
+
+Route::prefix('coolroom-kwitansi')->group(function() {
+    Route::get('/', [CoolroomKwitansiController::class, 'index'])->name('coolroomKwt.index');
+    Route::get('/get-data', [CoolroomKwitansiController::class,'getDataKwitansi'])->name('coolroomKwt.getData');
+    Route::post('/proses', [CoolroomKwitansiController::class, 'prosesKwitansi'])->name('coolroomKwt.proses');
+    Route::post('/delete',[CoolroomKwitansiController::class, 'deleteKwitansi']
+    )->name('coolroomKwt.delete');
+    Route::get('/pdf/{invoice}',[CoolroomKwitansiController::class, 'pdfInvoiceKwitansi'])->name('coolroomKwt.pdf');
 });
 
 Route::prefix('supplier')->middleware('auth')->group(function () {
