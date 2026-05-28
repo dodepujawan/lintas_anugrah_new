@@ -400,47 +400,29 @@ $(document).ready(function() {
     // ========================== ENd Of Trigger Hitung Piutang ==============================
     // ========================== End Of Return Table Expedisi Generate ==============================
     // Fungsi Print Electron JS
-    function printInvoice(invoiceNo){
-
-        // ambil printer dari database
-        $.get("{{ route('printer.current') }}", function(p){
-
-            var printerName = p.printer;
-
-            if(!printerName){
-                alert("Pilih printer dulu");
-                return;
-            }
-
-            // 🔥 pakai route name (AMAN)
-            var url = "{{ route('expedisiInvoice.text', ['invoiceNo' => '__INVOICE__']) }}";
-            url = url.replace('__INVOICE__', invoiceNo);
-
-            // ambil TEXT dari Laravel
-            $.get(url, function(res){
-
-                var text = res.text;
-
-                // kirim ke Electron
-                fetch('http://localhost:3000/print-text', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        printer: printerName,
-                        text: text
-                    })
+   function printInvoice(invoiceNo){
+        // 🔥 ROUTE INVOICE TEXT
+        var url = "{{ route('expedisiInvoice.text', ['invoiceNo' => '__INVOICE__']) }}";
+        url = url.replace('__INVOICE__', invoiceNo);
+        // 🔥 AMBIL TEXT DARI LARAVEL
+        $.get(url, function(res){
+            // 🔥 KIRIM KE ELECTRON
+            fetch('http://localhost:3000/print-text', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    text: res.text
                 })
-                .then(res => res.json())
-                .then(res => {
-                    console.log("🚀 PRINT TEXT:", res);
-                })
-                .catch(err => {
-                    console.log("❌ ERROR:", err);
-                    alert("Print service tidak aktif");
-                });
-
+            })
+            .then(res => res.json())
+            .then(res => {
+                console.log("🚀 PRINT TEXT:", res);
+            })
+            .catch(err => {
+                console.log("❌ ERROR:", err);
+                alert("Print service tidak aktif");
             });
 
         });
