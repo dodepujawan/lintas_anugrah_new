@@ -356,6 +356,9 @@ class RentPendinginController extends Controller
                 // USER
                 'user_id' => auth()->user()->user_id,
                 'user' => auth()->user()->name,
+                // AREA
+                'area_id' => auth()->user()->area_id,
+                'area_name' => auth()->user()->area_name,
             ]);
 
             DB::commit();
@@ -399,6 +402,16 @@ class RentPendinginController extends Controller
 
         try {
             $expedisi = Expedisi::where('NOSJ', $nosj)->lockForUpdate()->firstOrFail();
+            // ======================
+            // VALIDASI SUDAH INVOICE / GB
+            // ======================
+            if (!empty($expedisi->INVOICE) || !empty($expedisi->GB)) {
+                DB::rollBack();
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Data sudah memiliki invoice / GB dan tidak dapat diedit.'
+                ], 422);
+            }
 
             // ======================
             // HITUNG ULANG

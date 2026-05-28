@@ -487,6 +487,168 @@ class ExpedisiGenerateInvoiceController extends Controller
         );
     }
 
+    // ############################ Edit Invoice ####################################
+    public function indexEdit()
+    {
+        return view('expedisiInvoieGen.expedisi-invoice-edit');
+    }
+
+    public function tableEdit(Request $request)
+    {
+        $query = Expedisi::select([
+
+                'INVOICE',
+                'TGLINVOICE',
+                'CUSTOMER',
+
+                'GRAND',
+                'PIUTANG',
+
+                'GB',
+                'NOSJ',
+
+                'TGLJT',
+                'KETERANGAN'
+
+            ])
+
+            ->where('JENIS', 'EKS')
+
+            // =============================================
+            // SUDAH ADA INVOICE
+            // =============================================
+            ->whereNotNull('INVOICE')
+            ->where('INVOICE', '!=', '')
+
+            // =============================================
+            // MASTER ONLY
+            // =============================================
+            ->where('GRAND', '>', 0);
+
+        // =================================================
+        // FILTER TANGGAL
+        // =================================================
+        if ($request->tanggal_dari) {
+
+            $query->whereDate(
+                'TGLINVOICE',
+                '>=',
+                $request->tanggal_dari
+            );
+
+        }
+
+        if ($request->tanggal_sampai) {
+
+            $query->whereDate(
+                'TGLINVOICE',
+                '<=',
+                $request->tanggal_sampai
+            );
+
+        }
+
+        return DataTables::of($query)
+
+            ->addIndexColumn()
+
+            // =============================================
+            // FORMAT TGL
+            // =============================================
+            ->editColumn('TGLINVOICE', function ($row) {
+
+                return $row->TGLINVOICE
+                    ? \Carbon\Carbon::parse(
+                        $row->TGLINVOICE
+                    )->format('d-m-Y')
+                    : '-';
+
+            })
+
+            // =============================================
+            // GRAND
+            // =============================================
+            ->editColumn('GRAND', function ($row) {
+
+                return number_format(
+                    $row->GRAND ?? 0,
+                    0,
+                    ',',
+                    '.'
+                );
+
+            })
+
+            // =============================================
+            // PIUTANG
+            // =============================================
+            ->editColumn('PIUTANG', function ($row) {
+
+                return number_format(
+                    $row->PIUTANG ?? 0,
+                    0,
+                    ',',
+                    '.'
+                );
+
+            })
+
+            // =============================================
+            // BAYAR
+            // =============================================
+            ->addColumn('bayar', function ($row) {
+
+                $bayar =
+                    ($row->GRAND ?? 0)
+                    -
+                    ($row->PIUTANG ?? 0);
+
+                return number_format(
+                    $bayar,
+                    0,
+                    ',',
+                    '.'
+                );
+
+            })
+
+            // =============================================
+            // GB
+            // =============================================
+            ->addColumn('gb', function ($row) {
+
+                return $row->GB ?: '-';
+
+            })
+
+            // =============================================
+            // ACTION
+            // =============================================
+            ->addColumn('aksi', function ($row) {
+
+                return '
+
+                    <button
+                        class="btn btn-warning btn-sm btn_edit_invoice_eks"
+                        data-invoice="'.$row->INVOICE.'">
+
+                        <i class="fa fa-edit"></i>
+
+                    </button>
+
+                ';
+
+            })
+
+            ->rawColumns([
+                'aksi'
+            ])
+
+            ->make(true);
+    }
+
+
+
     private function generateInvoiceOnline(): string{
         $tahun = now()->format('Y');
 

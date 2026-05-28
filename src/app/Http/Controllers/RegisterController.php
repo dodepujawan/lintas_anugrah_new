@@ -35,6 +35,8 @@ class RegisterController extends Controller
                 'name' => 'required|string|max:255',
                 'password' => 'required|string|min:6',
                 'role' => 'required|string|max:255',
+                'area_id' => 'required',
+                'area_name' => 'required|string',
             ]);
 
             $roleMapping = [
@@ -62,6 +64,8 @@ class RegisterController extends Controller
                 'name' => $request->name,
                 'password' => Hash::make($request->password),
                 'role_old' => $roleName,
+                'area_id' => $request->area_id,
+                'area_name' => $request->area_name,
             ]);
 
             // 🔥 WAJIB: assign ke Spatie
@@ -230,6 +234,8 @@ class RegisterController extends Controller
                 'name' => 'required|string|max:255',
                 'password' => 'nullable|string|min:8',
                 'roles_list_reg' => 'required|string|max:255',
+                'area_id_reg_edit' => 'required',
+                'area_name_reg_edit' => 'required|string',
             ]);
 
             $user = User::where('user_id', $request->input('id'))->first();
@@ -317,6 +323,10 @@ class RegisterController extends Controller
                     ]);
                 }
             }
+
+            // Update Area
+            $user->area_id = $request->area_id_reg_edit;
+            $user->area_name = $request->area_name_reg_edit;
 
             // ================= SAVE =================
             $user->save();

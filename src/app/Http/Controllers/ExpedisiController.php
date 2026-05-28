@@ -151,6 +151,9 @@ class ExpedisiController extends Controller
                 // USER INFO
                 'user_id' => auth()->user()->user_id ?? 'SYSTEM',
                 'user' => auth()->user()->name ?? 'SYSTEM',
+                // AREA
+                'area_id' => auth()->user()->area_id,
+                'area_name' => auth()->user()->area_name,
                 // 'USERINV' => auth()->user()->name ?? 'SYSTEM',
                 // 'USERKENDARAAN' => auth()->user()->name ?? 'SYSTEM',
 
@@ -430,6 +433,16 @@ class ExpedisiController extends Controller
                     'success' => false,
                     'message' => 'Data expedisi tidak ditemukan'
                 ], 404);
+            }
+
+            // ======================
+            // VALIDASI SUDAH INVOICE / GB
+            // ======================
+            if (!empty($expedisi->INVOICE) || !empty($expedisi->GB)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Data sudah memiliki invoice / GB dan tidak dapat diedit.'
+                ], 422);
             }
 
             // ======================

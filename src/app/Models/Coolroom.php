@@ -20,7 +20,7 @@ class Coolroom extends Model
         // DATE
         // ======================
         'TGL'        => 'date',
-        'TGLSJ'=>'date',
+        'TGLSJ'      =>'date',
         'TGLINVOICE' => 'date',
         'TGLJT'      => 'date',
         'TGLKW'      => 'date',

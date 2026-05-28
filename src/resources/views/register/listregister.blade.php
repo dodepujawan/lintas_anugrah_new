@@ -85,6 +85,18 @@
                             <option value="CS">Customer</option>
                        </select>
                     </div>
+                    <div class="mb-3">
+                        <input type="hidden" name="area_name_reg_edit" id="area_name_reg_edit">
+                        <label for="area_id_reg_edit" class="form-label">
+                            <i class="fa fa-building me-2"></i> Area
+                        </label>
+
+                        <select name="area_id_reg_edit" id="area_id_reg_edit" class="form-select">
+                            <option value="">
+                                Loading Area...
+                            </option>
+                        </select>
+                    </div>
                     <button type="submit" class="btn btn-primary w-100 mt-2" id="but_edit_list_register"><i class="fa fa-user"></i> Update</button>
                     <hr>
                     <p class="text-center">Kembali ke <a href="javascript:void(0);">Dashboard !</a></p>
@@ -158,6 +170,7 @@ $(document).ready(function() {
                 $('#name').val(data.name);
                 $('#roles_flag').val(data.roles);
                 calling_roles_first();
+                loadAreaEdit(data.area_id);
 
                 // Tampilkan form
                 $('#formtable').hide();
@@ -184,6 +197,53 @@ $(document).ready(function() {
         }
     }
 
+    function loadAreaEdit(selectedId = '') {
+        $.ajax({
+            url: '{{ route('get_area') }}',
+            type: 'GET',
+            success: function(response) {
+                let html = `
+                    <option value="">
+                        -- Pilih Area --
+                    </option>
+                `;
+                $.each(response.data, function(i, item) {
+                    let selected =
+                        item.id == selectedId
+                        ? 'selected'
+                        : '';
+                        // 🔥 isi hidden area name
+                        if(item.id == selectedId){
+                            $('#area_name_reg_edit').val(item.area);
+                        }
+                    html += `
+                        <option value="${item.id}"
+                                data-name="${item.area}"
+                                ${selected}>
+                            ${item.area}
+                        </option>
+                    `;
+                });
+                $('#area_id_reg_edit').html(html);
+            },
+            error: function() {
+                $('#area_id_reg_edit').html(`
+                    <option value="">
+                        Gagal Load Area
+                    </option>
+                `);
+            }
+        });
+    }
+
+    // menubah name hidden area
+    $(document).on('change', '#area_id_reg_edit', function () {
+        let areaName =
+            $(this)
+            .find(':selected')
+            .data('name');
+        $('#area_name_reg_edit').val(areaName ?? '');
+    });
     // ========================== end of edit list user ===============================
     // ========================== update list user ===============================
     $(document).off('submit', '#editListRegisterForm');

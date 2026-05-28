@@ -180,6 +180,9 @@ Route::prefix('expedisi-generate-invoice')->group(function() {
     Route::get('/show/{surjalNo}', [ExpedisiGenerateInvoiceController::class, 'showInvoiceGabung'])->name('expedisiInvoiceGenerate.show');
     // generate excel
     Route::post('/laporan/excel/export', [ExpedisiGenerateInvoiceController::class, 'export'])->name('laporan.expedisiInvoiceGenerate.export');
+    // ### Edit Invoice
+    Route::get('/edit/table', [ExpedisiGenerateInvoiceController::class, 'indexEdit'])->name('expedisiInvoiceEdit.index');
+    Route::get('/data/edit', [ExpedisiGenerateInvoiceController::class, 'tableEdit'])->name('expedisiInvoiceEdit.data');
 });
 
 Route::prefix('expedisi-kwitansi')->group(function() {

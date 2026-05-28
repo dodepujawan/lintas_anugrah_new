@@ -160,7 +160,10 @@ class CoolroomController extends Controller
                     'GRAND'=>$grand,
                     'KETERANGAN'=>$request->keterangan,
                     'USERINPUT'=>auth()->user()->user_id,
-                    'CABANG'=>auth()->user()->cabang ?? null
+                    // AREA
+                    'area_id' => auth()->user()->area_id,
+                    'area_name' => auth()->user()->area_name,
+                    // 'CABANG'=>auth()->user()->cabang ?? null
                 ]);
             });
             return response()->json([
@@ -205,6 +208,15 @@ class CoolroomController extends Controller
             $nosj=null;
             DB::transaction(function () use ($request,$id,&$nosj) {
                 $coolroom=Coolroom::findOrFail($id);
+                // ======================
+                // VALIDASI SUDAH INVOICE / GB
+                // ======================
+                if (!empty($coolroom->INVOICE)) {
+                    throw new \Exception(
+                        'Data sudah memiliki invoice dan tidak dapat diedit.'
+                    );
+                }
+
                 $jumlah=(float)$request->jumlah;
                 $harga=(int)preg_replace('/[^0-9]/','',$request->harga);
                 $discPersen=(float)$request->disc;

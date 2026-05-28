@@ -55,6 +55,18 @@
                     </select>
                 </div>
 
+                <div class="mb-3">
+                    <label for="area_id_reg" class="form-label">
+                        <i class="fa fa-building me-2"></i> Area
+                    </label>
+
+                    <select name="area_id_reg" id="area_id_reg" class="form-select">
+                        <option value="">
+                            Loading Area...
+                        </option>
+                    </select>
+                </div>
+
                 <button type="submit" class="btn btn-primary w-100 py-2">
                     <i class="fa fa-user me-2"></i> Register
                 </button>
@@ -109,6 +121,38 @@ $(document).ready(function() {
         });
     });
 
+    // ### Mengambil Nilai Area Callback
+    function loadArea() {
+        $.ajax({
+            url: '{{ route('get_area') }}',
+            type: 'GET',
+            success: function(response) {
+                let html = `
+                    <option value="">
+                        -- Pilih Area --
+                    </option>
+                `;
+                $.each(response.data, function(i, item) {
+                    html += `
+                        <option value="${item.id}"
+                                data-name="${item.area}">
+                            ${item.area}
+                        </option>
+                    `;
+                });
+                $('#area_id_reg').html(html);
+            },
+            error: function() {
+                $('#area_id_reg').html(`
+                    <option value="">
+                        Gagal Load Area
+                    </option>
+                `);
+            }
+        });
+    }
+    loadArea();
+
     // ###Submit Form
     $('#registerForm').on('submit', function(e) {
         e.preventDefault();
@@ -121,6 +165,8 @@ $(document).ready(function() {
                 email: $('#email').val(),
                 password: $('#password').val(),
                 role: $('#role').val(),
+                area_id: $('#area_id_reg').val(),
+                area_name: $('#area_id_reg').find(':selected').data('name')
             },
             success: function(response) {
                 $('#message').html('<p>' + response.pesan + '</p>');
