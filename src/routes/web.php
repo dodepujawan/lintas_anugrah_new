@@ -232,6 +232,8 @@ Route::prefix('rent-pendingin-invoice-gen')->group(function() {
     Route::get('/invoice/pdf/{invoiceNo}', [RentPendinginGenerateInvoiceController::class, 'pdfInvoiceGenerate'])->name('rentPendinginGenerate.pdfGenerate');
     // generate excel
     Route::post('/laporan/excel/export', [RentPendinginGenerateInvoiceController::class, 'export'])->name('laporan.rentPendinginGenerate.export');
+    // #### EDIT RENT PEDINGIN
+    Route::get('/edit', [RentPendinginGenerateInvoiceController::class, 'indexEdit'])->name('rentPendinginInvGen.indexEdit');
 });
 
 Route::prefix('rent-pendingin-kwitansi')->group(function() {

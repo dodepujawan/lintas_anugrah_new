@@ -360,6 +360,12 @@ class RentPendinginGenerateInvoiceController extends Controller
         }
     }
 
+    // ############## EDIT INVOICE
+    public function indexEdit()
+    {
+        return view('rentPendinginInvoiceGen.rentPendingin-gen-edit');
+    }
+
     private function generateInvoiceOnline(): string{
         $tahun = now()->format('Y');
 

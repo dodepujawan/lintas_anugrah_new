@@ -734,8 +734,6 @@ class ExpedisiGenerateInvoiceController extends Controller
         }
     }
 
-
-
     private function generateInvoiceOnline(): string{
         $tahun = now()->format('Y');
 

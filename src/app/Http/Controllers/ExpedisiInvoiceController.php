@@ -442,7 +442,8 @@ class ExpedisiInvoiceController extends Controller
         }
     }
 
-    public function printInvoiceText($invoiceNo){
+    public function printInvoiceText($invoiceNo)
+    {
         $rows = Expedisi::where('INVOICE', $invoiceNo)
             ->orderBy('NOSJ')
             ->get();
@@ -453,65 +454,158 @@ class ExpedisiInvoiceController extends Controller
 
         $master = $rows->first();
 
+        // =====================================
+        // CUSTOMER
+        // =====================================
+        $customer = Mcustomer::where(
+            'KODE_CUS',
+            $master->CUSTOMER_KODE
+        )->first();
+
+        $customerNama = $customer->CUSTOMER ?? '-';
+        $customerAlamat = $customer->ALAMAT1 ?? '-';
+
+        // =====================================
+        // HEADER
+        // =====================================
         $lines = [];
 
-        // HEADER
-        $lines[] = str_pad("PT. LINTAS ANUGERAH SEJATI", 80, " ", STR_PAD_BOTH);
-        $lines[] = str_repeat("=", 80);
-        $lines[] = "INVOICE : {$master->INVOICE}";
-        $lines[] = "TANGGAL : " . date('d-m-Y', strtotime($master->TGLINVOICE));
-        $lines[] = "CUSTOMER: {$master->CUSTOMER}";
-        $lines[] = str_repeat("=", 80);
+        $lines[] = str_pad('PT. LINTAS MITRA ANUGERAH SEJATI', 80, ' ', STR_PAD_BOTH);
+        $lines[] = str_pad('COLD CHAIN DISTRIBUTION & STORAGE', 80, ' ', STR_PAD_BOTH);
+        $lines[] = '';
 
+        $lines[] = 'Jl. Raya Sempidi No.9 Badung - Bali';
+        $lines[] = 'Telp/Fax : (0361) 8947610';
+        $lines[] = 'Jl. Baja Taki IV No.9 Denpasar - Bali';
+        $lines[] = '(Cold Storage and Parking Area)';
+        $lines[] = 'Email : lintasmitrabali@yahoo.co.id';
+
+        $lines[] = str_repeat('=', 80);
+
+        $lines[] = 'Yth.';
+        $lines[] = strtoupper($customerNama);
+        $lines[] = $customerAlamat;
+        $lines[] = '';
+
+        $lines[] =
+            'Invoice : ' . $master->INVOICE .
+            str_repeat(' ', 20) .
+            'Tgl Inv : ' . date('d-m-Y', strtotime($master->TGLINVOICE));
+
+        $lines[] =
+            'Tgl Cetak : ' .
+            now()->format('d-m-Y H:i');
+
+        $lines[] = str_repeat('=', 80);
+
+        // =====================================
         // TABLE HEADER
+        // =====================================
         $lines[] = sprintf(
-            "%-3s %-10s %-30s %-5s %10s",
-            "NO", "SJ", "NAMA BARANG", "QTY", "TOTAL"
+            "%-3s %-12s %-35s %-10s %12s",
+            'NO',
+            'SJ',
+            'NAMA BARANG',
+            'QTY',
+            'TOTAL'
         );
 
-        $lines[] = str_repeat("-", 80);
+        $lines[] = str_repeat('-', 80);
 
-        // DATA
+        // =====================================
+        // DETAIL
+        // =====================================
         $no = 1;
+
         foreach ($rows as $r) {
-            $nama = trim($r->PESANANGB) !== '' ? $r->PESANANGB : $r->PESANAN;
+
+            $namaBarang = trim($r->PESANANGB) !== ''
+                ? $r->PESANANGB
+                : $r->PESANAN;
+
+            $qty = (float) $r->JUMLAH;
+
+            $qtyText = floor($qty) == $qty
+                ? number_format($qty, 0)
+                : rtrim(
+                    rtrim(
+                        number_format($qty, 3, '.', ''),
+                        '0'
+                    ),
+                    '.'
+                );
 
             $lines[] = sprintf(
-                "%-3s %-10s %-30s %-5s %10s",
+                "%-3s %-12s %-35s %-10s %12s",
                 $no,
                 $r->NOSJ,
-                substr($nama, 0, 30),
-                "KG",
+                substr($namaBarang, 0, 35),
+                $qtyText . ' KG',
                 number_format($r->TOTAL, 0, ',', '.')
             );
 
             $no++;
         }
 
-        $lines[] = str_repeat("=", 80);
+        $lines[] = str_repeat('-', 80);
+
         $lines[] = str_pad(
-            "TOTAL : " . number_format($master->GRAND, 0, ',', '.'),
+            'TOTAL : ' . number_format($master->GRAND, 0, ',', '.'),
             80,
-            " ",
+            ' ',
             STR_PAD_LEFT
         );
 
-        // FOOTER
-        $lines[] = "";
-        $lines[] = "";
-        $lines[] = str_pad("PENERIMA", 40) . str_pad("HORMAT KAMI", 40);
-        $lines[] = "";
-        $lines[] = "";
-        $lines[] = str_pad("(...................)", 40) . str_pad("LINTAS ANUGERAH", 40);
+        // =====================================
+        // FOOTER SELALU DI BAWAH
+        // =====================================
 
-        // 🔥 FIX HEIGHT (60 BARIS)
-        $maxLines = 60;
-        while (count($lines) < $maxLines) {
-            $lines[] = "";
+        $footer = [];
+
+        $footer[] = '';
+        $footer[] = '';
+        $footer[] = '';
+
+        $footer[] =
+            str_pad('DITERIMA OLEH,', 40) .
+            str_pad('HORMAT KAMI,', 40);
+
+        $footer[] = '';
+        $footer[] = '';
+        $footer[] = '';
+        $footer[] = '';
+
+        $footer[] =
+            str_pad('(......................)', 40) .
+            str_pad('PT. LINTAS MITRA ANUGERAH SEJATI', 40);
+
+        // =====================================
+        // KERTAS CONTINUOUS FORM
+        // =====================================
+
+        $pageHeight = 60;
+
+        while (
+            count($lines)
+            <
+            ($pageHeight - count($footer))
+        ) {
+            $lines[] = '';
         }
 
+        $lines = array_merge($lines, $footer);
+
+        // =====================================
+        // OUTPUT
+        // =====================================
+
         $text = implode("\r\n", $lines);
-        $text = iconv('UTF-8', 'CP437//TRANSLIT', $text);
+
+        $text = iconv(
+            'UTF-8',
+            'CP437//TRANSLIT',
+            $text
+        );
 
         return response()->json([
             'text' => $text

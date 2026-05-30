@@ -430,7 +430,7 @@ $(document).ready(function() {
         });
     }
 // ======================= End Of New Expedisi Invoice Kwitansi ====================================
-// ========================= New Expedisi Invoice Generate ======================================
+// ========================= New Expedisi Invoice Edit ======================================
     $(document).on('click', '#sidebar_Invoice_edit_expedisi', function(e) {
         e.preventDefault();
         loadInvoiceExpedisiEditForm();
@@ -448,7 +448,7 @@ $(document).ready(function() {
             }
         });
     }
-// ======================= End Of New Expedisi Invoice Generate ====================================
+// ======================= End Of New Expedisi Invoice Edit ====================================
 // ========================= New Rent Dingin ======================================
     $(document).on('click', '#sidebar_new_rent_dingin', function(e) {
         e.preventDefault();
@@ -525,6 +525,25 @@ $(document).ready(function() {
         });
     }
 // ========================= End Of Kwitansi Rent Dingin ======================================
+// ========================= New Rent Dingin Invoice Edit ======================================
+    $(document).on('click', '#sidebar_Invoice_edit_rent', function(e) {
+        e.preventDefault();
+        loadInvoiceExpedisiEditForm();
+    });
+
+    function loadInvoiceExpedisiEditForm() {
+        $.ajax({
+            url: '{{ route('rentPendinginInvGen.indexEdit') }}', // Route to load the form
+            type: 'GET',
+            success: function(response) {
+                $('.master-page').html(response);
+            },
+            error: function() {
+                $('.master-page').html('<p>Error loading form.</p>');
+            }
+        });
+    }
+// ======================= End Of New Rent Dingin Invoice Edit ====================================
 // ================================== Coolroom ======================================
     $(document).on('click', '#sidebar_coolroom', function(e) {
         e.preventDefault();

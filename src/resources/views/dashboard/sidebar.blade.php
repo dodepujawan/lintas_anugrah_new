@@ -185,11 +185,13 @@
                     </a>
                 </li>
                 @endcan
+
                 <li class="menu-item">
                     <a href="#" class="menu-link" id="sidebar_Invoice_edit_expedisi">
                     <span class="menu-text">Edit Invoice Ekspedisi</span>
                     </a>
                 </li>
+
                 <li class="menu-item">
                     <div class="dropdown-divider my-2"></div>
                 </li>
@@ -221,6 +223,12 @@
                     </a>
                 </li>
                 @endcan
+
+                <li class="menu-item">
+                    <a href="#" class="menu-link" id="sidebar_Invoice_edit_rent">
+                    <span class="menu-text">Edit Invoice Rent Pendingin</span>
+                    </a>
+                </li>
                 {{-- <li class="menu-item">
                     <a href="#" class="menu-link" id="sidebar_new_rent">
                     <span class="menu-text">Rent</span>
