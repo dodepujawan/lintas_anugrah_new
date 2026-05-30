@@ -1,3 +1,22 @@
+<style>
+    #modal_invoice_edit label{
+        font-size:11px;
+    }
+
+    #modal_invoice_edit .form-control-sm{
+        height:28px;
+        padding:2px 6px;
+        font-size:12px;
+    }
+
+    #modal_invoice_edit textarea{
+        font-size:12px;
+    }
+
+    #modal_invoice_edit .table{
+        font-size:12px;
+    }
+</style>
 <div class="container-fluid py-2">
     {{-- ===================================================== --}}
     {{-- HEADER --}}
@@ -72,7 +91,6 @@
             <div class="modal-header bg-success text-white py-2">
                 <div>
                     <h5 class="modal-title fw-bold mb-0">EDIT INVOICE EXPEDISI</h5>
-                    <small>Desktop Layout - Minim Scroll</small>
                 </div>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
@@ -81,24 +99,34 @@
             {{-- ================================================= --}}
             <div class="modal-body bg-light p-2">
                 <div class="row g-2">
-                    {{-- ============================================= --}}
                     {{-- LEFT --}}
-                    {{-- ============================================= --}}
                     <div class="col-lg-4">
                         <div class="card border-0 shadow-sm h-100">
                             <div class="card-body p-2">
                                 <div class="mb-2">
                                     <label class="form-label fw-bold mb-1">INVOICE</label>
-                                    <input type="text" class="form-control form-control-sm bg-secondary-subtle" id="invoice_edit" readonly>
+                                    <input type="text" class="form-control form-control-sm bg-secondary-subtle" id="invoice_invoice_edit" readonly>
                                 </div>
                                 <div class="mb-2">
                                     <label class="form-label fw-bold mb-1">CUSTOMER</label>
-                                    <input type="text" class="form-control form-control-sm" id="customer_invoice_edit">
+                                    <input type="text" class="form-control form-control-sm bg-secondary-subtle" id="customer_invoice_edit" readonly>
+                                </div>
+                                <div class="mb-2">
+                                    <label class="form-label fw-bold mb-1">KENDARAAN</label>
+                                    <input type="text" class="form-control form-control-sm bg-secondary-subtle" id="kendaraan_invoice_edit" readonly>
+                                </div>
+                                <div class="mb-2">
+                                    <label class="form-label fw-bold mb-1">DRIVER</label>
+                                    <input type="text" class="form-control form-control-sm bg-secondary-subtle" id="driver_invoice_edit" readonly>
+                                </div>
+                                <div class="mb-2">
+                                    <label class="form-label fw-bold mb-1">NO MUAT</label>
+                                    <input type="text" class="form-control form-control-sm bg-secondary-subtle" id="nomuat_invoice_edit" readonly>
                                 </div>
                                 <div class="row g-2 mb-2">
                                     <div class="col-6">
                                         <label class="form-label fw-bold mb-1">TGL INV</label>
-                                        <input type="date" class="form-control form-control-sm" id="tgl_invoice_edit">
+                                        <input type="date" class="form-control form-control-sm" id="tgl_invoice_invoice_edit">
                                     </div>
                                     <div class="col-6">
                                         <label class="form-label fw-bold mb-1">TGL JT</label>
@@ -108,68 +136,101 @@
                                 <div class="row g-2 mb-2">
                                     <div class="col-6">
                                         <label class="form-label fw-bold mb-1">BAYAR</label>
-                                        <input type="text" class="form-control form-control-sm text-end fw-bold bg-success-subtle" id="bayar_invoice_edit" readonly>
+                                        <input type="text" class="form-control form-control-sm text-end fw-bold bg-success-subtle" id="bayar_invoice_edit">
                                     </div>
                                     <div class="col-6">
                                         <label class="form-label fw-bold mb-1">PIUTANG</label>
-                                        <input type="text" class="form-control form-control-sm text-end fw-bold bg-warning-subtle" id="piutang_invoice_edit">
+                                        <input type="text" class="form-control form-control-sm text-end fw-bold bg-warning-subtle" id="piutang_invoice_edit" readonly>
                                     </div>
                                 </div>
-                                <div class="mb-2">
-                                    <label class="form-label fw-bold mb-1">KETERANGAN</label>
-                                    <textarea class="form-control form-control-sm" rows="4" id="keterangan_invoice_edit"></textarea>
+                                <!-- SIMPAN -->
+                                <div class="col-mb-3 d-flex align-items-end">
+                                    <button class="btn btn-success btn-sm w-100" id="btn_simpan_invoice_edit">
+                                        <i class='bx bx-save'></i>
+                                        SIMPAN
+                                    </button>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    {{-- ============================================= --}}
-                    {{-- RIGHT --}}
-                    {{-- ============================================= --}}
+                    <!-- RIGHT -->
+                    <!-- ========================================= -->
                     <div class="col-lg-8">
-                        <div class="card border-0 shadow-sm">
-                            <div class="card-body p-2">
-                                {{-- ===================================== --}}
-                                {{-- TOTAL --}}
-                                {{-- ===================================== --}}
-                                <div class="row g-2 mb-2">
-                                    <div class="col-lg-3">
-                                        <label class="form-label fw-bold mb-1">SUBTOTAL</label>
-                                        <input type="text" class="form-control form-control-sm text-end" id="subtotal_invoice_edit">
-                                    </div>
-                                    <div class="col-lg-2">
-                                        <label class="form-label fw-bold mb-1">DISKON</label>
-                                        <input type="text" class="form-control form-control-sm text-end" id="diskon_invoice_edit">
-                                    </div>
-                                    <div class="col-lg-2">
-                                        <label class="form-label fw-bold mb-1">PPN</label>
-                                        <input type="text" class="form-control form-control-sm text-end" id="ppn_invoice_edit">
-                                    </div>
-                                    <div class="col-lg-3">
-                                        <label class="form-label fw-bold mb-1">GRAND</label>
-                                        <input type="text" class="form-control form-control-sm text-end fw-bold bg-danger-subtle" id="grand_invoice_edit">
-                                    </div>
-                                    <div class="col-lg-2 d-flex align-items-end">
-                                        <button class="btn btn-success btn-sm w-100" id="btn_simpan_invoice_edit">
-                                            <i class="fa fa-save"></i> SIMPAN
-                                        </button>
-                                    </div>
-                                </div>
-                                {{-- ===================================== --}}
-                                {{-- TABLE DETAIL --}}
-                                {{-- ===================================== --}}
-                                <div class="table-responsive">
-                                    <table class="table table-bordered table-hover table-sm align-middle w-100" id="table_detail_invoice_edit">
-                                        <thead class="table-success">
-                                            <tr>
-                                                <th width="120">NO.SJ</th>
-                                                <th width="120" class="text-end">JUMLAH</th>
-                                                <th width="150" class="text-end">HARGA AW</th>
-                                                <th width="150" class="text-end">TOTAL</th>
-                                            </tr>
-                                        </thead>
-                                    </table>
-                                </div>
+                        <div class="row g-1">
+                            <!-- WILAYAH -->
+                            <div class="col-md-4">
+                                <label class="fw-bold small mb-0 d-block">WILAYAH</label>
+                                <input type="text" class="form-control form-control-sm bg-secondary-subtle" id="wilayah_invoice_edit" readonly>
                             </div>
+                            <!-- ITEM -->
+                            <div class="col-md-4">
+                                <label class="fw-bold small mb-0 d-block">ITEM</label>
+                                <input type="text" class="form-control form-control-sm bg-secondary-subtle" id="item_invoice_edit" readonly>
+                            </div>
+                            <!-- RUTE -->
+                            <div class="col-md-4">
+                                <label class="fw-bold small mb-0 d-block">RUTE</label>
+                                <input type="text" class="form-control form-control-sm bg-secondary-subtle" id="rute_invoice_edit" readonly>
+                            </div>
+                            <!-- JUMLAH -->
+                            <div class="col-md-4">
+                                <label class="fw-bold small mb-0 d-block">JUMLAH</label>
+                                <input type="text" class="form-control form-control-sm text-end bg-secondary-subtle" id="jumlah_invoice_edit">
+                            </div>
+                            <!-- HARGA -->
+                            <div class="col-md-4">
+                                <label class="fw-bold small mb-0 d-block">HARGA</label>
+                                <input type="text" class="form-control form-control-sm text-end" id="harga_invoice_edit">
+                            </div>
+                            <!-- SUBTOTAL -->
+                            <div class="col-md-4">
+                                <label class="fw-bold small mb-0 d-block">SUBTOTAL</label>
+                                <input type="text" class="form-control form-control-sm text-end" id="subtotal_invoice_edit" readonly>
+                            </div>
+                            <!-- DISC -->
+                            <div class="col-md-4">
+                                <label class="fw-bold small mb-0 d-block">DISC %</label>
+                                <input type="text" class="form-control form-control-sm text-end" id="diskon_invoice_edit">
+                            </div>
+                            <!-- SUBTOTAL -->
+                            <div class="col-md-4">
+                                <label class="fw-bold small mb-0 d-block">TOTAL</label>
+                                <input type="text" class="form-control form-control-sm text-end" id="total_invoice_edit" readonly>
+                            </div>
+                            <!-- DEL CHARGE -->
+                            <div class="col-md-4">
+                                <label class="fw-bold small mb-0 d-block">DEL.CHARGE</label>
+                                <input type="text" class="form-control form-control-sm text-end" id="del_charge_invoice_edit">
+                            </div>
+                            <!-- PPN -->
+                            <div class="col-md-4">
+                                <label class="fw-bold small mb-0 d-block">PPN %</label>
+                                <input type="text" class="form-control form-control-sm text-end" id="ppn_invoice_edit">
+                            </div>
+                            <!-- GRAND -->
+                            <div class="col-md-4">
+                                <label class="fw-bold small mb-0 d-block">GRAND</label>
+                                <input type="text" class="form-control form-control-sm text-end fw-bold bg-danger-subtle" id="grand_invoice_edit">
+                            </div>
+                            <div>
+                                <label class="form-label fw-bold mb-1">KETERANGAN</label>
+                                <textarea class="form-control form-control-sm" rows="2" id="keterangan_invoice_edit"></textarea>
+                            </div>
+                        </div>
+                        <hr class="my-2">
+                        <!-- DETAIL SJ -->
+                        <div style="height:220px;overflow-y:auto;">
+                            <table class="table table-bordered table-hover table-sm mb-0">
+                                <thead class="table-success">
+                                    <tr>
+                                        <th width="120">NO.SJ</th>
+                                        <th width="120" class="text-end">JUMLAH</th>
+                                        <th width="150" class="text-end">HARGA AW</th>
+                                        <th width="150" class="text-end">TOTAL</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tbody_detail_invoice_edit"></tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
@@ -265,121 +326,232 @@ $(document).ready(function() {
     });
 // ==================================== End Of Show Table ===============================================
 // ======================================== Show Invoice =================================================
-    // $(document).on('click','.btn_edit_invoice_eks',function(){
-    //     let invoice=$(this).data('invoice');
-    //     $.get('/invoice-eks/'+invoice+'/edit',function(r){
-    //         // ==========================================
-    //         // MASTER
-    //         // ==========================================
-    //         $('#invoice_edit').val(r.master.invoice);
-    //         $('#customer_invoice_edit').val(r.master.customer);
-
-    //         $('#tgl_invoice_edit').val(r.master.tgl_invoice);
-    //         $('#tgl_jt_invoice_edit').val(r.master.tgl_jt);
-
-    //         $('#subtotal_invoice_edit').val(r.master.subtotal);
-    //         $('#diskon_invoice_edit').val(r.master.diskon);
-    //         $('#ppn_invoice_edit').val(r.master.ppn);
-    //         $('#grand_invoice_edit').val(r.master.grand);
-
-    //         $('#bayar_invoice_edit').val(r.master.bayar);
-    //         $('#piutang_invoice_edit').val(r.master.piutang);
-
-    //         $('#keterangan_invoice_edit').val(r.master.keterangan);
-
-    //         // ==========================================
-    //         // DETAIL
-    //         // ==========================================
-    //         table_detail_invoice_edit.clear();
-    //         r.details.forEach(function(d){
-    //             table_detail_invoice_edit.row.add({
-    //                 nosj:d.nosj,
-    //                 jumlah:d.jumlah,
-    //                 harga:d.harga,
-    //                 total:d.total
-    //             });
-    //         });
-    //         table_detail_invoice_edit.draw();
-    //         $('#modal_invoice_edit').modal('show');
-    //     });
-    // });
+    $(document).on('click','.btn_edit_invoice_eks', function(){
+        let invoice = $(this).data('invoice');
+        const route_show_invoice_edit = "{{ route('expedisiInvoiceEdit.show', ':invoice') }}";
+        let url = route_show_invoice_edit.replace(':invoice', invoice);
+        $.ajax({
+            url:url,
+            type:'GET',
+            success:function(r){
+                if(!r.status){Swal.fire('Error',r.message,'error');
+                    return;
+                }
+                // Clear Form
+                clearFormInvoiceEdit();
+                let d = r.master;
+                // =================================
+                // MASTER
+                // =================================
+                $('#invoice_invoice_edit')
+                    .val(d.invoice);
+                $('#customer_invoice_edit')
+                    .val(d.customer);
+                $('#tgl_invoice_invoice_edit')
+                    .val(d.tgl_invoice.substring(0,10));
+                $('#tgl_jt_invoice_edit').val(
+                    d.tgl_jt.substring(0,10)
+                );
+                $('#diskon_invoice_edit')
+                    .val(d.diskon);
+                $('#ppn_invoice_edit')
+                    .val(d.ppn);
+                $('#grand_invoice_edit')
+                    .val(d.grand);
+                $('#bayar_invoice_edit')
+                    .val(d.bayar);
+                $('#piutang_invoice_edit')
+                    .val(d.piutang);
+                $('#keterangan_invoice_edit')
+                    .val(d.keterangan);
+                $('#kendaraan_invoice_edit')
+                .val(d.kendaraan);
+                $('#driver_invoice_edit')
+                    .val(d.driver);
+                $('#nomuat_invoice_edit')
+                    .val(d.nomuat);
+                $('#wilayah_invoice_edit')
+                    .val(d.wilayah);
+                $('#item_invoice_edit')
+                    .val(d.item);
+                $('#rute_invoice_edit')
+                    .val(d.rute);
+                $('#jumlah_invoice_edit')
+                    .val(parseFloat(d.jumlah));
+                $('#harga_invoice_edit')
+                    .val(d.harga);
+                $('#subtotal_invoice_edit')
+                    .val(parseFloat(d.jumlah) * d.harga);
+                $('#diskon_invoice_edit')
+                    .val(parseFloat(d.diskon));
+                $('#total_invoice_edit')
+                    .val(d.total);
+                $('#del_charge_invoice_edit')
+                    .val(d.del_charge);
+                $('#ppn_invoice_edit')
+                    .val(parseFloat(d.ppn));
+                $('#grand_invoice_edit')
+                    .val(d.grand);
+                // =================================
+                // DETAIL
+                // =================================
+                let html = '';
+                r.details.forEach(function(d){
+                    html += `
+                        <tr>
+                            <td>${d.nosj}</td>
+                            <td class="text-end">
+                                ${parseFloat(d.jumlah ?? 0).toLocaleString()}
+                            </td>
+                            <td class="text-end">
+                                ${parseFloat(d.hargaaw ?? 0).toLocaleString()}
+                            </td>
+                            <td class="text-end fw-bold">
+                                ${parseFloat(d.total ?? 0).toLocaleString()}
+                            </td>
+                        </tr>
+                    `;
+                });
+                $('#tbody_detail_invoice_edit').html(html);
+                // =================================
+                // SHOW MODAL
+                // =================================
+                $('#modal_invoice_edit').modal('show');
+            }
+        });
+    });
 // ==================================== End Of Show Invoice ===============================================
+// ====================================== Hitung Jumlah ================================================
+$(document).on(
+    'keyup change',
+    '#jumlah_invoice_edit,#harga_invoice_edit,#diskon_invoice_edit,#del_charge_invoice_edit,#ppn_invoice_edit,#bayar_invoice_edit',
+    function(){
+        hitungInvoiceEdit();
+    }
+);
+// ==================================== End Of Hitung Jumlah ============================================
 // ======================================= Submit Invoice ================================================
-    // $('#btn_simpan_invoice_edit').click(function(){
+    // SIMPAN EDIT INVOICE
+    $(document).on('click', '#btn_simpan_invoice_edit', function() {
+        let invoice = $('#invoice_invoice_edit').val();
+        if (!invoice) {
+            Swal.fire('Oops...', 'Invoice tidak ditemukan', 'error');
+            return;
+        }
 
-    //     let formData={
+        const route_update_invoice_edit = "{{ route('expedisiInvoiceEdit.update', ':invoice') }}";
+        let url = route_update_invoice_edit.replace(':invoice', invoice);
 
-    //         invoice:$('#invoice_edit').val(),
-    //         customer:$('#customer_invoice_edit').val(),
-
-    //         tgl_invoice:$('#tgl_invoice_edit').val(),
-    //         tgl_jt:$('#tgl_jt_invoice_edit').val(),
-
-    //         subtotal:$('#subtotal_invoice_edit').val(),
-    //         diskon:$('#diskon_invoice_edit').val(),
-    //         ppn:$('#ppn_invoice_edit').val(),
-    //         grand:$('#grand_invoice_edit').val(),
-
-    //         bayar:$('#bayar_invoice_edit').val(),
-    //         piutang:$('#piutang_invoice_edit').val(),
-
-    //         keterangan:$('#keterangan_invoice_edit').val()
-
-    //     };
-
-        // $.ajax({
-
-        //     url:'/invoice-eks/update',
-        //     type:'POST',
-        //     data:formData,
-
-        //     beforeSend:function(){
-
-        //         $('#btn_simpan_invoice_edit')
-        //             .prop('disabled',true)
-        //             .html('<i class="fa fa-spinner fa-spin"></i> SIMPAN...');
-
-        //     },
-
-    //         success:function(r){
-
-    //             $('#btn_simpan_invoice_edit')
-    //                 .prop('disabled',false)
-    //                 .html('<i class="fa fa-save"></i> SIMPAN');
-
-    //             $('#modal_invoice_edit').modal('hide');
-
-    //             table_invoice_eks.ajax.reload(null,false);
-
-    //             Swal.fire({
-
-    //                 icon:'success',
-    //                 title:'Berhasil',
-    //                 text:r.message
-
-    //             });
-
-    //         },
-
-    //         error:function(xhr){
-
-    //             $('#btn_simpan_invoice_edit')
-    //                 .prop('disabled',false)
-    //                 .html('<i class="fa fa-save"></i> SIMPAN');
-
-    //             Swal.fire({
-
-    //                 icon:'error',
-    //                 title:'Oops...',
-    //                 text:xhr.responseJSON.message
-
-    //             });
-
-    //         }
-
-    //     });
-
-    // });
+        $.ajax({
+            url: url,
+            type: 'POST',
+            data: {
+                invoice: invoice,
+                harga: $('#harga_invoice_edit').val(),
+                disc: $('#diskon_invoice_edit').val(),
+                del_charge: $('#del_charge_invoice_edit').val(),
+                ppn: $('#ppn_invoice_edit').val(),
+                tgl_jt: $('#tgl_jt_invoice_edit').val(),
+                jumlah: $('#jumlah_invoice_edit').val(),
+                keterangan: $('#keterangan_invoice_edit').val()
+            },
+            beforeSend: function() {
+                $('#btn_simpan_invoice_edit').prop('disabled', true).html("<i class='bx bx-loader-alt bx-spin'></i> MENYIMPAN...");
+            },
+            success: function(r) {
+                $('#btn_simpan_invoice_edit').prop('disabled', false).html("<i class='bx bx-save'></i> SIMPAN");
+                Swal.fire({ icon: 'success', title: 'Berhasil', text: r.message });
+                table_invoice_eks.ajax.reload(null, false);
+                $('#modal_invoice_edit').modal('hide');
+            },
+            error: function(xhr) {
+                $('#btn_simpan_invoice_edit').prop('disabled', false).html("<i class='bx bx-save'></i> SIMPAN");
+                let message = 'Terjadi kesalahan';
+                if (xhr.responseJSON && xhr.responseJSON.message) {
+                    message = xhr.responseJSON.message;
+                }
+                Swal.fire({ icon: 'error', title: 'Oops...', text: message });
+            }
+        });
+    });
 // ===================================== End Of Submit Invoice =============================================
 });
+// ************************************* Helper ***********************************************************
+function clearFormInvoiceEdit()
+{
+    // =====================================
+    // IDENTITAS
+    // =====================================
+    $('#invoice_invoice_edit').val('');
+    $('#customer_invoice_edit').val('');
+
+    $('#kendaraan_invoice_edit').val('');
+    $('#driver_invoice_edit').val('');
+    $('#nomuat_invoice_edit').val('');
+
+    // =====================================
+    // TANGGAL
+    // =====================================
+    $('#tgl_invoice_invoice_edit').val('');
+    $('#tgl_jt_invoice_edit').val('');
+
+    // =====================================
+    // INFO EXPEDISI
+    // =====================================
+    $('#wilayah_invoice_edit').val('');
+    $('#item_invoice_edit').val('');
+    $('#rute_invoice_edit').val('');
+
+    // =====================================
+    // NILAI
+    // =====================================
+    $('#jumlah_invoice_edit').val('');
+
+    $('#harga_invoice_edit').val('');
+    $('#subtotal_invoice_edit').val('');
+    $('#total_invoice_edit').val('');
+
+    $('#diskon_invoice_edit').val('');
+    $('#del_charge_invoice_edit').val('');
+
+    $('#ppn_invoice_edit').val('');
+    $('#grand_invoice_edit').val('');
+
+    // =====================================
+    // PEMBAYARAN
+    // =====================================
+    $('#bayar_invoice_edit').val('');
+    $('#piutang_invoice_edit').val('');
+
+    // =====================================
+    // KETERANGAN
+    // =====================================
+    $('#keterangan_invoice_edit').val('');
+
+    // =====================================
+    // DETAIL SJ
+    // =====================================
+    $('#tbody_detail_invoice_edit').html('');
+}
+
+function hitungInvoiceEdit() {
+    let jumlah = parseFloat($('#jumlah_invoice_edit').val()) || 0;
+    let harga = parseFloat($('#harga_invoice_edit').val()) || 0;
+    let disc = parseFloat($('#diskon_invoice_edit').val()) || 0;
+    let delCharge = parseFloat($('#del_charge_invoice_edit').val()) || 0;
+    let ppnPersen = parseFloat($('#ppn_invoice_edit').val()) || 0;
+    let bayar = parseFloat($('#bayar_invoice_edit').val()) || 0;
+
+    let subTotal = jumlah * harga;
+    let discAmount = subTotal * (disc / 100);
+    let total = subTotal - discAmount;
+    let ppnNominal = total * (ppnPersen / 100);
+    let grand = total + ppnNominal + delCharge;
+    let piutang = grand - bayar;
+
+    $('#subtotal_invoice_edit').val(Math.round(subTotal).toLocaleString('id-ID'));
+    $('#total_invoice_edit').val(Math.round(total).toLocaleString('id-ID'));
+    $('#grand_invoice_edit').val(Math.round(grand).toLocaleString('id-ID'));
+    $('#piutang_invoice_edit').val(Math.round(piutang).toLocaleString('id-ID'));
+}
 </script>

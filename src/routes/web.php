@@ -183,6 +183,8 @@ Route::prefix('expedisi-generate-invoice')->group(function() {
     // ### Edit Invoice
     Route::get('/edit/table', [ExpedisiGenerateInvoiceController::class, 'indexEdit'])->name('expedisiInvoiceEdit.index');
     Route::get('/data/edit', [ExpedisiGenerateInvoiceController::class, 'tableEdit'])->name('expedisiInvoiceEdit.data');
+    Route::get('/edit/show/{invoice}',[ExpedisiGenerateInvoiceController::class, 'showEditInvoice'])->name('expedisiInvoiceEdit.show');
+    Route::post('/edit/update/{invoice}',[ExpedisiGenerateInvoiceController::class, 'updateEditInvoice'])->name('expedisiInvoiceEdit.update');
 });
 
 Route::prefix('expedisi-kwitansi')->group(function() {

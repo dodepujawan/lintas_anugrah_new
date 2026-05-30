@@ -9,6 +9,7 @@ use App\Models\Expedisi;
 use App\Models\Rekening;
 use App\Models\Signature;
 use App\Models\Mcustomer;
+use App\Models\Kwitansi;
 use App\Models\Arh;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Log;
@@ -496,155 +497,241 @@ class ExpedisiGenerateInvoiceController extends Controller
     public function tableEdit(Request $request)
     {
         $query = Expedisi::select([
-
                 'INVOICE',
                 'TGLINVOICE',
                 'CUSTOMER',
-
                 'GRAND',
                 'PIUTANG',
-
                 'GB',
                 'NOSJ',
-
                 'TGLJT',
                 'KETERANGAN'
-
             ])
+        ->where('JENIS', 'EKS')
+        ->whereNotNull('INVOICE')
+        ->where('INVOICE', '!=', '')
+        ->where('GRAND', '>', 0)
+        ->orderByDesc('TGLINVOICE')
+        ->orderByDesc('INVOICE');
 
-            ->where('JENIS', 'EKS')
-
-            // =============================================
-            // SUDAH ADA INVOICE
-            // =============================================
-            ->whereNotNull('INVOICE')
-            ->where('INVOICE', '!=', '')
-
-            // =============================================
-            // MASTER ONLY
-            // =============================================
-            ->where('GRAND', '>', 0);
-
-        // =================================================
-        // FILTER TANGGAL
-        // =================================================
         if ($request->tanggal_dari) {
-
-            $query->whereDate(
-                'TGLINVOICE',
-                '>=',
-                $request->tanggal_dari
-            );
-
+            $query->whereDate('TGLINVOICE', '>=', $request->tanggal_dari);
         }
-
         if ($request->tanggal_sampai) {
-
-            $query->whereDate(
-                'TGLINVOICE',
-                '<=',
-                $request->tanggal_sampai
-            );
-
+            $query->whereDate('TGLINVOICE', '<=', $request->tanggal_sampai);
         }
 
         return DataTables::of($query)
-
             ->addIndexColumn()
-
-            // =============================================
-            // FORMAT TGL
-            // =============================================
             ->editColumn('TGLINVOICE', function ($row) {
-
-                return $row->TGLINVOICE
-                    ? \Carbon\Carbon::parse(
-                        $row->TGLINVOICE
-                    )->format('d-m-Y')
-                    : '-';
-
+                return $row->TGLINVOICE ? \Carbon\Carbon::parse($row->TGLINVOICE)->format('d-m-Y') : '-';
             })
-
-            // =============================================
-            // GRAND
-            // =============================================
             ->editColumn('GRAND', function ($row) {
-
-                return number_format(
-                    $row->GRAND ?? 0,
-                    0,
-                    ',',
-                    '.'
-                );
-
+                return number_format($row->GRAND ?? 0, 0, ',', '.');
             })
-
-            // =============================================
-            // PIUTANG
-            // =============================================
             ->editColumn('PIUTANG', function ($row) {
-
-                return number_format(
-                    $row->PIUTANG ?? 0,
-                    0,
-                    ',',
-                    '.'
-                );
-
+                return number_format($row->PIUTANG ?? 0, 0, ',', '.');
             })
-
-            // =============================================
-            // BAYAR
-            // =============================================
             ->addColumn('bayar', function ($row) {
-
-                $bayar =
-                    ($row->GRAND ?? 0)
-                    -
-                    ($row->PIUTANG ?? 0);
-
-                return number_format(
-                    $bayar,
-                    0,
-                    ',',
-                    '.'
-                );
-
+                $bayar = ($row->GRAND ?? 0) - ($row->PIUTANG ?? 0);
+                return number_format($bayar, 0, ',', '.');
             })
-
-            // =============================================
-            // GB
-            // =============================================
             ->addColumn('gb', function ($row) {
-
                 return $row->GB ?: '-';
-
             })
-
-            // =============================================
-            // ACTION
-            // =============================================
             ->addColumn('aksi', function ($row) {
-
-                return '
-
-                    <button
-                        class="btn btn-warning btn-sm btn_edit_invoice_eks"
-                        data-invoice="'.$row->INVOICE.'">
-
-                        <i class="fa fa-edit"></i>
-
-                    </button>
-
-                ';
-
+                return '<button class="btn btn-warning btn-sm btn_edit_invoice_eks" data-invoice="'.$row->INVOICE.'"><i class="bx bx-edit-alt"></i></button>';
             })
-
-            ->rawColumns([
-                'aksi'
-            ])
-
+            ->rawColumns(['aksi'])
             ->make(true);
+    }
+
+    public function showEditInvoice($invoice)
+    {
+        // =====================================
+        // AMBIL SEMUA BARIS INVOICE
+        // =====================================
+        $rows = Expedisi::where('INVOICE', $invoice)
+            ->orderBy('NOSJ')
+            ->get();
+        if ($rows->isEmpty()) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Invoice tidak ditemukan'
+            ]);
+        }
+
+        // =====================================
+        // MASTER
+        // =====================================
+        $master = $rows->firstWhere('GRAND', '>', 0)
+            ?? $rows->first();
+
+        // =====================================
+        // ARH
+        // =====================================
+        $arh = Arh::where(
+            'NOFAKTUR',
+            $master->INVOICE
+        )->first();
+
+        // =====================================
+        // DETAIL
+        // =====================================
+        $details = $rows->map(function ($row) {
+            return [
+                'nosj'    => $row->NOSJ,
+                'jumlah'  => $row->JUMLAH,
+                'hargaaw' => $row->hargaaw,
+                'total'   => $row->hargaaw
+            ];
+        });
+        return response()->json([
+            'status' => true,
+            'master' => [
+
+                // =====================================
+                // IDENTITAS
+                // =====================================
+                'invoice'      => $master->INVOICE,
+                'customer'     => $master->CUSTOMER,
+                'kendaraan'    => $master->NAMA_KENDARAAN ?? '',
+                'driver'       => $master->DRIVER ?? '',
+                'nomuat'       => $master->NOMUAT ?? '',
+                'tgl_invoice'  => $master->TGLINVOICE,
+                'tgl_jt'       => $arh->TGLJT ?? $master->TGLJT,
+                // =====================================
+                // INFO EXPEDISI
+                // =====================================
+                'wilayah'      => $master->WILAYAH ?? '',
+                'item'         => $master->PESANAN ?? '',
+                'rute'         => $master->rute ?? '',
+                // =====================================
+                // NILAI
+                // =====================================
+                'jumlah'       => $master->JUMLAH ?? 0,
+                'harga'        => $master->HARGA ?? 0,
+                'total'        => $master->TOTAL ?? 0,
+                'diskon'       => $master->DISC ?? 0,
+                'del_charge'   => $master->DC ?? 0,
+                'ppn'          => $master->PPN ?? 0,
+                'grand'        => $master->GRAND ?? 0,
+                // =====================================
+                // PEMBAYARAN
+                // =====================================
+                'bayar'        => $master->BAYAR ?? 0,
+                'piutang'      => ($master->GRAND ?? 0)-($master->BAYAR ?? 0),
+                'keterangan'   => $master->KETERANGAN
+            ],
+            'details' => $details
+        ]);
+    }
+
+    public function updateEditInvoice(Request $request)
+    {
+        try {
+            DB::transaction(function () use ($request) {
+                $invoice = $request->invoice;
+                if (!$invoice) {
+                    throw new \Exception('Invoice tidak ditemukan');
+                }
+
+                $rows = Expedisi::where('INVOICE', $invoice)->get();
+                if ($rows->isEmpty()) {
+                    throw new \Exception('Data invoice tidak ditemukan');
+                }
+
+                $master = $rows->firstWhere('GRAND', '>', 0) ?? $rows->first();
+                if (!$master) {
+                    throw new \Exception('Data master tidak ditemukan');
+                }
+
+                $harga = (float) str_replace(',', '', $request->harga);
+                $discPersen = (float) ($request->disc ?? 0);
+                $delCharge = (float) str_replace(',', '', $request->del_charge);
+                $ppnPersen = (float) ($request->ppn ?? 0);
+                $jumlah = (float) $request->jumlah;
+
+                $subTotal = $jumlah * $harga;
+                $ndisc = round($subTotal * ($discPersen / 100),0);
+
+                $total = round($subTotal - $ndisc,0);
+                $ppnNominal = round($total * ($ppnPersen / 100),0);
+                $grand = round($total + $ppnNominal + $delCharge,0);
+
+                $bayar = (float) ($master->BAYAR ?? 0);
+                if ($grand < $bayar) {
+                    throw new \Exception('Grand tidak boleh lebih kecil dari pembayaran yang sudah diterima');
+                }
+                $piutang = $grand - $bayar;
+
+                $master->update([
+                    'HARGA'      => $harga,
+                    'DISC'       => $discPersen,
+                    'NDISC'      => $ndisc,
+                    'DC'         => $delCharge,
+                    'TOTAL'      => $total,
+                    'PPN'        => $ppnPersen,
+                    'GRAND'      => $grand,
+                    'PIUTANG'    => $piutang,
+                    'TGLJT'      => $request->tgl_jt,
+                    'KETERANGAN' => $request->keterangan,
+                    'updated_at' => now()
+                ]);
+
+                $arh = Arh::where('NOFAKTUR', $invoice)->first();
+
+                if ($piutang > 0) {
+                    if (!$arh) {
+                        Arh::create([
+                            'NOFAKTUR'   => $invoice,
+                            'TGLFAKTUR'  => $master->TGLINVOICE,
+                            'TGLJT'      => $request->tgl_jt,
+                            'CUSTOMER'   => $master->CUSTOMER,
+                            'PIUTANG'    => $piutang,
+                            'BAYAR'      => $bayar,
+                            'SALDO'      => $piutang,
+                            'KETERANGAN' => $request->keterangan,
+                            'USER'       => auth()->user()->name ?? 'SYSTEM',
+                            'CABANG'     => $master->area_id ?? '',
+                        ]);
+                    } else {
+                        $arh->update([
+                            'TGLJT'       => $request->tgl_jt,
+                            'PIUTANG'     => $piutang,
+                            'BAYAR'       => $bayar,
+                            'SALDO'       => $piutang,
+                            'KETERANGAN'  => $request->keterangan,
+                            'USER_UPDATE' => auth()->user()->name ?? 'SYSTEM'
+                        ]);
+                    }
+                } else {
+                    if ($arh) {
+                        $arh->delete();
+                    }
+                }
+
+                $kwitansi = Kwitansi::where('FDOK_TRANS', $invoice)->first();
+                if ($kwitansi) {
+                    $kwitansi->update([
+                        'TOTAL' => $grand,
+                        'PPN'   => $ppnPersen,
+                        'DISC'  => $discPersen,
+                        'NDISC' => $ndisc
+                    ]);
+                }
+            });
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Invoice berhasil diperbarui'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 500);
+        }
     }
 
 
