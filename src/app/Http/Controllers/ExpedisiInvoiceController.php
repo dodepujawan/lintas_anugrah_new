@@ -454,78 +454,110 @@ class ExpedisiInvoiceController extends Controller
 
         $master = $rows->first();
 
-        // =====================================
+        // =========================================
         // CUSTOMER
-        // =====================================
+        // =========================================
+
         $customer = Mcustomer::where(
-            'KODE_CUS',
+            'kode_cus',
             $master->CUSTOMER_KODE
         )->first();
 
-        $customerNama = $customer->CUSTOMER ?? '-';
-        $customerAlamat = $customer->ALAMAT1 ?? '-';
+        $kepada = $customer->NAMACUST ?? '-';
+        $up = $customer->KONTAK ?? '-';
+        $alamat = $customer->ALAMAT1 ?? '-';
 
-        // =====================================
-        // HEADER
-        // =====================================
+        // =========================================
+        // REKENING
+        // =========================================
+
+        $rekening = Rekening::where('AKTIF', 1)->first();
+
+        $bank = $rekening->BANK ?? '-';
+        $norek = $rekening->NOREK ?? '-';
+        $namaRek = $rekening->NAMA ?? '-';
+
+        // =========================================
+        // TOTAL
+        // =========================================
+
+        $subtotal = (float) ($master->GRAND ?? 0);
+        $dibayar = (float) ($master->BAYAR ?? 0);
+        $saldo = (float) ($master->PIUTANG ?? 0);
+
         $lines = [];
 
-        $lines[] = str_pad('PT. LINTAS MITRA ANUGERAH SEJATI', 80, ' ', STR_PAD_BOTH);
-        $lines[] = str_pad('COLD CHAIN DISTRIBUTION & STORAGE', 80, ' ', STR_PAD_BOTH);
-        $lines[] = '';
+        // =========================================
+        // HEADER
+        // =========================================
 
-        $lines[] = 'Jl. Raya Sempidi No.9 Badung - Bali';
-        $lines[] = 'Telp/Fax : (0361) 8947610';
-        $lines[] = 'Jl. Baja Taki IV No.9 Denpasar - Bali';
-        $lines[] = '(Cold Storage and Parking Area)';
-        $lines[] = 'Email : lintasmitrabali@yahoo.co.id';
+        $lines[] = str_pad('INVOICE', 40) .
+            str_pad('PT. LINTAS MITRA ANUGERAH SEJATI', 40, ' ', STR_PAD_LEFT);
 
         $lines[] = str_repeat('=', 80);
 
-        $lines[] = 'Yth.';
-        $lines[] = strtoupper($customerNama);
-        $lines[] = $customerAlamat;
-        $lines[] = '';
+        $lines[] =
+            'NOMOR      : ' . $master->INVOICE;
 
         $lines[] =
-            'Invoice : ' . $master->INVOICE .
-            str_repeat(' ', 20) .
-            'Tgl Inv : ' . date('d-m-Y', strtotime($master->TGLINVOICE));
+            'TANGGAL    : ' .
+            date('d-m-Y', strtotime($master->TGLINVOICE));
 
         $lines[] =
-            'Tgl Cetak : ' .
+            'TGL JT     : ' .
+            date('d-m-Y', strtotime($master->TGLJT));
+
+        $lines[] =
+            'TGL CETAK  : ' .
             now()->format('d-m-Y H:i');
 
+        $lines[] = '';
+
+        $lines[] =
+            'NOMOR SJ   : ' .
+            $rows->pluck('NOSJ')->implode(', ');
+
+        $lines[] = '';
+
+        $lines[] =
+            'KEPADA     : ' . strtoupper($kepada);
+
+        $lines[] =
+            'UP         : ' . strtoupper($up);
+
+        $lines[] =
+            'ALAMAT     : ' . strtoupper($alamat);
+
         $lines[] = str_repeat('=', 80);
 
-        // =====================================
-        // TABLE HEADER
-        // =====================================
+        // =========================================
+        // TABLE
+        // =========================================
+
         $lines[] = sprintf(
-            "%-3s %-12s %-35s %-10s %12s",
+            "%-3s %-12s %-32s %-10s %15s",
             'NO',
             'SJ',
             'NAMA BARANG',
-            'QTY',
-            'TOTAL'
+            'JUMLAH',
+            'SUB TOTAL'
         );
 
         $lines[] = str_repeat('-', 80);
 
-        // =====================================
-        // DETAIL
-        // =====================================
         $no = 1;
 
         foreach ($rows as $r) {
 
-            $namaBarang = trim($r->PESANANGB) !== ''
+            $namaBarang =
+                trim($r->PESANANGB) !== ''
                 ? $r->PESANANGB
                 : $r->PESANAN;
 
             $qty = (float) $r->JUMLAH;
 
-            $qtyText = floor($qty) == $qty
+            $qtyText =
+                floor($qty) == $qty
                 ? number_format($qty, 0)
                 : rtrim(
                     rtrim(
@@ -536,10 +568,10 @@ class ExpedisiInvoiceController extends Controller
                 );
 
             $lines[] = sprintf(
-                "%-3s %-12s %-35s %-10s %12s",
+                "%-3s %-12s %-32s %-10s %15s",
                 $no,
                 $r->NOSJ,
-                substr($namaBarang, 0, 35),
+                substr($namaBarang, 0, 32),
                 $qtyText . ' KG',
                 number_format($r->TOTAL, 0, ',', '.')
             );
@@ -549,26 +581,59 @@ class ExpedisiInvoiceController extends Controller
 
         $lines[] = str_repeat('-', 80);
 
+        // =========================================
+        // INFO PEMBAYARAN
+        // =========================================
+
+        $lines[] = '';
+        $lines[] = 'Untuk pembayaran mohon transfer ke rekening resmi :';
+        $lines[] = '';
+        $lines[] = 'Bank   : ' . $bank;
+        $lines[] = 'No Rek : ' . $norek;
+        $lines[] = 'A/N    : ' . $namaRek;
+
+        $lines[] = '';
+
+        // =========================================
+        // TOTAL KANAN BAWAH
+        // =========================================
+
         $lines[] = str_pad(
-            'TOTAL : ' . number_format($master->GRAND, 0, ',', '.'),
+            'SUB TOTAL : ' .
+            number_format($subtotal, 0, ',', '.'),
             80,
             ' ',
             STR_PAD_LEFT
         );
 
-        // =====================================
-        // FOOTER SELALU DI BAWAH
-        // =====================================
+        $lines[] = str_pad(
+            'DIBAYAR   : ' .
+            number_format($dibayar, 0, ',', '.'),
+            80,
+            ' ',
+            STR_PAD_LEFT
+        );
+
+        $lines[] = str_pad(
+            'SALDO     : ' .
+            number_format($saldo, 0, ',', '.'),
+            80,
+            ' ',
+            STR_PAD_LEFT
+        );
+
+        // =========================================
+        // FOOTER
+        // =========================================
 
         $footer = [];
 
         $footer[] = '';
         $footer[] = '';
-        $footer[] = '';
 
         $footer[] =
-            str_pad('DITERIMA OLEH,', 40) .
-            str_pad('HORMAT KAMI,', 40);
+            str_pad('PENERIMA', 40) .
+            str_pad('MENGETAHUI', 40);
 
         $footer[] = '';
         $footer[] = '';
@@ -579,9 +644,9 @@ class ExpedisiInvoiceController extends Controller
             str_pad('(......................)', 40) .
             str_pad('PT. LINTAS MITRA ANUGERAH SEJATI', 40);
 
-        // =====================================
-        // KERTAS CONTINUOUS FORM
-        // =====================================
+        // =========================================
+        // FIX HEIGHT
+        // =========================================
 
         $pageHeight = 60;
 
@@ -593,13 +658,19 @@ class ExpedisiInvoiceController extends Controller
             $lines[] = '';
         }
 
-        $lines = array_merge($lines, $footer);
+        $lines = array_merge(
+            $lines,
+            $footer
+        );
 
-        // =====================================
+        // =========================================
         // OUTPUT
-        // =====================================
+        // =========================================
 
-        $text = implode("\r\n", $lines);
+        $text = implode(
+            "\r\n",
+            $lines
+        );
 
         $text = iconv(
             'UTF-8',

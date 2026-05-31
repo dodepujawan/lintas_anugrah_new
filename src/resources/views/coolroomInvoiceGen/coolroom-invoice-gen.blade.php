@@ -18,12 +18,12 @@
                             Status Invoice
                         </label>
                         <label>
-                            <input type="radio" name="status_invoice" value="belum" checked>
+                            <input type="radio" name="filter_inv_coolroom" value="belum" checked>
                             Belum Invoice
                         </label>
 
                         <label class="ms-3">
-                            <input type="radio" name="status_invoice" value="sudah">
+                            <input type="radio" name="filter_inv_coolroom" value="sudah">
                             Sudah Invoice
                         </label>
                     </div>
