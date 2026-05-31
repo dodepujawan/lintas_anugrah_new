@@ -582,7 +582,7 @@ $(document).ready(function() {
         });
     }
 // ================================= End Of CoolroomInvoice ====================================
-// ================================== Coolroom Invoice ======================================
+// ================================== Coolroom Kiwitansi ======================================
     $(document).on('click', '#sidebar_coolroom_kwt', function(e) {
         e.preventDefault();
         loadCoolRoomKwtForm();
@@ -600,7 +600,26 @@ $(document).ready(function() {
             }
         });
     }
-// ================================= End Of CoolroomInvoice ====================================
+// ================================= End Of Coolroom Kwitansi ====================================
+// ========================= Coolroom Invoice Edit ======================================
+    $(document).on('click', '#sidebar_coolroom_edit', function(e) {
+        e.preventDefault();
+        loadInvoiceCoolroomEditForm();
+    });
+
+    function loadInvoiceCoolroomEditForm() {
+        $.ajax({
+            url: '{{ route('coolroomInv.indexEdit') }}', // Route to load the form
+            type: 'GET',
+            success: function(response) {
+                $('.master-page').html(response);
+            },
+            error: function() {
+                $('.master-page').html('<p>Error loading form.</p>');
+            }
+        });
+    }
+// ======================= End Of Coolroom Invoice Edit ====================================
 // ================================ Form Supplier ======================================
     $(document).on('click', '#sidebar_new_supplier', function(e) {
         e.preventDefault();

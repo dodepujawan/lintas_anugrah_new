@@ -234,6 +234,10 @@ Route::prefix('rent-pendingin-invoice-gen')->group(function() {
     Route::post('/laporan/excel/export', [RentPendinginGenerateInvoiceController::class, 'export'])->name('laporan.rentPendinginGenerate.export');
     // #### EDIT RENT PEDINGIN
     Route::get('/edit', [RentPendinginGenerateInvoiceController::class, 'indexEdit'])->name('rentPendinginInvGen.indexEdit');
+    Route::get('/table/edit', [RentPendinginGenerateInvoiceController::class, 'tableEditRen'])->name('rentPendinginInvGen.tableEdit');
+    Route::get('/show/edit/{invoice}',[RentPendinginGenerateInvoiceController::class,'showEditInvoiceRen'])->name('rentPendinginInvGen.showEdit');
+    Route::get('/show/edit/{invoice}',[RentPendinginGenerateInvoiceController::class,'showEditInvoiceRen'])->name('rentPendinginInvGen.showEdit');
+    Route::post('/update/edit',[RentPendinginGenerateInvoiceController::class,'updateEditInvoiceRen'])->name('rentPendinginInvGen.updateEdit');
 });
 
 Route::prefix('rent-pendingin-kwitansi')->group(function() {
@@ -263,6 +267,11 @@ Route::prefix('coolroom-invoice')->group(function() {
     Route::post('/proses', [CoolroomGenerateInvoiceController::class, 'prosesInvoice'])->name('coolroomInv.proses');
     Route::get('/pdf/{invoice}', [CoolroomGenerateInvoiceController::class,'pdfGenerate'])->name('coolroomInv.pdf');
     Route::post('/laporan/excel/export', [CoolroomGenerateInvoiceController::class, 'export'])->name('coolroomInv.export');
+    // ####### EDIT COOLROOM
+    Route::get('/edit', [CoolroomGenerateInvoiceController::class, 'indexEdit'])->name('coolroomInv.indexEdit');
+    Route::get('/table/edit',[CoolroomGenerateInvoiceController::class,'tableEditCoolroom'])->name('coolroomInv.tableEdit');
+    Route::get('/show/edit/{invoice}',[CoolroomGenerateInvoiceController::class,'showEditInvoiceCoolroom'])->name('coolroomInv.showEdit');
+    Route::post('/update/edit',[CoolroomGenerateInvoiceController::class,'updateEditInvoiceCoolroom'])->name('coolroomInv.updateEdit');
 });
 
 Route::prefix('coolroom-kwitansi')->group(function() {

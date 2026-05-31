@@ -234,9 +234,22 @@
                     <span class="menu-text">Rent</span>
                     </a>
                 </li> --}}
-                <li class="menu-item">
-                    <div class="dropdown-divider my-2"></div>
-                </li>
+                </ul>
+            </li>
+            @endcanany
+
+            @canany([
+                'penjualan.coolroom',
+                'penjualan.coolroom_invoice',
+                'penjualan.coolroom_kwitansi',
+            ])
+            <li class="menu-item">
+                <a class="menu-link" data-bs-toggle="collapse" href="#coolroomMenu" role="button" aria-expanded="false">
+                <i class="menu-icon bx bx-package"></i>
+                <span class="menu-text">Penjualan Coolroom</span>
+                <i class="menu-arrow bx bx-chevron-right"></i>
+                </a>
+                <ul class="sub-menu collapse" id="coolroomMenu">
                 @can('penjualan.coolroom')
                 <li class="menu-item">
                     <a href="#" class="menu-link" id="sidebar_coolroom">
@@ -251,13 +264,17 @@
                     </a>
                 </li>
                 @endcan
-                @can('penjualan.kwitansi_rent_dingin')
+
                 <li class="menu-item">
                     <a href="#" class="menu-link" id="sidebar_coolroom_kwt">
                     <span class="menu-text">Kwitansi Coolroom</span>
                     </a>
                 </li>
-                @endcan
+                <li class="menu-item">
+                    <a href="#" class="menu-link" id="sidebar_coolroom_edit">
+                    <span class="menu-text">Edit Invoice Coolroom</span>
+                    </a>
+                </li>
                 </ul>
             </li>
             @endcanany

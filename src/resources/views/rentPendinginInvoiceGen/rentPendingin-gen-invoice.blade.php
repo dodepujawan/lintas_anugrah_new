@@ -246,7 +246,7 @@ $(document).ready(function() {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
         }
     });
-// ================================= Tabel Kwitansi Dingin =====================================
+// ================================= Tabel Rent Edit Dingin =====================================
     if ($.fn.DataTable.isDataTable('#DgnKwtTable')) {
         $('#DgnKwtTable').DataTable().destroy();
     }
@@ -284,7 +284,7 @@ $(document).ready(function() {
 
         table_kwt_dgn.ajax.reload();
     });
-// ============================== End Of Tabel Kwitansi Dingin ==================================
+// ============================== End Of Tabel Rent Edit Dingin ==================================
 // =============================== Form Detail Kwitansi Dingin ===================================
     $(document).on('click', '.btn-show-invoice-dgn-gen', function() {
 

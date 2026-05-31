@@ -409,6 +409,188 @@ class CoolroomGenerateInvoiceController extends Controller
         );
     }
 
+    // ##################### EDIT COOLROOM ###############################
+    public function indexEdit()
+    {
+        return view('coolroomInvoiceGen.coolroom-invoice-edit');
+    }
+
+    public function tableEditCoolroom(Request $request)
+    {
+        $query = Coolroom::select(['INVOICE', 'TGLINVOICE', 'CUSTOMER', 'GRAND', 'PIUTANG', 'TGLJT', 'KETERANGAN'])
+            ->whereNotNull('INVOICE')
+            ->where('INVOICE', '!=', '')
+            ->where('GRAND', '>', 0)
+            ->orderByDesc('TGLINVOICE')
+            ->orderByDesc('INVOICE');
+
+        if ($request->tanggal_dari) {
+            $query->whereDate('TGLINVOICE', '>=', $request->tanggal_dari);
+        }
+        if ($request->tanggal_sampai) {
+            $query->whereDate('TGLINVOICE', '<=', $request->tanggal_sampai);
+        }
+
+        return DataTables::of($query)
+            ->filter(function ($query) use ($request) {
+                if ($request->search['value'] ?? false) {
+                    $search = $request->search['value'];
+                    $query->where(function ($q) use ($search) {
+                        $q->where('INVOICE', 'like', "%{$search}%")
+                        ->orWhere('CUSTOMER', 'like', "%{$search}%");
+                    });
+                }
+            })
+            ->addIndexColumn()
+            ->editColumn('TGLINVOICE', fn($row) => $row->TGLINVOICE ? Carbon::parse($row->TGLINVOICE)->format('d-m-Y') : '-')
+            ->editColumn('GRAND', fn($row) => number_format($row->GRAND ?? 0, 0, ',', '.'))
+            ->editColumn('PIUTANG', fn($row) => number_format($row->PIUTANG ?? 0, 0, ',', '.'))
+            ->addColumn('bayar', fn($row) => number_format(($row->GRAND ?? 0) - ($row->PIUTANG ?? 0), 0, ',', '.'))
+            ->addColumn('aksi', fn($row) => '<button class="btn btn-warning btn-sm btn_edit_invoice_coolroom" data-invoice="' . $row->INVOICE . '"><i class="bx bx-edit-alt"></i></button>')
+            ->rawColumns(['aksi'])
+            ->make(true);
+    }
+
+    public function showEditInvoiceCoolroom($invoice)
+    {
+        $row = Coolroom::where('INVOICE', $invoice)->first();
+        if (!$row) {
+            return response()->json(['status' => false, 'message' => 'Invoice tidak ditemukan']);
+        }
+
+        $arh = Arh::where('NOFAKTUR', $invoice)->first();
+
+        return response()->json([
+            'status' => true,
+            'master' => [
+                'invoice' => $row->INVOICE,
+                'customer' => $row->CUSTOMER,
+                'tgl_invoice' => $row->TGLINVOICE ? Carbon::parse($row->TGLINVOICE)->format('Y-m-d') : null,
+                'tgl_jt' => ($arh->TGLJT ?? $row->TGLJT) ? Carbon::parse($arh->TGLJT ?? $row->TGLJT)->format('Y-m-d') : null,
+                'boxing' => $row->BOXING ?? 0,
+                'jumlah' => $row->JUMLAH ?? 0,
+                'unit' => $row->UNIT ?? 'KG',
+                'harga' => $row->HARGA ?? 0,
+                'subtotal' => $row->SUBTOTAL ?? 0,
+                'disc' => $row->DISC ?? 0,
+                'dpp' => $row->DPP ?? 0,
+                'ppn' => $row->PPN ?? 0,
+                'total' => $row->TOTAL ?? 0,
+                'grand' => $row->GRAND ?? 0,
+                'bayar' => $row->BAYAR ?? 0,
+                'piutang' => $row->PIUTANG ?? 0,
+                'keterangan' => $row->KETERANGAN ?? ''
+            ]
+        ]);
+    }
+
+    public function updateEditInvoiceCoolroom(Request $request)
+    {
+        try {
+            DB::transaction(function () use ($request) {
+                $invoice = $request->invoice;
+                if (!$invoice) {
+                    throw new \Exception('Invoice tidak ditemukan');
+                }
+
+                $coolroom = Coolroom::where('INVOICE', $invoice)->first();
+                if (!$coolroom) {
+                    throw new \Exception('Data invoice tidak ditemukan');
+                }
+
+                $jumlah = (float) ($request->jumlah ?? 0);
+                $harga = (float) ($request->harga ?? 0);
+                $discPersen = (float) ($request->disc ?? 0);
+                $ppnPersen = (float) ($request->ppn ?? 0);
+                $boxing = $request->boolean('boxing');
+
+                // Hitung subtotal
+                $subtotal = $boxing ? $harga : $jumlah * $harga;
+                $ndisc = round($subtotal * ($discPersen / 100), 0);
+                $dpp = round($subtotal - $ndisc, 0);
+                $nppn = round($dpp * ($ppnPersen / 100), 0);
+                $grand = round($dpp + $nppn, 0);
+
+                $bayar = (float) ($coolroom->BAYAR ?? 0);
+                if ($grand < $bayar) {
+                    throw new \Exception('Grand tidak boleh lebih kecil dari pembayaran yang sudah diterima');
+                }
+                $piutang = $grand - $bayar;
+
+                // Update coolroom
+                $coolroom->update([
+                    'BOXING'      => $boxing,
+                    'JUMLAH'      => $jumlah,
+                    'HARGA'       => $harga,
+                    'SUBTOTAL'    => $subtotal,
+                    'DISC'        => $discPersen,
+                    'NDISC'       => $ndisc,
+                    'DPP'         => $dpp,
+                    'PPN'         => $ppnPersen,
+                    'NPPN'        => $nppn,
+                    'TOTAL'       => $dpp,
+                    'GRAND'       => $grand,
+                    'PIUTANG'     => $piutang,
+                    'TGLJT'       => $request->tgl_jt,
+                    'KETERANGAN'  => $request->keterangan,
+                    'USEREDIT'    => auth()->user()->user_id
+                ]);
+
+                // Handle ARH
+                $arh = Arh::where('NOFAKTUR', $invoice)->first();
+                if ($piutang > 0) {
+                    if (!$arh) {
+                        Arh::create([
+                            'NOFAKTUR'   => $invoice,
+                            'TGLFAKTUR'  => $coolroom->TGLINVOICE,
+                            'TGLJT'      => $request->tgl_jt,
+                            'CUSTOMER'   => $coolroom->CUSTOMER,
+                            'PIUTANG'    => $piutang,
+                            'BAYAR'      => $bayar,
+                            'SALDO'      => $piutang,
+                            'KETERANGAN' => $request->keterangan,
+                            'USER'       => auth()->user()->user_id,
+                            'CABANG'     => $coolroom->area_id ?? ''
+                        ]);
+                    } else {
+                        $arh->update([
+                            'TGLJT'       => $request->tgl_jt,
+                            'PIUTANG'     => $piutang,
+                            'BAYAR'       => $bayar,
+                            'SALDO'       => $piutang,
+                            'KETERANGAN'  => $request->keterangan,
+                            'USER_UPDATE' => auth()->user()->user_id
+                        ]);
+                    }
+                } else {
+                    if ($arh) $arh->delete();
+                }
+
+                // Update kwitansi jika ada
+                $kwitansi = Kwitansi::where('FDOK_TRANS', $invoice)->first();
+                if ($kwitansi) {
+                    $kwitansi->update([
+                        'FNIL_DOK' => $grand,
+                        'TOTAL'    => $dpp,
+                        'PPN'      => $ppnPersen,
+                        'DISC'     => $discPersen,
+                        'NDISC'    => $ndisc
+                    ]);
+                }
+            });
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Invoice coolroom berhasil diperbarui'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
+
     private function generateInvoiceCoolroom(): string{
         $tahun = now()->format('Y');
         $last = Coolroom::where('INVOICE', 'like', "FCO{$tahun}%")

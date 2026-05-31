@@ -109,7 +109,7 @@ class CoolroomController extends Controller
                 $harga=(int)preg_replace('/[^0-9]/','',$request->harga);
                 $discPersen=(float)$request->disc;
                 $ppnPersen=(float)$request->ppn;
-                $boxing=$request->boxing ? true : false;
+                $boxing = $request->boolean('boxing');
                 // =====================
                 // SUBTOTAL
                 // =====================
@@ -221,7 +221,7 @@ class CoolroomController extends Controller
                 $harga=(int)preg_replace('/[^0-9]/','',$request->harga);
                 $discPersen=(float)$request->disc;
                 $ppnPersen=(float)$request->ppn;
-                $boxing=$request->boxing ? true : false;
+                $boxing = $request->boolean('boxing');
                 // =====================
                 // SUBTOTAL
                 // =====================

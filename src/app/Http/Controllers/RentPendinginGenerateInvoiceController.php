@@ -10,6 +10,7 @@ use App\Models\Rekening;
 use App\Models\Signature;
 use App\Models\Mcustomer;
 use App\Models\Arh;
+use App\Models\Kwitansi;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Log;
 use Mpdf\Mpdf;
@@ -360,10 +361,230 @@ class RentPendinginGenerateInvoiceController extends Controller
         }
     }
 
-    // ############## EDIT INVOICE
+    // ############## EDIT INVOICE ###################################
     public function indexEdit()
     {
         return view('rentPendinginInvoiceGen.rentPendingin-gen-edit');
+    }
+
+    public function tableEditRen(Request $request)
+    {
+        $query = Expedisi::select([
+                'INVOICE',
+                'TGLINVOICE',
+                'CUSTOMER',
+                'GRAND',
+                'PIUTANG',
+                'GB',
+                'TGLJT',
+                'KETERANGAN'
+            ])
+            ->where('JENIS', 'REN')
+            ->whereNotNull('INVOICE')
+            ->where('INVOICE', '!=', '')
+            ->where('GRAND', '>', 0)
+            ->orderByDesc('TGLINVOICE')
+            ->orderByDesc('INVOICE');
+
+        if ($request->tanggal_dari) {
+            $query->whereDate(
+                'TGLINVOICE',
+                '>=',
+                $request->tanggal_dari
+            );
+        }
+
+        if ($request->tanggal_sampai) {
+            $query->whereDate(
+                'TGLINVOICE',
+                '<=',
+                $request->tanggal_sampai
+            );
+        }
+
+        return DataTables::of($query)
+
+            ->addIndexColumn()
+
+            ->editColumn('TGLINVOICE', function ($row) {
+                return $row->TGLINVOICE
+                    ? Carbon::parse($row->TGLINVOICE)->format('d-m-Y')
+                    : '-';
+            })
+
+            ->editColumn('GRAND', function ($row) {
+                return number_format(
+                    $row->GRAND ?? 0,
+                    0,
+                    ',',
+                    '.'
+                );
+            })
+
+            ->editColumn('PIUTANG', function ($row) {
+                return number_format(
+                    $row->PIUTANG ?? 0,
+                    0,
+                    ',',
+                    '.'
+                );
+            })
+
+            ->addColumn('bayar', function ($row) {
+
+                $bayar =
+                    ($row->GRAND ?? 0)
+                    -
+                    ($row->PIUTANG ?? 0);
+
+                return number_format(
+                    $bayar,
+                    0,
+                    ',',
+                    '.'
+                );
+            })
+
+            ->addColumn('aksi', function ($row) {
+
+                return '
+                    <button
+                        class="btn btn-warning btn-sm btn_edit_invoice_ren"
+                        data-invoice="' . $row->INVOICE . '">
+                        <i class="bx bx-edit-alt"></i>
+                    </button>
+                ';
+            })
+
+            ->rawColumns(['aksi'])
+
+            ->make(true);
+    }
+
+    public function showEditInvoiceRen($invoice)
+    {
+        $row = Expedisi::where('INVOICE', $invoice)->where('JENIS', 'REN')->first();
+        if (!$row) {
+            return response()->json(['status' => false, 'message' => 'Invoice tidak ditemukan']);
+        }
+        $arh = Arh::where('NOFAKTUR', $row->INVOICE)->first();
+        return response()->json([
+            'status' => true,
+            'master' => [
+                'invoice'     => $row->INVOICE,
+                'customer'    => $row->CUSTOMER,
+                'kendaraan'   => $row->NAMA_KENDARAAN ?? '',
+                'driver'      => $row->DRIVER ?? '',
+                'nomuat'      => $row->NOMUAT ?? '',
+                'tgl_invoice' => $row->TGLINVOICE,
+                'tgl_jt'      => $arh->TGLJT ?? $row->TGLJT,
+                'rute'        => $row->rute ?? '',
+                'jumlah'      => $row->JUMLAH ?? 0,
+                'harga'       => $row->HARGA ?? 0,
+                'subtotal'    => ($row->JUMLAH ?? 0) * ($row->HARGA ?? 0),
+                'diskon'      => $row->DISC ?? 0,
+                'total'       => $row->TOTAL ?? 0,
+                'del_charge'  => $row->DC ?? 0,
+                'ppn'         => $row->PPN ?? 0,
+                'grand'       => $row->GRAND ?? 0,
+                'bayar'       => $row->BAYAR ?? 0,
+                'piutang'     => ($row->GRAND ?? 0) - ($row->BAYAR ?? 0),
+                'keterangan'  => $row->KETERANGAN ?? ''
+            ]
+        ]);
+    }
+
+    public function updateEditInvoiceRen(Request $request)
+    {
+        try {
+            DB::transaction(function () use ($request) {
+                $invoice = $request->invoice;
+                if (!$invoice) {
+                    throw new \Exception('Invoice tidak ditemukan');
+                }
+
+                $row = Expedisi::where('INVOICE', $invoice)->where('JENIS', 'REN')->first();
+                if (!$row) {
+                    throw new \Exception('Data invoice tidak ditemukan');
+                }
+
+                $harga = (float) $request->harga;
+                $discPersen = (float) ($request->disc ?? 0);
+                $delCharge = (float) ($request->del_charge ?? 0);
+                $ppnPersen = (float) ($request->ppn ?? 0);
+                $jumlah = (float) ($request->jumlah ?? 0);
+
+                $subTotal = $jumlah * $harga;
+                $ndisc = round($subTotal * ($discPersen / 100), 0);
+                $total = round($subTotal - $ndisc, 0);
+                $ppnNominal = round($total * ($ppnPersen / 100), 0);
+                $grand = round($total + $ppnNominal + $delCharge, 0);
+
+                $bayar = (float) ($row->BAYAR ?? 0);
+                if ($grand < $bayar) {
+                    throw new \Exception('Grand tidak boleh lebih kecil dari pembayaran yang sudah diterima');
+                }
+                $piutang = $grand - $bayar;
+
+                $row->update([
+                    'JUMLAH'      => $jumlah,
+                    'HARGA'       => $harga,
+                    'DISC'        => $discPersen,
+                    'NDISC'       => $ndisc,
+                    'DC'          => $delCharge,
+                    'TOTAL'       => $total,
+                    'PPN'         => $ppnPersen,
+                    'GRAND'       => $grand,
+                    'PIUTANG'     => $piutang,
+                    'TGLJT'       => $request->tgl_jt,
+                    'KETERANGAN'  => $request->keterangan,
+                    'updated_at'  => now()
+                ]);
+
+                $arh = Arh::where('NOFAKTUR', $invoice)->first();
+                if ($piutang > 0) {
+                    if (!$arh) {
+                        Arh::create([
+                            'NOFAKTUR'   => $invoice,
+                            'TGLFAKTUR'  => $row->TGLINVOICE,
+                            'TGLJT'      => $request->tgl_jt,
+                            'CUSTOMER'   => $row->CUSTOMER,
+                            'PIUTANG'    => $piutang,
+                            'BAYAR'      => $bayar,
+                            'SALDO'      => $piutang,
+                            'KETERANGAN' => $request->keterangan,
+                            'USER'       => auth()->user()->name ?? 'SYSTEM',
+                            'CABANG'     => $row->area_id ?? ''
+                        ]);
+                    } else {
+                        $arh->update([
+                            'TGLJT'       => $request->tgl_jt,
+                            'PIUTANG'     => $piutang,
+                            'BAYAR'       => $bayar,
+                            'SALDO'       => $piutang,
+                            'KETERANGAN'  => $request->keterangan,
+                            'USER_UPDATE' => auth()->user()->name ?? 'SYSTEM'
+                        ]);
+                    }
+                } else {
+                    if ($arh) $arh->delete();
+                }
+
+                $kwitansi = Kwitansi::where('FDOK_TRANS', $invoice)->first();
+                if ($kwitansi) {
+                    $kwitansi->update([
+                        'TOTAL' => $grand,
+                        'PPN'   => $ppnPersen,
+                        'DISC'  => $discPersen,
+                        'NDISC' => $ndisc
+                    ]);
+                }
+            });
+
+            return response()->json(['success' => true, 'message' => 'Invoice rental berhasil diperbarui']);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+        }
     }
 
     private function generateInvoiceOnline(): string{

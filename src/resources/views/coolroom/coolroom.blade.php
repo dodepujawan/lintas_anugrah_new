@@ -47,7 +47,7 @@
         </div>
 
         <div class="card-body p-3">
-            <input type="text" id="coolroom_id">
+            <input type="hidden" id="coolroom_id">
             <div class="row g-3">
                 {{-- LEFT --}}
                 <div class="col-lg-6">
@@ -457,8 +457,12 @@ $(document).ready(function() {
     }
 // =================================== End Of Pajak PPN ==================================
 // =================================== Submit Coolroom ==================================
+
     $('#proses_coolroom').on('click',function(e){
         e.preventDefault();
+        console.log(
+            $('#boxing_coolroom').is(':checked')
+        );
         let id=$('#coolroom_id').val();
         let url=id ? "{{ route('coolroom.update',['id'=>'__id__']) }}".replace('__id__',id) : "{{ route('coolroom.store') }}";
         $('#loading_modal').modal('show');
