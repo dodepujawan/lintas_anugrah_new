@@ -19,7 +19,7 @@ return new class extends Migration
         $table->bigIncrements('id');
 
         // PRIMARY KEY LAMA FOXPRO
-        $table->string('CUSTOMER', 30)->nullable();
+        $table->string('CUSTOMER', 30)->nullable()->unique();
         $table->string('kode_cus', 30)->nullable()->unique(); // alias modern
 
         // DATA UTAMA

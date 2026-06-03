@@ -49,15 +49,27 @@ class CustomerController extends Controller
 
     public function customer_store(Request $request)
     {
+        $request->merge([
+            'CUSTOMER' => strtoupper(trim($request->CUSTOMER))
+        ]);
         $request->validate([
             'nama' => 'required',
+            'CUSTOMER' => [
+                'required',
+                'string',
+                'min:5',
+                'max:50',
+                'regex:/^[A-Z0-9\-]+$/',
+                'unique:mcustomer,CUSTOMER',
+            ],
         ]);
+        $customerValue = $request->CUSTOMER;
         try {
             $kode_cus = $this->customer_kode_store();
             Mcustomer::create([
                 // mapping modern → legacy
                 'kode_cus'   => $kode_cus,
-                'CUSTOMER'   => $request->jenis_usaha, // atau generator FoxPro
+                'CUSTOMER'   => $customerValue,
                 'NAMACUST'   => $request->nama,
                 'ALAMAT1'    => $request->alamat,
                 'KOTA'       => $request->kota ?? '',
@@ -221,7 +233,7 @@ class CustomerController extends Controller
         try {
             // Mapping fields sama seperti store
             $customer->update([
-                'CUSTOMER'   => $request->jenis_usaha,
+                // 'CUSTOMER'   => $request->jenis_usaha,
                 'NAMACUST'   => $request->nama,
                 'ALAMAT1'    => $request->alamat ?? '',
                 'KOTA'       => $request->kota ?? '',
