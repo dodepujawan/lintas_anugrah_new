@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 use App\Models\Prices;
 use App\Models\Pricecushis;
+use App\Models\Pricecus;
+use App\Models\Mcustomer;
 use Illuminate\Http\Request;
 use DataTables;
 use Illuminate\Support\Facades\Auth;
@@ -51,11 +53,12 @@ class PricesController extends Controller
                             <button onclick="editData('.$row->id.')" class="btn btn-sm btn-warning">
                                 <i class="bx bx-edit"></i>
                             </button>
-                            <button onclick="deleteData('.$row->id.')" class="btn btn-sm btn-danger">
-                                <i class="bx bx-trash"></i>
-                            </button>
+
                         </div>
                     ';
+                    // <button onclick="deleteData('.$row->id.')" class="btn btn-sm btn-danger">
+                    //      <i class="bx bx-trash"></i>
+                    // </button>
                 })
 
                 ->rawColumns(['action'])
@@ -82,6 +85,7 @@ class PricesController extends Controller
 
         $Prices = Prices::create([
             'KODE' => $kode,
+            'TANGGAL' => now()->toDateString(),
             'KETERANGAN' => $request->keterangan_price,
             'DARI' => $request->dari_price,
             'SAMPAI' => $request->sampai_price,
@@ -97,6 +101,31 @@ class PricesController extends Controller
             'HG' => 0,
         ]);
 
+        $customers = Mcustomer::select('CUSTOMER')->get();
+        $data = [];
+        foreach ($customers as $customer) {
+            $data[] = [
+                'KODECUS' => $customer->CUSTOMER,
+                'KODE' => $Prices->id,
+                'TANGGAL' => $Prices->TANGGAL,
+                'KETERANGAN' => $Prices->KETERANGAN,
+                'DARI' => $Prices->DARI,
+                'SAMPAI' => $Prices->SAMPAI,
+                'RUTE' => $Prices->RUTE,
+                'HARGA' => $Prices->HARGA,
+                'HV' => $Prices->HV,
+                'HKG' => $Prices->HKG,
+                'HBOK' => $Prices->HBOK,
+                'USER' => $Prices->USER,
+                'USEREDIT' => $Prices->USEREDIT,
+                'KUNCI' => $Prices->KUNCI,
+                'HG' => $Prices->HG,
+                'JENIS' => $Prices->JENIS,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ];
+        }
+        Pricecus::insert($data);
         return response()->json([
             'success' => true,
             'message' => 'Data berhasil disimpan',
@@ -147,30 +176,6 @@ class PricesController extends Controller
         $old = Prices::findOrFail($id);
 
         /**
-         * 1️⃣ SIMPAN KE TABLE HISTORY / PRICECUS
-         *
-         * Hanya contoh: jika kamu memakai tabel pricecus
-         * sesuaikan field-nya dengan tabelmu
-         */
-        Pricecushis::create([
-            'KODE'        => $old->KODE,              // kode lama PRCxxxx
-            'KETERANGAN'  => $old->KETERANGAN,
-            'DARI'        => $old->DARI,
-            'SAMPAI'      => $old->SAMPAI,
-            'RUTE'        => $old->RUTE,
-            'HARGA'       => $old->HARGA,
-            'HV'          => $old->HV,
-            'HKG'         => $old->HKG,
-            'HBOK'        => $old->HBOK,
-            'JENIS'       => $old->JENIS,
-            'USER'        => $old->USER,
-            'USEREDIT'    => $old->USEREDIT,
-            'KUNCI'       => $old->KUNCI,
-            'HG'          => $old->HG,
-        ]);
-
-
-        /**
          * 2️⃣ UPDATE DATA BARU DI TABLE PRICES
          */
         $old->update([
@@ -191,7 +196,7 @@ class PricesController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Data berhasil diupdate dan history tersimpan',
+            'message' => 'Data berhasil diupdate',
             'data' => $old
         ]);
     }

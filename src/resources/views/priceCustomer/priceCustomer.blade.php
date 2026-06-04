@@ -101,6 +101,11 @@
 
                     {{-- View Table Detail Cust --}}
                     <div id="priceCusTableDetMaster" style="display:none;">
+                        <div class="col-12 d-flex justify-content-start">
+                            <button class="btn btn-link text-decoration-none p-0" id="returnPrcCusBtn" style="color: #107af3;">
+                                <i class='bx bx-chevron-left'></i> Kembali ke Daftar
+                            </button>
+                        </div>
                         <div id="customerInfo" class="card shadow-sm p-3" style="display:none;">
                             <h5 class="mb-3">
                                 <i class="bx bx-user"></i> Informasi Customer
@@ -131,7 +136,10 @@
                         <div class="card mt-3">
                             <div class="card-body">
                                 <div class="d-flex justify-content-end">
-                                    <button class="btn btn-primary" id="add_rute_customer">
+                                    <button class="btn btn-success" id="update_rute_customer">
+                                        + Update Harga Rute
+                                    </button>
+                                    <button class="btn btn-primary" id="add_rute_customer" hidden disabled>
                                         + Tambah Harga Rute
                                     </button>
                                 </div>
@@ -337,7 +345,7 @@ $(document).ready(function() {
         autoWidth: true,
         columns: [
             { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false },
-            { data: 'kode_cus', name: 'kode_cus' },
+            { data: 'CUSTOMER', name: 'CUSTOMER' },
             { data: 'NAMACUST', name: 'NAMACUST' },
             { data: 'TYPECUST', name: 'TYPECUST' },
             { data: 'TELEPON', name: 'TELEPON' },
@@ -393,6 +401,68 @@ $(document).ready(function() {
 
     });
     // ======================== End Of Initialize DataTables Detail Cus ==============================
+    // =============================== Return Table Price Dingin Cus =====================================
+    $('#returnPrcCusBtn').on('click', function () {
+        $("#custName").text('');
+        $("#custKode").text('');
+        $("#jenisUsaha").text('');
+        $("#alamat").text('');
+        $("#pemilikNama").text('');
+        // reload table
+        $('#priceCusTableDet').DataTable().clear().draw();
+
+        // reset form
+        resetFormCus();
+        $("#priceCusTableDetMaster").hide();
+        $("#priceCusTableMaster").show();
+
+        $('#priceCusTable').DataTable().ajax.reload();
+    });
+    // ============================ End Of Return Table Dingin Cus ==================================
+    // ========================= Update All Harga Customer Click ================================
+    $('#update_rute_customer').click(function () {
+        let kodecus = $('#custKode').text();
+        Swal.fire({
+            title: 'Update Harga Customer?',
+            text: 'Harga baru yang belum ada akan ditambahkan ke customer ini.',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Ya, Update',
+            cancelButtonText: 'Batal',
+            reverseButtons: true
+        }).then((result) => {
+            if (!result.isConfirmed) {
+                return;
+            }
+            $('#loading_modal').modal('show');
+            $('#loading_modal').one('shown.bs.modal', function () {
+                $.post('{{ route("price-customer.update-all") }}', {
+                    _token: $('meta[name="csrf-token"]').attr('content'),
+                    kodecus: kodecus
+                }, function (res) {
+                    $('#loading_modal').modal('hide');
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Berhasil',
+                        text: res.message,
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                    $('#priceCusTableDet').DataTable().ajax.reload();
+                }).fail(function(xhr){
+                    $('#loading_modal').modal('hide');
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Gagal',
+                        text: xhr.responseJSON?.message ?? 'Terjadi kesalahan.'
+                    });
+
+                });
+            });
+        });
+
+    });
+    // ========================= End Of Update All Harga Customer Click ================================
     // ================================ Update Row Cust ========================================
     $(document).on("click", ".save-price", function() {
         let btn = $(this);
@@ -422,25 +492,29 @@ $(document).ready(function() {
                 hargaCell.text(original);
                 return;
             }
-
-            $.ajax({
-                url: "{{ route('price-customer.update-row') }}",
-                method: "POST",
-                data: {
-                    kode: kode,
-                    kodecus: kodecus,
-                    harga: hargaBaru,
-                    _token: "{{ csrf_token() }}"
-                },
-                success: function(res) {
-                    Swal.fire("Berhasil", res.message, "success");
-                    btn.data("original", hargaBaru);
-                    hargaCell.attr("data-original", hargaBaru);
-                },
-                error: function() {
-                    Swal.fire("Error", "Gagal update harga!", "error");
-                    hargaCell.text(original);
-                }
+            $('#loading_modal').modal('show');
+            $('#loading_modal').one('shown.bs.modal', function () {
+                $.ajax({
+                    url: "{{ route('price-customer.update-row') }}",
+                    method: "POST",
+                    data: {
+                        kode: kode,
+                        kodecus: kodecus,
+                        harga: hargaBaru,
+                        _token: "{{ csrf_token() }}"
+                    },
+                    success: function(res) {
+                        $('#loading_modal').modal('hide');
+                        Swal.fire("Berhasil", res.message, "success");
+                        btn.data("original", hargaBaru);
+                        hargaCell.attr("data-original", hargaBaru);
+                    },
+                    error: function() {
+                        $('#loading_modal').modal('hide');
+                        Swal.fire("Error", "Gagal update harga!", "error");
+                        hargaCell.text(original);
+                    }
+                });
             });
         });
     });

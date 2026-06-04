@@ -343,46 +343,49 @@ $(document).ready(function(){
         };
 
         var url = $('#pricePendinginId').val() ? '{{ route("price-rent.update", ["id" => ":id"]) }}'.replace(':id', $('#pricePendinginId').val()) : '{{ route("price-rent.store") }}';
+        $('#loading_modal').modal('show');
+        $('#loading_modal').one('shown.bs.modal', function () {
+            // AJAX request
+            $.ajax({
+                url: url,
+                type: 'POST',
+                data: formData,
+                success: function(response) {
+                    $('#loading_modal').modal('hide');
+                    // Tampilkan notifikasi sukses
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Berhasil!',
+                        text: 'Kode ID :' + response.data.KODEDGN,
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                    resetFormDingin();
+                    $('#formDinginContainer').hide();
+                    $('#master_table_price_dingin').show();
+                    $('#pricedinginTable').DataTable().ajax.reload();
+                },
+                error: function(xhr) {
+                    $('#loading_modal').modal('hide');
+                    // Tampilkan error
+                    var errors = xhr.responseJSON?.errors;
+                    var errorMessage = 'Terjadi kesalahan saat menyimpan data.';
 
-        // AJAX request
-        $.ajax({
-            url: url,
-            type: 'POST',
-            data: formData,
-            success: function(response) {
-                // Tampilkan notifikasi sukses
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Berhasil!',
-                    text: 'Kode ID :' + response.data.KODEDGN,
-                    timer: 2000,
-                    showConfirmButton: false
-                });
-                resetFormDingin();
-                $('#formDinginContainer').hide();
-                $('#master_table_price_dingin').show();
-                $('#pricedinginTable').DataTable().ajax.reload();
-            },
-            error: function(xhr) {
+                    if (errors) {
+                        errorMessage = '';
+                        $.each(errors, function(key, value) {
+                            errorMessage += value[0] + '\n';
+                        });
+                    }
 
-                // Tampilkan error
-                var errors = xhr.responseJSON?.errors;
-                var errorMessage = 'Terjadi kesalahan saat menyimpan data.';
-
-                if (errors) {
-                    errorMessage = '';
-                    $.each(errors, function(key, value) {
-                        errorMessage += value[0] + '\n';
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Gagal!',
+                        text: errorMessage,
+                        confirmButtonText: 'OK'
                     });
                 }
-
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Gagal!',
-                    text: errorMessage,
-                    confirmButtonText: 'OK'
-                });
-            }
+            });
         });
     });
     // ======================= End Of Submit form pricedingin ===================================

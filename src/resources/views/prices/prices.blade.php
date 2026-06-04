@@ -317,37 +317,41 @@ $(document).ready(function() {
 
         var formData = new FormData(this);
         var url = $('#priceId').val() ? '{{ route("price-expedition.update", ["id" => ":id"]) }}'.replace(':id', $('#priceId').val()) : '{{ route("price-expedition.store") }}';
+        $('#loading_modal').modal('show');
+        $('#loading_modal').one('shown.bs.modal', function () {
+            $.ajax({
+                url: url,
+                method: 'POST',
+                data: formData,
+                processData: false,   // WAJIB
+                contentType: false,   // WAJIB
+                success: function(response) {
+                    if (response.success) {
+                        $('#loading_modal').modal('hide');
+                        Swal.fire('Sukses!', response.message, 'success');
+                        $('#formContainer').hide();
+                        resetForm();
+                        $('#master_table_price').show();
+                        $('#priceTable').DataTable().ajax.reload();
+                    }
+                },
+                error: function(xhr) {
+                    var errors = xhr.responseJSON.errors;
+                    if (errors) {
+                        $('#loading_modal').modal('hide');
+                        // Clear previous errors
+                        $('.is-invalid').removeClass('is-invalid');
+                        $('.invalid-feedback').remove();
 
-        $.ajax({
-            url: url,
-            method: 'POST',
-            data: formData,
-            processData: false,   // WAJIB
-            contentType: false,   // WAJIB
-            success: function(response) {
-                if (response.success) {
-                    Swal.fire('Sukses!', response.message, 'success');
-                    $('#formContainer').hide();
-                    resetForm();
-                    $('#master_table_price').show();
-                    $('#priceTable').DataTable().ajax.reload();
+                        // Display new errors
+                        $.each(errors, function(field, messages) {
+                            var input = $('[name="' + field + '"]');
+                            input.addClass('is-invalid');
+                            input.after('<div class="invalid-feedback">' + messages[0] + '</div>');
+                        });
+                    }
                 }
-            },
-            error: function(xhr) {
-                var errors = xhr.responseJSON.errors;
-                if (errors) {
-                    // Clear previous errors
-                    $('.is-invalid').removeClass('is-invalid');
-                    $('.invalid-feedback').remove();
-
-                    // Display new errors
-                    $.each(errors, function(field, messages) {
-                        var input = $('[name="' + field + '"]');
-                        input.addClass('is-invalid');
-                        input.after('<div class="invalid-feedback">' + messages[0] + '</div>');
-                    });
-                }
-            }
+            });
         });
     });
     // ========================= End Of Form Prices submission ==================================

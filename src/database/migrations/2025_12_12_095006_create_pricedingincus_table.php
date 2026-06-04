@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('pricedingincus', function (Blueprint $table) {
             $table->id();
-            $table->string('KODECUS', 50);
-            $table->string('KODEDGN', 50);
+            $table->string('KODECUS', 50); // beisi field CUSTOMER di table mcustomer
+            $table->string('KODEDGN', 50); // berisi field id di pricceedingn
             $table->date('TANGGAL')->nullable();
             $table->string('KODE', 20);
             $table->string('PERIODE', 50);

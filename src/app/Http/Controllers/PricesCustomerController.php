@@ -19,14 +19,14 @@ class PricesCustomerController extends Controller
     }
 
     public function getData(){
-        $customers = Mcustomer::select(['id', 'kode_cus', 'NAMACUST', 'TYPECUST', 'TELEPON', 'EMAIL', 'created_at']);
+        $customers = Mcustomer::select(['id', 'CUSTOMER', 'kode_cus', 'NAMACUST', 'TYPECUST', 'TELEPON', 'EMAIL', 'created_at']);
 
         return DataTables::of($customers)
             ->addIndexColumn()
             ->addColumn('action', function($customer) {
                 return '
                     <div class="btn-group">
-                        <button class="btn btn-sm btn-info view-btn-customer-price" id="show_price_cus" data-id="'.$customer->kode_cus.'" data-bs-toggle="tooltip" title="View">
+                        <button class="btn btn-sm btn-info view-btn-customer-price" id="show_price_cus" data-id="'.$customer->CUSTOMER.'" data-bs-toggle="tooltip" title="View">
                             <i class="bx bx-show"></i>
                         </button>
                     </div>
@@ -36,111 +36,40 @@ class PricesCustomerController extends Controller
             ->make(true);
     }
 
-    public function getPrice(Request $request, $kodecus){
-        // Ambil data customer
-        $customer = DB::table('mcustomer as c')
-            ->where('c.kode_cus', $kodecus)
+    public function getPrice(Request $request, $kodecus)
+    {
+        $customer = DB::table('mcustomer')
+            ->where('CUSTOMER', $kodecus)
             ->first();
 
-        // Siapkan metadata customer
         $customerData = [
-            'customer_kode' => $customer->kode_cus ?? null,
+            'customer_kode' => $customer->CUSTOMER ?? null,
             'customer_nama' => $customer->NAMACUST ?? null,
             'jenis_usaha'   => $customer->TYPECUST ?? null,
             'alamat'        => $customer->ALAMAT1 ?? null,
             'pemilik_nama'  => $customer->nama_p ?? null,
         ];
 
-        // Jika customer tidak ditemukan → return kosong tapi metadata tetap ada
         if (!$customer) {
             return DataTables::of(collect([]))
                 ->with($customerData)
                 ->make(true);
         }
 
-        $customerCreatedAt = $customer->created_at;
-        $final = collect();
-
-
-        // ============================================================
-        // 1️⃣ PRIORITAS PRICECUS (punya KODECUS asli)
-        // ============================================================
-
         $pricecus = DB::table('pricecus as pc')
             ->select('pc.*', 'pc.RUTE as nama_rute')
             ->where('pc.KODECUS', $kodecus)
             ->get();
 
-        foreach ($pricecus as $pc) {
-            $pc->source = 'pricecus';
-            // pc sudah punya KODECUS bawaan → aman
-            $final->push($pc);
-        }
-
-        $usedCodes = $pricecus->pluck('KODE')->toArray();
-
-
-
-        // ============================================================
-        // 2️⃣ PRIORITAS PRICECUSHIS (HARUS ditambah KODECUS)
-        // ============================================================
-
-        $allCodes = DB::table('prices')->pluck('KODE')->unique();
-
-        foreach ($allCodes as $kd) {
-
-            if (in_array($kd, $usedCodes)) continue;
-
-            $his = DB::table('pricecushis as ph')
-                ->select('ph.*', 'ph.RUTE as nama_rute')
-                ->where('ph.KODE', $kd)
-                ->where('ph.created_at', '>=', $customerCreatedAt)
-                ->orderBy('ph.created_at', 'asc')
-                ->first();
-
-            if ($his) {
-                $his->source = 'pricecushis';
-                $his->KODECUS = $kodecus; // FIX WAJIB
-                $final->push($his);
-                $usedCodes[] = $kd;
-            }
-        }
-
-
-
-        // ============================================================
-        // 3️⃣ DEFAULT PRICES (HARUS ditambah KODECUS)
-        // ============================================================
-
-        foreach ($allCodes as $kd) {
-
-            if (in_array($kd, $usedCodes)) continue;
-
-            $default = DB::table('prices as p')
-                ->select('p.*', 'p.RUTE as nama_rute')
-                ->where('p.KODE', $kd)
-                ->first();
-
-            if ($default) {
-                $default->source = 'prices';
-                $default->KODECUS = $kodecus; // FIX WAJIB
-                $final->push($default);
-                $usedCodes[] = $kd;
-            }
-        }
-
-
-
-        // ============================================================
-        // RETURN KE DATATABLES
-        // ============================================================
-
-        return DataTables::of($final)
+        return DataTables::of($pricecus)
             ->addIndexColumn()
+
             ->with($customerData)
+
             ->addColumn('jenis_text', function ($row) {
                 return $row->JENIS == 1 ? 'Eceran' : 'Booking';
             })
+
             ->addColumn('harga_html', function ($row) {
                 return '<span class="editable-price"
                     contenteditable="true"
@@ -148,94 +77,105 @@ class PricesCustomerController extends Controller
                     data-kode="'.$row->KODE.'"
                     data-kodecus="'.$row->KODECUS.'"
                     style="background:#fff7d1; padding:6px; border-radius:4px;">
-                    '.$row->HARGA.'</span>';
+                    '.$row->HARGA.'
+                </span>';
             })
+
             ->addColumn('aksi', function ($row) {
                 return '<button class="btn btn-success btn-sm save-price"
                     data-id="'.$row->id.'"
                     data-kode="'.$row->KODE.'"
-                    data-source="'.$row->source.'"
                     data-original="'.$row->HARGA.'">
-                    <i class="bx bx-save"></i></button>';
+                    <i class="bx bx-save"></i>
+                </button>';
             })
+
             ->rawColumns(['harga_html', 'aksi'])
             ->make(true);
     }
 
-    public function saveCustomerRow(Request $request){
-        $request->validate([
-            'kode' => 'required|string',
-            'harga' => 'required|numeric',
-            'kodecus' => 'required|string',
-        ]);
-
-        $kode = $request->kode;
-        $hargaBaru = $request->harga;
+    public function updateHargaRuteCustomer(Request $request)
+    {
         $kodecus = $request->kodecus;
 
-        // 1. Cek apakah kode sudah ada di pricecus
-        $existing = Pricecus::where('KODE', $kode)
-                            ->where('KODECUS', $kodecus)
-                            ->first();
+        $existingKode = Pricecus::where('KODECUS', $kodecus)
+            ->pluck('KODE')
+            ->toArray();
 
-        if ($existing) {
-            // -------------------------
-            //   UPDATE HARGA SAJA
-            // -------------------------
-            $existing->update([
-                'HARGA' => $hargaBaru,
-                'USEREDIT' => Auth::check() ? Auth::user()->user_id : 'System',
-            ]);
+        $newPrices = Prices::whereNotIn('id', $existingKode)
+            ->get();
 
+        if ($newPrices->isEmpty()) {
             return response()->json([
                 'success' => true,
-                'message' => 'Harga berhasil diupdate untuk customer ini'
+                'message' => 'Tidak ada harga baru'
             ]);
         }
 
-        // -------------------------
-        //   INSERT BARU
-        // -------------------------
+        $insertData = [];
 
-        // Ambil data dari harga umum
-        $price = Prices::where('KODE', $kode)->first();
-
-        if (!$price) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Kode harga tidak ditemukan di tabel Prices'
-            ]);
+        foreach ($newPrices as $price) {
+            $insertData[] = [
+                'KODECUS'   => $kodecus,
+                'KODE'      => $price->id,
+                'TANGGAL'   => $price->TANGGAL,
+                'KETERANGAN'=> $price->KETERANGAN,
+                'DARI'      => $price->DARI,
+                'SAMPAI'    => $price->SAMPAI,
+                'RUTE'      => $price->RUTE,
+                'HARGA'     => $price->HARGA,
+                'HV'        => $price->HV,
+                'HKG'       => $price->HKG,
+                'HBOK'      => $price->HBOK,
+                'USER'      => $price->USER,
+                'USEREDIT'  => $price->USEREDIT,
+                'KUNCI'     => $price->KUNCI,
+                'HG'        => $price->HG,
+                'JENIS'     => $price->JENIS,
+                'created_at'=> now(),
+                'updated_at'=> now(),
+            ];
         }
 
-        // Buat insert ke pricecus
-        Pricecus::create([
-            'KODECUS' => $kodecus,
-            'KODE' => $price->KODE,
-            'KETERANGAN' => $price->KETERANGAN,
-            'DARI' => $price->DARI,
-            'SAMPAI' => $price->SAMPAI,
-            'RUTE' => $price->RUTE,
-
-            // Harga khusus customer
-            'HARGA' => $hargaBaru,
-
-            'HV' => $price->HV,
-            'HKG' => $price->HKG,
-            'HBOK' => $price->HBOK,
-            'JENIS' => $price->JENIS,
-            'KUNCI' => $price->KUNCI,
-            'HG' => $price->HG,
-
-            'USER' => Auth::check() ? Auth::user()->user_id : 'System',
-            'USEREDIT' => Auth::check() ? Auth::user()->user_id : 'System',
-        ]);
+        Pricecus::insert($insertData);
 
         return response()->json([
             'success' => true,
-            'message' => 'Harga khusus customer berhasil ditambahkan'
+            'message' => count($insertData).' harga baru berhasil ditambahkan'
         ]);
     }
 
+    public function saveCustomerRow(Request $request)
+    {
+        $request->validate([
+            'kode' => 'required',
+            'harga' => 'required|numeric',
+            'kodecus' => 'required',
+        ]);
+
+        $updated = Pricecus::where('KODE', $request->kode)
+            ->where('KODECUS', $request->kodecus)
+            ->update([
+                'HARGA' => $request->harga,
+                'USEREDIT' => Auth::check()
+                    ? Auth::user()->user_id
+                    : 'System',
+            ]);
+
+        if (!$updated) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Data harga customer tidak ditemukan'
+            ], 404);
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Harga berhasil diupdate'
+        ]);
+    }
+
+    // ############################ gak diakai lagi karna fungsi simpan harga baru sudah gak dipakai #############
     public function store(Request $request)
     {
         $request->validate([
@@ -409,3 +349,205 @@ class PricesCustomerController extends Controller
     }
 
 }
+
+// ############ get price yang lama ##################
+// public function getPrice(Request $request, $kodecus){
+    //     // Ambil data customer
+    //     $customer = DB::table('mcustomer as c')
+    //         ->where('c.CUSTOMER', $kodecus)
+    //         ->first();
+
+    //     // Siapkan metadata customer
+    //     $customerData = [
+    //         'customer_kode' => $customer->CUSTOMER ?? null,
+    //         'customer_nama' => $customer->NAMACUST ?? null,
+    //         'jenis_usaha'   => $customer->TYPECUST ?? null,
+    //         'alamat'        => $customer->ALAMAT1 ?? null,
+    //         'pemilik_nama'  => $customer->nama_p ?? null,
+    //     ];
+
+    //     // Jika customer tidak ditemukan → return kosong tapi metadata tetap ada
+    //     if (!$customer) {
+    //         return DataTables::of(collect([]))
+    //             ->with($customerData)
+    //             ->make(true);
+    //     }
+
+    //     $customerCreatedAt = $customer->created_at;
+    //     $final = collect();
+
+
+    //     // ============================================================
+    //     // 1️⃣ PRIORITAS PRICECUS (punya KODECUS asli)
+    //     // ============================================================
+
+    //     $pricecus = DB::table('pricecus as pc')
+    //         ->select('pc.*', 'pc.RUTE as nama_rute')
+    //         ->where('pc.KODECUS', $kodecus)
+    //         ->get();
+
+    //     foreach ($pricecus as $pc) {
+    //         $pc->source = 'pricecus';
+    //         // pc sudah punya KODECUS bawaan → aman
+    //         $final->push($pc);
+    //     }
+
+    //     $usedCodes = $pricecus->pluck('KODE')->toArray();
+
+
+
+    //     // ============================================================
+    //     // 2️⃣ PRIORITAS PRICECUSHIS (HARUS ditambah KODECUS)
+    //     // ============================================================
+
+    //     $allCodes = DB::table('prices')->pluck('KODE')->unique();
+
+    //     foreach ($allCodes as $kd) {
+
+    //         if (in_array($kd, $usedCodes)) continue;
+
+    //         $his = DB::table('pricecushis as ph')
+    //             ->select('ph.*', 'ph.RUTE as nama_rute')
+    //             ->where('ph.KODE', $kd)
+    //             ->where('ph.created_at', '>=', $customerCreatedAt)
+    //             ->orderBy('ph.created_at', 'asc')
+    //             ->first();
+
+    //         if ($his) {
+    //             $his->source = 'pricecushis';
+    //             $his->KODECUS = $kodecus; // FIX WAJIB
+    //             $final->push($his);
+    //             $usedCodes[] = $kd;
+    //         }
+    //     }
+
+
+
+    //     // ============================================================
+    //     // 3️⃣ DEFAULT PRICES (HARUS ditambah KODECUS)
+    //     // ============================================================
+
+    //     foreach ($allCodes as $kd) {
+
+    //         if (in_array($kd, $usedCodes)) continue;
+
+    //         $default = DB::table('prices as p')
+    //             ->select('p.*', 'p.RUTE as nama_rute')
+    //             ->where('p.KODE', $kd)
+    //             ->first();
+
+    //         if ($default) {
+    //             $default->source = 'prices';
+    //             $default->KODECUS = $kodecus; // FIX WAJIB
+    //             $final->push($default);
+    //             $usedCodes[] = $kd;
+    //         }
+    //     }
+
+
+
+    //     // ============================================================
+    //     // RETURN KE DATATABLES
+    //     // ============================================================
+
+    //     return DataTables::of($final)
+    //         ->addIndexColumn()
+    //         ->with($customerData)
+    //         ->addColumn('jenis_text', function ($row) {
+    //             return $row->JENIS == 1 ? 'Eceran' : 'Booking';
+    //         })
+    //         ->addColumn('harga_html', function ($row) {
+    //             return '<span class="editable-price"
+    //                 contenteditable="true"
+    //                 data-original="'.$row->HARGA.'"
+    //                 data-kode="'.$row->KODE.'"
+    //                 data-kodecus="'.$row->KODECUS.'"
+    //                 style="background:#fff7d1; padding:6px; border-radius:4px;">
+    //                 '.$row->HARGA.'</span>';
+    //         })
+    //         ->addColumn('aksi', function ($row) {
+    //             return '<button class="btn btn-success btn-sm save-price"
+    //                 data-id="'.$row->id.'"
+    //                 data-kode="'.$row->KODE.'"
+    //                 data-source="'.$row->source.'"
+    //                 data-original="'.$row->HARGA.'">
+    //                 <i class="bx bx-save"></i></button>';
+    //         })
+    //         ->rawColumns(['harga_html', 'aksi'])
+    //         ->make(true);
+    // }
+
+    // ############# FUNGSI UPDATE ####################
+    // public function saveCustomerRow(Request $request){
+    //     $request->validate([
+    //         'kode' => 'required|string',
+    //         'harga' => 'required|numeric',
+    //         'kodecus' => 'required|string',
+    //     ]);
+
+    //     $kode = $request->kode;
+    //     $hargaBaru = $request->harga;
+    //     $kodecus = $request->kodecus;
+
+    //     // 1. Cek apakah kode sudah ada di pricecus
+    //     $existing = Pricecus::where('KODE', $kode)
+    //                         ->where('KODECUS', $kodecus)
+    //                         ->first();
+
+    //     if ($existing) {
+    //         // -------------------------
+    //         //   UPDATE HARGA SAJA
+    //         // -------------------------
+    //         $existing->update([
+    //             'HARGA' => $hargaBaru,
+    //             'USEREDIT' => Auth::check() ? Auth::user()->user_id : 'System',
+    //         ]);
+
+    //         return response()->json([
+    //             'success' => true,
+    //             'message' => 'Harga berhasil diupdate untuk customer ini'
+    //         ]);
+    //     }
+
+    //     // -------------------------
+    //     //   INSERT BARU
+    //     // -------------------------
+
+    //     // Ambil data dari harga umum
+    //     $price = Prices::where('KODE', $kode)->first();
+
+    //     if (!$price) {
+    //         return response()->json([
+    //             'success' => false,
+    //             'message' => 'Kode harga tidak ditemukan di tabel Prices'
+    //         ]);
+    //     }
+
+    //     // Buat insert ke pricecus
+    //     Pricecus::create([
+    //         'KODECUS' => $kodecus,
+    //         'KODE' => $price->KODE,
+    //         'KETERANGAN' => $price->KETERANGAN,
+    //         'DARI' => $price->DARI,
+    //         'SAMPAI' => $price->SAMPAI,
+    //         'RUTE' => $price->RUTE,
+
+    //         // Harga khusus customer
+    //         'HARGA' => $hargaBaru,
+
+    //         'HV' => $price->HV,
+    //         'HKG' => $price->HKG,
+    //         'HBOK' => $price->HBOK,
+    //         'JENIS' => $price->JENIS,
+    //         'KUNCI' => $price->KUNCI,
+    //         'HG' => $price->HG,
+
+    //         'USER' => Auth::check() ? Auth::user()->user_id : 'System',
+    //         'USEREDIT' => Auth::check() ? Auth::user()->user_id : 'System',
+    //     ]);
+
+    //     return response()->json([
+    //         'success' => true,
+    //         'message' => 'Harga khusus customer berhasil ditambahkan'
+    //     ]);
+    // }

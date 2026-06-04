@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 use App\Models\Pricedingin;
 use App\Models\Kendaraan;
+use App\Models\Pricedingincus;
+use App\Models\Mcustomer;
 use Illuminate\Http\Request;
 use DataTables;
 use Illuminate\Support\Facades\Auth;
@@ -53,11 +55,11 @@ class PricedinginController extends Controller
                             <button onclick="editDataDingin('.$row->id.')" class="btn btn-sm btn-warning">
                                 <i class="bx bx-edit"></i>
                             </button>
-                            <button onclick="deleteDataDingin('.$row->id.')" class="btn btn-sm btn-danger">
-                                <i class="bx bx-trash"></i>
-                            </button>
                         </div>
                     ';
+                    // <button onclick="deleteDataDingin('.$row->id.')" class="btn btn-sm btn-danger">
+                    //     <i class="bx bx-trash"></i>
+                    // </button>
                 })
 
                 ->rawColumns(['action'])
@@ -95,9 +97,40 @@ class PricedinginController extends Controller
         $number = $lastCode ? (int) substr($lastCode, 3) + 1 : 1;
         $kodedgn = 'PRD' . str_pad($number, 7, '0', STR_PAD_LEFT);
         $validated['KODEDGN'] = $kodedgn;
+        $validated['TANGGAL'] = now()->toDateString();
 
         // Simpan
         $pricedingin = Pricedingin::create($validated);
+
+        // Simpan Ke Pricdingincus
+        $customers = Mcustomer::select('CUSTOMER')->get();
+
+        $data = [];
+
+        foreach ($customers as $customer) {
+
+            $data[] = [
+                'KODECUS' => $customer->CUSTOMER,
+
+                // relasi ke master
+                'KODEDGN' => $pricedingin->id,
+                'TANGGAL' => $pricedingin->TANGGAL,
+
+                // copy data master
+                'KODE' => $pricedingin->KODE,
+                'PERIODE' => $pricedingin->PERIODE,
+                'PLAT' => $pricedingin->PLAT,
+                'ITEM' => $pricedingin->ITEM,
+                'HARGA' => $pricedingin->HARGA,
+                'USER' => $pricedingin->USER,
+                'JENIS' => $pricedingin->JENIS,
+
+                'created_at' => now(),
+                'updated_at' => now(),
+            ];
+        }
+
+        Pricedingincus::insert($data);
 
         return response()->json([
             'success' => true,

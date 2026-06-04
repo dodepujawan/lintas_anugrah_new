@@ -118,6 +118,7 @@ Route::prefix('price-customer')->group(function() {
     Route::get('/', [PricesCustomerController::class, 'index'])->name('price-customer.index');
     Route::get('/data', [PricesCustomerController::class, 'getData'])->name('price-customer.data');
     Route::get('/price/{kodecus}', [PricesCustomerController::class, 'getPrice'])->name('price-customer.price');
+    Route::post('/update-all', [PricesCustomerController::class, 'updateHargaRuteCustomer'])->name('price-customer.update-all');
     Route::post('/update-row', [PricesCustomerController::class, 'saveCustomerRow'])->name('price-customer.update-row');
     Route::post('/store', [PricesCustomerController::class, 'store'])->name('price-customer.store');
     Route::get('/price/modal/{kodecus}', [PricesCustomerController::class, 'getPriceModal'])->name('price-customer-modal.price');
@@ -136,6 +137,7 @@ Route::prefix('price-dingin-customer')->group(function() {
     Route::get('/', [PricedinginCustomerController::class, 'index'])->name('price-rentcus.index');
     Route::get('/data', [PricedinginCustomerController::class, 'getData'])->name('price-rentcus.data');
     Route::get('/price/{kodecus}', [PricedinginCustomerController::class, 'getPrice'])->name('price-rentcus.price');
+    Route::post('/update-all', [PricedinginCustomerController::class, 'updateHargaDinginCustomer'])->name('price-rentcus.update-all');
     Route::post('/update-row', [PricedinginCustomerController::class, 'saveCustomerRow'])->name('price-rentcus.update-row');
     Route::post('/store', [PricedinginCustomerController::class, 'store'])->name('price-rentcus.store');
     Route::get('/price/modal/{kodecus}', [PricedinginCustomerController::class, 'getPriceModal'])->name('price-rentcus-modal.price');
