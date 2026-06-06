@@ -87,239 +87,213 @@
 
     {{-- HEADER DOKUMEN --}}
     <div class="card-expedisi">
-        <div class="card-expedisi-header">
-            <h5><i class='bx bx-file'></i> DATA DOKUMEN</h5>
-            <span class="badge bg-success ms-2">READY</span>
-        </div>
-        <div class="row">
-            <div class="col-md-4">
-                <label class="form-label">TGL SJ</label>
-                <input type="date" class="form-control form-control-sm" id="tgl_sj_expedisi" name="tgl_sj_expedisi">
-            </div>
-            <div class="col-md-4">
-                <label class="form-label">NO SJ</label>
-                <div class="input-group input-group-sm mb-2">
-                    <input type="text" class="form-control form-control-sm" id="no_sj_expedisi" name="no_sj_expedisi" placeholder="Auto Generate/ Click To Update" Readonly>
-                    <button class="btn btn-outline-secondary" id="no_sj_expedisi_btn"><i class="bx bx-search"></i></button>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <label class="form-label">WILAYAH</label>
-                <select class="form-select form-select-sm" id="wilayah_expedisi" name="wilayah_expedisi">
-                    <option value="denpasar">DENPASAR</option>
-                    <option value="gianyar">GIANYAR</option>
-                </select>
-            </div>
-            {{-- <div class="col-md-3">
-                <label class="form-label">NOMOR PERJALANAN</label>
-                <input type="text" class="form-control form-control-sm" id="nomor_perjalanan_expedisi" name="nomor_perjalanan_expedisi" placeholder="Auto Generate" readonly>
-            </div> --}}
-        </div>
-        <div class="row">
-            <!-- CUSTOMER SECTION -->
-            <div class="col-md-6 mt-2">
-                <div class="card border-light">
-                    <div class="card-body p-2">
-                        <label class="form-label fw-semibold">CUSTOMER</label>
-                        <div class="input-group input-group-sm mb-2">
-                            <input type="hidden" name="customer_expedisi_id" id="customer_expedisi_id">
-                            <input type="text" class="form-control" id="customer_expedisi" name="customer_expedisi" readonly placeholder="Pilih customer...">
-                            <button class="btn btn-outline-primary" id="customer_expedisi_btn" type="button">
-                                <i class="bx bx-search"></i>
-                            </button>
-                        </div>
+  <div class="card-expedisi-header d-flex justify-content-between align-items-center">
+    <h5><i class='bx bx-truck me-2'></i> FORM EXPEDISI</h5>
+    <span class="badge bg-success">READY</span>
+  </div>
 
-                        <!-- CUSTOMER KODE -->
-                        <div class="customer-kode-info">
-                            <div class="d-flex align-items-center">
-                                <span class="badge bg-light text-dark me-2">Kode:</span>
-                                <input type="text" class="form-control form-control-sm border-0 bg-transparent"
-                                    id="customer_kode_expedisi" name="customer_kode_expedisi"
-                                    readonly style="font-weight: 600;">
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6 mt-2">
-                <label class="form-label">ITEM</label>
-                <div class="input-group input-group-sm">
-                    <input type="hidden" name="item_expedisi_id" id="item_expedisi_id">
-                    <input type="hidden" name="item_expedisi_tipe" id="item_expedisi_tipe">
-                    <input type="text" class="form-control" id="item_expedisi" name="item_expedisi" readonly placeholder="Pilih item...">
-                    <button class="btn btn-outline-secondary" id="item_expedisi_btn"><i class="bx bx-search"></i></button>
-                </div>
-            </div>
-        </div>
+  <div class="row g-2">
+    <div class="col-md-4">
+      <label class="form-label">TGL SJ</label>
+      <input type="date" class="form-control form-control-sm" id="tgl_sj_expedisi" name="tgl_sj_expedisi">
     </div>
 
-    {{-- KENDARAAN & DRIVER --}}
-    <div class="card-expedisi">
-        <div class="card-expedisi-header">
-            <h5><i class='bx bx-car'></i> KENDARAAN & DRIVER</h5>
-        </div>
-        <div class="row">
-            <div class="col-md-4">
-                <label class="form-label">KENDARAAN</label>
-                <div class="input-group input-group-sm">
-                    <input type="hidden" class="form-control" id="kendaraan_expedisi_id" name="kendaraan_expedisi_id" placeholder="Pilih kendaraan...">
-                    <input type="text" class="form-control" id="kendaraan_expedisi" name="kendaraan_expedisi" placeholder="Pilih kendaraan..." readonly>
-                    <button class="btn btn-outline-secondary" id="kendaraan_expedisi_btn"><i class="bx bx-search"></i></button>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <label class="form-label">DRIVER I</label>
-                <div class="input-group input-group-sm">
-                    <input type="hidden" class="form-control" id="driver_1_expedisi_id" name="driver_1_expedisi_id">
-                    <input type="text" class="form-control" id="driver_1_expedisi" name="driver_1_expedisi" readonly placeholder="Pilih drver I">
-                    <button class="btn btn-outline-secondary" id="driver_1_expedisi_btn" data-id="1"><i class="bx bx-search"></i></button>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <label class="form-label">DRIVER II</label>
-                <div class="input-group input-group-sm">
-                    <input type="hidden" class="form-control" id="driver_2_expedisi_id" name="driver_2_expedisi_id">
-                    <input type="text" class="form-control" id="driver_2_expedisi" name="driver_2_expedisi" readonly placeholder="Pilih driver II">
-                    <button class="btn btn-outline-secondary" id="driver_2_expedisi_btn" data-id="2"><i class="bx bx-search"></i></button>
-                </div>
-            </div>
-        </div>
+    <div class="col-md-4">
+      <label class="form-label">NO SJ</label>
+      <div class="input-group input-group-sm">
+        <input type="text" class="form-control" id="no_sj_expedisi" name="no_sj_expedisi" readonly>
+        <button class="btn btn-outline-secondary" id="no_sj_expedisi_btn"><i class="bx bx-search"></i></button>
+      </div>
     </div>
 
-    {{-- DATA PENERIMA --}}
-    <div class="card-expedisi">
-        <div class="card-expedisi-header">
-            <h5><i class='bx bx-user'></i> DATA PENERIMA</h5>
-        </div>
-        <div class="row">
-            <div class="col-md-4">
-                <label class="form-label">PENERIMA</label>
-                <input type="text" class="form-control form-control-sm" id="penerima_expedisi" name="penerima_expedisi">
-            </div>
-            <div class="col-md-4">
-                <label class="form-label">NAMA</label>
-                <input type="text" class="form-control form-control-sm" id="nama_penerima_expedisi" name="nama_penerima_expedisi">
-            </div>
-            <div class="col-md-4">
-                <label class="form-label">PHONE</label>
-                <input type="text" class="form-control form-control-sm" id="phone_penerima_expedisi" name="phone_penerima_expedisi">
-            </div>
-            <div class="col-md-12 mt-2">
-                <label class="form-label">ALAMAT</label>
-                <textarea class="form-control form-control-sm" rows="2" id="alamat_penerima_expedisi" name="alamat_penerima_expedisi"></textarea>
-            </div>
-        </div>
+    <div class="col-md-4">
+      <label class="form-label">WILAYAH</label>
+      <select class="form-select form-select-sm" id="wilayah_expedisi" name="wilayah_expedisi">
+        <option value="denpasar">DENPASAR</option>
+        <option value="gianyar">GIANYAR</option>
+      </select>
     </div>
 
-    {{-- DATA BARANG --}}
-    <div class="card-expedisi">
-        <div class="card-expedisi-header">
-            <h5><i class='bx bx-box'></i> DATA BARANG</h5>
-        </div>
-        <div class="row">
-            <div class="col-md-4">
-                <label class="form-label">Barang</label>
-                <input type="text" class="form-control form-control-sm" id="barang_expedisi" name="barang_expedisi">
-            </div>
-            <div class="col-md-4">
-                <label class="form-label">Penyimpanan</label>
-                <select class="form-select form-select-sm" id="penyimpanan_expedisi" name="penyimpanan_expedisi">
-                    <option value="F">F</option>
-                    <option value="C">C</option>
-                    <option value="D">D</option>
-                </select>
-            </div>
-            <div class="col-md-4">
-                <label class="form-label">Koli</label>
-                <input type="number" class="form-control form-control-sm" id="koli_expedisi" name="koli_expedisi">
-            </div>
-            <div class="col-md-12 mt-2">
-                <label class="form-label">Catatan</label>
-                <textarea class="form-control form-control-sm" rows="2" id="catatan_expedisi" name="catatan_expedisi"></textarea>
-            </div>
-        </div>
+    <div class="col-md-4">
+      <label class="form-label">CUSTOMER</label>
+      <div class="input-group input-group-sm">
+        <input type="hidden" id="customer_expedisi_id" name="customer_expedisi_id">
+        <input type="text" class="form-control" id="customer_expedisi" name="customer_expedisi" readonly>
+        <button class="btn btn-outline-primary" id="customer_expedisi_btn"><i class="bx bx-search"></i></button>
+      </div>
     </div>
 
-    {{-- DETAIL PENGIRIMAN & PERHITUNGAN --}}
-    <div class="card-expedisi">
-        <div class="card-expedisi-header">
-            <h5><i class='bx bx-calculator'></i> DETAIL & PERHITUNGAN</h5>
-        </div>
-        <div class="row">
-            <div class="col-md-3">
-                <label class="form-label">RUTE</label>
-                <input type="text" class="form-control form-control-sm" id="rute_expedisi" name="rute_expedisi">
-                {{-- <select class="form-select form-select-sm" id="rute_expedisi" name="rute_expedisi"></select> --}}
-            </div>
-            <div class="col-md-2">
-                <label class="form-label">JUMLAH</label>
-                <input type="number" class="form-control form-control-sm" id="jumlah_expedisi" name="jumlah_expedisi">
-            </div>
-            <div class="col-md-2">
-                <label class="form-label">HARGA @</label>
-                <input type="text" class="form-control form-control-sm" id="harga_expedisi" name="harga_expedisi">
-            </div>
-            <div class="col-md-2">
-                <label class="form-label">DISC %</label>
-                <input type="number" class="form-control form-control-sm" id="disc_expedisi" name="disc_expedisi">
-            </div>
-            <div class="col-md-3">
-                <label class="form-label">DEL CHARGE</label>
-                <div class="input-group input-group-sm">
-                    <input type="number" class="form-control" id="del_charge_expedisi" name="del_charge_expedisi">
-                    <button class="btn btn-warning" id="auto_dc_expedisi" name="auto_dc_expedisi">Auto DC</button>
-                </div>
-            </div>
-        </div>
-        <hr>
-        <div class="row">
-            <div class="col-md-3">
-                <label class="form-label">SUB TOTAL</label>
-                <input type="text" class="form-control form-control-sm" id="sub_total_expedisi" name="sub_total_expedisi" readonly>
-            </div>
-            <div class="col-md-3">
-                <label class="form-label">DPP</label>
-                <input type="text" class="form-control form-control-sm" id="dpp_expedisi" name="dpp_expedisi" readonly>
-            </div>
-            <div class="col-md-3">
-                <label class="form-label">PPN</label>
-                <input type="text" class="form-control form-control-sm" id="ppn_expedisi" name="ppn_expedisi" readonly>
-            </div>
-            <div class="col-md-3">
-                <label class="form-label">GRAND TOTAL</label>
-                <input type="text" class="form-control form-control-sm" id="grand_total_expedisi" name="grand_total_expedisi" readonly>
-            </div>
-        </div>
+    <div class="col-md-4">
+      <label class="form-label">KODE CUSTOMER</label>
+      <input type="text" class="form-control form-control-sm" id="customer_kode_expedisi" name="customer_kode_expedisi" readonly>
     </div>
 
-    <!-- Action Buttons -->
-    <div class="card-expedisi">
-        <div class="row g-2">
-            <div class="col-md-3 col-sm-6">
-                <button class="btn btn-info btn-action w-100" id="buttonSimpanExp">
-                    <i class='bx bx-save me-1'></i>SIMPAN
-                </button>
-            </div>
-            <div class="col-md-3 col-sm-6">
-                <button class="btn btn-danger btn-action w-100" id="buttonClearExp">
-                    <i class='bx bx-trash me-1'></i>Clear
-                </button>
-            </div>
-            @role('admin')
-            <div class="col-md-3 col-sm-6" style="display:none" id="divButtonAppendExp">
-                <button class="btn btn-warning btn-action w-100" id="buttonAppendExp">
-                    <i class='bx bx-plus-circle me-1'></i>Tambah Muatan
-                </button>
-            </div>
-            <div class="col-md-3 col-sm-6 d-none" id="divPrintSuratJalan">
-                <button class="btn btn-primary btn-action w-100" id="btnPrintSuratJalan" data-id="">
-                    <i class="bx bx-printer me-1"></i> Print Surat Jalan
-                </button>
-            </div>
-            @endrole
-        </div>
+    <div class="col-md-4">
+      <label class="form-label">ITEM</label>
+      <div class="input-group input-group-sm">
+        <input type="hidden" id="item_expedisi_id" name="item_expedisi_id">
+        <input type="hidden" id="item_expedisi_tipe" name="item_expedisi_tipe">
+        <input type="text" class="form-control" id="item_expedisi" name="item_expedisi" readonly>
+        <button class="btn btn-outline-secondary" id="item_expedisi_btn"><i class="bx bx-search"></i></button>
+      </div>
     </div>
 
+    <hr class="my-2">
+
+    <div class="col-md-4">
+      <label class="form-label">KENDARAAN</label>
+      <div class="input-group input-group-sm">
+        <input type="hidden" id="kendaraan_expedisi_id" name="kendaraan_expedisi_id">
+        <input type="text" class="form-control" id="kendaraan_expedisi" name="kendaraan_expedisi" readonly>
+        <button class="btn btn-outline-secondary" id="kendaraan_expedisi_btn"><i class="bx bx-search"></i></button>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <label class="form-label">DRIVER I</label>
+      <div class="input-group input-group-sm">
+        <input type="hidden" id="driver_1_expedisi_id" name="driver_1_expedisi_id">
+        <input type="text" class="form-control" id="driver_1_expedisi" name="driver_1_expedisi" readonly>
+        <button class="btn btn-outline-secondary" id="driver_1_expedisi_btn" data-id="1"><i class="bx bx-search"></i></button>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <label class="form-label">DRIVER II</label>
+      <div class="input-group input-group-sm">
+        <input type="hidden" id="driver_2_expedisi_id" name="driver_2_expedisi_id">
+        <input type="text" class="form-control" id="driver_2_expedisi" name="driver_2_expedisi" readonly>
+        <button class="btn btn-outline-secondary" id="driver_2_expedisi_btn" data-id="2"><i class="bx bx-search"></i></button>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <label class="form-label">PENERIMA</label>
+      <input type="text" class="form-control form-control-sm" id="penerima_expedisi" name="penerima_expedisi">
+    </div>
+
+    <div class="col-md-4">
+      <label class="form-label">NAMA</label>
+      <input type="text" class="form-control form-control-sm" id="nama_penerima_expedisi" name="nama_penerima_expedisi">
+    </div>
+
+    <div class="col-md-4">
+      <label class="form-label">PHONE</label>
+      <input type="text" class="form-control form-control-sm" id="phone_penerima_expedisi" name="phone_penerima_expedisi">
+    </div>
+
+    <div class="col-md-12">
+      <label class="form-label">ALAMAT</label>
+      <textarea class="form-control form-control-sm" rows="2" id="alamat_penerima_expedisi" name="alamat_penerima_expedisi"></textarea>
+    </div>
+
+    <hr class="my-2">
+
+    <div class="col-md-4">
+      <label class="form-label">BARANG</label>
+      <input type="text" class="form-control form-control-sm" id="barang_expedisi" name="barang_expedisi">
+    </div>
+
+    <div class="col-md-4">
+      <label class="form-label">PENYIMPANAN</label>
+      <select class="form-select form-select-sm" id="penyimpanan_expedisi" name="penyimpanan_expedisi">
+        <option value="F">F</option>
+        <option value="C">C</option>
+        <option value="D">D</option>
+      </select>
+    </div>
+
+    <div class="col-md-4">
+      <label class="form-label">KOLI</label>
+      <input type="number" class="form-control form-control-sm" id="koli_expedisi" name="koli_expedisi">
+    </div>
+
+    <div class="col-md-12">
+      <label class="form-label">CATATAN</label>
+      <textarea class="form-control form-control-sm" rows="2" id="catatan_expedisi" name="catatan_expedisi"></textarea>
+    </div>
+
+    <hr class="my-2">
+
+    <div class="col-md-3">
+      <label class="form-label">RUTE</label>
+      <input type="text" class="form-control form-control-sm" id="rute_expedisi" name="rute_expedisi">
+    </div>
+
+    <div class="col-md-2">
+      <label class="form-label">JUMLAH</label>
+      <input type="number" class="form-control form-control-sm" id="jumlah_expedisi" name="jumlah_expedisi">
+    </div>
+
+    <div class="col-md-2">
+      <label class="form-label">HARGA</label>
+      <input type="text" class="form-control form-control-sm" id="harga_expedisi" name="harga_expedisi">
+    </div>
+
+    <div class="col-md-2">
+      <label class="form-label">DISC</label>
+      <input type="number" class="form-control form-control-sm" id="disc_expedisi" name="disc_expedisi">
+    </div>
+
+    <div class="col-md-3">
+      <label class="form-label">DEL CHARGE</label>
+      <div class="input-group input-group-sm">
+        <input type="number" class="form-control" id="del_charge_expedisi" name="del_charge_expedisi">
+        <button class="btn btn-warning" id="auto_dc_expedisi">Auto DC</button>
+      </div>
+    </div>
+
+    <div class="col-md-3">
+      <label class="form-label">SUB TOTAL</label>
+      <input type="text" class="form-control form-control-sm" id="sub_total_expedisi" readonly>
+    </div>
+
+    <div class="col-md-3">
+      <label class="form-label">DPP</label>
+      <input type="text" class="form-control form-control-sm" id="dpp_expedisi" readonly>
+    </div>
+
+    <div class="col-md-3">
+      <label class="form-label">PPN</label>
+      <input type="text" class="form-control form-control-sm" id="ppn_expedisi" readonly>
+    </div>
+
+    <div class="col-md-3">
+      <label class="form-label fw-bold text-success">GRAND TOTAL</label>
+      <input type="text" class="form-control form-control-sm fw-bold" id="grand_total_expedisi" readonly>
+    </div>
+
+    <div class="row g-2">
+      <div class="col-md-3 col-sm-6">
+        <button class="btn btn-info btn-action w-100" id="buttonSimpanExp">
+          <i class='bx bx-save me-1'></i>SIMPAN
+        </button>
+      </div>
+
+      <div class="col-md-3 col-sm-6">
+        <button class="btn btn-danger btn-action w-100" id="buttonClearExp">
+          <i class='bx bx-trash me-1'></i>CLEAR
+        </button>
+      </div>
+
+      @role('admin')
+      <div class="col-md-3 col-sm-6" style="display:none" id="divButtonAppendExp">
+        <button class="btn btn-warning btn-action w-100" id="buttonAppendExp">
+          <i class='bx bx-plus-circle me-1'></i>TAMBAH MUATAN
+        </button>
+      </div>
+
+      <div class="col-md-3 col-sm-6 d-none" id="divPrintSuratJalan">
+        <button class="btn btn-primary btn-action w-100" id="btnPrintSuratJalan" data-id="">
+          <i class="bx bx-printer me-1"></i>PRINT SJ
+        </button>
+      </div>
+      @endrole
+    </div>
+  </div>
+</div>
+
+    <hr class="my-3">
     @role('admin')
     <!-- ############# DATA MUAT ############### -->
     <div class="card-expedisi tabel-surat-jalan">
@@ -477,6 +451,7 @@
     @endrole
 
 </div>
+
 {{-- MODAL --}}
 @include('expedisi.expedisi_modal')
 <script>
@@ -765,7 +740,7 @@ $(document).ready(function() {
         var namaCus = $(this).data('name');
         var CUSTOMER = $(this).data('customer');
         // Mengisi nilai ke elemen yang dituju
-        $('#customer_expedisi_id').val(kodeCus);
+        $('#customer_expedisi_id').val(CUSTOMER);
         $('#customer_expedisi').val(namaCus);
         $('#customer_kode_expedisi').val(CUSTOMER);
         // Kosongkan dulu item
@@ -813,7 +788,7 @@ $(document).ready(function() {
                 }
             },
             columns: [
-                { data: 'DT_RowIndex', name: 'DT_RowIndex' },
+                { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false },
                 { data: 'KETERANGAN' },
                 { data: 'DARI' },
                 { data: 'SAMPAI' },
@@ -1061,7 +1036,7 @@ $(document).ready(function() {
             TGLMUAT: $('#tgl_muat_expedisi').val(),
             NOJALAN: $('#nomor_perjalanan_expedisi').val(),
             WILAYAH: $('#wilayah_expedisi').val(),
-            CUSTOMER: $('#customer_kode_expedisi').val(),
+            CUSTOMER: $('#customer_expedisi').val(),
             customer_expedisi_id: $('#customer_expedisi_id').val(),
             item_expedisi_id: $('#item_expedisi_id').val(),
             item_expedisi: $('#item_expedisi').val(),
@@ -1819,3 +1794,4 @@ $(document).ready(function() {
     // $('#jumlah_expedisi, #harga_expedisi, #disc_expedisi').on('keyup change', hitungExpedisi);
 });
 </script>
+

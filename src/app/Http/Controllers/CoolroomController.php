@@ -87,7 +87,7 @@ class CoolroomController extends Controller
             ->addColumn('action', function($customer) {
                 return '
                     <div class="btn-group">
-                        <button class="btn btn-sm btn-info view-btn-customer-coolroom" data-id="'.$customer->kode_cus.'" data-name="'.$customer->NAMACUST.'" data-customer="'.$customer->CUSTOMER.'" data-bs-toggle="tooltip" title="View">
+                        <button class="btn btn-sm btn-info view-btn-customer-coolroom" data-id="'.$customer->CUSTOMER.'" data-name="'.$customer->NAMACUST.'" data-customer="'.$customer->CUSTOMER.'" data-bs-toggle="tooltip" title="View">
                             <i class="bx bx-check"></i>
                         </button>
                     </div>
@@ -105,42 +105,28 @@ class CoolroomController extends Controller
         try {
             $nosj=null;
             DB::transaction(function () use ($request,&$nosj) {
-                $jumlah=(float)$request->jumlah;
-                $harga=(int)preg_replace('/[^0-9]/','',$request->harga);
-                $discPersen=(float)$request->disc;
-                $ppnPersen=(float)$request->ppn;
+                $jumlah = (float) $request->jumlah;
+                $harga = (int) preg_replace('/[^0-9]/', '', $request->harga);
+                $discPersen = (float) $request->disc;
+                $ppnPersen = (float) $request->ppn;
                 $boxing = $request->boolean('boxing');
-                // =====================
                 // SUBTOTAL
-                // =====================
-                if($boxing){
-                    $subtotal=$harga;
-                }else{
-                    $subtotal=$jumlah*$harga;
+                if ($boxing) {
+                    $subtotal = round($harga);
+                } else {
+                    $subtotal = round($jumlah * $harga);
                 }
-                // =====================
                 // DISC
-                // =====================
-                $ndisc=$subtotal*$discPersen/100;
-                // =====================
+                $ndisc = round($subtotal * $discPersen / 100);
                 // DPP
-                // =====================
-                $dpp=$subtotal-$ndisc;
-                // =====================
+                $dpp = round($subtotal - $ndisc);
                 // PPN
-                // =====================
-                $nppn=$dpp*$ppnPersen/100;
-                // =====================
+                $nppn = round($dpp * $ppnPersen / 100);
                 // GRAND
-                // =====================
-                $grand=$dpp+$nppn;
-                // =====================
+                $grand = round($dpp + $nppn);
                 // GENERATE SJ
-                // =====================
                 $nosj=$this->generateSjCoolroom();
-                // =====================
                 // STORE
-                // =====================
                 Coolroom::create([
                     'NOSJ'=>$nosj,
                     'TGLSJ'=>$request->tglsj,
@@ -217,35 +203,35 @@ class CoolroomController extends Controller
                     );
                 }
 
-                $jumlah=(float)$request->jumlah;
-                $harga=(int)preg_replace('/[^0-9]/','',$request->harga);
-                $discPersen=(float)$request->disc;
-                $ppnPersen=(float)$request->ppn;
+                $jumlah = (float) $request->jumlah;
+                $harga = (int) preg_replace('/[^0-9]/', '', $request->harga);
+                $discPersen = (float) $request->disc;
+                $ppnPersen = (float) $request->ppn;
                 $boxing = $request->boolean('boxing');
                 // =====================
                 // SUBTOTAL
                 // =====================
-                if($boxing){
-                    $subtotal=$harga;
-                }else{
-                    $subtotal=$jumlah*$harga;
+                if ($boxing) {
+                    $subtotal = round($harga);
+                } else {
+                    $subtotal = round($jumlah * $harga);
                 }
                 // =====================
                 // DISC
                 // =====================
-                $ndisc=$subtotal*$discPersen/100;
+                $ndisc = round($subtotal * $discPersen / 100);
                 // =====================
                 // DPP
                 // =====================
-                $dpp=$subtotal-$ndisc;
+                $dpp = round($subtotal - $ndisc);
                 // =====================
                 // PPN
                 // =====================
-                $nppn=$dpp*$ppnPersen/100;
+                $nppn = round($dpp * $ppnPersen / 100);
                 // =====================
                 // GRAND
                 // =====================
-                $grand=$dpp+$nppn;
+                $grand = round($dpp + $nppn);
                 // =====================
                 // UPDATE
                 // =====================

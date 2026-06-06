@@ -64,7 +64,7 @@ td, th {
         <tr>
             <td>Tanggal SJ</td>
             <td>{{ $expedisi->tglsj }}</td>
-            <td>Nama Pengirim</td>
+            <td>Nama Customer</td>
             <td>{{ $expedisi->CUSTOMER }}</td>
         </tr>
         <tr>
@@ -197,7 +197,7 @@ td, th {
             <table style="width:100%; border-collapse: collapse;">
                 <tr>
                     <td colspan="2" style="border:1px solid #000; padding:6px; text-align:center; background:#f0f0f0;">
-                        <strong>PENGIRIM</strong>
+                        <strong>CUSTOMER</strong>
                     </td>
                 </tr>
                 <tr>

@@ -79,12 +79,11 @@ class ExpedisiController extends Controller
             $discPercent = $request->DISC ?? 0;
             $delCharge = $request->DC ?? 0;
             $ppnPercent = floatval($request->PPN);
-            $subTotal = $jumlah * $harga;
-            $discAmount = $subTotal * ($discPercent / 100);
-            $totalAfterDisc = $subTotal - $discAmount;
-            $ppn = $totalAfterDisc * ($ppnPercent / 100);
-            $grandTotal = $totalAfterDisc + $ppn + $delCharge;
-
+            $subTotal = round($jumlah * $harga);
+            $discAmount = round($subTotal * ($discPercent / 100));
+            $totalAfterDisc = round($subTotal - $discAmount);
+            $ppn = round($totalAfterDisc * ($ppnPercent / 100));
+            $grandTotal = round($totalAfterDisc + $ppn + $delCharge);
             // ======================
             // PREPARE DATA
             // ======================
@@ -321,7 +320,7 @@ class ExpedisiController extends Controller
 
             // Cek nilai customer untuk mengambil nama customer
             $customerName = DB::table('mcustomer')
-                ->where('kode_cus', $expedisi->CUSTOMER_KODE)
+                ->where('CUSTOMER', $expedisi->CUSTOMER_KODE)
                 ->value('NAMACUST') ?? "";
 
             // Format data sesuai kebutuhan form
@@ -453,13 +452,11 @@ class ExpedisiController extends Controller
             $discPercent = $request->DISC ?? 0;
             $delCharge   = $request->DC ?? 0;
             $ppnPercent  = floatval($request->PPN ?? 11);
-
-            $subTotal        = $jumlah * $harga;
-            $discAmount      = $subTotal * ($discPercent / 100);
-            $totalAfterDisc  = $subTotal - $discAmount;
-            $ppn             = $totalAfterDisc * ($ppnPercent / 100);
-            $grandTotal      = $totalAfterDisc + $ppn + $delCharge;
-
+            $subTotal = round($jumlah * $harga);
+            $discAmount = round($subTotal * ($discPercent / 100));
+            $totalAfterDisc = round($subTotal - $discAmount);
+            $ppn = round($totalAfterDisc * ($ppnPercent / 100));
+            $grandTotal = round($totalAfterDisc + $ppn + $delCharge);
             // ======================
             // PREPARE DATA UPDATE (MIRROR STORE)
             // ======================

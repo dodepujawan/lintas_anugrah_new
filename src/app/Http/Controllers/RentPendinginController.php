@@ -248,7 +248,7 @@ class RentPendinginController extends Controller
             ->addColumn('action', function($customer) {
                 return '
                     <div class="btn-group">
-                        <button class="btn btn-sm btn-info view-btn-customer-rent-dingin" data-id="'.$customer->kode_cus.'" data-name="'.$customer->NAMACUST.'" data-customer="'.$customer->CUSTOMER.'" data-alamat="'.$customer->ALAMAT1.'" data-telepon="'.$customer->TELEPON.'" data-bs-toggle="tooltip" title="View">
+                        <button class="btn btn-sm btn-info view-btn-customer-rent-dingin" data-id="'.$customer->CUSTOMER.'" data-name="'.$customer->NAMACUST.'" data-customer="'.$customer->CUSTOMER.'" data-alamat="'.$customer->ALAMAT1.'" data-telepon="'.$customer->TELEPON.'" data-bs-toggle="tooltip" title="View">
                             <i class="bx bx-check"></i>
                         </button>
                     </div>
@@ -284,27 +284,17 @@ class RentPendinginController extends Controller
             // ======================
             // HITUNG ULANG (SERVER SIDE)
             // ======================
-            $jumlah = (int) $request->jml_hari_rent_dingin;
-            $harga  = (int) $request->harga_rent_dingin;
-            // DISC dari form = PERSEN
+            $jumlah = (float) ($request->jml_hari_rent_dingin ?? 0);
+            $harga = (float) ($request->harga_rent_dingin ?? 0);
             $discPercent = (float) ($request->discount_rent_dingin ?? 0);
-            // Pajak = PERSEN
             $ppnPercent = (float) ($request->pajak_rent_dingin ?? 0);
-            // ======================
-            // PERHITUNGAN
-            // ======================
-            // 1. Sub total
-            $subTotal = $jumlah * $harga;
-            // 2. Discount dalam rupiah
+
+            $subTotal = round($jumlah * $harga);
             $discAmount = round($subTotal * ($discPercent / 100));
-            // 3. Safety: diskon tidak boleh > subtotal
             $discAmount = min($discAmount, $subTotal);
-            // 4. DPP
-            $dpp = $subTotal - $discAmount;
-            // 5. Pajak
+            $dpp = round($subTotal - $discAmount);
             $ppn = round($dpp * ($ppnPercent / 100));
-            // 6. Grand total
-            $grandTotal = $dpp + $ppn;
+            $grandTotal = round($dpp + $ppn);
 
             // ======================
             // SIMPAN DATA
@@ -416,19 +406,16 @@ class RentPendinginController extends Controller
             // ======================
             // HITUNG ULANG
             // ======================
-            $jumlah = (int) $request->jml_hari_rent_dingin;
-            $harga  = (int) $request->harga_rent_dingin;
-
+            $jumlah = (float) ($request->jml_hari_rent_dingin ?? 0);
+            $harga  = (float) ($request->harga_rent_dingin ?? 0);
             $discPercent = (float) ($request->discount_rent_dingin ?? 0);
             $ppnPercent  = (float) ($request->pajak_rent_dingin ?? 0);
-
-            $subTotal = $jumlah * $harga;
+            $subTotal = round($jumlah * $harga);
             $discAmount = round($subTotal * ($discPercent / 100));
             $discAmount = min($discAmount, $subTotal);
-            $dpp = $subTotal - $discAmount;
+            $dpp = round($subTotal - $discAmount);
             $ppn = round($dpp * ($ppnPercent / 100));
-            $grandTotal = $dpp + $ppn;
-
+            $grandTotal = round($dpp + $ppn);
             // ======================
             // UPDATE DATA
             // ======================

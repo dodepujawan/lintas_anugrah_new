@@ -132,9 +132,9 @@
             <td>{{ $expedisi->NOSJ }}</td>
         </tr>
         <tr>
-            <td><strong>KODE LEDGER</strong></td>
+            <td><strong>NAMA KONSUMEN</strong></td>
             <td>
-                <strong>NAMA KONSUMEN</strong> {{ $expedisi->CUSTOMER ?? '-' }}
+                {{ $expedisi->CUSTOMER ?? '-' }}
             </td>
         </tr>
         <tr>
