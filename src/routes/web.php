@@ -274,6 +274,7 @@ Route::prefix('coolroom-invoice')->group(function() {
     Route::get('/table/edit',[CoolroomGenerateInvoiceController::class,'tableEditCoolroom'])->name('coolroomInv.tableEdit');
     Route::get('/show/edit/{invoice}',[CoolroomGenerateInvoiceController::class,'showEditInvoiceCoolroom'])->name('coolroomInv.showEdit');
     Route::post('/update/edit',[CoolroomGenerateInvoiceController::class,'updateEditInvoiceCoolroom'])->name('coolroomInv.updateEdit');
+    Route::get('/print-invoice-text/{invoiceNo}', [CoolroomGenerateInvoiceController::class, 'printInvoiceCoolroom'])->name('coolroomInv.text');
 });
 
 Route::prefix('coolroom-kwitansi')->group(function() {

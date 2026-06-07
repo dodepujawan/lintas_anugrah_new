@@ -912,30 +912,42 @@ $(document).ready(function() {
         if (discPct > 100) discPct = 100;
         if (discPct < 0) discPct = 0;
 
-        const PPN_PCT = 11; // ⬅️ INI YANG DISIMPAN KE DB
+        const PPN_PCT = 11;
 
-        // Diskon nominal (hanya hitungan)
-        let diskonNominal = harga * (discPct / 100);
+        // =====================
+        // DISKON NOMINAL
+        // =====================
+        let diskonNominal = Math.round(harga * (discPct / 100));
 
+        // =====================
         // DPP
-        let dpp = harga - diskonNominal + dc;
+        // =====================
+        let dpp = Math.round(harga - diskonNominal + dc);
         if (dpp < 0) dpp = 0;
 
-        // PPN nominal (hanya hitung)
-        let ppnNominal = dpp * (PPN_PCT / 100);
+        // =====================
+        // PPN NOMINAL
+        // =====================
+        let ppnNominal = Math.round(dpp * (PPN_PCT / 100));
 
-        // Grand total
-        let grand = dpp + ppnNominal;
+        // =====================
+        // GRAND TOTAL
+        // =====================
+        let grand = Math.round(dpp + ppnNominal);
 
+        // =====================
         // TAMPILAN
+        // =====================
         $('#dpp_gabung_exp_inv').val(formatIDR(dpp));
         $('#total_gabung_exp_inv').val(formatIDR(dpp));
         $('#ppn_gabung_exp_inv').val(PPN_PCT);
         $('#grand_total_gabung_exp_inv').val(formatIDR(grand));
 
-        // NILAI UNTUK BACKEND
-        $('#ppn_value').val(PPN_PCT);          // persen
-        $('#grand_value').val(Math.round(grand));
+        // =====================
+        // NILAI BACKEND
+        // =====================
+        $('#ppn_value').val(PPN_PCT);
+        $('#grand_value').val(grand);
     }
 
     // fungsi mengecek jumlah tabel da nonaktifkan tombol

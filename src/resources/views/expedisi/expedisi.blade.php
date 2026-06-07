@@ -303,7 +303,7 @@
                 <div class="row align-items-end">
                     <div class="col-md-2 mb-2">
                         <label class="form-label mb-1">TGL MUAT</label>
-                        <input type="date" class="form-control form-control-sm" id="tgl_muat_expedisi" name="tgl_muat_expedisi" readonly>
+                        <input type="date" class="form-control form-control-sm" id="tgl_muat_expedisi" name="tgl_muat_expedisi">
                     </div>
                     <div class="col-md-3 mb-2">
                         <label class="form-label mb-1">NO MUAT</label>

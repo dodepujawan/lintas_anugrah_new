@@ -225,7 +225,7 @@ class ExpedisiGenerateInvoiceController extends Controller
                 // =============================
                 // DATA ARH
                 // =============================
-                'tgl_jt'       => $arh->TGLJT ?? $tglJatuhTempo->format('Y-m-d'),
+                'tgl_jt'       => $master->TGLJT ?? $tglJatuhTempo->format('Y-m-d'),
                 'piutang_arh'  => $arh->PIUTANG ?? 0,
                 'saldo'        => $arh->SALDO ?? 0,
             ]

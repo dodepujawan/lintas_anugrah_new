@@ -167,10 +167,10 @@ class RentPendinginGenerateInvoiceController extends Controller
                 ),
                 // langsung single SJ
                 'nomor_sj'     => $row->NOSJ,
+                'tgl_jt'       => $row->TGLJT ?? $tglJatuhTempo->format('Y-m-d'),
                 // =============================
                 // DATA ARH
                 // =============================
-                'tgl_jt'       => $arh->TGLJT ?? $tglJatuhTempo->format('Y-m-d'),
                 'piutang_arh'  => $arh->PIUTANG ?? 0,
                 'bayar'        => $row->BAYAR ?? 0,
                 'saldo'        => $arh->SALDO ?? 0,
@@ -293,12 +293,8 @@ class RentPendinginGenerateInvoiceController extends Controller
             return response()->json([
                 'status'  => true,
                 'message' => 'Invoice berhasil diproses',
-                'redirect' => route(
-                    'rentPendinginGenerate.pdfGenerate',
-                    [
-                        'invoiceNo' => $invoice
-                    ]
-                )
+                'invoice' => $invoice,
+                // 'redirect' => route('rentPendinginGenerate.pdfGenerate',['invoiceNo' => $invoice])
             ]);
         } catch (\Throwable $e) {
             return response()->json([

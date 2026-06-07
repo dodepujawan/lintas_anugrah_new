@@ -459,7 +459,7 @@ class ExpedisiInvoiceController extends Controller
         // =========================================
 
         $customer = Mcustomer::where(
-            'kode_cus',
+            'CUSTOMER',
             $master->CUSTOMER_KODE
         )->first();
 

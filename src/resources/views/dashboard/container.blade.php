@@ -528,10 +528,10 @@ $(document).ready(function() {
 // ========================= New Rent Dingin Invoice Edit ======================================
     $(document).on('click', '#sidebar_Invoice_edit_rent', function(e) {
         e.preventDefault();
-        loadInvoiceExpedisiEditForm();
+        loadInvoiceRentEditForm();
     });
 
-    function loadInvoiceExpedisiEditForm() {
+    function loadInvoiceRentEditForm() {
         $.ajax({
             url: '{{ route('rentPendinginInvGen.indexEdit') }}', // Route to load the form
             type: 'GET',

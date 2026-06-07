@@ -212,7 +212,7 @@
                 @can('penjualan.invoice_rent_dingin')
                 <li class="menu-item">
                     <a href="#" class="menu-link" id="sidebar_generate_rent_dingin">
-                    <span class="menu-text">Generate Invoice Sewa Mobil Pendingin</span>
+                    <span class="menu-text">Invoice Sewa Mobil Pendingin</span>
                     </a>
                 </li>
                 @endcan
@@ -245,7 +245,7 @@
             ])
             <li class="menu-item">
                 <a class="menu-link" data-bs-toggle="collapse" href="#coolroomMenu" role="button" aria-expanded="false">
-                <i class="menu-icon bx bx-package"></i>
+                <i class="menu-icon bx bx-fridge"></i>
                 <span class="menu-text">Penjualan Coolroom</span>
                 <i class="menu-arrow bx bx-chevron-right"></i>
                 </a>
@@ -260,7 +260,7 @@
                 @can('penjualan.coolroom_kwitansi')
                 <li class="menu-item">
                     <a href="#" class="menu-link" id="sidebar_coolroom_inv">
-                    <span class="menu-text">Generate Invoice Coolroom</span>
+                    <span class="menu-text">Invoice Coolroom</span>
                     </a>
                 </li>
                 @endcan

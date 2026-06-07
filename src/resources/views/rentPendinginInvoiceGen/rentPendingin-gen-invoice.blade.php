@@ -411,7 +411,8 @@ $(document).ready(function() {
                         $('#table_kwt_dgn').removeClass('d-none');
                         $('#DgnKwtTable').DataTable().ajax.reload();
                         // Cetak PDF
-                        window.open(response.redirect, '_blank');
+                        // window.open(response.redirect, '_blank');
+                        printInvoiceRen(response.invoice);
                     } else {
                         $('#loading_modal').modal('hide');
                         Swal.fire({
@@ -591,5 +592,34 @@ function clearAllKwtDgn() {
 
     // set ulang tanggal hari ini
     $('#tgl_jtp_kwt_dgn').val(new Date().toISOString().split('T')[0]);
+}
+
+// Fungsi Print Electron JS
+function printInvoiceRen(invoiceNo){
+    // 🔥 ROUTE INVOICE TEXT
+    var url = "{{ route('expedisiInvoice.text', ['invoiceNo' => '__INVOICE__']) }}";
+    url = url.replace('__INVOICE__', invoiceNo);
+    // 🔥 AMBIL TEXT DARI LARAVEL
+    $.get(url, function(res){
+        // 🔥 KIRIM KE ELECTRON
+        fetch('http://localhost:3000/print-text', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                text: res.text
+            })
+        })
+        .then(res => res.json())
+        .then(res => {
+            console.log("🚀 PRINT TEXT:", res);
+        })
+        .catch(err => {
+            console.log("❌ ERROR:", err);
+            alert("Print service tidak aktif");
+        });
+
+    });
 }
 </script>

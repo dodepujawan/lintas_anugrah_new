@@ -406,7 +406,7 @@ $(document).ready(function() {
                     $('#top_coolroom_inv')
                         .val(d.top);
                     $('#tgljt_coolroom_inv')
-                        .val(d.tgl_jt);
+                        .val(d.tgl_jt ? d.tgl_jt.substring(0,10) : '');
                 }
             });
         }
@@ -441,13 +441,14 @@ $(document).ready(function() {
                     // =====================
                     // RELOAD PDF
                     // =====================
-                    if(res.invoice){
-                        window.open(
-                            "{{ route('coolroomInv.pdf',['invoice'=>'__INV__']) }}"
-                                .replace('__INV__',res.invoice),
-                            '_blank'
-                        );
-                    }
+                    // if(res.invoice){
+                    //     window.open(
+                    //         "{{ route('coolroomInv.pdf',['invoice'=>'__INV__']) }}"
+                    //             .replace('__INV__',res.invoice),
+                    //         '_blank'
+                    //     );
+                    // }
+                    printInvoiceCol(res.invoice);
                     // =====================
                     // RESET
                     // =====================
@@ -550,5 +551,32 @@ $(document).on('keyup', '#bayar_coolroom_inv',
             .val(formatRupiah(piutang));
 
     }
+    // FNGSI DIRCT PRINT
+    function printInvoiceCol(invoiceNo){
+    // 🔥 ROUTE INVOICE TEXT
+    var url = "{{ route('coolroomInv.text', ['invoiceNo' => '__INVOICE__']) }}";
+    url = url.replace('__INVOICE__', invoiceNo);
+    // 🔥 AMBIL TEXT DARI LARAVEL
+    $.get(url, function(res){
+        // 🔥 KIRIM KE ELECTRON
+        fetch('http://localhost:3000/print-text', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                text: res.text
+            })
+        })
+        .then(res => res.json())
+        .then(res => {
+            console.log("🚀 PRINT TEXT:", res);
+        })
+        .catch(err => {
+            console.log("❌ ERROR:", err);
+            alert("Print service tidak aktif");
+        });
 
+    });
+}
 </script>
