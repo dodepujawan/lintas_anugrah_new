@@ -44,7 +44,11 @@
                         </label>
                         <input type="date" name="tanggal_sampai" class="form-control" value="{{ date('Y-m-d') }}" required>
                     </div>
-
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label">Customer</label>
+                        <select name="customer_invoice_col" id="customer_invoice_col" class="form-control">
+                        </select>
+                    </div>
                     <div class="col-md-2 mb-3 d-flex align-items-end">
                         <button type="submit" class="btn btn-success">
                             Export Excel
@@ -283,6 +287,27 @@ $(document).ready(function() {
         }
     );
 // ============================= End Of Table Colroom Invoice ===================================
+// =============================== Select Customer Expedisi ===================================
+    $('#customer_invoice_col').select2({
+        placeholder: 'Pilih Customer',
+        allowClear: true,
+        ajax: {
+            url: '{{ route("customer_select") }}',
+            dataType: 'json',
+            delay: 250,
+            data: function(params) {
+                return {
+                    search: params.term
+                };
+            },
+            processResults: function(data) {
+                return {
+                    results: data
+                };
+            }
+        }
+    });
+// =============================== End Of Select Customer Expedisi ===================================
 // ============================= Buat Colroom Invoice ===================================
     $(document).on('click','.btn-proses-invoice-coolroom',
         function(){

@@ -324,6 +324,28 @@ class CustomerController extends Controller
         }
     }
 
+    public function search_select(Request $request)
+    {
+        $search = $request->search;
+
+        $customers = Mcustomer::query()
+            ->when($search, function ($q) use ($search) {
+                $q->where('CUSTOMER', 'like', "%{$search}%")
+                ->orWhere('NAMACUST', 'like', "%{$search}%");
+            })
+            ->limit(20)
+            ->get();
+
+        return response()->json(
+            $customers->map(function ($c) {
+                return [
+                    'id' => $c->CUSTOMER,
+                    'text' => $c->CUSTOMER . ' - ' . $c->NAMACUST,
+                ];
+            })
+        );
+    }
+
     // Fungsi Calback id_user
     public function customer_kode() {
         $role = 'CST'; // Default prefix untuk customer

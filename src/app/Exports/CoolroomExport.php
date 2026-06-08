@@ -25,11 +25,13 @@ class CoolroomExport implements
     protected $tanggalSampai;
     protected $status;
     protected $grandTotal=0;
+    protected $customer;
 
     public function __construct(
         $tanggalDari,
         $tanggalSampai,
-        $status
+        $status,
+        $customer = null
     ){
 
         $this->tanggalDari=$tanggalDari;
@@ -37,6 +39,8 @@ class CoolroomExport implements
         $this->tanggalSampai=$tanggalSampai;
 
         $this->status=$status;
+
+        $this->customer = $customer;
 
     }
 
@@ -85,6 +89,12 @@ class CoolroomExport implements
                 $this->tanggalSampai
 
             ]);
+            $query->when($this->customer, function ($q) {
+                $q->where(
+                    'CUSTOMER_KODE',
+                    $this->customer
+                );
+            });
 
         // =====================
         // FILTER STATUS

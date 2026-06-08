@@ -34,7 +34,11 @@
                         </label>
                         <input type="date" name="tanggal_sampai" class="form-control" value="{{ date('Y-m-d') }}" required>
                     </div>
-
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">Customer</label>
+                        <select name="customer_invoice_ren" id="customer_invoice_ren" class="form-control">
+                        </select>
+                    </div>
                     <div class="col-md-2 mb-3 d-flex align-items-end">
                         <button type="submit" class="btn btn-success">
                             Export Excel
@@ -285,6 +289,27 @@ $(document).ready(function() {
         table_kwt_dgn.ajax.reload();
     });
 // ============================== End Of Tabel Rent Edit Dingin ==================================
+// =============================== Select Customer Expedisi ===================================
+    $('#customer_invoice_ren').select2({
+        placeholder: 'Pilih Customer',
+        allowClear: true,
+        ajax: {
+            url: '{{ route("customer_select") }}',
+            dataType: 'json',
+            delay: 250,
+            data: function(params) {
+                return {
+                    search: params.term
+                };
+            },
+            processResults: function(data) {
+                return {
+                    results: data
+                };
+            }
+        }
+    });
+// =============================== End Of Select Customer Expedisi ===================================
 // =============================== Form Detail Kwitansi Dingin ===================================
     $(document).on('click', '.btn-show-invoice-dgn-gen', function() {
 

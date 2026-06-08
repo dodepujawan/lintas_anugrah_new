@@ -472,6 +472,7 @@ class ExpedisiGenerateInvoiceController extends Controller
         $tanggalDari   = $request->tanggal_dari;
         $tanggalSampai = $request->tanggal_sampai;
         $status        = $request->filter_inv_gen;
+        $customer      = $request->customer_invoice_exp;
 
         $filename = 'laporan_invoice_expedisi_' .
             $status . '_' .
@@ -482,7 +483,8 @@ class ExpedisiGenerateInvoiceController extends Controller
             new InvoiceExport(
                 $tanggalDari,
                 $tanggalSampai,
-                $status
+                $status,
+                $customer
             ),
             $filename
         );

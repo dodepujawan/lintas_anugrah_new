@@ -25,12 +25,14 @@ class InvoiceDgnExport implements
     protected $tanggalSampai;
     protected $status;
     protected $grandTotal = 0;
+    protected $customer;
 
-    public function __construct($tanggalDari, $tanggalSampai, $status)
+    public function __construct($tanggalDari, $tanggalSampai, $status, $customer = null)
     {
-        $this->tanggalDari   = $tanggalDari;
+        $this->tanggalDari = $tanggalDari;
         $this->tanggalSampai = $tanggalSampai;
-        $this->status        = $status;
+        $this->status = $status;
+        $this->customer = $customer;
     }
 
     public function collection()
@@ -61,6 +63,12 @@ class InvoiceDgnExport implements
             ])
 
             ->where('JENIS', 'REN');
+            $query->when($this->customer, function ($q) {
+                $q->where(
+                    'CUSTOMER_KODE',
+                    $this->customer
+                );
+            });
 
         // =============================
         // BELUM INVOICE

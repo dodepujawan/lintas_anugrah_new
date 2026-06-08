@@ -387,24 +387,29 @@ class CoolroomGenerateInvoiceController extends Controller
     public function export(Request $request)
     {
         $request->validate([
-            'tanggal_dari'=>'required|date',
-            'tanggal_sampai'=>'required|date|after_or_equal:tanggal_dari',
-            'status_invoice'=>'required'
+            'tanggal_dari'   => 'required|date',
+            'tanggal_sampai' => 'required|date|after_or_equal:tanggal_dari',
+            'status_invoice' => 'required'
         ]);
-        $tanggalDari=$request->tanggal_dari;
-        $tanggalSampai=$request->tanggal_sampai;
-        $status=$request->status_invoice;
-        $filename=
-            'laporan_coolroom_'.
-            $status.'_'.
-            $tanggalDari.'_sd_'.
-            $tanggalSampai.
+
+        $tanggalDari   = $request->tanggal_dari;
+        $tanggalSampai = $request->tanggal_sampai;
+        $status        = $request->filter_inv_coolroom;
+        $customer      = $request->customer_invoice_col; // select2 customer
+
+        $filename =
+            'laporan_coolroom_' .
+            $status . '_' .
+            $tanggalDari . '_sd_' .
+            $tanggalSampai .
             '.xlsx';
+
         return Excel::download(
             new CoolroomExport(
                 $tanggalDari,
                 $tanggalSampai,
-                $status
+                $status,
+                $customer
             ),
             $filename
         );

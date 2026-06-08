@@ -61,6 +61,7 @@ Route::prefix('customer')->group(function () {
 
     // DataTables
     Route::get('/customer_get_data', [CustomerController::class, 'customer_get_data'])->name('customer_get_data');
+    Route::get('/customer-search', [CustomerController::class, 'search_select'])->name('customer_select');
 
     // CRUD
     Route::post('/store', [CustomerController::class, 'customer_store'])->name('customer_store');

@@ -609,6 +609,7 @@ class RentPendinginGenerateInvoiceController extends Controller
         $tanggalDari   = $request->tanggal_dari;
         $tanggalSampai = $request->tanggal_sampai;
         $status        = $request->filter_kwt_dgn;
+        $customer      = $request->customer_invoice_ren;
 
         $filename =
             'laporan_invoice_pendingin_' .
@@ -622,7 +623,8 @@ class RentPendinginGenerateInvoiceController extends Controller
             new InvoiceDgnExport(
                 $tanggalDari,
                 $tanggalSampai,
-                $status
+                $status,
+                $customer
             ),
 
             $filename

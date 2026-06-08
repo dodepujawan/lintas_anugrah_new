@@ -24,13 +24,19 @@ class InvoiceExport implements
     protected $tanggalDari;
     protected $tanggalSampai;
     protected $status;
+    protected $customer;
     protected $grandTotal = 0;
 
-    public function __construct($tanggalDari, $tanggalSampai, $status)
-    {
+    public function __construct(
+        $tanggalDari,
+        $tanggalSampai,
+        $status,
+        $customer = null
+    ) {
         $this->tanggalDari = $tanggalDari;
         $this->tanggalSampai = $tanggalSampai;
         $this->status = $status;
+        $this->customer = $customer;
     }
 
     public function collection()
@@ -60,6 +66,14 @@ class InvoiceExport implements
             ])
             ->where('JENIS', 'EKS');
 
+        // FILTER CUSTOMER
+        $query->when($this->customer, function ($q) {
+            $q->where(
+                'CUSTOMER_KODE',
+                $this->customer
+            );
+        });
+
         // BELUM INVOICE
         if ($this->status == 'belum') {
 
@@ -82,7 +96,6 @@ class InvoiceExport implements
             ->orderBy('TGLMUAT')
             ->get();
 
-        // TOTAL GRAND
         $this->grandTotal = $data->sum('GRAND');
 
         return $data;
@@ -108,7 +121,6 @@ class InvoiceExport implements
         ];
     }
 
-    // STYLE HEADER
     public function styles(Worksheet $sheet)
     {
         return [
@@ -174,7 +186,10 @@ class InvoiceExport implements
                 $totalRow = $lastRow + 2;
 
                 // LABEL TOTAL
-                $sheet->setCellValue('J'.$totalRow, 'TOTAL');
+                $sheet->setCellValue(
+                    'J'.$totalRow,
+                    'TOTAL'
+                );
 
                 // TOTAL GRAND
                 $sheet->setCellValue(
@@ -183,28 +198,28 @@ class InvoiceExport implements
                 );
 
                 // STYLE TOTAL
-                $sheet->getStyle('J'.$totalRow.':K'.$totalRow)
-                    ->applyFromArray([
+                $sheet->getStyle(
+                    'J'.$totalRow.':K'.$totalRow
+                )->applyFromArray([
 
-                        'font' => [
-                            'bold' => true,
-                            'size' => 12,
-                        ],
+                    'font' => [
+                        'bold' => true,
+                        'size' => 12,
+                    ],
 
-                        'fill' => [
-                            'fillType' => 'solid',
-                            'startColor' => [
-                                'rgb' => 'D9EAF7'
-                            ]
+                    'fill' => [
+                        'fillType' => 'solid',
+                        'startColor' => [
+                            'rgb' => 'D9EAF7'
                         ]
+                    ]
 
-                    ]);
+                ]);
 
                 // CENTER VERTICAL
                 $sheet->getStyle('A1:N'.$lastRow)
                     ->getAlignment()
                     ->setVertical('center');
-
             }
 
         ];
