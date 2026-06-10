@@ -389,7 +389,7 @@ class CoolroomGenerateInvoiceController extends Controller
         $request->validate([
             'tanggal_dari'   => 'required|date',
             'tanggal_sampai' => 'required|date|after_or_equal:tanggal_dari',
-            'status_invoice' => 'required'
+            'filter_inv_coolroom' => 'required'
         ]);
 
         $tanggalDari   = $request->tanggal_dari;

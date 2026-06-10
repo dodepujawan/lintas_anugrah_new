@@ -13,7 +13,7 @@
         <ul class="sneat-sidebar-menu">
             <li class="menu-header">Main</li>
             <li class="menu-item">
-                <a href="#" class="menu-link active">
+                <a href="#" class="menu-link active" id="sidebar_dashboard">
                 <i class="menu-icon bx bx-home"></i>
                 <span class="menu-text">Dashboard</span>
                 </a>

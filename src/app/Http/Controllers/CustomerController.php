@@ -50,11 +50,11 @@ class CustomerController extends Controller
     public function customer_store(Request $request)
     {
         $request->merge([
-            'CUSTOMER' => strtoupper(trim($request->CUSTOMER))
+            'jenis_customer' => strtoupper(trim($request->jenis_customer))
         ]);
         $request->validate([
             'nama' => 'required',
-            'CUSTOMER' => [
+            'jenis_customer' => [
                 'required',
                 'string',
                 'min:5',
@@ -63,7 +63,7 @@ class CustomerController extends Controller
                 'unique:mcustomer,CUSTOMER',
             ],
         ]);
-        $customerValue = $request->CUSTOMER;
+        $customerValue = $request->jenis_customer;
         try {
             $kode_cus = $this->customer_kode_store();
             Mcustomer::create([
@@ -149,7 +149,7 @@ class CustomerController extends Controller
             // ================= DATA CUSTOMER =================
             'kode'         => $c->kode_cus,
             'nama'         => $c->NAMACUST,
-            'jenis_usaha'  => $c->CUSTOMER,
+            'jenis_customer'  => $c->CUSTOMER,
             'alamat'       => trim($c->ALAMAT1 . ' ' . $c->ALAMAT2),
             'kota'         => $c->KOTA,
             'telepon'      => $c->TELEPON,

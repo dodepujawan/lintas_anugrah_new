@@ -2,9 +2,9 @@
 @section('content')
 <div class="main-master">
     <div class="master-page">
-        <h1>Main Page</h1>
+        {{-- <h1>Main Page</h1>
         <h2>Lintas Anugrah</h2>
-        <div>Expedisi</div>
+        <div>Expedisi</div> --}}
     </div>
 </div>
 
@@ -160,6 +160,8 @@
 @section('footer')
 <script>
 $(document).ready(function() {
+    // ### TAMPILKAN DASHBOARD ###
+    loadDashboard();
 // ########################### NAVBAR ROOM ##############################################
 // ========================= Edit Profile ======================================
     $(document).on('click', '#navbar_edit_profile', function(e) {
@@ -202,6 +204,25 @@ $(document).ready(function() {
 // ####################### End Of NAVBAR ROOM ###########################################
 
 // +++++++++++++++++++++++++++++++ SIDEBAR ROOM +++++++++++++++++++++++++++++++++++++++++
+// ========================= Dashboard ======================================
+    $(document).on('click', '#sidebar_dashboard', function(e) {
+        e.preventDefault();
+        loadDashboard();
+    });
+
+    function loadDashboard() {
+        $.ajax({
+            url: '{{ route('dashboard.index') }}', // Route to load the form
+            type: 'GET',
+            success: function(response) {
+                $('.master-page').html(response);
+            },
+            error: function() {
+                $('.master-page').html('<p>Error loading form.</p>');
+            }
+        });
+    }
+// ========================= End Of Dashboard ======================================
 // ========================= List Register ======================================
     $(document).on('click', '#sidebar_list_user', function(e) {
         e.preventDefault();

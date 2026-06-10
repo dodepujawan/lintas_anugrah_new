@@ -26,7 +26,12 @@ class CoolroomController extends Controller
 
     public function getData(Request $request)
     {
-        $query = Coolroom::query();
+        $query = Coolroom::query()
+        ->where(function ($q) {
+            $q->whereNull('INVOICE')
+            ->orWhere('INVOICE', '');
+        })
+        ->orderByDesc('TGLSJ');
         return DataTables::of($query)
             ->addIndexColumn()
             ->editColumn('TGL', function ($row) {

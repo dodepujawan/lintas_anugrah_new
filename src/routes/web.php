@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\KendaraanController;
 use App\Http\Controllers\DriverController;
 use App\Http\Controllers\PricesController;
@@ -54,6 +55,12 @@ Route::prefix('register')->middleware('auth')->group(function () {
     Route::post('update_list_register', [RegisterController::class, 'update_list_register'])->name('update_list_register');
     Route::delete('delete_list_register/{id}', [RegisterController::class, 'delete_list_register'])->name('delete_list_register');
     Route::get('/generate-user-id', [RegisterController::class, 'generate_user_id'])->name('generate_user_id');
+});
+
+Route::prefix('dashboard')->group(function () {
+    Route::get('/index', [DashboardController::class, 'index'])->name('dashboard.index');
+    Route::get('/summary', [DashboardController::class, 'summary'])->name('dashboard.summary');
+    Route::get('/chart', [DashboardController::class, 'chart'])->name('dashboard.chart');
 });
 
 Route::prefix('customer')->group(function () {

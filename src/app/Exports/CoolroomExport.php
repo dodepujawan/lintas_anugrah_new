@@ -46,84 +46,65 @@ class CoolroomExport implements
 
     public function collection()
     {
-        $query=Coolroom::query()
-
+        $query = Coolroom::query()
             ->select([
-
                 'TGLSJ',
-
                 'NOSJ',
-
                 'CUSTOMER',
-
                 'JUMLAH',
-
                 'UNIT',
-
                 'HARGA',
-
                 'DISC',
-
                 'NDISC',
-
                 'DPP',
-
                 'PPN',
-
                 'NPPN',
 
-                DB::raw(
-                    'CAST(GRAND AS DECIMAL(15,2)) as GRAND'
-                ),
+                DB::raw('CAST(GRAND AS DECIMAL(15,2)) as GRAND'),
 
                 'INVOICE',
-
                 'TGLINVOICE'
-
-            ])
-
-            ->whereBetween('TGLSJ',[
-
-                $this->tanggalDari,
-
-                $this->tanggalSampai
-
             ]);
-            $query->when($this->customer, function ($q) {
-                $q->where(
-                    'CUSTOMER_KODE',
-                    $this->customer
-                );
-            });
 
-        // =====================
-        // FILTER STATUS
-        // =====================
-        if($this->status=='belum'){
+        $query->when($this->customer, function ($q) {
+            $q->where(
+                'CUSTOMER_KODE',
+                $this->customer
+            );
+        });
 
-            $query->where(function($q){
+        if ($this->status === 'belum') {
 
+            $query->whereBetween('TGLSJ', [
+                $this->tanggalDari,
+                $this->tanggalSampai
+            ]);
+
+            $query->where(function ($q) {
                 $q->whereNull('INVOICE')
-                    ->orWhere('INVOICE','');
-
+                ->orWhere('INVOICE', '');
             });
 
-        }else{
+            $orderBy = 'TGLSJ';
+
+        } else {
+
+            $query->whereBetween('TGLINVOICE', [
+                $this->tanggalDari,
+                $this->tanggalSampai
+            ]);
 
             $query->whereNotNull('INVOICE')
-                ->where('INVOICE','!=','');
+                ->where('INVOICE', '!=', '');
 
+            $orderBy = 'TGLINVOICE';
         }
 
-        $data=$query
-            ->orderBy('TGLSJ')
+        $data = $query
+            ->orderBy($orderBy)
             ->get();
 
-        // =====================
-        // TOTAL GRAND
-        // =====================
-        $this->grandTotal=
-            $data->sum('GRAND');
+        $this->grandTotal = $data->sum('GRAND');
 
         return $data;
     }

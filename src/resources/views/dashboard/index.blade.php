@@ -69,7 +69,27 @@
     <!--! Template customizer & Theme config files MUST be included after core stylesheets and helpers.js in the <head> section -->
     <!--? Config:  Mandatory theme config file contain global vars & default theme options, Set your preferred theme option in this file.  -->
     <script src="{{ asset('dashboard/sneat/assets/js/config.js') }}"></script>
-
+    <style>
+        /* Button Scrol Atass */
+        #btnTop {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            width: 55px;
+            height: 55px;
+            border: none;
+            border-radius: 50%;
+            display: none;
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        #btnTop i{
+            font-size: 28px;
+            line-height: 1;
+        }
+    </style>
   </head>
 
   <body>
@@ -187,7 +207,9 @@
               </div>
             </footer>
             <!-- / Footer -->
-
+            <button id="btnTop">
+                <i class='bx bx-chevron-up'></i>
+            </button>
             <div class="content-backdrop fade"></div>
           </div>
           <!-- Content wrapper -->
@@ -226,6 +248,26 @@
 
     {{-- Select2 --}}
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+    {{-- CART JS --}}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        // Untuk Btn Scroll Atas
+        $(window).scroll(function () {
+            if ($(this).scrollTop() > 200) {
+                $('#btnTop').fadeIn();
+            } else {
+                $('#btnTop').fadeOut();
+            }
+        });
+        $('#btnTop').click(function () {
+            $('html, body').animate({
+                scrollTop: 0
+            }, 250);
+        });
+    </script>
+
     @yield('footer')
   </body>
 </html>

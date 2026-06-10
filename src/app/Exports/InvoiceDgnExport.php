@@ -56,49 +56,44 @@ class InvoiceDgnExport implements
                 'TGLINVOICE',
                 'STS',
             ])
+            ->where('JENIS', 'REN');
 
-            ->whereBetween('TGLMUAT', [
+        // Filter customer
+        $query->when($this->customer, function ($q) {
+            $q->where('CUSTOMER_KODE', $this->customer);
+        });
+
+        if ($this->status === 'belum') {
+
+            $query->whereBetween('TGLMUAT', [
                 $this->tanggalDari,
                 $this->tanggalSampai
-            ])
-
-            ->where('JENIS', 'REN');
-            $query->when($this->customer, function ($q) {
-                $q->where(
-                    'CUSTOMER_KODE',
-                    $this->customer
-                );
-            });
-
-        // =============================
-        // BELUM INVOICE
-        // =============================
-        if ($this->status == 'belum') {
+            ]);
 
             $query->where(function ($q) {
-
                 $q->whereNull('INVOICE')
-                    ->orWhere('INVOICE', '');
-
+                ->orWhere('INVOICE', '');
             });
+
+            $orderBy = 'TGLMUAT';
 
         } else {
 
-            // =============================
-            // SUDAH INVOICE
-            // =============================
+            $query->whereBetween('TGLINVOICE', [
+                $this->tanggalDari,
+                $this->tanggalSampai
+            ]);
+
             $query->whereNotNull('INVOICE')
                 ->where('INVOICE', '!=', '');
 
+            $orderBy = 'TGLINVOICE';
         }
 
         $data = $query
-            ->orderBy('TGLMUAT')
+            ->orderBy($orderBy)
             ->get();
 
-        // =============================
-        // TOTAL GRAND
-        // =============================
         $this->grandTotal = $data->sum('GRAND');
 
         return $data;
