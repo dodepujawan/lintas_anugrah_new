@@ -89,6 +89,22 @@
             font-size: 28px;
             line-height: 1;
         }
+
+        /* MEMPERKECIL UKURAN TABBLE DATATABLES GLOBBAL */
+        /* Memperkecil Table */
+        /* Global - berlaku untuk semua table DataTables */
+        table.dataTable thead th,
+        table.dataTable tbody td {
+            padding: 6px 10px;
+            font-size: 13px;
+        }
+
+        table.dataTable thead th {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: .04em;
+        }
     </style>
   </head>
 

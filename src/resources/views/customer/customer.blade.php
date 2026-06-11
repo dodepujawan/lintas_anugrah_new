@@ -23,6 +23,13 @@
         margin: 0;
     }
 
+    /* Memperkecil Table
+    table#mcustomer-table.dataTable thead th,
+    table#mcustomer-table.dataTable tbody td {
+        padding: 6px 10px;
+        font-size: 13px;
+    } */
+
     /* Untuk mobile */
     @media (max-width: 576px) {
         .card-customer-header {
@@ -246,7 +253,7 @@
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
-                        <table class="table table-bordered table-striped" id="mcustomer-table">
+                        <table class="table table-bordered table-striped table-sm" id="mcustomer-table">
                             <thead>
                                 <tr>
                                     <th>No</th>
@@ -280,7 +287,9 @@
       <!-- Header -->
       <div class="modal-header">
         <h5 class="modal-title" id="modal-title">Tambah Customer</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        {{-- <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button> --}}
+        <button type="button" data-bs-dismiss="modal" aria-label="Close" style="background:rgba(255,255,255,0.2);border:none;border-radius:6px; width:32px;height:32px;color:#fff;font-size:18px;line-height:1; cursor:pointer;transition:background .2s" onmouseover="this.style.background='rgba(255,255,255,0.35)'" onmouseout="this.style.background='rgba(255,255,255,0.2)'">&times;
+        </button>
       </div>
 
       <!-- Tab Nav -->
@@ -565,7 +574,9 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">Detail Customer</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                {{-- <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button> --}}
+                <button type="button" data-bs-dismiss="modal" aria-label="Close" style="background:rgba(255,255,255,0.2);border:none;border-radius:6px; width:32px;height:32px;color:#fff;font-size:18px;line-height:1; cursor:pointer;transition:background .2s" onmouseover="this.style.background='rgba(255,255,255,0.35)'" onmouseout="this.style.background='rgba(255,255,255,0.2)'">&times;
+                </button>
             </div>
             <div class="modal-body" id="view-content">
                 <!-- Content will be loaded by AJAX -->
