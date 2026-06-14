@@ -312,9 +312,17 @@ class CoolroomController extends Controller
         $user=DB::table('users')
             ->where('user_id',$coolroom->USERINPUT)
             ->first();
-        $pdf=new \Mpdf\Mpdf([
-            'mode'=>'utf-8',
-            'format'=>'A4'
+
+        $tempPath = storage_path('app/mpdf-temp');
+
+        if (!is_dir($tempPath)) {
+            mkdir($tempPath, 0775, true);
+        }
+
+        $pdf = new \Mpdf\Mpdf([
+            'mode'    => 'utf-8',
+            'format'  => 'A4',
+            'tempDir' => $tempPath,
         ]);
         $html=view(
             'coolroom.coolroom-pdf',

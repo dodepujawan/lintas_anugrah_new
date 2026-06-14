@@ -647,6 +647,12 @@ class RentPendinginGenerateInvoiceController extends Controller
 
         $html = view('rentPendinginInvoiceGen.rentPendingin-gen-pdf', compact('master','details','arh','signature'))->render();
 
+        $tempPath = storage_path('app/mpdf-temp');
+
+        if (!is_dir($tempPath)) {
+            mkdir($tempPath, 0775, true);
+        }
+
         $mpdf = new Mpdf([
             'mode' => 'utf-8',
             'format' => 'A4',
@@ -654,6 +660,7 @@ class RentPendinginGenerateInvoiceController extends Controller
             'margin_bottom' => 15,
             'margin_left' => 15,
             'margin_right' => 15,
+            'tempDir' => $tempPath,
         ]);
 
         $mpdf->WriteHTML($html);

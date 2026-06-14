@@ -300,6 +300,12 @@ class ExpedisiKwitansiController extends Controller
 
         $html = view('expedisiKwitansi.expedisi-kwitansi-pdf', compact('master','details','arh','signature'))->render();
 
+        $tempPath = storage_path('app/mpdf-temp');
+
+        if (!is_dir($tempPath)) {
+            mkdir($tempPath, 0775, true);
+        }
+
         $mpdf = new Mpdf([
             'mode' => 'utf-8',
             'format' => 'A4',
@@ -307,6 +313,7 @@ class ExpedisiKwitansiController extends Controller
             'margin_bottom' => 15,
             'margin_left' => 15,
             'margin_right' => 15,
+            'tempDir' => $tempPath,
         ]);
 
         $mpdf->WriteHTML($html);

@@ -1018,8 +1018,15 @@ class ExpedisiController extends Controller
 
         $header = $data->first();
 
+        $tempPath = storage_path('app/mpdf-temp');
+
+        if (!is_dir($tempPath)) {
+            mkdir($tempPath, 0775, true);
+        }
+
         $mpdf = new \Mpdf\Mpdf([
-            'format' => 'A4'
+            'format'  => 'A4',
+            'tempDir' => $tempPath,
         ]);
 
         $html = view('expedisi.expedisi-muat-pdf', compact(
@@ -1029,10 +1036,9 @@ class ExpedisiController extends Controller
 
         $mpdf->WriteHTML($html);
 
-        return response($mpdf->Output(
-            "Laporan-Muat-$nomuat.pdf",
-            'I'
-        ))->header('Content-Type', 'application/pdf');
+        return response(
+            $mpdf->Output("Laporan-Muat-$nomuat.pdf", 'I')
+        )->header('Content-Type', 'application/pdf');
     }
 
     private function generateNomuatWithLock(){
@@ -1119,6 +1125,12 @@ class ExpedisiController extends Controller
             }
         }
 
+        $tempPath = storage_path('app/mpdf-temp');
+
+        if (!is_dir($tempPath)) {
+            mkdir($tempPath, 0775, true);
+        }
+
         $mpdf = new Mpdf([
             'mode' => 'utf-8',
             'format' => 'A4',
@@ -1126,6 +1138,7 @@ class ExpedisiController extends Controller
             'margin_bottom' => 10,
             'margin_left' => 10,
             'margin_right' => 10,
+            'tempDir' => $tempPath,
         ]);
 
         $html = view('expedisi.expedisi-surjal-pdf', compact('expedisi'))->render();

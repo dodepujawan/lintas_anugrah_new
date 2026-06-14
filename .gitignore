@@ -30,3 +30,9 @@ npm_data/database.sqlite
 
 # TAMBAHAN TERBARU 13-5-2026
 npm_data/logs/
+# TAMBAHAN TERBARU 13-6-2026
+# Nginx Set Folder
+npm_data/
+npm_letsencrypt/
+# Docker logs
+logs/
