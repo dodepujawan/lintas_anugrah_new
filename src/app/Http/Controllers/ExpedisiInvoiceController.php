@@ -98,8 +98,10 @@ class ExpedisiInvoiceController extends Controller
             $expedisi->whereNotNull('GB')
             ->where('GB', '!=', '')
             ->where('HARGA', '>', 0)
-            ->whereNotNull('INVOICE')
-            ->where('INVOICE', '!=', '');
+            ->where(function ($q) {
+                $q->whereNull('INVOICE')
+                ->orWhere('INVOICE', '');
+            });
         }
 
         return DataTables::of($expedisi)
@@ -151,6 +153,10 @@ class ExpedisiInvoiceController extends Controller
             $q->whereNull('GB')
             ->orWhere('GB', '');
         })
+        ->where(function ($q) {
+            $q->whereNull('INVOICE')
+            ->orWhere('INVOICE', '');
+        })
         ->orderBy('TGLMUAT');
 
         return DataTables::of($data)
@@ -200,6 +206,7 @@ class ExpedisiInvoiceController extends Controller
                 'JENISHRG' => $r->JENISHRG,
                 'NAMA_KENDARAAN' => $r->NAMA_KENDARAAN,
                 'JUMLAH' => number_format($r->JUMLAH ?? 0,0,',','.').' '.$r->UNIT,
+                'jumlahreal' => $r->JUMLAH,
 
                 // ❗ ini kemungkinan 0 semua (karena belum invoice)
                 'harga_formatted' => 'Rp '.number_format($r->HARGA ?? 0,0,',','.'),

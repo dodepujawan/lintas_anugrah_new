@@ -446,6 +446,7 @@ $(document).ready(function() {
         });
 
         $('input[name="filter_invoice"]').change(function () {
+            refreshGabungButton();
             tableInvoiceExp.ajax.reload();
         });
     // ============================= End Of Tabel No Muat =====================================
@@ -500,15 +501,17 @@ $(document).ready(function() {
             loadDataGabung(customerKode, gbExist);
         });
     });
+    // ============================ End Of Pilih No Muat ==================================
+    // ============================ End Of Tampilkan Detail Right Table ================================
     function loadDataGabung(customerKode, gbExist, noSJ) {
-        // destroy dulu kalau sudah ada
+        // Destroy existing DataTable instance if any
         if ($.fn.DataTable.isDataTable('#GabungExpTableRight')) {
             $('#GabungExpTableRight').DataTable().destroy();
         }
 
         $('#GabungExpTableRight').DataTable({
             processing: true,
-            serverSide: true,
+            serverSide: false,
             searching: false,
             paging: false,
             info: false,
@@ -531,29 +534,30 @@ $(document).ready(function() {
                 { data: 'harga_formatted' },
                 { data: 'gtotal_formatted' }
             ],
-            // tambahkan parameter settings, json
-            initComplete: function (settings, json) {
-                // console.log(json.data.length);
-                // Data sudah siap
+            initComplete: function(settings, json) {
+                // Data is ready; populate customer fields if data exists
                 if (json.data && json.data.length > 0) {
                     let row = json.data[0];
-                        console.log("kode" +row.CUSTOMER_KODE);
-                        console.log("kode inv " +gbExist);
+                    console.log("kode " + row.CUSTOMER_KODE);
+                    console.log("kode inv " + gbExist);
                     $('#customer_kode_gabung_exp_inv').val(row.CUSTOMER_KODE);
                     $('#customer_gabung_exp_inv').val(row.CUSTOMER);
                 }
-                // 🔥 cek radio invoice untuk tau mode simpan atau edit
+
+                // Check radio invoice mode to determine save or edit
                 let filterMode = $('input[name="filter_invoice"]:checked').val();
                 if (filterMode === 'sudah') {
                     loadExistingInvoice(gbExist);
                 }
+
+                // Hide loading modal and show form
                 $('#loading_modal').modal('hide');
                 $('#master_form_exp_inv').addClass('d-none');
                 $('#form_gabung_inv_exp').removeClass('d-none');
             }
         });
     }
-    // ============================ End Of Pilih No Muat ==================================
+    // ============================ End Of Tampilkan Detail Right Table ==================================
     // =============================== Return Table Expedisi =====================================
     $('#returnInvExpBtn').on('click', function () {
         // reload table
@@ -711,7 +715,9 @@ $(document).ready(function() {
         $('#item_gabung_exp_inv').val(
             decodeHtml(selectedGabungRows[0].PESANAN)
         )
-        $('#jumlah_gabung_exp_inv').val(parseFloat(selectedGabungRows[0].jumlahreal));
+        console.log(selectedGabungRows[0]);
+        // $('#jumlah_gabung_exp_inv').val(parseFloat(selectedGabungRows[0].jumlahreal));
+        $('#jumlah_gabung_exp_inv').val(parseFloat(selectedGabungRows[0].jumlahreal ??selectedGabungRows[0].JUMLAH ?? 0));
         $('#harga_gabung_exp_inv').val(selectedGabungRows[0].HARGA);
         $('#diskon_gabung_exp_inv').val(parseFloat(selectedGabungRows[0].DISC));
         $('#dc_gabung_exp_inv').val(selectedGabungRows[0].DC);
@@ -1065,6 +1071,21 @@ $(document).ready(function() {
         btn.addClass('btn btn-primary');
 
         btn.html('<i class="bx bx-plus-circle me-1"></i> Gabung Surat Jalan');
+    }
+
+    function refreshGabungButton() {
+        let mode = $('input[name="filter_invoice"]:checked').val();
+        if (mode === 'sudah') {
+            $('#gabungInvExpBtn')
+                .removeClass('btn-primary')
+                .addClass('btn-success')
+                .html('<i class="bx bx-edit me-1"></i>Edit Gabung Surat Jalan');
+        } else {
+            $('#gabungInvExpBtn')
+                .removeClass('btn-success')
+                .addClass('btn-primary')
+                .html('<i class="bx bx-plus-circle me-1"></i>Gabung Surat Jalan');
+        }
     }
 
     // Fungsi Print Electron JS
