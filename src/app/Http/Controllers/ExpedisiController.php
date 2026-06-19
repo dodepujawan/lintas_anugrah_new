@@ -202,6 +202,7 @@ class ExpedisiController extends Controller
             'id',
             'NOSJ',
             'tglsj',
+            'NOMUAT',
             'CUSTOMER',
             'rute',
             'JUMLAH',
@@ -219,9 +220,15 @@ class ExpedisiController extends Controller
             'created_at'
         ])->where('JENIS', 'EKS')
         // BELUM MUAT
+        // ->where(function($query) {
+        //     $query->where('NOMUAT', '')
+        //         ->orWhereNull('NOMUAT');
+        // })
+
+        // BELUM INVOICE
         ->where(function($query) {
-            $query->where('NOMUAT', '')
-                ->orWhereNull('NOMUAT');
+            $query->where('GB', '')
+                ->orWhereNull('GB');
         })
 
         // BELUM INVOICE
@@ -251,6 +258,7 @@ class ExpedisiController extends Controller
             $search = $request->search_muat;
             $expedisi->where(function($query) use ($search) {
                 $query->where('NOSJ', 'like', '%' . $search . '%')
+                    ->orWhere('NOMUAT', 'like', '%' . $search . '%')
                     ->orWhere('CUSTOMER', 'like', '%' . $search . '%')
                     ->orWhere('rute', 'like', '%' . $search . '%');
             });

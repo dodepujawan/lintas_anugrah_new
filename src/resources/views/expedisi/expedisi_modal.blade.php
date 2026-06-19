@@ -36,6 +36,7 @@
                         <th width="30">No</th>
                         <th>NO SJ</th>
                         <th>TGL SJ</th>
+                        <th>NO MUAT</th>
                         <th>CUSTOMER</th>
                         <th>RUTE</th>
                         <th>JUMLAH</th>

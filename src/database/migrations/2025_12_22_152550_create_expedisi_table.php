@@ -102,7 +102,7 @@ return new class extends Migration
             $table->double('SUHU', 12, 2)->nullable();
 
             $table->char('kunci', 100)->nullable();
-            $table->string('KETERANGAN', 100)->nullable();
+            $table->text('KETERANGAN')->nullable();
             $table->char('STS', 20)->nullable();
             $table->char('JENIS', 3)->nullable();
 

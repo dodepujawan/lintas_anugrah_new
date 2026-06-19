@@ -101,6 +101,7 @@
     <div class="col-md-4">
       <label class="form-label">NO SJ</label>
       <div class="input-group input-group-sm">
+        <input type="text" class="form-control" id="no_muat_expedisi_flag" name="no_muat_expedisi_flag" hidden>
         <input type="text" class="form-control" id="no_sj_expedisi" name="no_sj_expedisi" readonly>
         <button class="btn btn-outline-secondary" id="no_sj_expedisi_btn"><i class="bx bx-search"></i></button>
       </div>
@@ -145,7 +146,7 @@
       <div class="input-group input-group-sm">
         <input type="hidden" id="kendaraan_expedisi_id" name="kendaraan_expedisi_id">
         <input type="text" class="form-control" id="kendaraan_expedisi" name="kendaraan_expedisi" readonly>
-        <button class="btn btn-outline-secondary" id="kendaraan_expedisi_btn"><i class="bx bx-search"></i></button>
+        <button class="btn btn-outline-secondary" id="kendaraan_expedisi_btn" data-id="1"><i class="bx bx-search"></i></button>
       </div>
     </div>
 
@@ -323,7 +324,7 @@
                         <div class="input-group input-group-sm">
                             <input type="hidden" id="kendaraan_kode_muat_expedisi" name="kendaraan_kode_muat_expedisi">
                             <input type="text" class="form-control" id="kendaraan_muat_expedisi" name="kendaraan_muat_expedisi">
-                            <button class="btn btn-outline-secondary" type="button" id="kendaraan_muat_expedisi_btn">
+                            <button class="btn btn-outline-secondary" type="button" id="kendaraan_muat_expedisi_btn" data-id="2">
                                 <i class="bx bx-search"></i>
                             </button>
                         </div>
@@ -344,14 +345,14 @@
                 <div class="row align-items-end">
                     <div class="col-md-3 mb-2">
                         <label class="form-label mb-1">PLAT</label>
-                        <input type="text" class="form-control form-control-sm" id="plat_nomor_muat_expedisi" name="plat_nomor_muat_expedisi">
+                        <input type="text" class="form-control form-control-sm" id="plat_nomor_muat_expedisi" name="plat_nomor_muat_expedisi" readonly>
                     </div>
                     <div class="col-md-3 mb-2">
                         <label class="form-label mb-1">DRIVER 1</label>
                         <div class="input-group input-group-sm">
                             <input type="hidden" id="driver1_kode_muat_expedisi" name="driver1_kode_muat_expedisi">
                             <input type="text" class="form-control" id="driver1_muat_expedisi" name="driver1_muat_expedisi">
-                            <button class="btn btn-outline-secondary" type="button" id="driver1_muat_expedisi_btn">
+                            <button class="btn btn-outline-secondary" type="button" id="driver1_muat_expedisi_btn" data-id="3">
                                 <i class="bx bx-search"></i>
                             </button>
                         </div>
@@ -361,22 +362,15 @@
                         <div class="input-group input-group-sm">
                             <input type="hidden" id="driver2_kode_muat_expedisi" name="driver2_kode_muat_expedisi">
                             <input type="text" class="form-control" id="driver2_muat_expedisi" name="driver2_muat_expedisi">
-                            <button class="btn btn-outline-secondary" type="button" id="driver2_muat_expedisi_btn">
+                            <button class="btn btn-outline-secondary" type="button" id="driver2_muat_expedisi_btn" data-id="4">
                                 <i class="bx bx-search"></i>
                             </button>
                         </div>
                     </div>
-
-                    <div class="col-md-1 mb-2">
+                    <div class="col-md-3 mb-2">
                         <label class="form-label mb-1">KM AWAL</label>
                         <input type="number" step="0.1" class="form-control form-control-sm" id="km_awal_muat_expedisi" name="km_awal_muat_expedisi">
                     </div>
-
-                    <div class="col-md-1 mb-2">
-                        <label class="form-label mb-1">KM AKHIR</label>
-                        <input type="number" step="0.1" class="form-control form-control-sm" id="km_akhir_muat_expedisi" name="km_akhir_muat_expedisi">
-                    </div>
-
                     {{-- <div class="col-md-1 mb-2">
                         <label class="form-label mb-1">AC</label>
                         <select class="form-select form-select-sm" id="ac_kendaraan_muat_expedisi" name="ac_kendaraan_muat_expedisi">
@@ -385,12 +379,15 @@
                             <option value="0">T</option>
                         </select>
                     </div> --}}
-
                 </div>
 
 
                 {{-- BARIS 3 --}}
                 <div class="row align-items-end">
+                    <div class="col-md-3 mb-2">
+                        <label class="form-label mb-1">KM AKHIR</label>
+                        <input type="number" step="0.1" class="form-control form-control-sm" id="km_akhir_muat_expedisi" name="km_akhir_muat_expedisi">
+                    </div>
                     <div class="col-md-3 mb-2">
                         <label class="form-label mb-1">UANG JALAN</label>
                         <input type="text" class="form-control form-control-sm rupiah text-end" id="uang_jalan_muat_expedisi" name="uang_jalan_muat_expedisi">
@@ -532,6 +529,7 @@ $(document).ready(function() {
                 { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false },
                 { data: 'NOSJ', name: 'NOSJ' },
                 { data: 'tglsj', name: 'tglsj' },
+                { data: 'NOMUAT', name: 'NOMUAT' },
                 { data: 'CUSTOMER', name: 'CUSTOMER' },
                 { data: 'rute', name: 'rute' },
                 { data: 'JUMLAH', name: 'JUMLAH' },
@@ -617,7 +615,8 @@ $(document).ready(function() {
                         const data = response.data;
                         setButtonToUpdateMode();
                          // DATA DOKUMEN
-                        $('#wilayah_expedisi').val(data.wilayah || 'denpasar');
+                        $('#no_muat_expedisi_flag').val(data.no_muat || '');
+                        $('#wilayah_expedisi').val(data.wilayah || 'DENPASAR');
 
                         // Customer
                         $('#customer_expedisi_id').val(data.customer_id || '');
@@ -823,8 +822,11 @@ $(document).ready(function() {
     });
     // =============================== End Of Pilih Item ==================================
     // =================================== Pilih Kendaraan =====================================
-    $(document).on('click', '#kendaraan_expedisi_btn', function(e) {
-
+    $(document).on('click', '#kendaraan_expedisi_btn, #kendaraan_muat_expedisi_btn', function(e) {
+        e.preventDefault();
+        var kodeCus = $(this).data('id');
+        // Simpan kodeKen ke modal sebagai data atribut
+        $('#kendaraanModalExp').data('kode-cus', kodeCus);
         $('#kendaraanModalExp').modal('show');
 
         // hancurkan datatable jika sudah pernah dipakai
@@ -857,22 +859,30 @@ $(document).ready(function() {
     // ### Select Button
     $(document).on('click', '.pickKendaraanModel', function(e) {
         e.preventDefault();
+        var kodeCus = $('#kendaraanModalExp').data('kode-cus');
         var kodeKendaraan = $(this).data('id');
         // Ambil KETERANGAN dari kolom di baris yang sama
         var row = $(this).closest('tr');
         var keterangan = row.find('td:eq(1)').text();
         var nama = row.find('td:eq(2)').text();
+        var plat = row.find('td:eq(3)').text();
 
-        // Mengisi nilai ke elemen yang dituju
-        $('#kendaraan_expedisi_id').val(keterangan);
-        $('#kendaraan_expedisi').val(nama);
+        // Cek kodeKen untuk menentukan field mana yang diisi
+        if (kodeCus == 1) {
+            $('#kendaraan_expedisi_id').val(keterangan);
+            $('#kendaraan_expedisi').val(nama);
+        } else if (kodeCus == 2) {
+            $('#kendaraan_kode_muat_expedisi').val(keterangan);
+            $('#kendaraan_muat_expedisi').val(nama);
+            $('#plat_nomor_muat_expedisi').val(plat);
+        }
 
         // Tutup modal
         $('#kendaraanModalExp').modal('hide');
     });
     // =============================== End Of Pilih Kendaraan ==================================
     // =================================== Pilih Driver =====================================
-    $(document).on('click', '#driver_1_expedisi_btn, #driver_2_expedisi_btn', function(e) {
+    $(document).on('click', '#driver_1_expedisi_btn, #driver_2_expedisi_btn, #driver1_muat_expedisi_btn, #driver2_muat_expedisi_btn', function(e) {
         e.preventDefault();
         var kodeKen = $(this).data('id');
         // Simpan kodeKen ke modal sebagai data atribut
@@ -927,6 +937,12 @@ $(document).ready(function() {
         } else if (kodeKen == 2) {
             $('#driver_2_expedisi_id').val(kodeDriver);
             $('#driver_2_expedisi').val(nama);
+        } else if (kodeKen == 3) {
+            $('#driver1_kode_muat_expedisi').val(kodeDriver);
+            $('#driver1_muat_expedisi').val(nama);
+        } else if (kodeKen == 4) {
+            $('#driver2_kode_muat_expedisi').val(kodeDriver);
+            $('#driver2_muat_expedisi').val(nama);
         }
 
         // Tutup modal
@@ -970,7 +986,7 @@ $(document).ready(function() {
 
         // Validasi required fields
         if (!$('#tgl_sj_expedisi').val()) {
-            errors.push('Tgl Muat harus diisi');
+            errors.push('Tgl surat jalan harus diisi');
             isValid = false;
         }
         if (!$('#customer_expedisi').val()) {
@@ -1130,7 +1146,8 @@ $(document).ready(function() {
                     focusConfirm: true
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        if (userRole === 'admin') {
+                        const noMuat = $('#no_muat_expedisi_flag').val();
+                        if (userRole === 'admin' && (!noMuat || noMuat.trim() === '')) {
                             addRowExpedisi({
                                 NOSJ: response.data.NOSJ,
                                 tglsj: $('#tgl_sj_expedisi').val(),
@@ -1178,18 +1195,29 @@ $(document).ready(function() {
     // ======================== End Of Submit Data Form Surjal =============================
     // ================================= Append Form to Table No Muat ====================================
     $('#buttonAppendExp').on('click', function () {
+        const noMuat = $('#no_muat_expedisi_flag').val();
         if (userRole === 'admin') {
-            addRowExpedisi({
-                NOSJ: $('#no_sj_expedisi').val(),
-                tglsj: $('#tgl_sj_expedisi').val(),
-                JUMLAH: $('#jumlah_expedisi').val(),
-                HARGA: $('#harga_expedisi').val(),
-                DC: $('#del_charge_expedisi').val(),
-                NDISC: $('#disc_expedisi').val(),
-                PPN: $('#ppn_expedisi').val(),
-                JENISHRG: $('#item_expedisi_tipe').val(),
-                GRAND: $('#grand_total_expedisi').val(),
-            });
+            if (!noMuat || noMuat.trim() === '') {
+                addRowExpedisi({
+                    NOSJ: $('#no_sj_expedisi').val(),
+                    tglsj: $('#tgl_sj_expedisi').val(),
+                    JUMLAH: $('#jumlah_expedisi').val(),
+                    HARGA: $('#harga_expedisi').val(),
+                    DC: $('#del_charge_expedisi').val(),
+                    NDISC: $('#disc_expedisi').val(),
+                    PPN: $('#ppn_expedisi').val(),
+                    JENISHRG: $('#item_expedisi_tipe').val(),
+                    GRAND: $('#grand_total_expedisi').val(),
+                });
+            } else {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Nomor Muat Sudah Ada',
+                    text: 'Data yang sudah memiliki nomor muat tidak dapat ditambahkan ke tabel.',
+                    confirmButtonText: 'OK'
+                });
+                return;
+            }
         }
         resetFormExpedisi();
     });

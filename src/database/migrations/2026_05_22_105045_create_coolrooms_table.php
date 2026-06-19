@@ -63,7 +63,7 @@ return new class extends Migration
             // ======================
             // KETERANGAN
             // ======================
-            $table->string('KETERANGAN', 255)->nullable();
+            $table->text('KETERANGAN')->nullable();
             // ======================
             // JURNAL
             // ======================
