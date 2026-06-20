@@ -317,7 +317,10 @@
                     </div>
                     <div class="col-md-3 mb-2">
                         <label class="form-label mb-1">RUTE</label>
-                        <input type="text" class="form-control form-control-sm" id="rute_muat_expedisi" name="rute_muat_expedisi">
+                        <div class="input-group input-group-sm">
+                            <input type="text" class="form-control" id="rute_muat_expedisi" name="rute_muat_expedisi">
+                            <button class="btn btn-outline-secondary" type="button" data-bs-toggle="modal" data-bs-target="#ruteModalExp"><i class="bx bx-search"></i></button>
+                        </div>
                     </div>
                     <div class="col-md-3 mb-2">
                         <label class="form-label mb-1">KENDARAAN</label>
@@ -875,6 +878,16 @@ $(document).ready(function() {
             $('#kendaraan_kode_muat_expedisi').val(keterangan);
             $('#kendaraan_muat_expedisi').val(nama);
             $('#plat_nomor_muat_expedisi').val(plat);
+            $.ajax({
+                url: "{{ route('expedisi.dataKm') }}",
+                type: 'GET',
+                data: {
+                    kendaraan: keterangan
+                },
+                success: function(res) {
+                    $('#km_awal_muat_expedisi').val(res.km_akhir);
+                }
+            });
         }
 
         // Tutup modal
@@ -1283,6 +1296,23 @@ $(document).ready(function() {
         });
     });
     // ============================= End Of Pilih No Muat =====================================
+    // ============================ Rute Table Muat ===================================
+     $('#ruteTableExp').DataTable({
+        processing: true,
+        serverSide: true,
+        ajax: '{{ route("rute-muat.data") }}',
+        columns: [
+            { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false },
+            { data: 'RUTE', name: 'RUTE' },
+            { data: 'created_at', name: 'created_at' },
+            { data: 'action', name: 'action', orderable: false, searchable: false, width: '20%'}
+        ]
+    });
+    window.pickDataRuteMuat = function(id, ruteText) {
+        $('#ruteModalExp').modal('hide');
+        $('#rute_muat_expedisi').val(ruteText);
+    }
+    // ============================ End Of Rute Table Muat ===================================
     // ============================= Show Detail No Muat ================================
     // Event listener untuk tombol pickMuat
     $(document).on('click', '.pickMuat', function () {
@@ -1419,6 +1449,17 @@ $(document).ready(function() {
     // ============================ Simpan Submit No Muat =================================
     $('#simpanMuatExpBtn').on('click', function () {
         // if (!validateForm()) return;
+        let kmAwal  = parseFloat($('#km_awal_muat_expedisi').val()) || 0;
+        let kmAkhir = parseFloat($('#km_akhir_muat_expedisi').val()) || 0;
+        if(kmAkhir < kmAwal){
+            Swal.fire({
+                icon: 'warning',
+                title: 'Peringatan',
+                text: 'KM Akhir tidak boleh lebih kecil dari KM Awal'
+            });
+            return false;
+        }
+        return true;
 
         let nosjList = [];
 

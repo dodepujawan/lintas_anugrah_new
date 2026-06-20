@@ -164,6 +164,8 @@ Route::prefix('expedisi')->group(function() {
     Route::post('/destroy/{id}', [ExpedisiController::class, 'destroySurjal'])->name('expedisi.destroy');
     Route::post('/destroy/muat/{nomuat}', [ExpedisiController::class, 'destroyMuat'])->name('expedisi-muat.destroy');
     Route::post('/store/muat', [ExpedisiController::class, 'storeMuat'])->name('expedisi-muat.store');
+    Route::get('/data/rute', [ExpedisiController::class, 'getRuteMuat'])->name('rute-muat.data');
+    Route::get('/expedisi/get-km-terakhir', [ExpedisiController::class, 'getKmTerakhir'])->name('expedisi.dataKm');
     // PDF
     Route::get('/expedisi/{id}/print-surat-jalan', [ExpedisiController::class, 'printSuratJalan'])->name('expedisi.printSuratJalan');
     Route::get('/expedisi/{nomuat}/print-nomuat', [ExpedisiController::class, 'pdfMuat'])->name('expedisi.pdfMuat');

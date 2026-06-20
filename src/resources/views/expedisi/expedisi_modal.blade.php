@@ -235,6 +235,66 @@
         </div>
     </div>
 </div>
+<!-- Modal Tabel Rute -->
+<!-- Modal -->
+<div class="modal fade" id="ruteModalExp" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Data Rute</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                {{-- <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h2 class="h5 mb-0 text-dark">Data Rute</h2>
+                    <button class="btn btn-primary btn-sm" id="tambah_rute">
+                        <i class="fas fa-plus me-1"></i>Tambah Rute
+                    </button>
+                </div> --}}
+                <div class="table-responsive">
+                    <table id="ruteTableExp" class="table table-striped table-bordered table-hover w-100">
+                        <thead class="table-dark">
+                            <tr>
+                                <th width="5%">No</th>
+                                <th>RUTE</th>
+                                <th>Tanggal Dibuat</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Data akan di-load oleh DataTables -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Modal Tambah Rute -->
+{{-- <div class="modal fade" id="addRuteModalExp" tabindex="-1" aria-labelledby="addRuteModalExpLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addRuteModalExpLabel">Tambah Rute Baru</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="add_rute_flag">
+                <form id="ruteForm">
+                    @csrf
+                    <div class="mb-3">
+                        <label for="newRute" class="form-label">Nama Rute</label>
+                        <input type="text" class="form-control" id="newRuteExp" name="newRuteExp" placeholder="Contoh: DIY - DPS" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                <button type="button" class="btn btn-primary" onclick="saveRute()">Simpan</button>
+            </div>
+        </div>
+    </div>
+</div> --}}
  <!-- Action Buttons -->
     {{-- <div class="card-expedisi">
         <div class="row g-2">

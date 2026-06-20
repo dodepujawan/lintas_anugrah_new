@@ -7,6 +7,7 @@ use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\DB;
 use App\Models\Expedisi;
 use App\Models\Mcustomer;
+use App\Models\Rute;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Log;
 use Mpdf\Mpdf;
@@ -1011,6 +1012,37 @@ class ExpedisiController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Muatan berhasil dibatalkan'
+        ]);
+    }
+
+    public function getRuteMuat(){
+        $data = Rute::select('id', 'RUTE', 'created_at');
+
+        return DataTables::of($data)
+            ->addIndexColumn()
+            ->addColumn('action', function($row){
+                $btn = '
+                     <div class="d-flex gap-1">
+                        <button onclick="pickDataRuteMuat('.$row->id.', \''.$row->RUTE.'\')" class="btn btn-primary btn-sm me-1">Pilih</button>
+                    </div>
+                ';
+                return $btn;
+            })
+            ->editColumn('created_at', function($row){
+                return $row->created_at->format('d/m/Y H:i');
+            })
+            ->rawColumns(['action'])
+            ->make(true);
+    }
+
+    public function getKmTerakhir(Request $request)
+    {
+        $data = Expedisi::where('KENDARAAN', $request->kendaraan)
+            ->latest('id')
+            ->first();
+
+        return response()->json([
+            'km_akhir' => $data?->KM_AKHIR ?? 0
         ]);
     }
 
