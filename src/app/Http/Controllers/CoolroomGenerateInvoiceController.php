@@ -115,10 +115,16 @@ class CoolroomGenerateInvoiceController extends Controller
         // =====================
         $arh=null;
         if(!empty($coolroom->INVOICE)){
-            $arh=Arh::where(
-                'NOFAKTUR',
-                $coolroom->INVOICE
-            )->first();
+            $arh=Arh::where('NOFAKTUR',$coolroom->INVOICE)->first();
+            if ($arh) {
+                $bayar = (float) ($arh->BAYAR ?? 0);
+                if ($bayar > 0) {
+                    return response()->json([
+                        'status' => false,
+                        'message' => 'Invoice sudah memiliki pembayaran. Silakan hubungi admin.'
+                    ]);
+                }
+            }
         }
         // =====================
         // TOP KREDIT CUSTOMER
@@ -471,7 +477,19 @@ class CoolroomGenerateInvoiceController extends Controller
             return response()->json(['status' => false, 'message' => 'Invoice tidak ditemukan']);
         }
 
-        $arh = Arh::where('NOFAKTUR', $invoice)->first();
+        $arh = null;
+        if (!empty($row->INVOICE)) {
+            $arh = Arh::where('NOFAKTUR', $invoice)->first();
+            if ($arh) {
+                $bayar = (float) ($arh->BAYAR ?? 0);
+                if ($bayar > 0) {
+                    return response()->json([
+                        'status' => false,
+                        'message' => 'Invoice sudah memiliki pembayaran. Silakan hubungi admin.'
+                    ]);
+                }
+            }
+        }
 
         return response()->json([
             'status' => true,

@@ -885,7 +885,7 @@ $(document).ready(function() {
                     kendaraan: keterangan
                 },
                 success: function(res) {
-                    $('#km_awal_muat_expedisi').val(res.km_akhir);
+                    $('#km_awal_muat_expedisi').val(Math.round(Number(res.km_akhir)));
                 }
             });
         }
@@ -1021,29 +1021,30 @@ $(document).ready(function() {
         let tbody = $('#tableProsesExpedisi tbody');
         let rowCount = tbody.find('tr').length;
 
-        if (rowCount > 0) {
-            // Ambil jenis dari row pertama
-            let jenisTabel = tbody
-                .find('tr:first td[data-jenis]')
-                .data('jenis');
+        // ### Fungsi Untuk Jenis Booking Atau Eceran Harus Sama
+        // if (rowCount > 0) {
+        //     // Ambil jenis dari row pertama
+        //     let jenisTabel = tbody
+        //         .find('tr:first td[data-jenis]')
+        //         .data('jenis');
 
-            let jenisInput = $('#item_expedisi_tipe').val();
+        //     let jenisInput = $('#item_expedisi_tipe').val();
 
-            if (jenisInput && jenisTabel != jenisInput) {
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Tipe Item Berbeda',
-                    html: `
-                        Tipe item yang dipilih <b>tidak sama</b> dengan data di tabel.<br><br>
-                        <b>Solusi:</b><br>
-                        • Hapus data di tabel terlebih dahulu<br>
-                        • Atau submit data yang sudah ada
-                    `,
-                    confirmButtonText: 'OK'
-                });
-                return false;
-            }
-        }
+        //     if (jenisInput && jenisTabel != jenisInput) {
+        //         Swal.fire({
+        //             icon: 'warning',
+        //             title: 'Tipe Item Berbeda',
+        //             html: `
+        //                 Tipe item yang dipilih <b>tidak sama</b> dengan data di tabel.<br><br>
+        //                 <b>Solusi:</b><br>
+        //                 • Hapus data di tabel terlebih dahulu<br>
+        //                 • Atau submit data yang sudah ada
+        //             `,
+        //             confirmButtonText: 'OK'
+        //         });
+        //         return false;
+        //     }
+        // }
 
         if (!isValid) {
             Swal.fire({

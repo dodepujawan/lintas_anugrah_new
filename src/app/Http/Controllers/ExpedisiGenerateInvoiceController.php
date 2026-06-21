@@ -157,8 +157,16 @@ class ExpedisiGenerateInvoiceController extends Controller
         // =====================================
         $arh = null;
         if (!empty($master->INVOICE)) {
-            $arh = Arh::where('NOFAKTUR', $master->INVOICE)
-                ->first();
+            $arh = Arh::where('NOFAKTUR', $master->INVOICE)->first();
+            if ($arh) {
+                $bayar = (float) ($arh->BAYAR ?? 0);
+                if ($bayar > 0) {
+                    return response()->json([
+                        'status' => false,
+                        'message' => 'Invoice sudah memiliki pembayaran. Silakan hubungi admin.'
+                    ]);
+                }
+            }
         }
         // =====================================
         // 6. TOP KREDIT CUSTOMER
@@ -572,10 +580,19 @@ class ExpedisiGenerateInvoiceController extends Controller
         // =====================================
         // ARH
         // =====================================
-        $arh = Arh::where(
-            'NOFAKTUR',
-            $master->INVOICE
-        )->first();
+        $arh = null;
+        if (!empty($master->INVOICE)) {
+            $arh = Arh::where('NOFAKTUR', $master->INVOICE)->first();
+            if ($arh) {
+                $bayar = (float) ($arh->BAYAR ?? 0);
+                if ($bayar > 0) {
+                    return response()->json([
+                        'status' => false,
+                        'message' => 'Invoice sudah memiliki pembayaran. Silakan hubungi admin.'
+                    ]);
+                }
+            }
+        }
 
         // =====================================
         // DETAIL

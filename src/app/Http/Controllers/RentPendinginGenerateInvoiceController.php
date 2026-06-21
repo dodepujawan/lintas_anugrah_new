@@ -117,11 +117,17 @@ class RentPendinginGenerateInvoiceController extends Controller
         // DATA ARH
         // =====================================
         $arh = null;
-        if (!empty($row->INVOICE)) {
-            $arh = Arh::where(
-                'NOFAKTUR',
-                $row->INVOICE
-            )->first();
+        if (!empty($row->INVOICE)){
+            $arh = Arh::where('NOFAKTUR',$row->INVOICE)->first();
+            if ($arh) {
+                $bayar = (float) ($arh->BAYAR ?? 0);
+                if ($bayar > 0) {
+                    return response()->json([
+                        'status' => false,
+                        'message' => 'Invoice sudah memiliki pembayaran. Silakan hubungi admin.'
+                    ]);
+                }
+            }
         }
         // =====================================
         // TOP KREDIT CUSTOMER
@@ -463,7 +469,19 @@ class RentPendinginGenerateInvoiceController extends Controller
         if (!$row) {
             return response()->json(['status' => false, 'message' => 'Invoice tidak ditemukan']);
         }
-        $arh = Arh::where('NOFAKTUR', $row->INVOICE)->first();
+        $arh = null;
+        if (!empty($row->INVOICE)) {
+            $arh = Arh::where('NOFAKTUR', $row->INVOICE)->first();
+            if ($arh) {
+                $bayar = (float) ($arh->BAYAR ?? 0);
+                if ($bayar > 0) {
+                    return response()->json([
+                        'status' => false,
+                        'message' => 'Invoice sudah memiliki pembayaran. Silakan hubungi admin.'
+                    ]);
+                }
+            }
+        }
         return response()->json([
             'status' => true,
             'master' => [

@@ -540,6 +540,7 @@ class ExpedisiController extends Controller
                 'success' => true,
                 'message' => 'Data ekspedisi berhasil diupdate',
                 'data' => [
+                    'id' => $expedisi->id,
                     'NOMUAT' => $expedisi->NOMUAT,
                     'NOSJ'   => $expedisi->NOSJ,
                     'GRAND'  => number_format($expedisi->GRAND, 0, ',', '.'),

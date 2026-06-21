@@ -343,7 +343,7 @@
                         </table>
                     </div>
                     <button class="btn btn-success w-100" id="addToInvExpBtn">
-                        <i class="bx bx-arrow-from-right"></i> Tambah Surat Jalan
+                        <i class="bx bx-arrow-from-right"></i> Tambah Gabung
                     </button>
                 </div>
             </div>
