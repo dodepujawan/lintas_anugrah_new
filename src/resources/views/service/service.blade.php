@@ -88,7 +88,7 @@
                         </div>
                     </div>
 
-                    <div class="row mb-2">
+                    <div class="row mb-2" hidden>
                         <label class="col-sm-3 col-form-label">AKUN BIAYA MOBIL</label>
                         <div class="col-sm-3">
                             <input type="text" class="form-control" name="fno_prk_b_service" id="fno_prk_b_service">

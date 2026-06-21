@@ -85,6 +85,17 @@ class ServiceController extends Controller
                 // UPDATE
                 // =====================
                 $service = DB::table('service')->where('id', $id)->first();
+                // =====================
+                // CEK APH
+                // =====================
+                $aph = DB::table('aph')
+                    ->where('NOFAKTUR', $service->NO_SERVICE)
+                    ->first();
+                if ($aph && (float)$aph->BAYAR > 0) {
+                    throw new \Exception(
+                        'Hutang sudah memiliki pembayaran. Silakan hubungi admin.'
+                    );
+                }
 
                 DB::table('service')
                     ->where('id', $id)
@@ -296,11 +307,16 @@ class ServiceController extends Controller
     }
 
     private function syncAph($request, $noFaktur){
+        $aph = DB::table('aph')->where('NOFAKTUR', $noFaktur)->first();
+        if ($aph && (float)$aph->BAYAR > 0) {
+            throw new \Exception('Hutang sudah memiliki pembayaran. Tidak dapat diubah.');
+        }
+
         // hitung saldo (basic dulu)
-        $hutang   = $request->nilai_servis ?? 0;
-        $bayar    = 0;
-        $retur    = 0;
-        $discount = 0;
+        $hutang   = (float) ($request->nilai_servis ?? 0);
+        $retur    = $aph->RETUR ?? 0;
+        $discount = $aph->DISCOUNT ?? 0;
+        $bayar    = $aph->BAYAR ?? 0;
 
         $saldo = $hutang - $bayar - $retur - $discount;
 
@@ -313,9 +329,9 @@ class ServiceController extends Controller
 
                 'HUTANG'   => $hutang,
                 'UM'       => 0,
-                'BAYAR'    => $bayar,
                 'RETUR'    => $retur,
                 'DISCOUNT' => $discount,
+                'BAYAR'    => $bayar,
                 'SALDO'    => $saldo,
 
                 'KETERANGAN' => $request->keterangan_service,
