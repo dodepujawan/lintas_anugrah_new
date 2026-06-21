@@ -110,10 +110,6 @@
                             <label for="nama" class="form-label">Nama</label>
                             <input type="text" class="form-control" id="nama" name="nama" required>
                         </div>
-                        <div class="mb-3">
-                            <label for="plat" class="form-label">Plat</label>
-                            <input type="text" class="form-control" id="plat" name="plat" required>
-                        </div>
                     </div>
                     <div class="col-md-6">
                         <div class="mb-3">
@@ -121,33 +117,37 @@
                             <input type="text" class="form-control" id="jenis" name="jenis" required>
                         </div>
                         <div class="mb-3">
-                            <label for="fno_prk_b" class="form-label">FNO PRK B</label>
-                            <input type="text" class="form-control" id="fno_prk_b" name="fno_prk_b" required>
+                            <label for="plat" class="form-label">Plat</label>
+                            <input type="text" class="form-control" id="plat" name="plat" required>
                         </div>
-                        <div class="mb-3">
+                        <div class="mb-3" hidden>
+                            <label for="fno_prk_b" class="form-label">FNO PRK B</label>
+                            <input type="text" class="form-control" id="fno_prk_b" name="fno_prk_b" value="0">
+                        </div>
+                        <div class="mb-3" hidden>
                             <label for="fno_prk_p" class="form-label">FNO PRK P</label>
-                            <input type="text" class="form-control" id="fno_prk_p" name="fno_prk_p" required>
+                            <input type="text" class="form-control" id="fno_prk_p" name="fno_prk_p" value="0">
                         </div>
                     </div>
                 </div>
 
                 <div class="row">
-                    <div class="col-md-4">
+                    <div class="col-md-4" hidden>
                         <div class="mb-3">
                             <label for="fno_prk_s" class="form-label">FNO PRK S</label>
-                            <input type="text" class="form-control" id="fno_prk_s" name="fno_prk_s" required>
+                            <input type="text" class="form-control" id="fno_prk_s" name="fno_prk_s" value="0">
                         </div>
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-4" hidden>
                         <div class="mb-3">
                             <label for="fno_prk_o" class="form-label">FNO PRK O</label>
-                            <input type="text" class="form-control" id="fno_prk_o" name="fno_prk_o" required>
+                            <input type="text" class="form-control" id="fno_prk_o" name="fno_prk_o" value="0">
                         </div>
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-4" hidden>
                         <div class="mb-3">
                             <label for="fno_prk_m" class="form-label">FNO PRK M</label>
-                            <input type="text" class="form-control" id="fno_prk_m" name="fno_prk_m" required>
+                            <input type="text" class="form-control" id="fno_prk_m" name="fno_prk_m" value="0">
                         </div>
                     </div>
                 </div>

@@ -38,11 +38,11 @@ class KendaraanController extends Controller
             'nama' => 'required|max:100',
             'plat' => 'required|max:50',
             'jenis' => 'required|max:50',
-            'fno_prk_b' => 'required|max:20',
-            'fno_prk_p' => 'required|max:20',
-            'fno_prk_s' => 'required|max:20',
-            'fno_prk_o' => 'required|max:20',
-            'fno_prk_m' => 'required|max:20',
+            // 'fno_prk_b' => 'required|max:20',
+            // 'fno_prk_p' => 'required|max:20',
+            // 'fno_prk_s' => 'required|max:20',
+            // 'fno_prk_o' => 'required|max:20',
+            // 'fno_prk_m' => 'required|max:20',
         ]);
 
         try {
@@ -89,11 +89,11 @@ class KendaraanController extends Controller
             'nama' => 'required|max:100',
             'plat' => 'required|max:50',
             'jenis' => 'required|max:50',
-            'fno_prk_b' => 'required|max:20',
-            'fno_prk_p' => 'required|max:20',
-            'fno_prk_s' => 'required|max:20',
-            'fno_prk_o' => 'required|max:20',
-            'fno_prk_m' => 'required|max:20',
+            // 'fno_prk_b' => 'required|max:20',
+            // 'fno_prk_p' => 'required|max:20',
+            // 'fno_prk_s' => 'required|max:20',
+            // 'fno_prk_o' => 'required|max:20',
+            // 'fno_prk_m' => 'required|max:20',
         ]);
 
         try {

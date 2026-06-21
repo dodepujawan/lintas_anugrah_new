@@ -21,11 +21,11 @@ return new class extends Migration
             $table->char('PLAT', 50);
             $table->char('JENIS', 50);
 
-            $table->char('FNO_PRK_B', 20);
-            $table->char('FNO_PRK_P', 20);
-            $table->char('FNO_PRK_S', 20);
-            $table->char('FNO_PRK_O', 20);
-            $table->char('FNO_PRK_M', 20);
+            $table->char('FNO_PRK_B', 20)->nullable();
+            $table->char('FNO_PRK_P', 20)->nullable();
+            $table->char('FNO_PRK_S', 20)->nullable();
+            $table->char('FNO_PRK_O', 20)->nullable();
+            $table->char('FNO_PRK_M', 20)->nullable();
 
             // Laravel timestamps (nullable, lowercase)
             $table->nullableTimestamps();
