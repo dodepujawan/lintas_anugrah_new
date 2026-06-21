@@ -404,6 +404,14 @@ class ExpedisiGenerateInvoiceController extends Controller
                 $grand = (int) $master->GRAND;
 
                 // =============================
+                // CEK PEMBAYARAN ARH
+                // =============================
+                $arh = null;
+                if (!empty($master->INVOICE)) {
+                    $arh = Arh::where('NOFAKTUR', $master->INVOICE)->first();
+                    if ($arh && (float)$arh->BAYAR > 0) {throw new \Exception('Invoice sudah memiliki pembayaran. Silakan hubungi admin.');}
+                }
+                // =============================
                 // 2. VALIDASI
                 // =============================
                 if ($bayar < 0) {
@@ -665,6 +673,15 @@ class ExpedisiGenerateInvoiceController extends Controller
                     throw new \Exception('Data master tidak ditemukan');
                 }
 
+                // =============================
+                // CEK PEMBAYARAN ARH
+                // =============================
+                $arh = null;
+                if (!empty($master->INVOICE)) {
+                    $arh = Arh::where('NOFAKTUR', $master->INVOICE)->first();
+                    if ($arh && (float)$arh->BAYAR > 0) {throw new \Exception('Invoice sudah memiliki pembayaran. Silakan hubungi admin.');}
+                }
+
                 $harga = (float) str_replace(',', '', $request->harga);
                 $discPersen = (float) ($request->disc ?? 0);
                 $delCharge = (float) str_replace(',', '', $request->del_charge);
@@ -708,7 +725,7 @@ class ExpedisiGenerateInvoiceController extends Controller
                             'TGLJT'      => $request->tgl_jt,
                             'CUSTOMER'   => $master->CUSTOMER,
                             'PIUTANG'    => $piutang,
-                            'BAYAR'      => $bayar,
+                            'BAYAR'      => 0,
                             'SALDO'      => $piutang,
                             'KETERANGAN' => $request->keterangan,
                             'USER'       => auth()->user()->name ?? 'SYSTEM',
@@ -718,7 +735,6 @@ class ExpedisiGenerateInvoiceController extends Controller
                         $arh->update([
                             'TGLJT'       => $request->tgl_jt,
                             'PIUTANG'     => $piutang,
-                            'BAYAR'       => $bayar,
                             'SALDO'       => $piutang,
                             'KETERANGAN'  => $request->keterangan,
                             'USER_UPDATE' => auth()->user()->name ?? 'SYSTEM'

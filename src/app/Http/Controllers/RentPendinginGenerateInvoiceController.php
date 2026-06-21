@@ -232,6 +232,14 @@ class RentPendinginGenerateInvoiceController extends Controller
                     if (!$row) {
                         throw new \Exception('Invoice tidak ditemukan');
                     }
+                    // =============================
+                    // CEK PEMBAYARAN ARH
+                    // =============================
+                    $arh = null;
+                    if (!empty($row->INVOICE)) {
+                        $arh = Arh::where('NOFAKTUR', $row->INVOICE)->first();
+                        if ($arh && (float)$arh->BAYAR > 0) {throw new \Exception('Invoice sudah memiliki pembayaran. Silakan hubungi admin.');}
+                    }
                 }
 
                 // =====================================
@@ -522,6 +530,15 @@ class RentPendinginGenerateInvoiceController extends Controller
                     throw new \Exception('Data invoice tidak ditemukan');
                 }
 
+                // =============================
+                // CEK PEMBAYARAN ARH
+                // =============================
+                $arh = null;
+                if (!empty($row->INVOICE)) {
+                    $arh = Arh::where('NOFAKTUR', $row->INVOICE)->first();
+                    if ($arh && (float)$arh->BAYAR > 0) {throw new \Exception('Invoice sudah memiliki pembayaran. Silakan hubungi admin.');}
+                }
+
                 $harga = (float) $request->harga;
                 $discPersen = (float) ($request->disc ?? 0);
                 $delCharge = (float) ($request->del_charge ?? 0);
@@ -564,7 +581,7 @@ class RentPendinginGenerateInvoiceController extends Controller
                             'TGLJT'      => $request->tgl_jt,
                             'CUSTOMER'   => $row->CUSTOMER,
                             'PIUTANG'    => $piutang,
-                            'BAYAR'      => $bayar,
+                            'BAYAR'      => 0,
                             'SALDO'      => $piutang,
                             'KETERANGAN' => $request->keterangan,
                             'USER'       => auth()->user()->name ?? 'SYSTEM',
@@ -574,7 +591,6 @@ class RentPendinginGenerateInvoiceController extends Controller
                         $arh->update([
                             'TGLJT'       => $request->tgl_jt,
                             'PIUTANG'     => $piutang,
-                            'BAYAR'       => $bayar,
                             'SALDO'       => $piutang,
                             'KETERANGAN'  => $request->keterangan,
                             'USER_UPDATE' => auth()->user()->name ?? 'SYSTEM'
