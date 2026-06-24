@@ -235,6 +235,12 @@
                     <div class="d-flex justify-content-end gap-2 mt-3">
                         <button class="btn btn-sm btn-primary" id="proses_kwt_dgn">PROSES
                         </button>
+                        <button class="btn btn-sm btn-success" id="print_kwt_dgn">
+                            Print
+                        </button>
+                        <button class="btn btn-sm btn-info" id="pdf_kwt_dgn">
+                            Cetak Pdf
+                        </button>
                         <button class="btn btn-sm btn-secondary" id="kembali_kwt_dgn">KEMBALI</button>
                     </div>
                 </div>
@@ -363,6 +369,8 @@ $(document).ready(function() {
                     $('#top_kwt_dgn').val(0);
                     $('#tgl_jtp_kwt_dgn').val(d.tgl_jt ? d.tgl_jt.substring(0,10) : '');
                     $('#piutang_kwt_dgn').val(formatRupiah(d.grand));
+
+                    $('#print_kwt_dgn, #pdf_kwt_dgn').hide();
                 },
                 error: function(xhr) {
                     $('#loading_modal').modal('hide');
@@ -518,6 +526,7 @@ $(document).ready(function() {
                 success: function(response) {
 
                     if (!response.status) {
+                        $('#loading_modal').modal('hide');
                         alert(response.message);
                         return;
                     }
@@ -558,6 +567,8 @@ $(document).ready(function() {
                     $('#top_kwt_dgn').val(formatRupiah(d.saldo));
                     $('#tgl_jtp_kwt_dgn').val(d.tgl_jt ? d.tgl_jt.substring(0,10) : '');
                     $('#piutang_kwt_dgn').val(formatRupiah(d.grand - d.bayar));
+
+                    $('#print_kwt_dgn, #pdf_kwt_dgn').show();
                 },
                 error: function(xhr) {
                     $('#loading_modal').modal('hide');
@@ -568,6 +579,25 @@ $(document).ready(function() {
     });
 
 // ========================= End Of Form Detail Edit Kwitansi Dingin ==============================
+// ============================== Cetak Pdf Rent Pendingin Invoice =================================
+    $('#pdf_kwt_dgn').on('click', function(e) {
+        e.preventDefault();
+        var invoiceNo = $('#no_faktur_kwt_dgn').val();
+        if (!invoiceNo) {
+            alert('Nomor faktur tidak ditemukan!');
+            return;
+        }
+        var url = "{{ route('rentPendinginGenerate.pdfGenerate', ['invoiceNo' => ':invoiceNo']) }}".replace(':invoiceNo', invoiceNo);
+        window.open(url, '_blank');
+    });
+    // =========================== End Of Cetak Pdf Rent Pendingin Invoice ==============================
+    // ============================== Cetak Rent Pendingin Invoice =================================
+    $('#print_kwt_exp').on('click', function(e) {
+        e.preventDefault();
+        var invoiceNo = $('#no_faktur_kwt_dgn').val();
+        printInvoiceRen(invoiceNo);
+    });
+    // =========================== End Of Cetak Rent Pendingin Invoice ==============================
 });
 // ########################################################################
 // FUNCTION HELPER:

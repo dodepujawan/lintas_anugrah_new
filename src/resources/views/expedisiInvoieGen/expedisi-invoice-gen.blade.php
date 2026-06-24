@@ -179,6 +179,12 @@
                         <button class="btn btn-sm btn-primary" id="proses_kwt_exp">
                             PROSES
                         </button>
+                        <button class="btn btn-sm btn-success" id="print_kwt_exp">
+                            Print
+                        </button>
+                        <button class="btn btn-sm btn-info" id="pdf_kwt_exp">
+                            Cetak Pdf
+                        </button>
                         <button class="btn btn-sm btn-secondary" id="keluar_kwt_exp">
                             KELUAR
                         </button>
@@ -314,6 +320,12 @@ $(document).ready(function() {
                     $('#tgl_jtp_kwt_exp').val(d.tgl_jt ? d.tgl_jt.substring(0,10) : '');
                     $('#piutang_kwt_exp').val(formatRupiah(d.grand - d.bayar));
 
+                    var invoiceNo = $('#no_faktur_kwt_exp').val();
+                    if (invoiceNo != "") {
+                        $('#print_kwt_exp, #pdf_kwt_exp').show();
+                    } else {
+                        $('#print_kwt_exp, #pdf_kwt_exp').hide();
+                    }
                     // $('#modalKwitansiExp').modal('show');
                 },
                 error: function(xhr) {
@@ -424,8 +436,26 @@ $(document).ready(function() {
             formatRupiah(piutang)
         );
     });
-    // ========================== ENd Of Trigger Hitung Piutang ==============================
-    // ========================== End Of Return Table Expedisi Generate ==============================
+    // ========================== End Of Trigger Hitung Piutang ==============================
+    // ============================== Cetak Pdf Expedisi Invoice =================================
+    $('#pdf_kwt_exp').on('click', function(e) {
+        e.preventDefault();
+        var invoiceNo = $('#no_faktur_kwt_exp').val();
+        if (!invoiceNo) {
+            alert('Nomor faktur tidak ditemukan!');
+            return;
+        }
+        var url = "{{ route('expedisiInvoice.pdfInvoice', ['invoiceNo' => ':invoiceNo']) }}".replace(':invoiceNo', invoiceNo);
+        window.open(url, '_blank');
+    });
+    // =========================== End Of Cetak Pdf Expedisi Invoice ==============================
+    // ============================== Cetak Expedisi Invoice =================================
+    $('#print_kwt_exp').on('click', function(e) {
+        e.preventDefault();
+        var invoiceNo = $('#no_faktur_kwt_exp').val();
+        printInvoice(invoiceNo);
+    });
+    // =========================== End Of Cetak Expedisi Invoice ==============================
     // Fungsi Print Electron JS
    function printInvoice(invoiceNo){
         // 🔥 ROUTE INVOICE TEXT

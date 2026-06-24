@@ -207,6 +207,12 @@
                         <button class="btn btn-sm btn-primary" id="proses_coolroom_inv">
                             PROSES INVOICE
                         </button>
+                        <button class="btn btn-sm btn-primary" id="print_coolroom_inv">
+                            PRINT
+                        </button>
+                        <button class="btn btn-sm btn-secondary" id="pdf_coolroom_inv">
+                            PDF
+                        </button>
                         <button class="btn btn-sm btn-secondary" id="keluar_coolroom_inv">
                             KELUAR
                         </button>
@@ -364,6 +370,8 @@ $(document).ready(function() {
                         .val(d.top);
                     $('#tgljt_coolroom_inv')
                         .val(d.tgl_jt);
+
+                    $('#print_coolroom_inv, #pdf_coolroom_inv').hide();
                 }
             });
         }
@@ -432,6 +440,8 @@ $(document).ready(function() {
                         .val(d.top);
                     $('#tgljt_coolroom_inv')
                         .val(d.tgl_jt ? d.tgl_jt.substring(0,10) : '');
+
+                    $('#print_coolroom_inv, #pdf_coolroom_inv').show();
                 }
             });
         }
@@ -494,6 +504,25 @@ $(document).ready(function() {
         });
     });
 // =============================== End Of Submit Colroom Invoice ===============================
+// ============================== Cetak Pdf Expedisi Invoice =================================
+    $('#pdf_coolroom_inv').on('click', function(e) {
+        e.preventDefault();
+        var invoiceNo = $('#invoice_coolroom_inv').val();
+        if (!invoiceNo) {
+            alert('Nomor faktur tidak ditemukan!');
+            return;
+        }
+        var url = "{{ route('coolroomInv.pdf', ['invoice' => ':invoiceNo']) }}".replace(':invoiceNo', invoiceNo);
+        window.open(url, '_blank');
+    });
+// =========================== End Of Cetak Pdf Expedisi Invoice ==============================
+// ============================== Cetak Expedisi Invoice =================================
+    $('#print_coolroom_inv').on('click', function(e) {
+        e.preventDefault();
+        var invoiceNo = $('#invoice_coolroom_inv').val();
+        printInvoiceCol(invoiceNo);
+    });
+// =========================== End Of Cetak Expedisi Invoice ==============================
 // =============================== Keluar Colroom Invoice =================================
     $('#returnCoolroomInvBtn,#keluar_coolroom_inv').on('click', function(){
             $('#form_coolroom_inv').addClass('d-none');

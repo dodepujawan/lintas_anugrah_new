@@ -179,9 +179,6 @@ Route::prefix('expedisi-invoice')->group(function() {
     Route::get('/data/gabung', [ExpedisiInvoiceController::class, 'dataGabung'])->name('expedisiInvoiceGabung.data');
     Route::get('data/invoice/existing', [ExpedisiInvoiceController::class,'getExistingGabung'])
     ->name('expedisiInvoiceGabungExisting.data');
-    // // PDF
-    Route::get('/expedisi/invoice/pdf/{invoiceNo}', [ExpedisiInvoiceController::class, 'pdfGabungInvoice'])->name('expedisiInvoice.pdfInvoice');
-    Route::get('/print-invoice-text/{invoiceNo}', [ExpedisiInvoiceController::class, 'printInvoiceText'])->name('expedisiInvoice.text');
 });
 
 Route::prefix('expedisi-generate-invoice')->group(function() {
@@ -197,6 +194,9 @@ Route::prefix('expedisi-generate-invoice')->group(function() {
     Route::get('/data/edit', [ExpedisiGenerateInvoiceController::class, 'tableEdit'])->name('expedisiInvoiceEdit.data');
     Route::get('/edit/show/{invoice}',[ExpedisiGenerateInvoiceController::class, 'showEditInvoice'])->name('expedisiInvoiceEdit.show');
     Route::post('/edit/update/{invoice}',[ExpedisiGenerateInvoiceController::class, 'updateEditInvoice'])->name('expedisiInvoiceEdit.update');
+     // PDF
+    Route::get('/invoice/pdf/{invoiceNo}', [ExpedisiGenerateInvoiceController::class, 'pdfGabungInvoice'])->name('expedisiInvoice.pdfInvoice');
+    Route::get('/print-invoice-text/{invoiceNo}', [ExpedisiGenerateInvoiceController::class, 'printInvoiceText'])->name('expedisiInvoice.text');
 });
 
 Route::prefix('expedisi-kwitansi')->group(function() {
