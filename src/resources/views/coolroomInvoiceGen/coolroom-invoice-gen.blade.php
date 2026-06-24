@@ -295,6 +295,8 @@ $(document).ready(function() {
 // ============================= End Of Table Colroom Invoice ===================================
 // =============================== Select Customer Expedisi ===================================
     $('#customer_invoice_col').select2({
+        theme: "bootstrap-5",
+        width: '100%',
         placeholder: 'Pilih Customer',
         allowClear: true,
         ajax: {

@@ -297,6 +297,8 @@ $(document).ready(function() {
 // ============================== End Of Tabel Rent Edit Dingin ==================================
 // =============================== Select Customer Expedisi ===================================
     $('#customer_invoice_ren').select2({
+        theme: "bootstrap-5",
+        width: '100%',
         placeholder: 'Pilih Customer',
         allowClear: true,
         ajax: {

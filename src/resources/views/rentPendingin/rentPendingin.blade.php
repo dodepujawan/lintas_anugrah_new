@@ -823,10 +823,14 @@ $(document).ready(function() {
                                 confirmButtonText: 'OK',
                                 confirmButtonColor: '#3085d6'
                             });
+                            $('#no_surjal_rent_dingin').val(res.data.NOSJ);
                         }
-
-                        clearRentDinginForm();
-                        setButtonToSaveMode();
+                        // Button Print PDF
+                        $('#divPrintSuratJalanRent').removeClass('d-none');
+                        $('#btnPrintSuratJalanRent').attr('data-sj',res.data.NOSJ);
+                        setButtonToUpdateMode();
+                        // clearRentDinginForm();
+                        // setButtonToSaveMode();
                         // reset form kalau mau
                         // $('#formRentPendingin')[0].reset();
                     }

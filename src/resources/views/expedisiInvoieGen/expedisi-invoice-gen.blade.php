@@ -245,6 +245,8 @@ $(document).ready(function() {
 // ============================ End Of Tabel Invoice Generate Expedisi ================================
 // =============================== Select Customer Expedisi ===================================
     $('#customer_invoice_exp').select2({
+        theme: "bootstrap-5",
+        width: '100%',
         placeholder: 'Pilih Customer',
         allowClear: true,
         ajax: {
