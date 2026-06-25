@@ -769,8 +769,7 @@ class ExpedisiGenerateInvoiceController extends Controller
         }
     }
 
-    public function printInvoiceText($invoiceNo)
-    {
+    public function printInvoiceText($invoiceNo){
         $rows = Expedisi::where('INVOICE', $invoiceNo)->orderBy('NOSJ')->get();
         if ($rows->isEmpty()) abort(404);
 
@@ -796,43 +795,43 @@ class ExpedisiGenerateInvoiceController extends Controller
         $lines = [];
 
         // HEADER
-        $lines[] = str_pad('PT. LINTAS MITRA ANUGERAH SEJATI', 80, ' ', STR_PAD_BOTH);
-        $lines[] = str_pad('COLD CHAIN DISTRIBUTION & STORAGE', 80, ' ', STR_PAD_BOTH);
-        $lines[] = str_pad('Jl. Raya Sempidi No.9 Badung - Bali', 80, ' ', STR_PAD_BOTH);
-        $lines[] = str_pad('Telp. (0361) 8947610', 80, ' ', STR_PAD_BOTH);
-        $lines[] = str_repeat('=', 80);
-        $lines[] = str_pad('INVOICE', 80, ' ', STR_PAD_BOTH);
-        $lines[] = str_repeat('=', 80);
+        $lines[] = str_pad('PT. LINTAS MITRA ANUGERAH SEJATI', 90, ' ', STR_PAD_BOTH);
+        $lines[] = str_pad('COLD CHAIN DISTRIBUTION & STORAGE', 90, ' ', STR_PAD_BOTH);
+        $lines[] = str_pad('Jl. Raya Sempidi No.9 Badung - Bali', 90, ' ', STR_PAD_BOTH);
+        $lines[] = str_pad('Telp. (0361) 8947610', 90, ' ', STR_PAD_BOTH);
+        $lines[] = str_repeat('=', 90);
+        $lines[] = str_pad('INVOICE', 90, ' ', STR_PAD_BOTH);
+        $lines[] = str_repeat('=', 90);
 
         // INFO 2 KOLOM
         $lines[] = sprintf(
-            "%-40s %-40s",
+            "%-45s %-45s",
             'NOMOR  : ' . $master->INVOICE,
             'TANGGAL : ' . date('d-m-Y', strtotime($master->TGLINVOICE))
         );
         $lines[] = sprintf(
-            "%-40s %-40s",
-            'KEPADA : ' . substr($kepada, 0, 28),
+            "%-45s %-45s",
+            'KEPADA : ' . substr($kepada, 0, 33),
             !empty($master->TGLJT) ? 'TGL JT : ' . date('d-m-Y', strtotime($master->TGLJT)) : ''
         );
         $lines[] = sprintf(
-            "%-40s %-40s",
-            'UP     : ' . substr($up, 0, 28),
+            "%-45s %-45s",
+            'UP     : ' . substr($up, 0, 33),
             'CETAK : ' . now()->format('d-m-Y H:i')
         );
 
         // ALAMAT (multiline)
-        $alamatWrap = explode("\n", wordwrap($alamat, 65, "\n"));
+        $alamatWrap = explode("\n", wordwrap($alamat, 60, "\n"));
         foreach ($alamatWrap as $i => $alamatRow) {
             $lines[] = $i === 0 ? 'ALAMAT : ' . $alamatRow : '         ' . $alamatRow;
         }
         $lines[] = '';
         $lines[] = 'JUMLAH SJ : ' . $rows->count();
-        $lines[] = str_repeat('=', 80);
+        $lines[] = str_repeat('=', 90);
 
         // TABLE HEADER
-        $lines[] = sprintf("%-4s %-14s %-35s %-10s %12s", 'NO', 'SJ', 'NAMA BARANG', 'QTY', 'TOTAL');
-        $lines[] = str_repeat('-', 80);
+        $lines[] = sprintf("%-4s %-16s %-42s %-10s %14s", 'NO', 'SJ', 'NAMA BARANG', 'QTY', 'TOTAL');
+        $lines[] = str_repeat('-', 90);
 
         // DETAIL
         $no = 1;
@@ -841,36 +840,44 @@ class ExpedisiGenerateInvoiceController extends Controller
             $qty = (float) $r->JUMLAH;
             $qtyText = floor($qty) == $qty ? number_format($qty, 0) : rtrim(rtrim(number_format($qty, 3, '.', ''), '0'), '.');
             $lines[] = sprintf(
-                "%-4s %-14s %-35s %-10s %12s",
+                "%-4s %-16s %-42s %-10s %14s",
                 $no,
-                substr($r->NOSJ, 0, 14),
-                substr($namaBarang, 0, 35),
+                substr($r->NOSJ, 0, 16),
+                substr($namaBarang, 0, 42),
                 $qtyText . ' KG',
                 number_format($r->TOTAL, 0, ',', '.')
             );
             $no++;
         }
-        $lines[] = str_repeat('-', 80);
+        $lines[] = str_repeat('-', 90);
 
-        // REKENING + TOTAL (2 kolom)
-        $lines[] = sprintf("%-40s %-40s", 'BANK   : ' . $bank, 'SUB TOTAL : ' . number_format($subtotal, 0, ',', '.'));
-        $lines[] = sprintf("%-40s %-40s", 'NO REK : ' . $norek, 'DIBAYAR   : ' . number_format($dibayar, 0, ',', '.'));
-        $lines[] = sprintf("%-40s %-40s", 'A/N    : ' . $namaRek, 'SALDO     : ' . number_format($saldo, 0, ',', '.'));
+        // REKENING + TOTAL
+        $lines[] = sprintf("%-45s %-45s", 'BANK   : ' . $bank, 'SUB TOTAL : ' . number_format($subtotal, 0, ',', '.'));
+        $lines[] = sprintf("%-45s %-45s", 'NO REK : ' . $norek, 'DIBAYAR   : ' . number_format($dibayar, 0, ',', '.'));
+        $lines[] = sprintf("%-45s %-45s", 'A/N    : ' . $namaRek, 'SALDO     : ' . number_format($saldo, 0, ',', '.'));
 
         // FOOTER
         $lines[] = '';
         $lines[] = '';
-        $lines[] = str_pad('PENERIMA', 40) . str_pad('MENGETAHUI', 40);
+        $lines[] = str_pad('PENERIMA', 45) . str_pad('MENGETAHUI', 45);
         $lines[] = '';
         $lines[] = '';
         $lines[] = '';
-        $lines[] = str_pad('(......................)', 40) . str_pad('PT. LINTAS MITRA ANUGERAH SEJATI', 40);
+        $lines[] = str_pad('(......................)', 45) . str_pad('PT. LINTAS MITRA ANUGERAH SEJATI', 45);
 
-        // OUTPUT
+        // OUTPUT - Konversi dulu, baru bungkus ESC/P
         $text = implode("\r\n", $lines);
-        $text = iconv('UTF-8', 'CP437//TRANSLIT', $text);
+        $text = iconv('UTF-8','CP437//TRANSLIT//IGNORE',$text);
+        if ($text === false) {
+            $text = implode("\r\n", $lines);
+        }
 
-        return response()->json(['text' => $text]);
+        // ESC/P wrapper setelah konversi
+        $text = "\x1B\x0F" . $text . "\x12";
+
+        return response()->json([
+            'text' => $text
+        ]);
     }
 
     public function pdfGabungInvoice($invoiceNo){
@@ -925,3 +932,108 @@ class ExpedisiGenerateInvoiceController extends Controller
         return 'FJO' . $tahun . str_pad($lastNo + 1, 6, '0', STR_PAD_LEFT);
     }
 }
+
+
+    //  public function printInvoiceText($invoiceNo)
+    // {
+    //     $rows = Expedisi::where('INVOICE', $invoiceNo)->orderBy('NOSJ')->get();
+    //     if ($rows->isEmpty()) abort(404);
+
+    //     $master = $rows->first();
+
+    //     // CUSTOMER
+    //     $customer = Mcustomer::where('CUSTOMER', $master->CUSTOMER_KODE)->first();
+    //     $kepada = strtoupper($customer->NAMACUST ?? '-');
+    //     $up     = strtoupper($customer->KONTAK ?? '-');
+    //     $alamat = strtoupper($customer->ALAMAT1 ?? '-');
+
+    //     // REKENING
+    //     $rekening = Rekening::where('AKTIF', 1)->first();
+    //     $bank    = $rekening->BANK ?? '-';
+    //     $norek   = $rekening->NOREK ?? '-';
+    //     $namaRek = $rekening->NAMA ?? '-';
+
+    //     // TOTAL
+    //     $subtotal = (float) ($master->GRAND ?? 0);
+    //     $dibayar  = (float) ($master->BAYAR ?? 0);
+    //     $saldo    = (float) ($master->PIUTANG ?? 0);
+
+    //     $lines = [];
+
+    //     // HEADER
+    //     $lines[] = str_pad('PT. LINTAS MITRA ANUGERAH SEJATI', 80, ' ', STR_PAD_BOTH);
+    //     $lines[] = str_pad('COLD CHAIN DISTRIBUTION & STORAGE', 80, ' ', STR_PAD_BOTH);
+    //     $lines[] = str_pad('Jl. Raya Sempidi No.9 Badung - Bali', 80, ' ', STR_PAD_BOTH);
+    //     $lines[] = str_pad('Telp. (0361) 8947610', 80, ' ', STR_PAD_BOTH);
+    //     $lines[] = str_repeat('=', 80);
+    //     $lines[] = str_pad('INVOICE', 80, ' ', STR_PAD_BOTH);
+    //     $lines[] = str_repeat('=', 80);
+
+    //     // INFO 2 KOLOM
+    //     $lines[] = sprintf(
+    //         "%-40s %-40s",
+    //         'NOMOR  : ' . $master->INVOICE,
+    //         'TANGGAL : ' . date('d-m-Y', strtotime($master->TGLINVOICE))
+    //     );
+    //     $lines[] = sprintf(
+    //         "%-40s %-40s",
+    //         'KEPADA : ' . substr($kepada, 0, 28),
+    //         !empty($master->TGLJT) ? 'TGL JT : ' . date('d-m-Y', strtotime($master->TGLJT)) : ''
+    //     );
+    //     $lines[] = sprintf(
+    //         "%-40s %-40s",
+    //         'UP     : ' . substr($up, 0, 28),
+    //         'CETAK : ' . now()->format('d-m-Y H:i')
+    //     );
+
+    //     // ALAMAT (multiline)
+    //     $alamatWrap = explode("\n", wordwrap($alamat, 65, "\n"));
+    //     foreach ($alamatWrap as $i => $alamatRow) {
+    //         $lines[] = $i === 0 ? 'ALAMAT : ' . $alamatRow : '         ' . $alamatRow;
+    //     }
+    //     $lines[] = '';
+    //     $lines[] = 'JUMLAH SJ : ' . $rows->count();
+    //     $lines[] = str_repeat('=', 80);
+
+    //     // TABLE HEADER
+    //     $lines[] = sprintf("%-4s %-14s %-35s %-10s %12s", 'NO', 'SJ', 'NAMA BARANG', 'QTY', 'TOTAL');
+    //     $lines[] = str_repeat('-', 80);
+
+    //     // DETAIL
+    //     $no = 1;
+    //     foreach ($rows as $r) {
+    //         $namaBarang = trim($r->PESANANGB) !== '' ? $r->PESANANGB : $r->PESANAN;
+    //         $qty = (float) $r->JUMLAH;
+    //         $qtyText = floor($qty) == $qty ? number_format($qty, 0) : rtrim(rtrim(number_format($qty, 3, '.', ''), '0'), '.');
+    //         $lines[] = sprintf(
+    //             "%-4s %-14s %-35s %-10s %12s",
+    //             $no,
+    //             substr($r->NOSJ, 0, 14),
+    //             substr($namaBarang, 0, 35),
+    //             $qtyText . ' KG',
+    //             number_format($r->TOTAL, 0, ',', '.')
+    //         );
+    //         $no++;
+    //     }
+    //     $lines[] = str_repeat('-', 80);
+
+    //     // REKENING + TOTAL (2 kolom)
+    //     $lines[] = sprintf("%-40s %-40s", 'BANK   : ' . $bank, 'SUB TOTAL : ' . number_format($subtotal, 0, ',', '.'));
+    //     $lines[] = sprintf("%-40s %-40s", 'NO REK : ' . $norek, 'DIBAYAR   : ' . number_format($dibayar, 0, ',', '.'));
+    //     $lines[] = sprintf("%-40s %-40s", 'A/N    : ' . $namaRek, 'SALDO     : ' . number_format($saldo, 0, ',', '.'));
+
+    //     // FOOTER
+    //     $lines[] = '';
+    //     $lines[] = '';
+    //     $lines[] = str_pad('PENERIMA', 40) . str_pad('MENGETAHUI', 40);
+    //     $lines[] = '';
+    //     $lines[] = '';
+    //     $lines[] = '';
+    //     $lines[] = str_pad('(......................)', 40) . str_pad('PT. LINTAS MITRA ANUGERAH SEJATI', 40);
+
+    //     // OUTPUT
+    //     $text = implode("\r\n", $lines);
+    //     $text = iconv('UTF-8', 'CP437//TRANSLIT', $text);
+
+    //     return response()->json(['text' => $text]);
+    // }
