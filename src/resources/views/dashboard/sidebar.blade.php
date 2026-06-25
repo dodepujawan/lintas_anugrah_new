@@ -167,7 +167,7 @@
                 @can('penjualan.invoice')
                 <li class="menu-item">
                     <a href="#" class="menu-link" id="sidebar_invoice_expedisi">
-                    <span class="menu-text">Gabung Muatan Expedisi</span>
+                    <span class="menu-text">Gabung Sujal Expedisi</span>
                     </a>
                 </li>
                 @endcan

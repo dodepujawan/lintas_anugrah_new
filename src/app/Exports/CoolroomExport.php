@@ -24,7 +24,9 @@ class CoolroomExport implements
     protected $tanggalDari;
     protected $tanggalSampai;
     protected $status;
-    protected $grandTotal=0;
+    protected $grandTotal = 0;
+    protected $bayarTotal = 0;
+    protected $piutangTotal = 0;
     protected $customer;
 
     public function __construct(
@@ -59,11 +61,11 @@ class CoolroomExport implements
                 'DPP',
                 'PPN',
                 'NPPN',
-
-                DB::raw('CAST(GRAND AS DECIMAL(15,2)) as GRAND'),
-
                 'INVOICE',
-                'TGLINVOICE'
+                'TGLINVOICE',
+                DB::raw('CAST(GRAND AS DECIMAL(15,2)) as GRAND'),
+                DB::raw('CAST(BAYAR AS DECIMAL(15,2)) as BAYAR'),
+                DB::raw('CAST(PIUTANG AS DECIMAL(15,2)) as PIUTANG'),
             ]);
 
         $query->when($this->customer, function ($q) {
@@ -104,7 +106,9 @@ class CoolroomExport implements
             ->orderBy($orderBy)
             ->get();
 
-        $this->grandTotal = $data->sum('GRAND');
+        $this->grandTotal   = $data->sum('GRAND');
+        $this->bayarTotal   = $data->sum('BAYAR');
+        $this->piutangTotal = $data->sum('PIUTANG');
 
         return $data;
     }
@@ -112,35 +116,22 @@ class CoolroomExport implements
     public function headings(): array
     {
         return [
-
             'Tanggal SJ',
-
             'No SJ',
-
             'Customer',
-
             'Jumlah',
-
             'Unit',
-
             'Harga',
-
             'Disc %',
-
             'Disc Rp',
-
             'DPP',
-
             'PPN %',
-
             'PPN Rp',
-
-            'Grand Total',
-
             'Invoice',
-
-            'Tanggal Invoice'
-
+            'Tanggal Invoice',
+            'Grand Total',
+            'Bayar',
+            'Piutang'
         ];
     }
 
@@ -203,7 +194,7 @@ class CoolroomExport implements
                 // BORDER
                 // =====================
                 $sheet->getStyle(
-                    'A1:N'.$lastRow
+                    'A1:P'.$lastRow
                 )->applyFromArray([
 
                     'borders'=>[
@@ -219,17 +210,20 @@ class CoolroomExport implements
                 // =====================
                 // FORMAT RUPIAH
                 // =====================
-                $sheet->getStyle(
-                    'F2:L'.($lastRow+2)
-                )
-                ->getNumberFormat()
-                ->setFormatCode('#,##0');
-
+                $sheet->getStyle('F2:F'.($lastRow+2))
+                    ->getNumberFormat()
+                    ->setFormatCode('#,##0');
+                $sheet->getStyle('H2:I'.($lastRow+2))
+                    ->getNumberFormat()
+                    ->setFormatCode('#,##0');
+                $sheet->getStyle('K2:P'.($lastRow+2))
+                    ->getNumberFormat()
+                    ->setFormatCode('#,##0');
                 // =====================
                 // WRAP TEXT
                 // =====================
                 $sheet->getStyle(
-                    'A1:N'.$lastRow
+                    'A1:P'.$lastRow
                 )
                 ->getAlignment()
                 ->setWrapText(true);
@@ -237,48 +231,34 @@ class CoolroomExport implements
                 // =====================
                 // TOTAL ROW
                 // =====================
-                $totalRow=$lastRow+2;
-
-                $sheet->setCellValue(
-                    'K'.$totalRow,
-                    'TOTAL'
-                );
-
-                $sheet->setCellValue(
-                    'L'.$totalRow,
-                    $this->grandTotal
-                );
-
+                $totalRow = $lastRow + 2;
+                $sheet->setCellValue('M'.$totalRow, 'TOTAL');
+                $sheet->setCellValue('N'.$totalRow, $this->grandTotal);
+                $sheet->setCellValue('O'.$totalRow, $this->bayarTotal);
+                $sheet->setCellValue('P'.$totalRow, $this->piutangTotal);
                 // =====================
                 // STYLE TOTAL
                 // =====================
                 $sheet->getStyle(
-                    'K'.$totalRow.
-                    ':L'.$totalRow
+                    'M'.$totalRow.':P'.$totalRow
                 )->applyFromArray([
-
-                    'font'=>[
-
-                        'bold'=>true,
-
-                        'size'=>12
-
+                    'font' => [
+                        'bold' => true,
+                        'size' => 12
                     ],
-
-                    'fill'=>[
-
-                        'fillType'=>'solid',
-
-                        'startColor'=>[
-                            'rgb'=>'D9EAF7'
+                    'fill' => [
+                        'fillType' => 'solid',
+                        'startColor' => [
+                            'rgb' => 'D9EAF7'
                         ]
-
+                    ],
+                    'borders' => [
+                        'allBorders' => [
+                            'borderStyle' => 'thin'
+                        ]
                     ]
-
                 ]);
-
             }
-
         ];
     }
 }
