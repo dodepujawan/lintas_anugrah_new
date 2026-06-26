@@ -188,6 +188,9 @@
                         <button class="btn btn-sm btn-secondary" id="keluar_kwt_exp">
                             KELUAR
                         </button>
+                        <button class="btn btn-sm btn-secondary" onclick="printTest()">
+                            TEST DOT MATRIX
+                        </button>
                     </div>
                 </div>
             </div>
@@ -487,6 +490,29 @@ $(document).ready(function() {
         });
     }
 // =========================== Form Detail Edit Kwitansi Expedisi (Expired) ==============================
+    // Ngtest Print
+    function printTest() {
+        $.get("{{ route('print.test') }}", function(res){
+            fetch("http://localhost:3000/print-text", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    text: res.text
+                })
+            })
+            .then(r => r.json())
+            .then(r => {
+                console.log(r);
+            })
+            .catch(err => {
+                console.error(err);
+                alert("Print service tidak aktif");
+            });
+        });
+
+    }
     // $(document).on('click', '.btn-edit-kwt-exp', function() {
 
     //     let muatNo = $(this).data('invoice');

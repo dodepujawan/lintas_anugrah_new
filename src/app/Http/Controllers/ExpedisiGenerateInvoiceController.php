@@ -886,6 +886,94 @@ class ExpedisiGenerateInvoiceController extends Controller
         ]);
     }
 
+    // Menguji Printer
+    public function printTest(){
+        $text = '';
+
+        // ==========================================
+        // HEADER
+        // ==========================================
+        $text .= "========================================\r\n";
+        $text .= "       EPSON LX RAW PRINT TEST\r\n";
+        $text .= "========================================\r\n\r\n";
+
+        // ==========================================
+        // NORMAL MODE
+        // ==========================================
+        $text .= "===== NORMAL MODE =====\r\n";
+        $text .= "01234567890123456789012345678901234567890123456789\r\n";
+        $text .= "ABCDEFGHIJKLMNOPQRSTUVWXYZ\r\n\r\n";
+
+        // ==========================================
+        // CONDENSED MODE
+        // ==========================================
+        $text .= "\x0F";     // Condensed ON
+        $text .= "===== CONDENSED MODE =====\r\n";
+        $text .= "012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789\r\n";
+        $text .= "ABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLMNOPQRSTUVWXYZ\r\n";
+        $text .= "\x12";     // Condensed OFF
+        $text .= "\r\n";
+
+        // ==========================================
+        // NORMAL LAGI (sanity check balik normal)
+        // ==========================================
+        $text .= "===== NORMAL LAGI =====\r\n";
+        $text .= "01234567890123456789012345678901234567890123456789\r\n";
+        $text .= "ABCDEFGHIJKLMNOPQRSTUVWXYZ\r\n\r\n";
+
+        // ==========================================
+        // WIDTH TEST - NORMAL MODE
+        // ==========================================
+        $text .= "========================================\r\n";
+        $text .= "WIDTH TEST - NORMAL MODE\r\n";
+        $text .= "========================================\r\n\r\n";
+
+        for ($i = 70; $i <= 100; $i += 5) {
+            $text .= "LEN {$i}\r\n";
+            $text .= str_repeat("=", $i);
+            $text .= "\r\n\r\n";
+        }
+
+        // ==========================================
+        // WIDTH TEST - CONDENSED MODE
+        // ==========================================
+        $text .= "\x0F"; // Condensed ON
+        $text .= "========================================\r\n";
+        $text .= "WIDTH TEST - CONDENSED MODE\r\n";
+        $text .= "========================================\r\n\r\n";
+
+        for ($i = 100; $i <= 140; $i += 5) {
+            $text .= "LEN {$i}\r\n";
+            $text .= str_repeat("=", $i);
+            $text .= "\r\n\r\n";
+        }
+        $text .= "\x12"; // Condensed OFF
+        $text .= "\r\n";
+
+        // ==========================================
+        // FOOTER
+        // ==========================================
+        $text .= "========================================\r\n";
+        $text .= "END OF TEST\r\n";
+        $text .= "========================================\r\n";
+
+        // ==========================================
+        // ENCODING
+        // ==========================================
+        $text = iconv(
+            'UTF-8',
+            'CP437//TRANSLIT//IGNORE',
+            $text
+        );
+        if ($text === false) {
+            $text = '';
+        }
+
+        return response()->json([
+            'text' => $text
+        ]);
+    }
+
     // public function printInvoiceText($invoiceNo){
     //     $rows = Expedisi::where('INVOICE', $invoiceNo)->orderBy('NOSJ')->get();
     //     if ($rows->isEmpty()) abort(404);

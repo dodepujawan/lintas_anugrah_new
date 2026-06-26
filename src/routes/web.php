@@ -198,6 +198,8 @@ Route::prefix('expedisi-generate-invoice')->group(function() {
     Route::get('/invoice/pdf/{invoiceNo}', [ExpedisiGenerateInvoiceController::class, 'pdfGabungInvoice'])->name('expedisiInvoice.pdfInvoice');
     Route::get('/print-invoice-text/{invoiceNo}', [ExpedisiGenerateInvoiceController::class, 'printInvoiceText'])->name('expedisiInvoice.text');
 });
+// Test Print
+Route::get('/print-test', [ExpedisiGenerateInvoiceController::class, 'printTest'])->name('print.test');
 
 Route::prefix('expedisi-kwitansi')->group(function() {
     Route::get('/', [ExpedisiKwitansiController::class, 'index'])->name('expedisiKwitansi.index');
