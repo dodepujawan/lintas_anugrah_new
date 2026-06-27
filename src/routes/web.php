@@ -31,6 +31,7 @@ use App\Http\Controllers\UserPermissionController;
 use App\Http\Controllers\CoolroomGenerateInvoiceController;
 use App\Http\Controllers\CoolroomKwitansiController;
 use App\Http\Controllers\AreaController;
+use App\Http\Controllers\KwitansiHistoryController;
 
 Route::get('/', function () {
     return redirect()->route('login');
@@ -296,6 +297,13 @@ Route::prefix('coolroom-kwitansi')->group(function() {
     Route::post('/delete',[CoolroomKwitansiController::class, 'deleteKwitansi']
     )->name('coolroomKwt.delete');
     Route::get('/pdf/{invoice}',[CoolroomKwitansiController::class, 'pdfInvoiceKwitansi'])->name('coolroomKwt.pdf');
+});
+
+Route::prefix('kwitansi')->group(function () {
+    Route::get('/', [KwitansiHistoryController::class, 'index'])->name('index.kwitansi');
+    Route::get('/data', [KwitansiHistoryController::class, 'getDataKwitansi'])->name('kwitansi.data');
+    // Di routes/web.php
+    Route::post('/export', [KwitansiHistoryController::class, 'exportKwitansi'])->name('kwitansi.export');
 });
 
 Route::prefix('supplier')->middleware('auth')->group(function () {

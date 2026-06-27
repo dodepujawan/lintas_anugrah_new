@@ -279,6 +279,21 @@
             </li>
             @endcanany
 
+            <li class="menu-item">
+                <a class="menu-link" data-bs-toggle="collapse" href="#kwitansiMenu" role="button" aria-expanded="false">
+                <i class="menu-icon bx bx-notepad"></i>
+                <span class="menu-text">Kwitansi History</span>
+                <i class="menu-arrow bx bx-chevron-right"></i>
+                </a>
+                <ul class="sub-menu collapse" id="kwitansiMenu">
+                <li class="menu-item">
+                    <a href="#" class="menu-link" id="sidebar_new_kwitansi">
+                    <span class="menu-text">Kwitansi</span>
+                    </a>
+                </li>
+                </ul>
+            </li>
+
             @canany([
                 'supplier.view',
                 'service.view'
@@ -299,6 +314,7 @@
                 @endcan
                 </ul>
             </li>
+
             <li class="menu-item">
                 <a class="menu-link" data-bs-toggle="collapse" href="#serviceMenu" role="button" aria-expanded="false">
                 <i class="menu-icon bx bx-wrench"></i>

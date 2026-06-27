@@ -641,6 +641,25 @@ $(document).ready(function() {
         });
     }
 // ======================= End Of Coolroom Invoice Edit ====================================
+// ========================= Kwitansi History ======================================
+    $(document).on('click', '#sidebar_new_kwitansi', function(e) {
+        e.preventDefault();
+        loadKwitansiHisForm();
+    });
+
+    function loadKwitansiHisForm() {
+        $.ajax({
+            url: '{{ route('index.kwitansi') }}', // Route to load the form
+            type: 'GET',
+            success: function(response) {
+                $('.master-page').html(response);
+            },
+            error: function() {
+                $('.master-page').html('<p>Error loading form.</p>');
+            }
+        });
+    }
+// ======================= End Of Kwitansi History ====================================
 // ================================ Form Supplier ======================================
     $(document).on('click', '#sidebar_new_supplier', function(e) {
         e.preventDefault();
