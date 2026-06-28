@@ -495,12 +495,13 @@ class RentPendinginGenerateInvoiceController extends Controller
             'master' => [
                 'invoice'     => $row->INVOICE,
                 'customer'    => $row->CUSTOMER,
+                'customer_kode'    => $row->CUSTOMER_KODE,
                 'kendaraan'   => $row->NAMA_KENDARAAN ?? '',
                 'driver'      => $row->DRIVER ?? '',
                 'nomuat'      => $row->NOMUAT ?? '',
                 'tgl_invoice' => $row->TGLINVOICE,
                 'tgl_jt'      => $arh->TGLJT ?? $row->TGLJT,
-                'rute'        => $row->rute ?? '',
+                'item'        => $row->PESANAN ?? '',
                 'jumlah'      => $row->JUMLAH ?? 0,
                 'harga'       => $row->HARGA ?? 0,
                 'subtotal'    => ($row->JUMLAH ?? 0) * ($row->HARGA ?? 0),
@@ -558,6 +559,7 @@ class RentPendinginGenerateInvoiceController extends Controller
                 $piutang = $grand - $bayar;
 
                 $row->update([
+                    'PESANAN'    => $request->item,
                     'JUMLAH'      => $jumlah,
                     'HARGA'       => $harga,
                     'DISC'        => $discPersen,
@@ -582,7 +584,7 @@ class RentPendinginGenerateInvoiceController extends Controller
                             'CUSTOMER'   => $row->CUSTOMER,
                             'PIUTANG'    => $piutang,
                             'BAYAR'      => 0,
-                            'SALDO'      => $piutang,
+                            // 'SALDO'      => $piutang,
                             'KETERANGAN' => $request->keterangan,
                             'USER'       => auth()->user()->name ?? 'SYSTEM',
                             'CABANG'     => $row->area_id ?? ''
@@ -591,7 +593,7 @@ class RentPendinginGenerateInvoiceController extends Controller
                         $arh->update([
                             'TGLJT'       => $request->tgl_jt,
                             'PIUTANG'     => $piutang,
-                            'SALDO'       => $piutang,
+                            // 'SALDO'       => $piutang,
                             'KETERANGAN'  => $request->keterangan,
                             'USER_UPDATE' => auth()->user()->name ?? 'SYSTEM'
                         ]);

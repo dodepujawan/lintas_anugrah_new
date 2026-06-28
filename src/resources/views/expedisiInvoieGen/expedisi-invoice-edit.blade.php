@@ -518,7 +518,7 @@ $(document).ready(function() {
         var row = $(this).closest('tr');
         var pesanan = row.find('td:eq(1)').text();
         var rute = row.find('td:eq(4)').text();
-        var harga = row.find('td:eq(5)').text();
+        var harga = row.find('td:eq(5)').text().trim();
 
         // Mengisi nilai ke elemen yang dituju
         $('#item_invoice_edit').val(pesanan);
@@ -555,6 +555,8 @@ $(document).on(
             type: 'POST',
             data: {
                 invoice: invoice,
+                item: $('#item_invoice_edit').val(),
+                rute: $('#rute_invoice_edit').val(),
                 harga: $('#harga_invoice_edit').val(),
                 disc: $('#diskon_invoice_edit').val(),
                 del_charge: $('#del_charge_invoice_edit').val(),
