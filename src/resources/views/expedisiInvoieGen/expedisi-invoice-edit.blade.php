@@ -16,6 +16,10 @@
     #modal_invoice_edit .table{
         font-size:12px;
     }
+
+    #modal_invoice_edit .input-group > .btn{
+        padding: 0 .6rem !important;
+    }
 </style>
 <div class="container-fluid py-2">
     {{-- ===================================================== --}}
@@ -109,6 +113,7 @@
                                 </div>
                                 <div class="mb-2">
                                     <label class="form-label fw-bold mb-1">CUSTOMER</label>
+                                    <input type="text" name="customer_invoice_edit_kd" id="customer_invoice_edit_kd" hidden>
                                     <input type="text" class="form-control form-control-sm bg-secondary-subtle" id="customer_invoice_edit" readonly>
                                 </div>
                                 <div class="mb-2">
@@ -165,7 +170,10 @@
                             <!-- ITEM -->
                             <div class="col-md-4">
                                 <label class="fw-bold small mb-0 d-block">ITEM</label>
-                                <input type="text" class="form-control form-control-sm bg-secondary-subtle" id="item_invoice_edit" readonly>
+                                <div class="input-group input-group-sm">
+                                    <input type="text" class="form-control form-control-sm bg-secondary-subtle" id="item_invoice_edit" readonly>
+                                    <button class="btn btn-primary" type="button" id="btnItemGabungExpEdit"> <i class="bx bx-search"></i> </button>
+                                </div>
                             </div>
                             <!-- RUTE -->
                             <div class="col-md-4">
@@ -233,6 +241,40 @@
                             </table>
                         </div>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{{-- Modal Item --}}
+<div class="modal fade" id="itemModalInvEditExp" tabindex="-1">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Data Item</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div>
+                    <h3 id="custNameInvExp"></h3>
+                    <h3 id="custKodeInvExp"></h3>
+                </div>
+                <div class="table-responsive">
+                <table class="table table-bordered table-striped w-100" id="modalItemInvExpEditTable">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>No</th>
+                            <th>NAMA ITEM</th>
+                            <th>DARI</th>
+                            <th>SAMPAI</th>
+                            <th>RUTE</th>
+                            <th>HARGA</th>
+                            <th>JENIS</th>
+                            <th>AKSI</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
                 </div>
             </div>
         </div>
@@ -345,6 +387,8 @@ $(document).ready(function() {
                 // =================================
                 $('#invoice_invoice_edit')
                     .val(d.invoice);
+                $('#customer_invoice_edit_kd')
+                    .val(d.customer_kode);
                 $('#customer_invoice_edit')
                     .val(d.customer);
                 $('#tgl_invoice_invoice_edit')
@@ -421,6 +465,70 @@ $(document).ready(function() {
         });
     });
 // ==================================== End Of Show Invoice ===============================================
+// =================================== Pilih Item =====================================
+    $(document).on('click', '#btnItemGabungExpEdit', function(e) {
+        var expedisiId = $('#customer_invoice_edit_kd').val();
+
+        if (!expedisiId || expedisiId.trim() === '') {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Warning',
+                text: 'Silahkan Pilih Customer!',
+                confirmButtonColor: '#3085d6'
+            });
+            e.preventDefault();
+            return false;
+        }
+
+        $('#itemModalInvEditExp').modal('show');
+
+        // hancurkan datatable jika sudah pernah dipakai
+        if ($.fn.DataTable.isDataTable('#modalItemInvExpEditTable')) {
+            $('#modalItemInvExpEditTable').DataTable().destroy();
+        }
+
+        // rebuild datatable
+        $('#modalItemInvExpEditTable').DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: {
+                url: "{{ route('price-customer-modal.price', ':kode') }}".replace(':kode', expedisiId),
+                dataSrc: function (json) {
+                    // SET INFO CUSTOMER DI ATAS TABEL
+                    $("#custNameInvExp").text(json.customer_nama);
+                    $("#custKodeInvExp").text(json.customer_kode);
+                    return json.data;
+                }
+            },
+            columns: [
+                { data: 'DT_RowIndex', orderable: false, searchable: false },
+                { data: 'KETERANGAN' },
+                { data: 'DARI' },
+                { data: 'SAMPAI' },
+                { data: 'nama_rute' },
+                { data: 'harga_html', orderable: false, searchable: false },
+                { data: 'jenis_text' },
+                { data: 'aksi', orderable: false, searchable: false }
+            ]
+        });
+    });
+    // ### Select Button
+    $(document).on('click', '.pick-price-exp', function(e) {
+        e.preventDefault();
+        var row = $(this).closest('tr');
+        var pesanan = row.find('td:eq(1)').text();
+        var rute = row.find('td:eq(4)').text();
+        var harga = row.find('td:eq(5)').text();
+
+        // Mengisi nilai ke elemen yang dituju
+        $('#item_invoice_edit').val(pesanan);
+        $('#rute_invoice_edit').val(rute);
+        $('#harga_invoice_edit').val(harga);
+        hitungInvoiceEdit();
+        // Tutup modal
+        $('#itemModalInvEditExp').modal('hide');
+    });
+    // =============================== End Of Pilih Item ==================================
 // ====================================== Hitung Jumlah ================================================
 $(document).on(
     'keyup change',
@@ -483,6 +591,7 @@ function clearFormInvoiceEdit()
     // IDENTITAS
     // =====================================
     $('#invoice_invoice_edit').val('');
+    $('#customer_invoice_edit_kd').val('');
     $('#customer_invoice_edit').val('');
 
     $('#kendaraan_invoice_edit').val('');

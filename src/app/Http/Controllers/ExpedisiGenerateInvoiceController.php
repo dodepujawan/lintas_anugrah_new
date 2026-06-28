@@ -621,6 +621,7 @@ class ExpedisiGenerateInvoiceController extends Controller
                 // IDENTITAS
                 // =====================================
                 'invoice'      => $master->INVOICE,
+                'customer_kode'     => $master->CUSTOMER_KODE,
                 'customer'     => $master->CUSTOMER,
                 'kendaraan'    => $master->NAMA_KENDARAAN ?? '',
                 'driver'       => $master->DRIVER ?? '',
