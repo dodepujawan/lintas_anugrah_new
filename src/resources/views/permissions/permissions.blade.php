@@ -86,6 +86,10 @@
                         <input class="form-check-input perm" type="checkbox" value="penjualan.kwitansi">
                         <label class="form-check-label">Kwitansi Ekspedisi</label>
                     </div>
+                    <div class="form-check">
+                        <input class="form-check-input perm" type="checkbox" value="penjualan.edit_expedisi">
+                        <label class="form-check-label">Edit Invoice Ekspedisi</label>
+                    </div>
                     <hr>
                     <div class="form-check">
                         <input class="form-check-input perm" type="checkbox" value="penjualan.rent_dingin">
@@ -100,6 +104,11 @@
                         <label class="form-check-label">Kwitansi Rent Dingin</label>
                     </div>
                     <div class="form-check">
+                        <input class="form-check-input perm" type="checkbox" value="penjualan.edit_rent_dingin">
+                        <label class="form-check-label">Edit Invoice Rent Dingin</label>
+                    </div>
+                    <hr>
+                    <div class="form-check">
                         <input class="form-check-input perm" type="checkbox" value="penjualan.coolroom">
                         <label class="form-check-label">Coolroom</label>
                     </div>
@@ -110,6 +119,19 @@
                     <div class="form-check">
                         <input class="form-check-input perm" type="checkbox" value="penjualan.coolroom_kwitansi">
                         <label class="form-check-label">Kwitansi Coolroom</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input perm" type="checkbox" value="penjualan.edit_coolroom_invoice">
+                        <label class="form-check-label">Edit Invoice Coolroom</label>
+                    </div>
+                </div>
+
+                {{-- ================= kwitansi History ================= --}}
+                <div class="col-md-4 mb-3">
+                    <h6 class="fw-bold">Kwitansi History</h6>
+                    <div class="form-check">
+                        <input class="form-check-input perm" type="checkbox" value="kwitansi.history">
+                        <label class="form-check-label">Kwitnasi History</label>
                     </div>
                 </div>
 

@@ -143,12 +143,11 @@
                 'penjualan.invoice',
                 'penjualan.invoice_generate',
                 'penjualan.kwitansi',
+                'penjualan.edit_expedisi',
                 'penjualan.rent_dingin',
                 'penjualan.invoice_rent_dingin',
                 'penjualan.kwitansi_rent_dingin',
-                'penjualan.coolroom',
-                'penjualan.coolroom_invoice',
-                'penjualan.coolroom_kwitansi',
+                'penjualan.edit_rent_dingin',
             ])
             <li class="menu-item">
                 <a class="menu-link" data-bs-toggle="collapse" href="#penjualanMenu" role="button" aria-expanded="false">
@@ -185,13 +184,13 @@
                     </a>
                 </li>
                 @endcan
-
+                @can('penjualan.edit_expedisi')
                 <li class="menu-item">
                     <a href="#" class="menu-link" id="sidebar_Invoice_edit_expedisi">
                     <span class="menu-text">Edit Invoice Ekspedisi</span>
                     </a>
                 </li>
-
+                @endcan
                 <li class="menu-item">
                     <div class="dropdown-divider my-2"></div>
                 </li>
@@ -223,12 +222,13 @@
                     </a>
                 </li>
                 @endcan
-
+                @can('penjualan.edit_rent_dingin')
                 <li class="menu-item">
                     <a href="#" class="menu-link" id="sidebar_Invoice_edit_rent">
                     <span class="menu-text">Edit Invoice Rent Pendingin</span>
                     </a>
                 </li>
+                @endcan
                 {{-- <li class="menu-item">
                     <a href="#" class="menu-link" id="sidebar_new_rent">
                     <span class="menu-text">Rent</span>
@@ -242,6 +242,7 @@
                 'penjualan.coolroom',
                 'penjualan.coolroom_invoice',
                 'penjualan.coolroom_kwitansi',
+                'penjualan.edit_coolroom_invoice',
             ])
             <li class="menu-item">
                 <a class="menu-link" data-bs-toggle="collapse" href="#coolroomMenu" role="button" aria-expanded="false">
@@ -257,28 +258,34 @@
                     </a>
                 </li>
                 @endcan
-                @can('penjualan.coolroom_kwitansi')
+                @can('penjualan.coolroom_invoice')
                 <li class="menu-item">
                     <a href="#" class="menu-link" id="sidebar_coolroom_inv">
                     <span class="menu-text">Invoice Coolroom</span>
                     </a>
                 </li>
                 @endcan
-
+                @can('penjualan.coolroom_kwitansi')
                 <li class="menu-item">
                     <a href="#" class="menu-link" id="sidebar_coolroom_kwt">
                     <span class="menu-text">Kwitansi Coolroom</span>
                     </a>
                 </li>
+                @endcan
+                @can('penjualan.edit_coolroom_invoice')
                 <li class="menu-item">
                     <a href="#" class="menu-link" id="sidebar_coolroom_edit">
                     <span class="menu-text">Edit Invoice Coolroom</span>
                     </a>
                 </li>
+                @endcan
                 </ul>
             </li>
             @endcanany
 
+            @canany([
+                'kwitansi.history'
+            ])
             <li class="menu-item">
                 <a class="menu-link" data-bs-toggle="collapse" href="#kwitansiMenu" role="button" aria-expanded="false">
                 <i class="menu-icon bx bx-notepad"></i>
@@ -286,13 +293,16 @@
                 <i class="menu-arrow bx bx-chevron-right"></i>
                 </a>
                 <ul class="sub-menu collapse" id="kwitansiMenu">
+                @can('kwitansi.history')
                 <li class="menu-item">
                     <a href="#" class="menu-link" id="sidebar_new_kwitansi">
                     <span class="menu-text">Kwitansi</span>
                     </a>
                 </li>
+                @endcan
                 </ul>
             </li>
+            @endcanany
 
             @canany([
                 'supplier.view',
