@@ -556,11 +556,11 @@ class CoolroomGenerateInvoiceController extends Controller
                 $nppn = round($dpp * ($ppnPersen / 100), 0);
                 $grand = round($dpp + $nppn, 0);
 
-                $bayar = (float) ($coolroom->BAYAR ?? 0);
+                $bayar = round((float) str_replace(',', '', $request->bayar));
                 if ($grand < $bayar) {
                     throw new \Exception('Grand tidak boleh lebih kecil dari pembayaran yang sudah diterima');
                 }
-                $piutang = $grand - $bayar;
+                $piutang = round($grand - $bayar);
 
                 // Update coolroom
                 $coolroom->update([
@@ -575,6 +575,7 @@ class CoolroomGenerateInvoiceController extends Controller
                     'NPPN'        => $nppn,
                     'TOTAL'       => $dpp,
                     'GRAND'       => $grand,
+                    'BAYAR'       => $bayar,
                     'PIUTANG'     => $piutang,
                     'TGLJT'       => $request->tgl_jt,
                     'KETERANGAN'  => $request->keterangan,
@@ -592,7 +593,7 @@ class CoolroomGenerateInvoiceController extends Controller
                             'CUSTOMER'   => $coolroom->CUSTOMER,
                             'PIUTANG'    => $piutang,
                             'BAYAR'      => 0,
-                            'SALDO'      => $piutang,
+                            // 'SALDO'      => $piutang,
                             'KETERANGAN' => $request->keterangan,
                             'USER'       => auth()->user()->user_id,
                             'CABANG'     => $coolroom->area_id ?? ''
@@ -601,7 +602,7 @@ class CoolroomGenerateInvoiceController extends Controller
                         $arh->update([
                             'TGLJT'       => $request->tgl_jt,
                             'PIUTANG'     => $piutang,
-                            'SALDO'       => $piutang,
+                            // 'SALDO'       => $piutang,
                             'KETERANGAN'  => $request->keterangan,
                             'USER_UPDATE' => auth()->user()->user_id
                         ]);

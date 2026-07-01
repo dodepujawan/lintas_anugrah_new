@@ -252,6 +252,7 @@ $(document).on('change', '#boxing_invoice_edit_coolroom', function() {
                 tgl_jt: $('#tgl_jt_invoice_edit_coolroom').val(),
                 boxing: $('#boxing_invoice_edit_coolroom').is(':checked'),
                 jumlah: $('#jumlah_invoice_edit_coolroom').val(),
+                bayar: $('#bayar_invoice_edit_coolroom').val(),
                 harga: unformatRupiah($('#harga_invoice_edit_coolroom').val()),
                 disc: $('#diskon_invoice_edit_coolroom').val(),
                 ppn: $('#ppn_invoice_edit_coolroom').val(),

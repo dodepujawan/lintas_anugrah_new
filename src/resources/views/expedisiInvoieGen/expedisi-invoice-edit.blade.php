@@ -557,6 +557,7 @@ $(document).on(
                 invoice: invoice,
                 item: $('#item_invoice_edit').val(),
                 rute: $('#rute_invoice_edit').val(),
+                bayar: $('#bayar_invoice_edit').val(),
                 harga: $('#harga_invoice_edit').val(),
                 disc: $('#diskon_invoice_edit').val(),
                 del_charge: $('#del_charge_invoice_edit').val(),

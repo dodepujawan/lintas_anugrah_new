@@ -546,20 +546,20 @@ class RentPendinginGenerateInvoiceController extends Controller
                 $ppnPersen = (float) ($request->ppn ?? 0);
                 $jumlah = (float) ($request->jumlah ?? 0);
 
-                $subTotal = $jumlah * $harga;
-                $ndisc = round($subTotal * ($discPersen / 100), 0);
-                $total = round($subTotal - $ndisc, 0);
-                $ppnNominal = round($total * ($ppnPersen / 100), 0);
-                $grand = round($total + $ppnNominal + $delCharge, 0);
+                $subTotal = round($jumlah * $harga);
+                $ndisc = round($subTotal * ($discPersen / 100));
+                $total = round($subTotal - $ndisc);
+                $ppnNominal = round($total * ($ppnPersen / 100));
+                $grand = round($total + $ppnNominal + $delCharge);
 
-                $bayar = (float) ($row->BAYAR ?? 0);
+                $bayar = round((float) str_replace(',', '', $request->bayar));
                 if ($grand < $bayar) {
                     throw new \Exception('Grand tidak boleh lebih kecil dari pembayaran yang sudah diterima');
                 }
-                $piutang = $grand - $bayar;
+                $piutang = round($grand - $bayar);
 
                 $row->update([
-                    'PESANAN'    => $request->item,
+                    'PESANAN'     => $request->item,
                     'JUMLAH'      => $jumlah,
                     'HARGA'       => $harga,
                     'DISC'        => $discPersen,
@@ -568,6 +568,7 @@ class RentPendinginGenerateInvoiceController extends Controller
                     'TOTAL'       => $total,
                     'PPN'         => $ppnPersen,
                     'GRAND'       => $grand,
+                    'BAYAR'       => $bayar,
                     'PIUTANG'     => $piutang,
                     'TGLJT'       => $request->tgl_jt,
                     'KETERANGAN'  => $request->keterangan,

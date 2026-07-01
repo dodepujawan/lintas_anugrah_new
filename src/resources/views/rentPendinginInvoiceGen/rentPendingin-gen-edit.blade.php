@@ -459,6 +459,7 @@ $(document).on('keyup','#jumlah_invoice_edit_ren,#harga_invoice_edit_ren,#diskon
                 item: $('#item_invoice_edit_ren').val(),
                 tgl_jt: $('#tgl_jt_invoice_edit_ren').val(),
                 jumlah: $('#jumlah_invoice_edit_ren').val(),
+                bayar: $('#bayar_invoice_edit_ren').val(),
                 harga: unformatRupiah($('#harga_invoice_edit_ren').val()),
                 disc: $('#diskon_invoice_edit_ren').val(),
                 del_charge: unformatRupiah($('#del_charge_invoice_edit_ren').val()),

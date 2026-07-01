@@ -683,24 +683,23 @@ class ExpedisiGenerateInvoiceController extends Controller
                     if ($arh && (float)$arh->BAYAR > 0) {throw new \Exception('Invoice sudah memiliki pembayaran. Silakan hubungi admin.');}
                 }
 
-                $harga = (float) str_replace(',', '', $request->harga);
-                $discPersen = (float) ($request->disc ?? 0);
-                $delCharge = (float) str_replace(',', '', $request->del_charge);
-                $ppnPersen = (float) ($request->ppn ?? 0);
-                $jumlah = (float) $request->jumlah;
+                $jumlah      = (float) $request->jumlah;
+                $harga       = (float) str_replace(',', '', $request->harga);
+                $discPersen  = (float) ($request->disc ?? 0);
+                $delCharge   = (float) str_replace(',', '', $request->del_charge);
+                $ppnPersen   = (float) ($request->ppn ?? 0);
 
-                $subTotal = $jumlah * $harga;
-                $ndisc = round($subTotal * ($discPersen / 100),0);
+                $subTotal = round($jumlah * $harga);
+                $ndisc = round($subTotal * ($discPersen / 100));
+                $total = round($subTotal - $ndisc);
+                $ppnNominal = round($total * ($ppnPersen / 100));
+                $grand = round($total + $ppnNominal + $delCharge);
 
-                $total = round($subTotal - $ndisc,0);
-                $ppnNominal = round($total * ($ppnPersen / 100),0);
-                $grand = round($total + $ppnNominal + $delCharge,0);
-
-                $bayar = (float) ($master->BAYAR ?? 0);
+                $bayar = round((float) str_replace(',', '', $request->bayar));
                 if ($grand < $bayar) {
                     throw new \Exception('Grand tidak boleh lebih kecil dari pembayaran yang sudah diterima');
                 }
-                $piutang = $grand - $bayar;
+                $piutang = round($grand - $bayar);
 
                 $master->update([
                     'PESANAN'    => $request->item,
@@ -712,6 +711,7 @@ class ExpedisiGenerateInvoiceController extends Controller
                     'TOTAL'      => $total,
                     'PPN'        => $ppnPersen,
                     'GRAND'      => $grand,
+                    'BAYAR'      => $bayar,
                     'PIUTANG'    => $piutang,
                     'TGLJT'      => $request->tgl_jt,
                     'KETERANGAN' => $request->keterangan,
@@ -729,7 +729,7 @@ class ExpedisiGenerateInvoiceController extends Controller
                             'CUSTOMER'   => $master->CUSTOMER,
                             'PIUTANG'    => $piutang,
                             'BAYAR'      => 0,
-                            'SALDO'      => $piutang,
+                            // 'SALDO'      => $piutang,
                             'KETERANGAN' => $request->keterangan,
                             'USER'       => auth()->user()->name ?? 'SYSTEM',
                             'CABANG'     => $master->area_id ?? '',
@@ -738,7 +738,7 @@ class ExpedisiGenerateInvoiceController extends Controller
                         $arh->update([
                             'TGLJT'       => $request->tgl_jt,
                             'PIUTANG'     => $piutang,
-                            'SALDO'       => $piutang,
+                            // 'SALDO'       => $piutang,
                             'KETERANGAN'  => $request->keterangan,
                             'USER_UPDATE' => auth()->user()->name ?? 'SYSTEM'
                         ]);
