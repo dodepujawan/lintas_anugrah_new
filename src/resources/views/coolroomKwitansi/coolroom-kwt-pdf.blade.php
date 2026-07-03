@@ -115,7 +115,7 @@
 
             <td width="70%">
 
-                <div class="box">
+                <div>
                     {{ $master->CUSTOMER }}
                 </div>
 
@@ -135,7 +135,7 @@
 
             <td>
 
-                <div class="box">
+                <div>
 
                     {{ ucwords(terbilang(optional($master)->GRAND ?? 0)) }}
                     Rupiah
@@ -158,15 +158,12 @@
 
             <td>
 
-                <div class="box">
+                <div>
 
                     Sewa ruang dingin
                     <br>
 
-                    Surat jalan nomor :
                     {{ $details->pluck('NOSJ')->implode(', ') }}
-
-                    <br>
 
                     Invoice :
                     {{ $master->INVOICE }}
@@ -230,11 +227,7 @@
 
                 <b>JUMLAH</b>
 
-                <div
-                    class="box"
-                    style="width:200px;"
-                >
-
+                <div style="width:200px;">
                     RP.
                     {{ number_format(optional($master)->GRAND ?? 0, 0, ',', '.') }}
 

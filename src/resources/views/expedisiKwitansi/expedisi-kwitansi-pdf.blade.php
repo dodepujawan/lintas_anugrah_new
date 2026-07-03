@@ -75,7 +75,7 @@ KWITANSI NO : {{ $master->kwt }}
 <td width="25%">SUDAH TERIMA DARI</td>
 <td width="5%">:</td>
 <td width="70%">
-    <div class="box">
+    <div>
         {{ $master->CUSTOMER }}
     </div>
 </td>
@@ -85,7 +85,7 @@ KWITANSI NO : {{ $master->kwt }}
 <td>BANYAKNYA UANG</td>
 <td>:</td>
 <td>
-    <div class="box">
+    <div>
         {{ ucwords(terbilang(optional($master)->GRAND ?? 0)) }} Rupiah
     </div>
 </td>
@@ -95,8 +95,8 @@ KWITANSI NO : {{ $master->kwt }}
 <td>UNTUK PEMBAYARAN</td>
 <td>:</td>
 <td>
-    <div class="box">
-        Surat jalan nomor : {{ $details->pluck('NOSJ')->implode(', ') }}
+    <div>
+        {{ $details->pluck('NOSJ')->implode(', ') }}
         invoice : {{ $master->INVOICE }}
     </div>
 </td>
@@ -131,7 +131,7 @@ Denpasar {{ \Carbon\Carbon::parse($master->TGLKW)->format('d-m-Y') }}
 <tr>
 <td width="50%">
 <b>JUMLAH</b>
-<div class="box" style="width:200px;">
+<div style="width:200px;">
     RP. {{ number_format(optional($master)->GRAND ?? 0, 0, ',', '.') }}
 </div>
 </td>
