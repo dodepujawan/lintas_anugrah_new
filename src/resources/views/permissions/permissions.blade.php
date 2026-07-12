@@ -167,6 +167,15 @@
                     </div>
                 </div>
 
+                {{-- ================= AKUNTANSI ================= --}}
+                <div class="col-md-4 mb-3">
+                    <h6 class="fw-bold">Akuntansi</h6>
+                    <div class="form-check">
+                        <input class="form-check-input perm" type="checkbox" value="akuntansi.view">
+                        <label class="form-check-label">Akuntansi</label>
+                    </div>
+                </div>
+
                 {{-- ================= EXTRA ================= --}}
                 <div class="col-md-6 mb-3">
                     <h6 class="fw-bold">Extra</h6>

@@ -915,6 +915,11 @@ $(document).ready(function() {
         $('#areaModal').modal('show');
     });
 
+    // Auto Capital
+    $('#modal-area').on('input', function() {
+        this.value = this.value.toUpperCase();
+    });
+
     // ======================================
     // SUBMIT AREA
     // ======================================

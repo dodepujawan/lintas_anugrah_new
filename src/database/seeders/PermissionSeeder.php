@@ -51,6 +51,8 @@ class PermissionSeeder extends Seeder
             'user.view',
             'user.create',
 
+            'akuntansi.view',
+
             'extra.pajak',
             'extra.rekening',
             'extra.signature',

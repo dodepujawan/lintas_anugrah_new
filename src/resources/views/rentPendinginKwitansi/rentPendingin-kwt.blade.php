@@ -64,7 +64,8 @@ $(document).ready(function() {
     });
     // ========================== End Of Tabel Invoice Generate Expedisi ===============================
 
-    $(document).on('click', '.btn-proses-kwt-dgn', function () {
+    $(document).on('click', '.btn-proses-kwt-dgn', function (e) {
+        e.preventDefault();
         let invoice = $(this).data('invoice');
         Swal.fire({
             title: 'Proses Kwitansi?',
@@ -84,16 +85,16 @@ $(document).ready(function() {
                     },
                     success: function (response) {
                         if (response.status) {
+                            let kwitansi = response.nokwt;
                             Swal.fire({
-
                                 icon: 'success',
                                 title: 'Berhasil',
                                 text: response.message
                             });
                             $('#KwitansiDgnTable').DataTable().ajax.reload();
                             // PDF
-                            let pdfUrl = "{{ route('pendinginKwitansi.pdfKwitansi', ':invoice') }}";
-                            pdfUrl = pdfUrl.replace(':invoice', invoice);
+                            let pdfUrl = "{{ route('pendinginKwitansi.pdfKwitansi', ':kwitansi') }}";
+                            pdfUrl = pdfUrl.replace(':kwitansi', kwitansi);
                             window.open(pdfUrl, '_blank');
                         } else {
                             Swal.fire({
@@ -115,7 +116,8 @@ $(document).ready(function() {
         });
     });
 
-    $(document).on('click', '.btn-delete-kwt-dgn', function () {
+    $(document).on('click', '.btn-delete-kwt-dgn', function (e) {
+        e.preventDefault();
         let kwt = $(this).data('kwitansi');
         Swal.fire({
             title: 'Batalkan Kwitansi?',
@@ -158,6 +160,14 @@ $(document).ready(function() {
                 });
             }
         });
+    });
+
+    $(document).on('click', '.btn-cetak-kwt-dgn', function (e) {
+        e.preventDefault();
+        let kwitansi = $(this).data('kwitansi');
+        let pdfUrl = "{{ route('pendinginKwitansi.pdfKwitansi', ':kwitansi') }}";
+            pdfUrl = pdfUrl.replace(':kwitansi', kwitansi);
+            window.open(pdfUrl, '_blank');
     });
 
 });

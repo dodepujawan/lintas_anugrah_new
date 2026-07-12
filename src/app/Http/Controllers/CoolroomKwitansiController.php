@@ -87,17 +87,17 @@ class CoolroomKwitansiController extends Controller
                     ';
                 }
                 return '
-                    <a
-                        href="'.route('coolroomKwt.pdf', $row->INVOICE).'"
-                        target="_blank"
-                        class="btn btn-sm btn-primary">
-                        PDF
-                    </a>
                     <button
                         class="btn btn-sm btn-danger btn-delete-kwt-coolroom"
                         data-kwt="'.$row->kwt.'">
                         Delete
                     </button>
+                    <a
+                        href="'.route('coolroomKwt.pdf', $row->kwt).'"
+                        target="_blank"
+                        class="btn btn-sm btn-primary">
+                        PDF
+                    </a>
                 ';
             })
             ->rawColumns(['action'])
@@ -108,7 +108,7 @@ class CoolroomKwitansiController extends Controller
     {
         try {
             $invoice = $request->invoice;
-            DB::transaction(function () use ($invoice, &$kwt) {
+            $kwt = DB::transaction(function () use ($invoice, &$kwt) {
                 // =====================================
                 // VALIDASI
                 // =====================================
@@ -191,12 +191,13 @@ class CoolroomKwitansiController extends Controller
                     'NDISC' => $master->NDISC ?? 0,
                     'JENIS' => 'COL',
                 ]);
+                return $kwt;
             });
             return response()->json([
                 'status'  => true,
                 'message' => 'Kwitansi berhasil diproses',
                 'pdf_url' => route(
-                'coolroomKwt.pdf',$invoice
+                'coolroomKwt.pdf',$kwt
             )
             ]);
         } catch (\Throwable $e) {
@@ -269,20 +270,21 @@ class CoolroomKwitansiController extends Controller
         }
     }
 
-    public function pdfInvoiceKwitansi($invoice)
+    public function pdfInvoiceKwitansi($kwt)
     {
         // ==========================================
         // MASTER COOLROOM
         // ==========================================
-        $master = Coolroom::where('INVOICE', $invoice)
+        $master = Coolroom::where('kwt', $kwt)
             ->where('GRAND', '>', 0)
             ->firstOrFail();
         // ==========================================
         // DETAIL COOLROOM
         // ==========================================
-        $details = Coolroom::where('INVOICE', $invoice)
+        $details = Coolroom::where('kwt', $kwt)
             ->orderBy('NOSJ')
             ->get();
+        $invoice = $master->INVOICE;
         // ==========================================
         // PEMBAYARAN ARH
         // ==========================================

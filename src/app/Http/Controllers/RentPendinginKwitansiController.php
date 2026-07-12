@@ -98,7 +98,7 @@ class RentPendinginKwitansiController extends Controller
                 if ($request->status_kwt == 'belum') {
                     return '
                         <button
-                            class="btn btn-sm btn-success btn-proses-kwt-dgn"
+                            class="btn btn-sm btn-primary btn-proses-kwt-dgn"
                             data-invoice="'.$row->INVOICE.'">
                             Proses
                         </button>
@@ -108,11 +108,18 @@ class RentPendinginKwitansiController extends Controller
                 // SUDAH KWITANSI
                 // ==============================
                 return '
-                    <button
-                        class="btn btn-sm btn-danger btn-delete-kwt-dgn"
-                        data-kwitansi="'.$row->kwt.'">
-                        Delete
-                    </button>
+                    <div class="d-flex gap-1">
+                        <button
+                            class="btn btn-sm btn-danger btn-delete-kwt-dgn"
+                            data-kwitansi="'.$row->kwt.'">
+                            Delete
+                        </button>
+                        <button
+                            class="btn btn-sm btn-success btn-cetak-kwt-dgn"
+                            data-kwitansi="'.$row->kwt.'">
+                            Pdf
+                        </button>
+                    </div>
                 ';
             })
             ->rawColumns(['action'])
@@ -123,7 +130,7 @@ class RentPendinginKwitansiController extends Controller
     {
         try {
             $invoice = $request->invoice;
-            DB::transaction(function () use ($invoice) {
+            $kwt = DB::transaction(function () use ($invoice) {
                 // =====================================
                 // VALIDASI
                 // =====================================
@@ -213,10 +220,12 @@ class RentPendinginKwitansiController extends Controller
                     'NDISC' => $master->NDISC ?? 0,
                     'JENIS' => 'REN',
                 ]);
+                return $kwt;
             });
             return response()->json([
                 'status'  => true,
-                'message' => 'Kwitansi berhasil diproses'
+                'message' => 'Kwitansi berhasil diproses',
+                'nokwt'   => $kwt,
             ]);
         } catch (\Throwable $e) {
             return response()->json([
@@ -280,15 +289,15 @@ class RentPendinginKwitansiController extends Controller
         }
     }
 
-    public function pdfInvoiceKwitansi($invoice){
-        $master = Expedisi::where('INVOICE', $invoice)
+    public function pdfInvoiceKwitansi($kwitansi){
+        $master = Expedisi::where('kwt', $kwitansi)
             ->where('GRAND', '>', 0)
             ->firstOrFail();
 
-        $details = Expedisi::where('INVOICE', $invoice)
+        $details = Expedisi::where('kwt', $kwitansi)
             ->orderBy('NOSJ')
             ->get();
-
+        $invoice = $master->INVOICE;
         $arh = Arh::where('NOFAKTUR', $invoice)
             ->first();
 

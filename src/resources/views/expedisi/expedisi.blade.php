@@ -947,19 +947,22 @@ $(document).ready(function() {
         if (kodeKen == 1) {
             $('#driver_1_expedisi_id').val(kodeDriver);
             $('#driver_1_expedisi').val(nama);
+            $('#driverModalExp').modal('hide');
         } else if (kodeKen == 2) {
             $('#driver_2_expedisi_id').val(kodeDriver);
             $('#driver_2_expedisi').val(nama);
+            $('#driverModalExp').modal('hide');
+            $('#penerima_expedisi').focus();
         } else if (kodeKen == 3) {
             $('#driver1_kode_muat_expedisi').val(kodeDriver);
             $('#driver1_muat_expedisi').val(nama);
+            $('#driverModalExp').modal('hide');
         } else if (kodeKen == 4) {
             $('#driver2_kode_muat_expedisi').val(kodeDriver);
             $('#driver2_muat_expedisi').val(nama);
+            $('#driverModalExp').modal('hide');
+            $('#km_akhir_muat_expedisi').focus();
         }
-
-        // Tutup modal
-        $('#driverModalExp').modal('hide');
     });
     // =============================== End Of Pilih Driver ==================================
     // ============================ Submit Data Form Surjal =================================
@@ -1581,6 +1584,89 @@ $(document).ready(function() {
         deleteRowTabelMuat();
     });
     // ========================== End Of Clear Table No Muat =================================
+    // =============================== Enter Next Function =====================================
+    // ### FORM SURJAL
+    $(document).ready(function() {
+    // Daftar semua input dalam urutan
+        var inputs = [
+            '#tgl_sj_expedisi',
+            '#no_sj_expedisi',
+            '#wilayah_expedisi',
+            '#customer_expedisi',
+            '#customer_kode_expedisi',
+            '#item_expedisi',
+            '#kendaraan_expedisi',
+            '#driver_1_expedisi',
+            '#driver_2_expedisi',
+            '#penerima_expedisi',
+            '#nama_penerima_expedisi',
+            '#phone_penerima_expedisi',
+            '#alamat_penerima_expedisi',
+            '#barang_expedisi',
+            '#penyimpanan_expedisi',
+            '#koli_expedisi',
+            '#catatan_expedisi',
+            '#rute_expedisi',
+            '#jumlah_expedisi',
+            '#harga_expedisi',
+            '#disc_expedisi',
+            '#del_charge_expedisi'
+        ];
+
+        // Event Enter untuk semua input
+        $('input, select, textarea').on('keydown', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+
+                var currentId = '#' + $(this).attr('id');
+                var currentIndex = inputs.indexOf(currentId);
+
+                if (currentIndex !== -1) {
+                    // Cari field berikutnya yang bisa diisi
+                    for (var i = currentIndex + 1; i < inputs.length; i++) {
+                        var nextField = $(inputs[i]);
+                        if (nextField.is(':visible') && !nextField.prop('disabled')) {
+                            nextField.focus();
+                            if (nextField.is('input, textarea')) {
+                                nextField.select();
+                            }
+                            return;
+                        }
+                    }
+                    // Jika sudah di akhir, fokus ke tombol SIMPAN
+                    $('#buttonSimpanExp').focus();
+                }
+            }
+        });
+    });
+    // ### FORM MUAT
+    $(document).ready(function() {
+        var fields = [
+            '#tgl_muat_expedisi','#no_muat_expedisi','#rute_muat_expedisi',
+            '#kendaraan_muat_expedisi','#plat_nomor_muat_expedisi',
+            '#driver1_muat_expedisi','#driver2_muat_expedisi',
+            '#km_awal_muat_expedisi','#km_akhir_muat_expedisi',
+            '#uang_jalan_muat_expedisi','#uang_driver_makan_muat_expedisi',
+            '#uang_lain_lain_muat_expedisi'
+        ];
+
+        $(fields.join(',')).on('keydown', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                var idx = fields.indexOf('#' + $(this).attr('id'));
+                for (var i = idx + 1; i < fields.length; i++) {
+                    var f = $(fields[i]);
+                    if (f.is(':visible') && !f.prop('disabled')) {
+                        f.focus();
+                        f.select();
+                        return;
+                    }
+                }
+                $('#simpanMuatExpBtn').focus();
+            }
+        });
+    });
+    // ========================= End Of Enter Next Function ============================
     // ########################################################################
     // FUNCTION HELPER:
     // ########################################################################

@@ -383,6 +383,30 @@
             @endcanany
 
             @canany([
+                'akuntansi.view',
+            ])
+            <li class="menu-item">
+                <a class="menu-link" data-bs-toggle="collapse" href="#akuntansiMenu" role="button" aria-expanded="false">
+                <i class="menu-icon bx bx-book"></i>
+                <span class="menu-text">Akuntansi</span>
+                <i class="menu-arrow bx bx-chevron-right"></i>
+                </a>
+                <ul class="sub-menu collapse" id="akuntansiMenu">
+                @can('akuntansi.view')
+                <li class="menu-item">
+                    <a href="#"
+                    class="menu-link active"
+                    id="sidebar_akuntansi"
+                    onclick="window.open('https://lintasgo.duckdns.org/', '_blank'); return false;">
+                        <span class="menu-text">Akuntansi</span>
+                    </a>
+                </li>
+                @endcan
+                </ul>
+            </li>
+            @endcanany
+
+            @canany([
                 'extra.pajak',
                 'extra.rekening',
                 'extra.signature',
@@ -418,13 +442,13 @@
                     </a>
                 </li>
                 @endcan
-                @can('extra.printer')
+                {{-- @can('extra.printer')
                 <li class="menu-item">
                     <a href="#" class="menu-link" id="sidebar_extra_printer">
                     <span class="menu-text">Printer</span>
                     </a>
                 </li>
-                @endcan
+                @endcan --}}
                 @can('extra.permissions')
                 <li class="menu-item">
                     <a href="#" class="menu-link" id="sidebar_extra_permissions">

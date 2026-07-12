@@ -208,7 +208,7 @@ Route::prefix('expedisi-kwitansi')->group(function() {
     Route::post('/proses', [ExpedisiKwitansiController::class, 'prosesKwitansi'])->name('expedisiKwitansi.proses');
     Route::post('/destroy', [ExpedisiKwitansiController::class, 'deleteKwitansi'])->name('expedisiKwitansi.destroy');
     // // PDF
-    Route::get('/invoice/pdf/{invoiceNo}', [ExpedisiKwitansiController::class, 'pdfInvoiceKwitansi'])->name('expedisiKwitansi.pdfKwitansi');
+    Route::get('/invoice/pdf/{kwitansiNo}', [ExpedisiKwitansiController::class, 'pdfInvoiceKwitansi'])->name('expedisiKwitansi.pdfKwitansi');
 });
 
 Route::prefix('rent-pendingin')->group(function() {
@@ -261,7 +261,7 @@ Route::prefix('rent-pendingin-kwitansi')->group(function() {
     Route::post('/proses', [RentPendinginKwitansiController::class, 'prosesKwitansi'])->name('pendinginKwitansi.proses');
     Route::post('/destroy', [RentPendinginKwitansiController::class, 'deleteKwitansi'])->name('pendinginKwitansi.destroy');
     // // PDF
-    Route::get('/invoice/pdf/{invoiceNo}', [RentPendinginKwitansiController::class, 'pdfInvoiceKwitansi'])->name('pendinginKwitansi.pdfKwitansi');
+    Route::get('/invoice/pdf/{kwitansiNo}', [RentPendinginKwitansiController::class, 'pdfInvoiceKwitansi'])->name('pendinginKwitansi.pdfKwitansi');
 });
 
 Route::prefix('coolroom')->group(function() {
@@ -296,7 +296,7 @@ Route::prefix('coolroom-kwitansi')->group(function() {
     Route::post('/proses', [CoolroomKwitansiController::class, 'prosesKwitansi'])->name('coolroomKwt.proses');
     Route::post('/delete',[CoolroomKwitansiController::class, 'deleteKwitansi']
     )->name('coolroomKwt.delete');
-    Route::get('/pdf/{invoice}',[CoolroomKwitansiController::class, 'pdfInvoiceKwitansi'])->name('coolroomKwt.pdf');
+    Route::get('/pdf/{kwitansi}',[CoolroomKwitansiController::class, 'pdfInvoiceKwitansi'])->name('coolroomKwt.pdf');
 });
 
 Route::prefix('kwitansi')->group(function () {

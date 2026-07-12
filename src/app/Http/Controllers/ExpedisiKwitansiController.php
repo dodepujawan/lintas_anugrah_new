@@ -98,7 +98,7 @@ class ExpedisiKwitansiController extends Controller
                 if ($request->status_kwt == 'belum') {
                     return '
                         <button
-                            class="btn btn-sm btn-success btn-proses-kwt"
+                            class="btn btn-sm btn-primary btn-proses-kwt"
                             data-invoice="'.$row->INVOICE.'">
                             Proses
                         </button>
@@ -113,6 +113,11 @@ class ExpedisiKwitansiController extends Controller
                         data-kwitansi="'.$row->kwt.'">
                         Delete
                     </button>
+                    <button
+                        class="btn btn-sm btn-success btn-cetak-kwt"
+                        data-kwitansi="'.$row->kwt.'">
+                        Pdf
+                    </button>
                 ';
             })
             ->rawColumns(['action'])
@@ -123,7 +128,7 @@ class ExpedisiKwitansiController extends Controller
     {
         try {
             $invoice = $request->invoice;
-            DB::transaction(function () use ($invoice) {
+            $kwt = DB::transaction(function () use ($invoice) {
                 // =====================================
                 // VALIDASI
                 // =====================================
@@ -213,11 +218,12 @@ class ExpedisiKwitansiController extends Controller
                     'NDISC' => $master->NDISC ?? 0,
                     'JENIS' => $master->JENIS ?? 'EKS',
                 ]);
+                return $kwt;
             });
             return response()->json([
                 'status'  => true,
-                'message' => 'Kwitansi berhasil diproses'
-
+                'message' => 'Kwitansi berhasil diproses',
+                'nokwt'   => $kwt,
             ]);
         } catch (\Throwable $e) {
             return response()->json([
@@ -284,15 +290,14 @@ class ExpedisiKwitansiController extends Controller
         }
     }
 
-    public function pdfInvoiceKwitansi($invoice){
-        $master = Expedisi::where('INVOICE', $invoice)
+    public function pdfInvoiceKwitansi($kwitansi){
+        $master = Expedisi::where('kwt', $kwitansi)
             ->where('GRAND', '>', 0)
             ->firstOrFail();
-
-        $details = Expedisi::where('INVOICE', $invoice)
+        $details = Expedisi::where('kwt', $kwitansi)
             ->orderBy('NOSJ')
             ->get();
-
+        $invoice = $master->INVOICE;
         $arh = Arh::where('NOFAKTUR', $invoice)
             ->first();
 
