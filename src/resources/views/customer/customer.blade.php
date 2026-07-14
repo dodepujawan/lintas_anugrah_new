@@ -855,6 +855,75 @@ $(document).ready(function() {
     // ================================= modal customer handler ================================
     customerModal();
     // ============================= End of modal customer handler =============================
+    // =============================== Enter Next cCustomer Input ==============================
+    $(document).ready(function() {
+        // Daftar semua input per panel
+        var panelFields = {
+            0: '#panel-0 .enter-next',
+            1: '#panel-1 .enter-next',
+            2: '#panel-2 .enter-next',
+            3: '#panel-3 .enter-next',
+            4: '#panel-4 .enter-next'
+        };
+
+        // Navigasi Enter
+        $('.enter-next').on('keydown', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+
+                var currentPanel = $(this).closest('.cust-panel');
+                var panelId = currentPanel.attr('id');
+                var panelIndex = parseInt(panelId.split('-')[1]);
+
+                var fields = currentPanel.find('.enter-next:visible');
+                var idx = fields.index($(this));
+
+                // Cek apakah ada field berikutnya di panel yang sama
+                if (idx < fields.length - 1) {
+                    var nextField = fields.eq(idx + 1);
+                    nextField.focus();
+                    nextField.select();
+                } else {
+                    // Pindah ke panel berikutnya
+                    var nextPanelIndex = panelIndex + 1;
+                    if (nextPanelIndex <= 4) {
+                        // Klik tab berikutnya
+                        $('.cust-tab-btn[data-tab="' + nextPanelIndex + '"]').click();
+
+                        // Fokus ke field pertama di panel baru
+                        setTimeout(function() {
+                            var newPanel = $('#panel-' + nextPanelIndex);
+                            var firstField = newPanel.find('.enter-next:visible').first();
+                            if (firstField.length) {
+                                firstField.focus();
+                                firstField.select();
+                            }
+                        }, 300);
+                    } else {
+                        // Jika sudah di panel terakhir, fokus ke tombol Simpan
+                        $('#save-btn').focus();
+                    }
+                }
+            }
+        });
+
+        // Enter untuk tombol
+        $('#save-btn, .btn-cancel, #btnNext, #btnPrev').on('keydown', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                $(this).click();
+            }
+        });
+
+        // Fokus pertama saat modal ditampilkan
+        $('#customer-modal').on('shown.bs.modal', function() {
+            setTimeout(function() {
+                // $('#panel-0 .enter-next:visible').first().focus();
+                $('#nama').focus();
+            }, 300);
+        });
+    });
+    // =========================== End Of Enter Next Customer Input =============================
 });
     // ################################ HELPER #######################################
     // ******* Modal Customer *********************

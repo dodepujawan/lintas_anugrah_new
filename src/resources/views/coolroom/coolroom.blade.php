@@ -96,7 +96,7 @@
                                     <div class="form-check mt-2">
                                         <input class="form-check-input" type="checkbox" id="boxing_coolroom">
                                         <label class="form-check-label small fw-bold" for="boxing_coolroom">
-                                            Harga Boxing
+                                            Harga Boxing (tekan spasi to check)
                                         </label>
                                     </div>
                                 </div>
@@ -333,6 +333,7 @@ $(document).ready(function() {
             $('#customer_kode_coolroom').val(CUSTOMER);
             // tutup modal
             $('#customerModalCool').modal('hide');
+            $('#jumlah_coolroom').focus();
         }
     );
 // ============================== End Of Pilih Customer ====================================
@@ -594,6 +595,51 @@ $(document).ready(function() {
         }
     );
 // =================================== End Of Delete Coolroom ==================================
+// =================================== Enter Next Input Coolroom ==================================
+    $(document).ready(function() {
+        var fields = [
+            '#nosj_coolroom','#tglsj_coolroom','#customer_coolroom',
+            '#customer_kode_coolroom','#jumlah_coolroom','#harga_coolroom',
+            '#boxing_coolroom','#keterangan_coolroom','#subtotal_coolroom',
+            '#disc_coolroom','#ndisc_coolroom','#dpp_coolroom',
+            '#ppn_coolroom','#nppn_coolroom','#grand_coolroom'
+        ];
+
+        // Enter untuk pindah field
+        $(fields.join(',')).on('keydown', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                var idx = fields.indexOf('#' + $(this).attr('id'));
+                for (var i = idx + 1; i < fields.length; i++) {
+                    var f = $(fields[i]);
+                    if (f.is(':visible') && !f.prop('disabled') && !f.prop('readonly')) {
+                        f.focus();
+                        f.select();
+                        return;
+                    }
+                }
+                $('#proses_coolroom').focus();
+            }
+        });
+
+        // Cehckbox Bisa toggle dengan Enter dan Spasi
+        $('#boxing_coolroom').on('keydown', function(e) {
+            if (e.key === ' ') {
+                e.preventDefault();
+                $(this).prop('checked', !$(this).prop('checked'));
+                $(this).trigger('change');
+            }
+        });
+
+        // Tombol SIMPAN & KELUAR
+        $('#proses_coolroom, #keluar_coolroom').on('keydown', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                $(this).click();
+            }
+        });
+    });
+// ================================ End Of Enter Next Input Coolroom ===============================
 });
 
 // ++++++++++++++++++++++++++++++++++++++++ Helper ++++++++++++++++++++++++++++++++++++++++++
