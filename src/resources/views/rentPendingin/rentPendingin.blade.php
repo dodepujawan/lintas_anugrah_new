@@ -807,6 +807,7 @@ $(document).ready(function() {
                 success: function (res) {
                     if (res.success) {
                         $('#loading_modal').modal('hide');
+                        printSuratJalanRent(res.data.NOSJ);
                         if($('#no_surjal_rent_dingin').val() != ""){
                             Swal.fire({
                                 icon: 'success',
@@ -1285,5 +1286,27 @@ $(document).ready(function() {
             // aktifkan button papend to table
             $('#btnMuatRentPendinginDiv').addClass('d-none');
             $('#divPrintSuratJalanRent').addClass('d-none');
+    }
+
+    // ###Print PDF
+    function printSuratJalanRent(sj) {
+        let url = "{{ route('rentPendingin.printSuratJalan', ':sj') }}";
+        url = url.replace(':sj', sj);
+        fetch("http://localhost:3000/print", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                url: url,
+                printer: "EPSONLX"
+            })
+        })
+        .then(r => r.json())
+        .then(r => console.log(r))
+        .catch(err => {
+            console.error(err);
+            alert("Print service tidak aktif");
+        });
     }
 </script>

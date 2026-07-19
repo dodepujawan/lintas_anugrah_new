@@ -1163,6 +1163,7 @@ $(document).ready(function() {
                     focusConfirm: true
                 }).then((result) => {
                     if (result.isConfirmed) {
+                        printSuratJalan(response.data.id);
                         const noMuat = $('#no_muat_expedisi_flag').val();
                         if (userRole === 'admin' && (!noMuat || noMuat.trim() === '')) {
                             addRowExpedisi({
@@ -1922,6 +1923,27 @@ $(document).ready(function() {
         $('#clearMuatExpBtn').hide();
     }
 
+    // ###Print PDF
+    function printSuratJalan(id) {
+        let url = "{{ route('expedisi.printSuratJalan', ':id') }}";
+        url = url.replace(':id', id);
+        fetch("http://localhost:3000/print", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                url: url,
+                printer: "EPSONLX"
+            })
+        })
+        .then(r => r.json())
+        .then(r => console.log(r))
+        .catch(err => {
+            console.error(err);
+            alert("Print service tidak aktif");
+        });
+    }
     // function hitungExpedisi() {
     //     let jumlah = parseFloat($('#jumlah_expedisi').val()) || 0;
     //     let harga  = parseFloat($('#harga_expedisi').val()) || 0;

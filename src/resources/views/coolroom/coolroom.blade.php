@@ -488,7 +488,8 @@ $(document).ready(function() {
                         title:'Berhasil',
                         text:res.message
                     });
-                    window.open("{{ route('coolroom.pdf',['nosj'=>'__NOSJ__']) }}".replace('__NOSJ__',res.nosj), '_blank');
+                    printSuratJalanCool(res.nosj);
+                    // window.open("{{ route('coolroom.pdf',['nosj'=>'__NOSJ__']) }}".replace('__NOSJ__',res.nosj), '_blank');
                     $('#loading_modal').modal('hide');
                     $('#form_coolroom').addClass('d-none');
                     $('#table_coolroom').removeClass('d-none');
@@ -684,6 +685,28 @@ $(document).ready(function() {
         $('#nppn_coolroom').val('');
         $('#grand_coolroom').val('');
         $('#keterangan_coolroom').val('');
+    }
+
+    // ###Print PDF
+    function printSuratJalanCool(sj) {
+        let url = "{{ route('coolroom.pdf', ':sj') }}";
+        url = url.replace(':sj', sj);
+        fetch("http://localhost:3000/print", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                url: url,
+                printer: "EPSONLX"
+            })
+        })
+        .then(r => r.json())
+        .then(r => console.log(r))
+        .catch(err => {
+            console.error(err);
+            alert("Print service tidak aktif");
+        });
     }
 // ++++++++++++++++++++++++++++++++++++ End Of Helper ++++++++++++++++++++++++++++++++++++++++++
 </script>
