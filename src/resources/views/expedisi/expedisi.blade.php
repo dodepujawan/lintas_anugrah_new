@@ -1242,7 +1242,7 @@ $(document).ready(function() {
     // ============================== End Of Append Form to Table No Muat ==============================
     // =========================== Print PDF ================================
     $('#btnPrintSuratJalan').on('click', function () {
-        let id = $(this).data('id');
+        let id = $(this).attr('data-id');
         let url = "{{ route('expedisi.printSuratJalan', ':id') }}";
         url = url.replace(':id', id);
         window.open(url, '_blank');
@@ -1462,9 +1462,8 @@ $(document).ready(function() {
                 title: 'Peringatan',
                 text: 'KM Akhir tidak boleh lebih kecil dari KM Awal'
             });
-            return false;
+            return;
         }
-        return true;
 
         let nosjList = [];
 

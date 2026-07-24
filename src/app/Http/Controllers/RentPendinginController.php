@@ -697,7 +697,12 @@ class RentPendinginController extends Controller
                 abort(404, 'Data bukan tipe RENT');
             }
 
-            // Konfigurasi mPDF
+            $tempPath = storage_path('app/mpdf-temp');
+
+            if (!is_dir($tempPath)) {
+                mkdir($tempPath, 0775, true);
+            }
+
             $mpdfConfig = [
                 'mode' => 'utf-8',
                 'format' => 'A4',
@@ -710,8 +715,8 @@ class RentPendinginController extends Controller
                 'margin_header' => 5,
                 'margin_footer' => 5,
                 'orientation' => 'P',
+                'tempDir' => $tempPath,   // <-- tambahkan ini
             ];
-
             // Inisialisasi mPDF
             $mpdf = new Mpdf($mpdfConfig);
 

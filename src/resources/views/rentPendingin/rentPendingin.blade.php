@@ -1132,7 +1132,7 @@ $(document).ready(function() {
     // ============================ End Of Submit Form Muat ==================================
     // =========================== Print PDF ================================
     $('#btnPrintSuratJalanRent').on('click', function () {
-        let sj = $(this).data('sj');
+        let sj = $(this).attr('data-sj');
         let url = "{{ route('rentPendingin.printSuratJalan', ':sj') }}";
         url = url.replace(':sj', sj);
         window.open(url, '_blank');
