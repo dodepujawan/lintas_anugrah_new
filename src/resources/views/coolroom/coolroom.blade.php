@@ -153,6 +153,9 @@
                         <button class="btn btn-sm btn-primary" id="proses_coolroom">
                             SIMPAN
                         </button>
+                        <button class="btn btn-warning btn-sm px-4 d-none" id="btnPrintSuratJalanCool" type="button" data-id="">
+                            <i class="bx bx-printer me-1"></i>Print surat jalan
+                        </button>
                         <button class="btn btn-sm btn-secondary" id="keluar_coolroom">
                             KELUAR
                         </button>
@@ -257,6 +260,7 @@ $(document).ready(function() {
         clearCoolroomForm();
         // Generae PPN
         loadInputPajak();
+        setButtonCoolMode('save');
     });
 // ============================== End Of Show Form Colroom ====================================
 // ================================== Show Table Colroom =====================================
@@ -538,14 +542,18 @@ $(document).ready(function() {
                     // =====================
                     $('#subtotal_coolroom').val(formatRupiah(d.SUBTOTAL)
                     );
-                    $('#ndisc_coolroom').val(formatRupiah(d.NDISC)
+                    $('#ndisc_coolroom').val((d.NDISC)
                     );
                     $('#dpp_coolroom').val(formatRupiah(d.DPP)
                     );
-                    $('#nppn_coolroom').val(formatRupiah(d.NPPN)
+                    $('#nppn_coolroom').val((d.NPPN)
                     );
                     $('#grand_coolroom').val(formatRupiah(d.GRAND)
                     );
+
+                    $('#btnPrintSuratJalanCool').removeClass('d-none');
+                    $('#btnPrintSuratJalanCool').attr('data-sj',d.NOSJ);
+                    setButtonCoolMode('update');
                 }
             });
 
@@ -641,6 +649,14 @@ $(document).ready(function() {
         });
     });
 // ================================ End Of Enter Next Input Coolroom ===============================
+// =========================== Print PDF ================================
+    $('#btnPrintSuratJalanCool').on('click', function () {
+        let sj = $(this).attr('data-sj');
+        let url = "{{ route('coolroom.pdf', ':sj') }}";
+        url = url.replace(':sj', sj);
+        window.open(url, '_blank');
+    });
+// ======================== End Of Print PDF =============================
 });
 
 // ++++++++++++++++++++++++++++++++++++++++ Helper ++++++++++++++++++++++++++++++++++++++++++
@@ -685,6 +701,19 @@ $(document).ready(function() {
         $('#nppn_coolroom').val('');
         $('#grand_coolroom').val('');
         $('#keterangan_coolroom').val('');
+    }
+
+    function setButtonCoolMode(mode) {
+        let btn = $('#proses_coolroom');
+        if (mode === 'update') {
+            btn.text('UPDATE')
+            .removeClass('btn-primary')
+            .addClass('btn-success');
+        } else {
+            btn.text('SIMPAN')
+            .removeClass('btn-success')
+            .addClass('btn-primary');
+        }
     }
 
     // ###Print PDF
