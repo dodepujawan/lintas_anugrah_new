@@ -58,13 +58,13 @@ Route::prefix('register')->middleware('auth')->group(function () {
     Route::get('/generate-user-id', [RegisterController::class, 'generate_user_id'])->name('generate_user_id');
 });
 
-Route::prefix('dashboard')->middleware('auth')->group(function () {
+Route::prefix('dashboard')->group(function () {
     Route::get('/index', [DashboardController::class, 'index'])->name('dashboard.index');
     Route::get('/summary', [DashboardController::class, 'summary'])->name('dashboard.summary');
     Route::get('/chart', [DashboardController::class, 'chart'])->name('dashboard.chart');
 });
 
-Route::prefix('customer')->middleware('auth')->group(function () {
+Route::prefix('customer')->group(function () {
     Route::get('/', [CustomerController::class, 'index_customer'])->name('index_customer');
 
     // DataTables
@@ -81,7 +81,7 @@ Route::prefix('customer')->middleware('auth')->group(function () {
     Route::get('/customer_kode', [CustomerController::class, 'customer_kode'])->name('customer_kode');
 });
 
-Route::prefix('kendaraan')->middleware('auth')->group(function () {
+Route::prefix('kendaraan')->group(function () {
     Route::get('/', [KendaraanController::class, 'index'])->name('kendaraan.index');
     Route::post('/store', [KendaraanController::class, 'store'])->name('kendaraan.store');
     Route::get('/data', [KendaraanController::class, 'data'])->name('kendaraan.data');
@@ -93,7 +93,7 @@ Route::prefix('kendaraan')->middleware('auth')->group(function () {
     Route::get('/data-model', [KendaraanController::class, 'dataModel'])->name('kendaraan.datamodel');
 });
 
-Route::prefix('driver')->middleware('auth')->group(function () {
+Route::prefix('driver')->group(function () {
     Route::get('/', [DriverController::class, 'index'])->name('driver.index');
     Route::get('/data', [DriverController::class, 'data'])->name('driver.data');
     Route::get('/edit/{id}', [DriverController::class, 'edit'])->name('driver.edit');
@@ -106,7 +106,7 @@ Route::prefix('driver')->middleware('auth')->group(function () {
     Route::get('/data/driver/{user_id}', [DriverController::class, 'dataDriver'])->name('driver-det.data');
 });
 
-Route::prefix('price-expedition')->middleware('auth')->group(function() {
+Route::prefix('price-expedition')->group(function() {
     Route::get('/', [PricesController::class, 'index'])->name('price-expedition.index');
     Route::get('/data', [PricesController::class, 'getData'])->name('price-expedition.data');
     Route::post('/store', [PricesController::class, 'store'])->name('price-expedition.store');
@@ -115,7 +115,7 @@ Route::prefix('price-expedition')->middleware('auth')->group(function() {
     Route::post('/destroy/{id}', [PricesController::class, 'destroy'])->name('price-expedition.destroy');
 });
 
-Route::prefix('rute')->middleware('auth')->group(function() {
+Route::prefix('rute')->group(function() {
     Route::get('/data', [RuteController::class, 'getData'])->name('rute.data');
     Route::post('/store', [RuteController::class, 'store'])->name('rute.store');
     Route::get('/show/{id}', [RuteController::class, 'show'])->name('rute.show');
@@ -123,7 +123,7 @@ Route::prefix('rute')->middleware('auth')->group(function() {
     Route::post('/destroy/{id}', [RuteController::class, 'destroy'])->name('rute.destroy');
 });
 
-Route::prefix('price-customer')->middleware('auth')->group(function() {
+Route::prefix('price-customer')->group(function() {
     Route::get('/', [PricesCustomerController::class, 'index'])->name('price-customer.index');
     Route::get('/data', [PricesCustomerController::class, 'getData'])->name('price-customer.data');
     Route::get('/price/{kodecus}', [PricesCustomerController::class, 'getPrice'])->name('price-customer.price');
@@ -133,7 +133,7 @@ Route::prefix('price-customer')->middleware('auth')->group(function() {
     Route::get('/price/modal/{kodecus}', [PricesCustomerController::class, 'getPriceModal'])->name('price-customer-modal.price');
 });
 
-Route::prefix('price-rent')->middleware('auth')->group(function() {
+Route::prefix('price-rent')->group(function() {
     Route::get('/', [PricedinginController::class, 'index'])->name('price-rent.index');
     Route::get('/data', [PricedinginController::class, 'getData'])->name('price-rent.data');
     Route::post('/store', [PricedinginController::class, 'store'])->name('price-rent.store');
@@ -142,7 +142,7 @@ Route::prefix('price-rent')->middleware('auth')->group(function() {
     Route::post('/destroy/{id}', [PricedinginController::class, 'destroy'])->name('price-rent.destroy');
 });
 
-Route::prefix('price-dingin-customer')->middleware('auth')->group(function() {
+Route::prefix('price-dingin-customer')->group(function() {
     Route::get('/', [PricedinginCustomerController::class, 'index'])->name('price-rentcus.index');
     Route::get('/data', [PricedinginCustomerController::class, 'getData'])->name('price-rentcus.data');
     Route::get('/price/{kodecus}', [PricedinginCustomerController::class, 'getPrice'])->name('price-rentcus.price');
@@ -152,7 +152,7 @@ Route::prefix('price-dingin-customer')->middleware('auth')->group(function() {
     Route::get('/price/modal/{kodecus}', [PricedinginCustomerController::class, 'getPriceModal'])->name('price-rentcus-modal.price');
 });
 
-Route::prefix('expedisi')->middleware('auth')->group(function() {
+Route::prefix('expedisi')->group(function() {
     Route::get('/', [ExpedisiController::class, 'index'])->name('expedisi.index');
     Route::get('/data/cus', [ExpedisiController::class, 'getDataCustomer'])->name('expedisi-cus.data');
     Route::post('/store', [ExpedisiController::class, 'storeSurjal'])->name('expedisi.store');
@@ -167,12 +167,12 @@ Route::prefix('expedisi')->middleware('auth')->group(function() {
     Route::post('/store/muat', [ExpedisiController::class, 'storeMuat'])->name('expedisi-muat.store');
     Route::get('/data/rute', [ExpedisiController::class, 'getRuteMuat'])->name('rute-muat.data');
     Route::get('/expedisi/get-km-terakhir', [ExpedisiController::class, 'getKmTerakhir'])->name('expedisi.dataKm');
-});
-// PDF
+    // PDF
     Route::get('/expedisi/{id}/print-surat-jalan', [ExpedisiController::class, 'printSuratJalan'])->name('expedisi.printSuratJalan');
     Route::get('/expedisi/{nomuat}/print-nomuat', [ExpedisiController::class, 'pdfMuat'])->name('expedisi.pdfMuat');
+});
 
-Route::prefix('expedisi-invoice')->middleware('auth')->group(function() {
+Route::prefix('expedisi-invoice')->group(function() {
     Route::get('/', [ExpedisiInvoiceController::class, 'index'])->name('expedisiInvoice.index');
     Route::post('/store', [ExpedisiInvoiceController::class, 'storeGabungInvoice'])->name('expedisiInvoice.store');
     Route::post('/update', [ExpedisiInvoiceController::class, 'updateGabungInvoice'])->name('expedisiInvoice.update');
@@ -182,7 +182,7 @@ Route::prefix('expedisi-invoice')->middleware('auth')->group(function() {
     ->name('expedisiInvoiceGabungExisting.data');
 });
 
-Route::prefix('expedisi-generate-invoice')->middleware('auth')->group(function() {
+Route::prefix('expedisi-generate-invoice')->group(function() {
     Route::get('/', [ExpedisiGenerateInvoiceController::class, 'index'])->name('expedisiInvoiceGenerate.index');
     Route::post('/store', [ExpedisiGenerateInvoiceController::class, 'prosesInvoiceStore'])->name('expedisiInvoiceGenerate.store');
     Route::post('/update', [ExpedisiGenerateInvoiceController::class, 'updateInvoice'])->name('expedisiInvoiceGenerate.update');
@@ -195,23 +195,23 @@ Route::prefix('expedisi-generate-invoice')->middleware('auth')->group(function()
     Route::get('/data/edit', [ExpedisiGenerateInvoiceController::class, 'tableEdit'])->name('expedisiInvoiceEdit.data');
     Route::get('/edit/show/{invoice}',[ExpedisiGenerateInvoiceController::class, 'showEditInvoice'])->name('expedisiInvoiceEdit.show');
     Route::post('/edit/update/{invoice}',[ExpedisiGenerateInvoiceController::class, 'updateEditInvoice'])->name('expedisiInvoiceEdit.update');
-});
-    // PDF
+     // PDF
     Route::get('/invoice/pdf/{invoiceNo}', [ExpedisiGenerateInvoiceController::class, 'pdfGabungInvoice'])->name('expedisiInvoice.pdfInvoice');
     Route::get('/print-invoice-text/{invoiceNo}', [ExpedisiGenerateInvoiceController::class, 'printInvoiceText'])->name('expedisiInvoice.text');
+});
 // Test Print
-// Route::get('/print-test', [ExpedisiGenerateInvoiceController::class, 'printTest'])->name('print.test');
+Route::get('/print-test', [ExpedisiGenerateInvoiceController::class, 'printTest'])->name('print.test');
 
-Route::prefix('expedisi-kwitansi')->middleware('auth')->group(function() {
+Route::prefix('expedisi-kwitansi')->group(function() {
     Route::get('/', [ExpedisiKwitansiController::class, 'index'])->name('expedisiKwitansi.index');
     Route::get('/data', [ExpedisiKwitansiController::class, 'getDataKwitansi'])->name('expedisiKwitansi.data');
     Route::post('/proses', [ExpedisiKwitansiController::class, 'prosesKwitansi'])->name('expedisiKwitansi.proses');
     Route::post('/destroy', [ExpedisiKwitansiController::class, 'deleteKwitansi'])->name('expedisiKwitansi.destroy');
-});
-    // PDF
+    // // PDF
     Route::get('/invoice/pdf/{kwitansiNo}', [ExpedisiKwitansiController::class, 'pdfInvoiceKwitansi'])->name('expedisiKwitansi.pdfKwitansi');
+});
 
-Route::prefix('rent-pendingin')->middleware('auth')->group(function() {
+Route::prefix('rent-pendingin')->group(function() {
     Route::get('/', [RentPendinginController::class, 'index'])->name('rentPendingin.index');
     Route::get('/data/cus', [RentPendinginController::class, 'getDataCustomer'])->name('rentPendingin-cus.data');
     Route::post('/store', [RentPendinginController::class, 'storeRentPendinginSurjal'])->name('rentPendingin-surjal.store');
@@ -224,12 +224,12 @@ Route::prefix('rent-pendingin')->middleware('auth')->group(function() {
     Route::post('/update/muat/{nosj}', [RentPendinginController::class, 'updateRentPendinginMuat'])->name('rentPendinginMuat.update');
     Route::get('/show/muat/{nomuat}', [RentPendinginController::class, 'showMuat'])->name('rentPendinginMuat.show');
     Route::post('/destroy/muat/{id}', [RentPendinginController::class, 'destroyMuat'])->name('rentPendinginMuat.destroy');
-});
-    // PDF
+    // // PDF
     Route::get('/rent/pendingin/{nosj}/print-surat-jalan', [RentPendinginController::class, 'printSurjalRent'])->name('rentPendingin.printSuratJalan');
+});
 
 // ### Expired
-Route::prefix('rent-pendingin-invoice')->middleware('auth')->group(function() {
+Route::prefix('rent-pendingin-invoice')->group(function() {
     Route::get('/', [RentPendinginInvoiceController::class, 'index'])->name('rentPendinginInv.index');
     Route::post('/store', [RentPendinginInvoiceController::class, 'storeRentDinginInvoice'])->name('rentPendinginInv.store');
     Route::get('/data', [RentPendinginInvoiceController::class, 'getDataMuat'])->name('rentPendinginInv.data');
@@ -237,12 +237,14 @@ Route::prefix('rent-pendingin-invoice')->middleware('auth')->group(function() {
     Route::post('/update', [RentPendinginInvoiceController::class, 'updateRentDinginInvoice'])->name('rentPendinginInv.update');
 });
 
-Route::prefix('rent-pendingin-invoice-gen')->middleware('auth')->group(function() {
+Route::prefix('rent-pendingin-invoice-gen')->group(function() {
     Route::get('/', [RentPendinginGenerateInvoiceController::class, 'index'])->name('rentPendinginInvGen.index');
     Route::post('/store', [RentPendinginGenerateInvoiceController::class, 'prosesInvoicePembayaran'])->name('rentPendinginInvGen.store');
     Route::get('/data', [RentPendinginGenerateInvoiceController::class, 'getDataInvoiceGen'])->name('rentPendinginInvGen.data');
     Route::get('/show/{nosj}', [RentPendinginGenerateInvoiceController::class, 'showInvoiceDetail'])->name('rentPendinginInvGen.show');
     Route::post('/destroy', [RentPendinginGenerateInvoiceController::class, 'prosesKwitansiDelete'])->name('rentPendinginKwitansi.destroy');
+    // // PDF
+    Route::get('/invoice/pdf/{invoiceNo}', [RentPendinginGenerateInvoiceController::class, 'pdfInvoiceGenerate'])->name('rentPendinginGenerate.pdfGenerate');
     // generate excel
     Route::post('/laporan/excel/export', [RentPendinginGenerateInvoiceController::class, 'export'])->name('laporan.rentPendinginGenerate.export');
     // #### EDIT RENT PEDINGIN
@@ -252,35 +254,33 @@ Route::prefix('rent-pendingin-invoice-gen')->middleware('auth')->group(function(
     Route::get('/show/edit/{invoice}',[RentPendinginGenerateInvoiceController::class,'showEditInvoiceRen'])->name('rentPendinginInvGen.showEdit');
     Route::post('/update/edit',[RentPendinginGenerateInvoiceController::class,'updateEditInvoiceRen'])->name('rentPendinginInvGen.updateEdit');
 });
-    // PDF
-    Route::get('/invoice/pdf/{invoiceNo}', [RentPendinginGenerateInvoiceController::class, 'pdfInvoiceGenerate'])->name('rentPendinginGenerate.pdfGenerate');
 
-Route::prefix('rent-pendingin-kwitansi')->middleware('auth')->group(function() {
+Route::prefix('rent-pendingin-kwitansi')->group(function() {
     Route::get('/', [RentPendinginKwitansiController::class, 'index'])->name('pendinginKwitansi.index');
     Route::get('/data', [RentPendinginKwitansiController::class, 'getDataKwitansi'])->name('pendinginKwitansi.data');
     Route::post('/proses', [RentPendinginKwitansiController::class, 'prosesKwitansi'])->name('pendinginKwitansi.proses');
     Route::post('/destroy', [RentPendinginKwitansiController::class, 'deleteKwitansi'])->name('pendinginKwitansi.destroy');
-});
-    // PDF
+    // // PDF
     Route::get('/invoice/pdf/{kwitansiNo}', [RentPendinginKwitansiController::class, 'pdfInvoiceKwitansi'])->name('pendinginKwitansi.pdfKwitansi');
+});
 
-Route::prefix('coolroom')->middleware('auth')->group(function() {
+Route::prefix('coolroom')->group(function() {
     Route::get('/', [CoolroomController::class, 'index'])->name('coolroom.index');
     Route::get('/get-data', [CoolroomController::class, 'getData'])->name('coolroom.getData');
     Route::get('/data/cus', [CoolroomController::class, 'getDataCustomer'])->name('coolroom-cus.data');
     Route::post('/store', [CoolroomController::class, 'store'])->name('coolroom.store');
+    Route::get('/pdf/{nosj}', [CoolroomController::class,'pdf'])->name('coolroom.pdf');
     Route::get('/edit/{id}', [CoolroomController::class,'edit'])->name('coolroom.edit');
     Route::post('/update/{id}', [CoolroomController::class,'update'])->name('coolroom.update');
     Route::delete('/coolroom/delete/{id}', [CoolroomController::class,'destroy'])->name('coolroom.destroy');
 });
-    // PDF
-    Route::get('/pdf/{nosj}', [CoolroomController::class,'pdf'])->name('coolroom.pdf');
 
-Route::prefix('coolroom-invoice')->middleware('auth')->group(function() {
+Route::prefix('coolroom-invoice')->group(function() {
     Route::get('/', [CoolroomGenerateInvoiceController::class, 'index'])->name('coolroomInv.index');
     Route::get('/get-data', [CoolroomGenerateInvoiceController::class,'getDataInvoice'])->name('coolroomInv.getData');
     Route::get('/show-data/{nosj}', [CoolroomGenerateInvoiceController::class,'showInvoiceCoolroom'])->name('coolroomInv.show');
     Route::post('/proses', [CoolroomGenerateInvoiceController::class, 'prosesInvoice'])->name('coolroomInv.proses');
+    Route::get('/pdf/{invoice}', [CoolroomGenerateInvoiceController::class,'pdfGenerate'])->name('coolroomInv.pdf');
     Route::post('/laporan/excel/export', [CoolroomGenerateInvoiceController::class, 'export'])->name('coolroomInv.export');
     // ####### EDIT COOLROOM
     Route::get('/edit', [CoolroomGenerateInvoiceController::class, 'indexEdit'])->name('coolroomInv.indexEdit');
@@ -289,20 +289,17 @@ Route::prefix('coolroom-invoice')->middleware('auth')->group(function() {
     Route::post('/update/edit',[CoolroomGenerateInvoiceController::class,'updateEditInvoiceCoolroom'])->name('coolroomInv.updateEdit');
     Route::get('/print-invoice-text/{invoiceNo}', [CoolroomGenerateInvoiceController::class, 'printInvoiceCoolroom'])->name('coolroomInv.text');
 });
-    // PDF
-    Route::get('/pdf/{invoice}', [CoolroomGenerateInvoiceController::class,'pdfGenerate'])->name('coolroomInv.pdf');
 
-Route::prefix('coolroom-kwitansi')->middleware('auth')->group(function() {
+Route::prefix('coolroom-kwitansi')->group(function() {
     Route::get('/', [CoolroomKwitansiController::class, 'index'])->name('coolroomKwt.index');
     Route::get('/get-data', [CoolroomKwitansiController::class,'getDataKwitansi'])->name('coolroomKwt.getData');
     Route::post('/proses', [CoolroomKwitansiController::class, 'prosesKwitansi'])->name('coolroomKwt.proses');
     Route::post('/delete',[CoolroomKwitansiController::class, 'deleteKwitansi']
     )->name('coolroomKwt.delete');
-});
-    // PDF
     Route::get('/pdf/{kwitansi}',[CoolroomKwitansiController::class, 'pdfInvoiceKwitansi'])->name('coolroomKwt.pdf');
+});
 
-Route::prefix('kwitansi')->middleware('auth')->group(function () {
+Route::prefix('kwitansi')->group(function () {
     Route::get('/', [KwitansiHistoryController::class, 'index'])->name('index.kwitansi');
     Route::get('/data', [KwitansiHistoryController::class, 'getDataKwitansi'])->name('kwitansi.data');
     // Di routes/web.php
