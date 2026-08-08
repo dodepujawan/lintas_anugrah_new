@@ -93,7 +93,7 @@
             @canany([
                 'price.expedisi',
                 'price.customer',
-                'price.rent_dingin',
+                'price.rent',
                 'price.customer_rent'
             ])
             <li class="menu-item">
@@ -120,7 +120,7 @@
                    <li class="menu-item">
                         <div class="dropdown-divider my-2"></div>
                     </li>
-                @can('price.rent_dingin')
+                @can('price.rent')
                 <li class="menu-item">
                     <a href="#" class="menu-link" id="sidebar_new_rent">
                     <span class="menu-text">Rent</span>

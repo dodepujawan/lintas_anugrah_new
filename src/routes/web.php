@@ -195,12 +195,11 @@ Route::prefix('expedisi-generate-invoice')->middleware('auth')->group(function()
     Route::get('/data/edit', [ExpedisiGenerateInvoiceController::class, 'tableEdit'])->name('expedisiInvoiceEdit.data');
     Route::get('/edit/show/{invoice}',[ExpedisiGenerateInvoiceController::class, 'showEditInvoice'])->name('expedisiInvoiceEdit.show');
     Route::post('/edit/update/{invoice}',[ExpedisiGenerateInvoiceController::class, 'updateEditInvoice'])->name('expedisiInvoiceEdit.update');
-});
-    // PDF
-    Route::get('/invoice/pdf/{invoiceNo}', [ExpedisiGenerateInvoiceController::class, 'pdfGabungInvoice'])->name('expedisiInvoice.pdfInvoice');
     Route::get('/print-invoice-text/{invoiceNo}', [ExpedisiGenerateInvoiceController::class, 'printInvoiceText'])->name('expedisiInvoice.text');
-// Test Print
-// Route::get('/print-test', [ExpedisiGenerateInvoiceController::class, 'printTest'])->name('print.test');
+});
+    Route::get('/expedisi-generate-invoice/invoice/pdf/{invoiceNo}', [ExpedisiGenerateInvoiceController::class, 'pdfGabungInvoice'])->name('expedisiInvoice.pdfInvoice');
+
+    Route::get('/print-test', [ExpedisiGenerateInvoiceController::class, 'printTest'])->name('print.test');
 
 Route::prefix('expedisi-kwitansi')->middleware('auth')->group(function() {
     Route::get('/', [ExpedisiKwitansiController::class, 'index'])->name('expedisiKwitansi.index');
@@ -209,7 +208,7 @@ Route::prefix('expedisi-kwitansi')->middleware('auth')->group(function() {
     Route::post('/destroy', [ExpedisiKwitansiController::class, 'deleteKwitansi'])->name('expedisiKwitansi.destroy');
 });
     // PDF
-    Route::get('/invoice/pdf/{kwitansiNo}', [ExpedisiKwitansiController::class, 'pdfInvoiceKwitansi'])->name('expedisiKwitansi.pdfKwitansi');
+    Route::get('/expedisi-kwitansi/invoice/pdf/{kwitansiNo}', [ExpedisiKwitansiController::class, 'pdfInvoiceKwitansi'])->name('expedisiKwitansi.pdfKwitansi');
 
 Route::prefix('rent-pendingin')->middleware('auth')->group(function() {
     Route::get('/', [RentPendinginController::class, 'index'])->name('rentPendingin.index');
@@ -253,7 +252,7 @@ Route::prefix('rent-pendingin-invoice-gen')->middleware('auth')->group(function(
     Route::post('/update/edit',[RentPendinginGenerateInvoiceController::class,'updateEditInvoiceRen'])->name('rentPendinginInvGen.updateEdit');
 });
     // PDF
-    Route::get('/invoice/pdf/{invoiceNo}', [RentPendinginGenerateInvoiceController::class, 'pdfInvoiceGenerate'])->name('rentPendinginGenerate.pdfGenerate');
+    Route::get('/rent-pendingin-invoice-gen/invoice/pdf/{invoiceNo}', [RentPendinginGenerateInvoiceController::class, 'pdfInvoiceGenerate'])->name('rentPendinginGenerate.pdfGenerate');
 
 Route::prefix('rent-pendingin-kwitansi')->middleware('auth')->group(function() {
     Route::get('/', [RentPendinginKwitansiController::class, 'index'])->name('pendinginKwitansi.index');
@@ -262,7 +261,7 @@ Route::prefix('rent-pendingin-kwitansi')->middleware('auth')->group(function() {
     Route::post('/destroy', [RentPendinginKwitansiController::class, 'deleteKwitansi'])->name('pendinginKwitansi.destroy');
 });
     // PDF
-    Route::get('/invoice/pdf/{kwitansiNo}', [RentPendinginKwitansiController::class, 'pdfInvoiceKwitansi'])->name('pendinginKwitansi.pdfKwitansi');
+    Route::get('/rent-pendingin-kwitansi/invoice/pdf/{kwitansiNo}', [RentPendinginKwitansiController::class, 'pdfInvoiceKwitansi'])->name('pendinginKwitansi.pdfKwitansi');
 
 Route::prefix('coolroom')->middleware('auth')->group(function() {
     Route::get('/', [CoolroomController::class, 'index'])->name('coolroom.index');
