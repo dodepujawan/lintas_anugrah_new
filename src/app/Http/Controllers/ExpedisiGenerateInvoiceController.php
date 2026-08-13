@@ -782,7 +782,7 @@ class ExpedisiGenerateInvoiceController extends Controller
         // ====== ANGKA YANG PERLU DITES DI KANTOR ======
         $LINE_WIDTH     = 130; // lebar karakter per baris (udah fix, terbukti pas)
         $LEFT_MARGIN    = 3;   // spasi kosong di kiri biar gak kena lubang kertas
-        $LINES_PER_PAGE = 33;  // jumlah baris yg muat di 1 lembar (~14cm @ 6 LPI)
+        $LINES_PER_PAGE = 30;  // jumlah baris yg muat di 1 lembar (~14cm @ 6 LPI)
         // ================================================
 
         $half = intdiv($LINE_WIDTH, 2);
@@ -803,6 +803,12 @@ class ExpedisiGenerateInvoiceController extends Controller
         $dibayar  = (float) ($master->BAYAR ?? 0);
         $saldo    = (float) ($master->PIUTANG ?? 0);
 
+        // ---------- GABUNG SEMUA NOMOR SJ ----------
+        $nomorSjList = $rows->pluck('NOSJ')
+            ->filter(fn($v) => !empty(trim((string) $v)))
+            ->unique()
+            ->implode(',');
+
         // ---------- HEADER PENUH (halaman pertama saja) ----------
         $headerFull = [];
         $headerFull[] = str_pad('PT. LINTAS MITRA ANUGERAH SEJATI', $LINE_WIDTH, ' ', STR_PAD_BOTH);
@@ -816,6 +822,11 @@ class ExpedisiGenerateInvoiceController extends Controller
         $headerFull[] = sprintf("%-{$half}s %-{$half}s",
             'NOMOR  : ' . $master->INVOICE,
             'TANGGAL : ' . date('d-m-Y', strtotime($master->TGLINVOICE))
+        );
+        // ---------- BARIS BARU: NOMOR SJ ----------
+        $headerFull[] = sprintf("%-{$half}s %-{$half}s",
+            'NOMOR SJ : ' . substr($nomorSjList, 0, $half - 12),
+            ''
         );
         $headerFull[] = sprintf("%-{$half}s %-{$half}s",
             'KEPADA : ' . substr($kepada, 0, $half - 10),
@@ -834,28 +845,29 @@ class ExpedisiGenerateInvoiceController extends Controller
         $headerFull[] = 'JUMLAH SJ : ' . $rows->count();
         $headerFull[] = str_repeat('=', $LINE_WIDTH);
 
-        // ---------- HEADER TABEL (diulang tiap halaman) ----------
+        // ---------- HEADER TABEL ----------
         $tableHeader = [];
-        $tableHeader[] = sprintf("%-4s %-16s %-{$namaBarangWidth}s %-10s %14s", 'NO', 'SJ', 'NAMA BARANG', 'QTY', 'TOTAL');
+        $tableHeader[] = sprintf("%-4s %-{$namaBarangWidth}s %-10s %14s", 'NO', 'NAMA BARANG', 'QTY', 'TOTAL');
         $tableHeader[] = str_repeat('-', $LINE_WIDTH);
 
-        // ---------- BARIS DETAIL ----------
+        // ---------- DETAIL: DIRINGKAS JADI 1 BARIS ----------
+        // Nama barang diambil dari baris master (baris pertama), bukan per-SJ.
+        // JUMLAH dan TOTAL dijumlahkan dari semua baris SJ terkait invoice ini.
+        $namaBarang = trim($master->PESANANGB) !== '' ? $master->PESANANGB : $master->PESANAN;
+        $totalQty   = (float) $rows->sum('JUMLAH');
+        $totalRow   = (float) $rows->sum('TOTAL');
+        $qtyText    = floor($totalQty) == $totalQty
+            ? number_format($totalQty, 0)
+            : rtrim(rtrim(number_format($totalQty, 3, '.', ''), '0'), '.');
+
         $detailLines = [];
-        $no = 1;
-        foreach ($rows as $r) {
-            $namaBarang = trim($r->PESANANGB) !== '' ? $r->PESANANGB : $r->PESANAN;
-            $qty = (float) $r->JUMLAH;
-            $qtyText = floor($qty) == $qty ? number_format($qty, 0) : rtrim(rtrim(number_format($qty, 3, '.', ''), '0'), '.');
-            $detailLines[] = sprintf(
-                "%-4s %-16s %-{$namaBarangWidth}s %-10s %14s",
-                $no,
-                substr($r->NOSJ, 0, 16),
-                substr($namaBarang, 0, $namaBarangWidth),
-                $qtyText . ' KG',
-                number_format($r->TOTAL, 0, ',', '.')
-            );
-            $no++;
-        }
+        $detailLines[] = sprintf(
+            "%-4s %-{$namaBarangWidth}s %-10s %14s",
+            1,
+            substr($namaBarang, 0, $namaBarangWidth),
+            $qtyText . ' KG',
+            number_format($totalRow, 0, ',', '.')
+        );
 
         // ---------- FOOTER (rekening + total + ttd, cuma halaman terakhir) ----------
         $footer = [];
@@ -872,6 +884,9 @@ class ExpedisiGenerateInvoiceController extends Controller
         $footer[] = str_pad('(......................)', $half) . str_pad('PT. LINTAS MITRA ANUGERAH SEJATI', $half);
 
         // ====================== PAGINASI ======================
+        // Catatan: karena detail sekarang selalu 1 baris, praktis invoice ini
+        // hampir pasti muat 1 halaman. Tapi logic paginasi tetap dipertahankan
+        // untuk jaga-jaga kalau suatu saat mau kembali ke mode per-SJ.
         $overheadFirst = count($headerFull) + count($tableHeader);
         $overheadNext  = 2 + count($tableHeader); // judul lanjutan + garis
         $footerHeight  = count($footer);
@@ -884,7 +899,7 @@ class ExpedisiGenerateInvoiceController extends Controller
             $capacity = max(1, $LINES_PER_PAGE - $overhead);
             $pages[] = array_splice($remainingRows, 0, $capacity);
         }
-        if (empty($pages)) $pages[] = []; // jaga-jaga kalau 0 baris
+        if (empty($pages)) $pages[] = [];
 
         $lastOverhead = (count($pages) === 1) ? $overheadFirst : $overheadNext;
         $usedOnLastPage = $lastOverhead + count(end($pages));
@@ -906,8 +921,6 @@ class ExpedisiGenerateInvoiceController extends Controller
             $lines = array_merge($lines, $tableHeader, $chunk);
 
             if ($i === count($pages) - 1 && !$footerNeedsOwnPage) {
-                // Dorong footer ke baris paling bawah kertas: hitung sisa ruang
-                // antara isi tabel sekarang + footer, sisanya diisi blank DI ATAS footer.
                 $spaceUsedIfFooterAppended = count($lines) + $footerHeight;
                 if ($spaceUsedIfFooterAppended < $LINES_PER_PAGE) {
                     $padCount = $LINES_PER_PAGE - $spaceUsedIfFooterAppended;
@@ -924,8 +937,7 @@ class ExpedisiGenerateInvoiceController extends Controller
             $lines[] = str_pad('INVOICE ' . $master->INVOICE . ' (LANJUTAN) - HAL ' . $pageNum . '/' . $totalPages, $LINE_WIDTH, ' ', STR_PAD_BOTH);
             $lines[] = str_repeat('=', $LINE_WIDTH);
 
-            // Sama juga di halaman khusus footer: dorong footer ke bawah biar konsisten
-            $overheadHere = 2; // judul + garis
+            $overheadHere = 2;
             $spaceUsedIfFooterAppended = $overheadHere + $footerHeight;
             if ($spaceUsedIfFooterAppended < $LINES_PER_PAGE) {
                 $padCount = $LINES_PER_PAGE - $spaceUsedIfFooterAppended;
@@ -943,7 +955,6 @@ class ExpedisiGenerateInvoiceController extends Controller
             $pageTexts[] = implode("\r\n", $padded);
         }
 
-        // \x0C = form feed, dorong kertas ke lembar baru di dot matrix
         $text = implode("\r\n\x0C\r\n", $pageTexts);
 
         $text = iconv('UTF-8', 'CP437//TRANSLIT//IGNORE', $text);

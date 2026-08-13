@@ -492,8 +492,8 @@ $(document).ready(function() {
                         title:'Berhasil',
                         text:res.message
                     });
-                    printSuratJalanCool(res.nosj);
-                    // window.open("{{ route('coolroom.pdf',['nosj'=>'__NOSJ__']) }}".replace('__NOSJ__',res.nosj), '_blank');
+                    // printSuratJalanCool(res.nosj);
+                    window.open("{{ route('coolroom.pdf',['nosj'=>'__NOSJ__']) }}".replace('__NOSJ__',res.nosj), '_blank');
                     $('#loading_modal').modal('hide');
                     $('#form_coolroom').addClass('d-none');
                     $('#table_coolroom').removeClass('d-none');
@@ -713,6 +713,8 @@ $(document).ready(function() {
             btn.text('SIMPAN')
             .removeClass('btn-success')
             .addClass('btn-primary');
+            let btnPdf = $('#btnPrintSuratJalanCool');
+            btnPdf.addClass('d-none');
         }
     }
 

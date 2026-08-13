@@ -8,8 +8,8 @@
 </head>
 <style>
 body {
-    font-size: 10px;
-    font-family: Arial, Helvetica, sans-serif;
+    font-size: 12px;
+    font-family: Comic Sans, Helvetica, sans-serif;
 }
 
 table {
@@ -19,7 +19,7 @@ table {
 }
 
 th {
-    background-color: #f2f2f2;
+    /* background-color: #f2f2f2; */
     text-align: center;
     font-weight: bold;
 }
@@ -165,7 +165,7 @@ td, th {
         <td style="width:33.33%; vertical-align: top;">
             <table style="width:100%; border-collapse: collapse;">
                 <tr>
-                    <td colspan="2" style="border:1px solid #000; padding:6px; text-align:center; background:#f0f0f0;">
+                    <td colspan="2" style="border:1px solid #000; padding:6px; text-align:center;">
                         <strong>DISTRIBUSI</strong>
                     </td>
                 </tr>
@@ -196,7 +196,7 @@ td, th {
         <td style="width:33.33%; vertical-align: top;">
             <table style="width:100%; border-collapse: collapse;">
                 <tr>
-                    <td colspan="2" style="border:1px solid #000; padding:6px; text-align:center; background:#f0f0f0;">
+                    <td colspan="2" style="border:1px solid #000; padding:6px; text-align:center;">
                         <strong>CUSTOMER</strong>
                     </td>
                 </tr>
@@ -223,7 +223,7 @@ td, th {
         <td style="width:33.33%; vertical-align: top;">
             <table style="width:100%; border-collapse: collapse;">
                 <tr>
-                    <td colspan="2" style="border:1px solid #000; padding:6px; text-align:center; background:#f0f0f0;">
+                    <td colspan="2" style="border:1px solid #000; padding:6px; text-align:center;">
                         <strong>PENERIMA</strong>
                     </td>
                 </tr>

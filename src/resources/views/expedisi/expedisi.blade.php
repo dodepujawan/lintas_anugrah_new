@@ -1163,7 +1163,11 @@ $(document).ready(function() {
                     focusConfirm: true
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        printSuratJalan(response.data.id);
+                        // printSuratJalan(response.data.id);
+                        let id = response.data.id;
+                        let url = "{{ route('expedisi.printSuratJalan', ':id') }}";
+                        url = url.replace(':id', id);
+                        window.open(url, '_blank');
                         const noMuat = $('#no_muat_expedisi_flag').val();
                         if (userRole === 'admin' && (!noMuat || noMuat.trim() === '')) {
                             addRowExpedisi({

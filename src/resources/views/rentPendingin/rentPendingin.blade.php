@@ -807,7 +807,11 @@ $(document).ready(function() {
                 success: function (res) {
                     if (res.success) {
                         $('#loading_modal').modal('hide');
-                        printSuratJalanRent(res.data.NOSJ);
+                        // printSuratJalanRent(res.data.NOSJ);
+                        let sj = res.data.NOSJ;
+                        let url = "{{ route('rentPendingin.printSuratJalan', ':sj') }}";
+                        url = url.replace(':sj', sj);
+                        window.open(url, '_blank');
                         if($('#no_surjal_rent_dingin').val() != ""){
                             Swal.fire({
                                 icon: 'success',

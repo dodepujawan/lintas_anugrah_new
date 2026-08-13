@@ -422,7 +422,7 @@
     </div>
 
     <!-- Informasi tambahan untuk internal -->
-    <div style="margin-top: 30px; font-size: 9px; color: #666; border-top: 1px dashed #ccc; padding-top: 5px;">
+    <div style="margin-top: 5px; font-size: 9px; color: #666; border-top: 1px dashed #ccc; padding-top: 5px;">
         <strong>INFORMASI INTERNAL:</strong><br>
         No. SJ: {{ $expedisi->NOSJ }} | Customer: {{ $expedisi->CUSTOMER }} |
         Jumlah: {{ rtrim(rtrim(number_format($expedisi->JUMLAH, 3, '.', ''), '0'), '.') }} {{ $expedisi->UNIT }} |
