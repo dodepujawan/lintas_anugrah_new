@@ -852,8 +852,22 @@ class ExpedisiGenerateInvoiceController extends Controller
 
         // ---------- DETAIL: DIRINGKAS JADI 1 BARIS ----------
         // Nama barang diambil dari baris master (baris pertama), bukan per-SJ.
+        // Sumber teks: KETERANGAN (bukan PESANAN lagi), didahului info kendaraan.
         // JUMLAH dan TOTAL dijumlahkan dari semua baris SJ terkait invoice ini.
-        $namaBarang = trim($master->PESANANGB) !== '' ? $master->PESANANGB : $master->PESANAN;
+        $namaKendaraan = trim((string) ($master->NAMA_KENDARAAN ?? ''));
+        $platNomor     = trim((string) ($master->PLAT_NOMOR ?? ''));
+        $kendaraanText = $namaKendaraan !== '' ? $namaKendaraan : '-';
+        if ($platNomor !== '') {
+            $kendaraanText .= ' (' . $platNomor . ')';
+        }
+
+        $keterangan = trim((string) ($master->PESANANGB ?? ''));
+        if ($keterangan === '') {
+            $keterangan = trim((string) ($master->KETERANGAN ?? '-'));
+        }
+
+        $namaBarang = $kendaraanText . ' - ' . $keterangan;
+
         $totalQty   = (float) $rows->sum('JUMLAH');
         $totalRow   = (float) $rows->sum('TOTAL');
         $qtyText    = floor($totalQty) == $totalQty

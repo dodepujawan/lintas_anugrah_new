@@ -646,7 +646,7 @@ class CoolroomGenerateInvoiceController extends Controller
         // ====== ANGKA YANG PERLU DITES DI KANTOR ======
         $LINE_WIDTH     = 90;  // lebar karakter per baris (tetep sama kayak sebelumnya)
         $LEFT_MARGIN    = 3;   // spasi kosong di kiri biar gak kena lubang kertas
-        $LINES_PER_PAGE = 33;  // total baris yg muat di 1 lembar (~14cm), buat isi kertas full
+        $LINES_PER_PAGE = 30;  // total baris yg muat di 1 lembar (~14cm), buat isi kertas full
         // ================================================
 
         // CUSTOMER
@@ -707,22 +707,36 @@ class CoolroomGenerateInvoiceController extends Controller
         $lines[] = 'JUMLAH SJ : ' . $rows->count();
         $lines[] = str_repeat('=', $LINE_WIDTH);
 
+        // ---------- LEBAR KOLOM TABEL ----------
+        // NO(4) SJ(14) KETERANGAN(32) JUMLAH(8) UNIT(6) BOXING(8) TOTAL(12) + 6 spasi = 90
+        $fmt = "%-4s %-14s %-32s %-8s %-6s %-8s %12s";
+
         // TABLE HEADER
-        $lines[] = sprintf("%-4s %-16s %-36s %-10s %-8s %12s", 'NO', 'SJ', 'KETERANGAN', 'JUMLAH', 'UNIT', 'TOTAL');
+        $lines[] = sprintf($fmt, 'NO', 'SJ', 'KETERANGAN', 'JUMLAH', 'UNIT', 'BOXING', 'TOTAL');
         $lines[] = str_repeat('-', $LINE_WIDTH);
 
         // DETAIL
         $no = 1;
         foreach ($rows as $r) {
             $qty = (float) ($r->JUMLAH ?? 0);
-            $qtyText = floor($qty) == $qty ? number_format($qty, 0) : rtrim(rtrim(number_format($qty, 3, '.', ''), '0'), '.');
+            // Buang desimal .000 kalau nilainya bulat, tapi tetep tampilkan
+            // pecahan kalau memang ada (mis. 5.250 -> "5.25")
+            $qtyText = floor($qty) == $qty
+                ? number_format($qty, 0, '.', '')
+                : rtrim(rtrim(number_format($qty, 3, '.', ''), '0'), '.');
+
+            // BOXING: 1 = dikemas box, 0/kosong = tidak
+            $isBoxing = (int) ($r->BOXING ?? 0) === 1;
+            $boxingText = $isBoxing ? 'BOX' : '-';
+
             $lines[] = sprintf(
-                "%-4s %-16s %-36s %-10s %-8s %12s",
+                $fmt,
                 $no,
-                substr($r->NOSJ ?? '-', 0, 16),
-                substr($r->KETERANGAN ?? '-', 0, 36),
+                substr($r->NOSJ ?? '-', 0, 14),
+                substr($r->KETERANGAN ?? '-', 0, 32),
                 $qtyText,
                 $r->UNIT ?? '',
+                $boxingText,
                 number_format($r->TOTAL ?? 0, 0, ',', '.')
             );
             $no++;
@@ -748,8 +762,6 @@ class CoolroomGenerateInvoiceController extends Controller
         $lines[] = str_pad('(......................)', 45) . str_pad('PT. LINTAS MITRA ANUGERAH SEJATI', 45);
 
         // ====================== ISI SISA KERTAS SAMPAI PENUH ======================
-        // Kalau baris yg kepake masih kurang dari LINES_PER_PAGE, tambahin baris
-        // kosong di bawah biar tinggi cetakan selalu konsisten 1 lembar penuh.
         if (count($lines) < $LINES_PER_PAGE) {
             $lines = array_pad($lines, $LINES_PER_PAGE, '');
         }
