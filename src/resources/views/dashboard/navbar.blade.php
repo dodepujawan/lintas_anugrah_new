@@ -10,6 +10,10 @@
         <button class="btn btn-outline-secondary me-3" type="button" data-bs-toggle="offcanvas" data-bs-target="#sneatSidebar">
         <i class="bx bx-menu"></i>
         </button>
+        <span class="navbar-page-title">
+            <span class="navbar-page-title-main">Lintas Anugrah</span>
+            <span class="navbar-page-title-sub">Portal Operasional</span>
+        </span>
     </div>
 
     <div class="navbar-nav-right d-flex align-items-center" id="navbar-collapse">

@@ -2,9 +2,17 @@
     <div class="offcanvas-header">
     <div class="brand-link">
         <div class="brand-logo">
-        <i class="bx bx-palette"></i>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 16V6a1 1 0 0 1 1-1h9v11" />
+            <path d="M13 9h4l4 4v3a1 1 0 0 1-1 1h-1" />
+            <circle cx="7.5" cy="17.5" r="1.8" />
+            <circle cx="17.5" cy="17.5" r="1.8" />
+        </svg>
         </div>
-        <span class="brand-text">Sneat</span>
+        <div class="brand-text-wrap">
+            <span class="brand-text">Lintas Anugrah</span>
+            <span class="brand-sub">Portal Operasional</span>
+        </div>
     </div>
     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"></button>
     </div>
@@ -397,7 +405,7 @@
                     <a href="#"
                     class="menu-link active"
                     id="sidebar_akuntansi"
-                    onclick="window.open('https://lintasgo.duckdns.org/', '_blank'); return false;">
+                    onclick="window.open('https://ledger.lintasanugrah.my.id', '_blank'); return false;">
                         <span class="menu-text">Akuntansi</span>
                     </a>
                 </li>
@@ -416,7 +424,7 @@
             ])
             <li class="menu-item">
                 <a class="menu-link" data-bs-toggle="collapse" href="#extraMenu" role="button" aria-expanded="false">
-                <i class="menu-icon bx-slider-alt"></i>
+                <i class="menu-icon bx bx-slider-alt"></i>
                 <span class="menu-text">Extra</span>
                 <i class="menu-arrow bx bx-chevron-right"></i>
                 </a>
@@ -471,6 +479,10 @@
             {{-- End Of Extra Spasi --}}
         </ul>
     </nav>
+    <div class="sidebar-footer">
+        <strong>Lintas Anugrah Ekspedisi</strong><br>
+        &copy; {{ date('Y') }} &middot; All rights reserved
+    </div>
     </div>
 </div>
 <script>
