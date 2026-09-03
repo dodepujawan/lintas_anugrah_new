@@ -255,7 +255,7 @@
     <script async defer src="https://buttons.github.io/buttons.js"></script>
 
     <!-- Dode JS -->
-    <script src="{{ asset('dashboard/sneat/assets/dode/the.js') }}"></script>
+     <script src="{{ asset('dashboard/sneat/assets/dode/the.js') }}?v={{ filemtime(public_path('dashboard/sneat/assets/dode/the.js')) }}"></script>
 
     {{-- Datatables JS --}}
     <script src="https://cdn.datatables.net/2.3.5/js/dataTables.min.js"></script>

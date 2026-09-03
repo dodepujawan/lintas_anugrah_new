@@ -6,11 +6,15 @@
         </div>
 
         <div class="mb-3">
-            <label>Pilih User</label>
-            <select id="userSelect" class="form-select">
-                <option value="">-- Pilih User --</option>
-                @foreach($users as $user)
-                    <option value="{{ $user->id }}">{{ $user->name }}</option>
+            <label>Pilih Role</label>
+
+            <select id="roleSelect" class="form-select">
+                <option value="">-- Pilih Role --</option>
+
+                @foreach($roles as $role)
+                    <option value="{{ $role->id }}">
+                        {{ $role->name }}
+                    </option>
                 @endforeach
             </select>
         </div>
@@ -215,20 +219,19 @@
 $(document).ready(function () {
 
     // ================= LOAD PERMISSION =================
-    $('#userSelect').change(function () {
-        let userId = $(this).val();
+    $('#roleSelect').change(function () {
+        let roleId = $(this).val();
         // reset semua checkbox
         $('.perm').prop('checked', false);
-
-        if (!userId) return;
-
+        if (!roleId) return;
         $.ajax({
-            url: "{{ route('user.permissions', ':id') }}".replace(':id', userId),
+            url: "{{ route('role.permissions', ':id') }}".replace(':id', roleId),
             type: "GET",
             success: function (res) {
-                // checklist sesuai permission user
+                // checklist sesuai permission role
                 res.permissions.forEach(function (perm) {
-                    $('.perm[value="' + perm + '"]').prop('checked', true);
+                    $('.perm[value="' + perm + '"]')
+                        .prop('checked', true);
                 });
             },
             error: function () {
@@ -239,14 +242,12 @@ $(document).ready(function () {
 
     // ================= SAVE PERMISSION =================
     $('#saveBtn').click(function () {
-        let userId = $('#userSelect').val();
-
-        if (!userId) {
-            alert('Pilih user dulu');
+        let roleId = $('#roleSelect').val();
+        if (!roleId) {
+            alert('Pilih role dulu');
             return;
         }
         let permissions = [];
-
         $('.perm:checked').each(function () {
             permissions.push($(this).val());
         });
@@ -254,14 +255,12 @@ $(document).ready(function () {
             url: "{{ route('update.permissions') }}",
             type: "POST",
             data: {
-                user_id: userId,
+                role_id: roleId,
                 permissions: permissions,
                 _token: "{{ csrf_token() }}"
             },
             success: function (res) {
-
                 alert('Berhasil disimpan ✅');
-
             },
             error: function () {
                 alert('Gagal simpan ❌');

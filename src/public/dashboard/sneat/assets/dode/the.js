@@ -1,8 +1,3 @@
-// Auto close sub-menus when closing sidebar
-$('#sneatSidebar').on('hidden.bs.offcanvas', function () {
-    $('.sub-menu.show').removeClass('show');
-});
-
 // Active menu management
 $(document).ready(function() {
     const $menuLinks = $('.sneat-sidebar-menu .menu-link');

@@ -13,6 +13,21 @@
             <span class="brand-text">Lintas Anugrah</span>
             <span class="brand-sub">Portal Operasional</span>
         </div>
+        {{-- Debug --}}
+        {{-- @php
+            $user = auth()->user();
+        @endphp
+
+        <pre>
+        USER:
+        {{ $user->name }}
+
+        ROLE:
+        {{ $user->getRoleNames()->implode(', ') }}
+
+        PERMISSIONS:
+        {{ $user->getAllPermissions()->pluck('name')->implode(', ') }}
+        </pre> --}}
     </div>
     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"></button>
     </div>

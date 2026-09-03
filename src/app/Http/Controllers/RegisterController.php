@@ -330,6 +330,7 @@ class RegisterController extends Controller
 
             // ================= SAVE =================
             $user->save();
+            $user->syncRoles([$roleBaru]);
             DB::commit();
 
             return response()->json([
@@ -359,6 +360,8 @@ class RegisterController extends Controller
             $user = User::where('user_id', $id)->first();
 
             if (!$user) {
+                DB::rollBack();
+
                 return response()->json(['error' => 'User tidak ditemukan'], 404);
             }
 
@@ -386,6 +389,12 @@ class RegisterController extends Controller
                     $driver->delete();
                 }
             }
+
+            // ================= HAPUS ROLE SPATIE =================
+            DB::table('model_has_roles')
+                ->where('model_id', $user->id)
+                ->where('model_type', User::class)
+                ->delete();
 
             // ================= HAPUS USER =================
             $user->delete();

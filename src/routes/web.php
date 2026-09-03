@@ -352,7 +352,7 @@ Route::prefix('printer')->middleware('auth')->group(function () {
 
 Route::prefix('permissions')->middleware('auth')->group(function () {
     Route::get('/index', [UserPermissionController::class, 'index'])->name('index.permissions');
-    Route::get('/user-permissions/{id}', [UserPermissionController::class, 'getPermissions'])->name('user.permissions');
+    Route::get('/role-permissions/{id}', [UserPermissionController::class, 'getPermissions'])->name('role.permissions');
     Route::post('/save-permissions', [UserPermissionController::class, 'update'])->name('update.permissions');
 });
 
@@ -367,3 +367,5 @@ Route::prefix('area')->middleware('auth')->group(function () {
 //     Route::get('/users', UsersPage::class)->name('users.page');
 // });
 
+// untuk sycroneize roles ke spatie -> php artisan users:sync-roles
+// untuk fix permission ./fixperm.sh
