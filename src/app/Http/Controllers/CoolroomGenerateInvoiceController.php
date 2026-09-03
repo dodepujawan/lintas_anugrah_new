@@ -639,145 +639,170 @@ class CoolroomGenerateInvoiceController extends Controller
     public function printInvoiceCoolroom($invoiceNo)
     {
         $rows = Coolroom::where('INVOICE', $invoiceNo)->orderBy('NOSJ')->get();
-        if ($rows->isEmpty()) abort(404);
+        if ($rows->isEmpty()) {
+            abort(404);
+        }
 
         $master = $rows->first();
 
-        // ====== ANGKA YANG PERLU DITES DI KANTOR ======
-        $LINE_WIDTH     = 90;  // lebar karakter per baris (tetep sama kayak sebelumnya)
-        $LEFT_MARGIN    = 3;   // spasi kosong di kiri biar gak kena lubang kertas
-        $LINES_PER_PAGE = 30;  // total baris yg muat di 1 lembar (~14cm), buat isi kertas full
         // ================================================
+        // SETTING PRINT - SAMA SEPERTI EXPEDISI
+        // ================================================
+        $LINE_WIDTH = 130;
+        $LEFT_MARGIN = 3;
+        $LINES_PER_PAGE = 30;
 
+        // ================================================
+        // ESC/P CODES - SAMA SEPERTI EXPEDISI
+        // ================================================
+        $ESC = "\x1B";
+        $BOLD_ON = $ESC . 'E';
+        $BOLD_OFF = $ESC . 'F';
+        $DW_ON = $ESC . 'W' . "\x01";
+        $DW_OFF = $ESC . 'W' . "\x00";
+
+        // ================================================
         // CUSTOMER
+        // ================================================
         $customer = Mcustomer::where('CUSTOMER', $master->CUSTOMER_KODE)->first();
         $kepada = strtoupper($customer->NAMACUST ?? '-');
-        $up     = strtoupper($customer->KONTAK ?? '-');
+        $up = strtoupper($customer->KONTAK ?? '-');
         $alamat = strtoupper($customer->ALAMAT1 ?? '-');
 
+        // ================================================
         // REKENING
+        // ================================================
         $rekening = Rekening::where('AKTIF', 1)->first();
-        $bank    = $rekening->BANK ?? '-';
-        $norek   = $rekening->NOREK ?? '-';
+        $bank = $rekening->BANK ?? '-';
+        $norek = $rekening->NOREK ?? '-';
         $namaRek = $rekening->NAMA ?? '-';
 
+        // ================================================
         // TOTAL
+        // ================================================
         $subtotal = (float) ($master->SUBTOTAL ?? 0);
-        $ndisc    = (float) ($master->NDISC ?? 0);
-        $dpp      = (float) ($master->DPP ?? 0);
-        $nppn     = (float) ($master->NPPN ?? 0);
-        $grand    = (float) ($master->GRAND ?? 0);
-        $dibayar  = (float) ($master->BAYAR ?? 0);
-        $saldo    = (float) ($master->PIUTANG ?? 0);
+        $ndisc = (float) ($master->NDISC ?? 0);
+        $dpp = (float) ($master->DPP ?? 0);
+        $nppn = (float) ($master->NPPN ?? 0);
+        $grand = (float) ($master->GRAND ?? 0);
+        $dibayar = (float) ($master->BAYAR ?? 0);
+        $saldo = (float) ($master->PIUTANG ?? 0);
 
         $lines = [];
 
-        // HEADER
-        $lines[] = str_pad('PT. LINTAS MITRA ANUGERAH SEJATI', $LINE_WIDTH, ' ', STR_PAD_BOTH);
-        $lines[] = str_pad('COLD CHAIN DISTRIBUTION & STORAGE', $LINE_WIDTH, ' ', STR_PAD_BOTH);
-        $lines[] = str_pad('Jl. Raya Sempidi No.9 Badung - Bali', $LINE_WIDTH, ' ', STR_PAD_BOTH);
-        $lines[] = str_pad('Telp. (0361) 8947610', $LINE_WIDTH, ' ', STR_PAD_BOTH);
-        $lines[] = str_repeat('=', $LINE_WIDTH);
-        $lines[] = str_pad('INVOICE COOLROOM', $LINE_WIDTH, ' ', STR_PAD_BOTH);
+        // ================================================
+        // HEADER - STYLING SAMA SEPERTI EXPEDISI
+        // ================================================
+        $half = intdiv($LINE_WIDTH, 2);
+        $judul1 = 'INVOICE';
+        $judul2 = 'PT.LINTAS ANUGERAH SEJATI';
+        $leftText = $BOLD_ON . $DW_ON . $judul1 . $DW_OFF . $BOLD_OFF;
+        $rightText = $BOLD_ON . $DW_ON . $judul2 . $DW_OFF . $BOLD_OFF;
+        $leftPad = str_repeat(' ', max(0, $half - strlen($judul1) * 2));
+        $rightPad = str_repeat(' ', max(0, $half - strlen($judul2) * 2));
+        $lines[] = $leftText . $leftPad . $rightPad . $rightText;
         $lines[] = str_repeat('=', $LINE_WIDTH);
 
-        // INFO 2 KOLOM
-        $lines[] = sprintf(
-            "%-45s %-45s",
-            'NOMOR  : ' . $master->INVOICE,
-            'TANGGAL : ' . date('d-m-Y', strtotime($master->TGLINVOICE))
-        );
-        $lines[] = sprintf(
-            "%-45s %-45s",
-            'KEPADA : ' . substr($kepada, 0, 33),
-            !empty($master->TGLJT) ? 'TGL JT : ' . date('d-m-Y', strtotime($master->TGLJT)) : ''
-        );
-        $lines[] = sprintf(
-            "%-45s %-45s",
-            'UP     : ' . substr($up, 0, 33),
-            'CETAK : ' . now()->format('d-m-Y H:i')
-        );
+        // ================================================
+        // INFO 2 KOLOM - 130 KARAKTER = 65 + 65
+        // ================================================
+        $lines[] = sprintf("%-65s%65s", 'NOMOR  : ' . $master->INVOICE, 'TANGGAL : ' . date('d-m-Y', strtotime($master->TGLINVOICE)));
+        $lines[] = sprintf("%-65s%65s", 'KEPADA : ' . substr($kepada, 0, 55), !empty($master->TGLJT) ? 'TGL JT : ' . date('d-m-Y', strtotime($master->TGLJT)) : '');
+        $lines[] = sprintf("%-65s%65s", 'UP     : ' . substr($up, 0, 55), 'CETAK : ' . now()->format('d-m-Y H:i'));
 
-        // ALAMAT (multiline)
+        // ================================================
+        // ALAMAT
+        // ================================================
         $alamatWrap = explode("\n", wordwrap($alamat, 60, "\n"));
         foreach ($alamatWrap as $i => $alamatRow) {
             $lines[] = $i === 0 ? 'ALAMAT : ' . $alamatRow : '         ' . $alamatRow;
         }
+
+        // ================================================
+        // JUMLAH SJ
+        // ================================================
         $lines[] = '';
         $lines[] = 'JUMLAH SJ : ' . $rows->count();
         $lines[] = str_repeat('=', $LINE_WIDTH);
 
-        // ---------- LEBAR KOLOM TABEL ----------
-        // NO(4) SJ(14) KETERANGAN(32) JUMLAH(8) UNIT(6) BOXING(8) TOTAL(12) + 6 spasi = 90
+        // ================================================
+        // LEBAR KOLOM TABEL COOLROOM - NO(4) SJ(14) KETERANGAN(32) JUMLAH(8) UNIT(6) BOXING(8) TOTAL(12) + 6 spasi = 90
+        // ================================================
         $fmt = "%-4s %-14s %-32s %-8s %-6s %-8s %12s";
 
+        // ================================================
         // TABLE HEADER
+        // ================================================
         $lines[] = sprintf($fmt, 'NO', 'SJ', 'KETERANGAN', 'JUMLAH', 'UNIT', 'BOXING', 'TOTAL');
-        $lines[] = str_repeat('-', $LINE_WIDTH);
+        $lines[] = str_repeat('-', 90);
 
+        // ================================================
         // DETAIL
+        // ================================================
         $no = 1;
         foreach ($rows as $r) {
             $qty = (float) ($r->JUMLAH ?? 0);
-            // Buang desimal .000 kalau nilainya bulat, tapi tetep tampilkan
-            // pecahan kalau memang ada (mis. 5.250 -> "5.25")
-            $qtyText = floor($qty) == $qty
-                ? number_format($qty, 0, '.', '')
-                : rtrim(rtrim(number_format($qty, 3, '.', ''), '0'), '.');
-
-            // BOXING: 1 = dikemas box, 0/kosong = tidak
+            // Buang .000 kalau bulat, tetap tampilkan pecahan kalau ada
+            $qtyText = floor($qty) == $qty ? number_format($qty, 0, '.', '') : rtrim(rtrim(number_format($qty, 3, '.', ''), '0'), '.');
+            // BOXING: 1 = BOX, 0/kosong = -
             $isBoxing = (int) ($r->BOXING ?? 0) === 1;
             $boxingText = $isBoxing ? 'BOX' : '-';
-
-            $lines[] = sprintf(
-                $fmt,
-                $no,
-                substr($r->NOSJ ?? '-', 0, 14),
-                substr($r->KETERANGAN ?? '-', 0, 32),
-                $qtyText,
-                $r->UNIT ?? '',
-                $boxingText,
-                number_format($r->TOTAL ?? 0, 0, ',', '.')
-            );
+            $lines[] = sprintf($fmt, $no, substr($r->NOSJ ?? '-', 0, 14), substr($r->KETERANGAN ?? '-', 0, 32), $qtyText, $r->UNIT ?? '', $boxingText, number_format($r->TOTAL ?? 0, 0, ',', '.'));
             $no++;
         }
-        $lines[] = str_repeat('-', $LINE_WIDTH);
 
-        // REKENING + TOTAL
-        $lines[] = sprintf("%-45s %-45s", 'BANK   : ' . $bank, 'SUB TOTAL : ' . number_format($subtotal, 0, ',', '.'));
-        $lines[] = sprintf("%-45s %-45s", 'NO REK : ' . $norek, 'DISKON : ' . number_format($ndisc, 0, ',', '.'));
-        $lines[] = sprintf("%-45s %-45s", 'A/N    : ' . $namaRek, 'DPP : ' . number_format($dpp, 0, ',', '.'));
-        $lines[] = sprintf("%-45s %-45s", '', 'PPN : ' . number_format($nppn, 0, ',', '.'));
-        $lines[] = sprintf("%-45s %-45s", '', 'GRAND TOTAL : ' . number_format($grand, 0, ',', '.'));
-        $lines[] = sprintf("%-45s %-45s", '', 'DIBAYAR : ' . number_format($dibayar, 0, ',', '.'));
-        $lines[] = sprintf("%-45s %-45s", '', 'SALDO : ' . number_format($saldo, 0, ',', '.'));
+        // ================================================
+        // GARIS SEPARATOR
+        // ================================================
+        $lines[] = str_repeat('-', 90);
 
+        // ================================================
+        // REKENING + TOTAL - LEBAR HEADER 130
+        // ================================================
+        $lines[] = sprintf("%-65s%65s", 'BANK   : ' . $bank, 'SUB TOTAL : ' . number_format($subtotal, 0, ',', '.'));
+        $lines[] = sprintf("%-65s%65s", 'NO REK : ' . $norek, 'DISKON : ' . number_format($ndisc, 0, ',', '.'));
+        $lines[] = sprintf("%-65s%65s", 'A/N    : ' . $namaRek, 'DPP : ' . number_format($dpp, 0, ',', '.'));
+        $lines[] = sprintf("%-65s%65s", '', 'PPN : ' . number_format($nppn, 0, ',', '.'));
+        $lines[] = sprintf("%-65s%65s", '', 'GRAND TOTAL : ' . number_format($grand, 0, ',', '.'));
+        $lines[] = sprintf("%-65s%65s", '', 'DIBAYAR : ' . number_format($dibayar, 0, ',', '.'));
+        $lines[] = sprintf("%-65s%65s", '', 'SALDO : ' . number_format($saldo, 0, ',', '.'));
+
+        // ================================================
         // FOOTER
+        // ================================================
         $lines[] = '';
         $lines[] = '';
-        $lines[] = str_pad('PENERIMA', 45) . str_pad('MENGETAHUI', 45);
+        $lines[] = str_pad('PENERIMA', $half) . str_pad('MENGETAHUI', $half);
         $lines[] = '';
         $lines[] = '';
         $lines[] = '';
-        $lines[] = str_pad('(......................)', 45) . str_pad('PT. LINTAS MITRA ANUGERAH SEJATI', 45);
+        $lines[] = str_pad('(......................)', $half) . str_pad('PT. LINTAS MITRA ANUGERAH SEJATI', $half);
 
-        // ====================== ISI SISA KERTAS SAMPAI PENUH ======================
+        // ================================================
+        // ISI SISA KERTAS SAMPAI 30 BARIS
+        // ================================================
         if (count($lines) < $LINES_PER_PAGE) {
             $lines = array_pad($lines, $LINES_PER_PAGE, '');
         }
 
-        // ====================== TAMBAH MARGIN KIRI ======================
+        // ================================================
+        // TAMBAH MARGIN KIRI
+        // ================================================
         $marginStr = str_repeat(' ', $LEFT_MARGIN);
         $lines = array_map(fn($l) => $marginStr . $l, $lines);
 
-        // OUTPUT - Konversi dulu, baru bungkus ESC/P
+        // ================================================
+        // OUTPUT - KONVERSI DULU BARU ESC/P WRAPPER
+        // ================================================
         $text = implode("\r\n", $lines);
         $text = iconv('UTF-8', 'CP437//TRANSLIT//IGNORE', $text);
         if ($text === false) {
             $text = implode("\r\n", $lines);
         }
 
-        // ESC/P wrapper setelah konversi
+        // ================================================
+        // CONDENSED MODE
+        // ================================================
         $text = "\x1B\x0F" . $text . "\x12";
 
         return response()->json([
@@ -797,6 +822,157 @@ class CoolroomGenerateInvoiceController extends Controller
         return 'FCO' . $tahun . str_pad($lastNo + 1, 6, '0', STR_PAD_LEFT);
     }
 }
+
+// ### Versi New 3-9-2026
+// public function printInvoiceCoolroom($invoiceNo)
+//     {
+//         $rows = Coolroom::where('INVOICE', $invoiceNo)->orderBy('NOSJ')->get();
+//         if ($rows->isEmpty()) abort(404);
+
+//         $master = $rows->first();
+
+//         // ====== ANGKA YANG PERLU DITES DI KANTOR ======
+//         $LINE_WIDTH     = 90;  // lebar karakter per baris (tetep sama kayak sebelumnya)
+//         $LEFT_MARGIN    = 3;   // spasi kosong di kiri biar gak kena lubang kertas
+//         $LINES_PER_PAGE = 30;  // total baris yg muat di 1 lembar (~14cm), buat isi kertas full
+//         // ================================================
+
+//         // CUSTOMER
+//         $customer = Mcustomer::where('CUSTOMER', $master->CUSTOMER_KODE)->first();
+//         $kepada = strtoupper($customer->NAMACUST ?? '-');
+//         $up     = strtoupper($customer->KONTAK ?? '-');
+//         $alamat = strtoupper($customer->ALAMAT1 ?? '-');
+
+//         // REKENING
+//         $rekening = Rekening::where('AKTIF', 1)->first();
+//         $bank    = $rekening->BANK ?? '-';
+//         $norek   = $rekening->NOREK ?? '-';
+//         $namaRek = $rekening->NAMA ?? '-';
+
+//         // TOTAL
+//         $subtotal = (float) ($master->SUBTOTAL ?? 0);
+//         $ndisc    = (float) ($master->NDISC ?? 0);
+//         $dpp      = (float) ($master->DPP ?? 0);
+//         $nppn     = (float) ($master->NPPN ?? 0);
+//         $grand    = (float) ($master->GRAND ?? 0);
+//         $dibayar  = (float) ($master->BAYAR ?? 0);
+//         $saldo    = (float) ($master->PIUTANG ?? 0);
+
+//         $lines = [];
+
+//         // HEADER
+//         $lines[] = str_pad('PT. LINTAS MITRA ANUGERAH SEJATI', $LINE_WIDTH, ' ', STR_PAD_BOTH);
+//         $lines[] = str_pad('COLD CHAIN DISTRIBUTION & STORAGE', $LINE_WIDTH, ' ', STR_PAD_BOTH);
+//         $lines[] = str_pad('Jl. Raya Sempidi No.9 Badung - Bali', $LINE_WIDTH, ' ', STR_PAD_BOTH);
+//         $lines[] = str_pad('Telp. (0361) 8947610', $LINE_WIDTH, ' ', STR_PAD_BOTH);
+//         $lines[] = str_repeat('=', $LINE_WIDTH);
+//         $lines[] = str_pad('INVOICE COOLROOM', $LINE_WIDTH, ' ', STR_PAD_BOTH);
+//         $lines[] = str_repeat('=', $LINE_WIDTH);
+
+//         // INFO 2 KOLOM
+//         $lines[] = sprintf(
+//             "%-45s %-45s",
+//             'NOMOR  : ' . $master->INVOICE,
+//             'TANGGAL : ' . date('d-m-Y', strtotime($master->TGLINVOICE))
+//         );
+//         $lines[] = sprintf(
+//             "%-45s %-45s",
+//             'KEPADA : ' . substr($kepada, 0, 33),
+//             !empty($master->TGLJT) ? 'TGL JT : ' . date('d-m-Y', strtotime($master->TGLJT)) : ''
+//         );
+//         $lines[] = sprintf(
+//             "%-45s %-45s",
+//             'UP     : ' . substr($up, 0, 33),
+//             'CETAK : ' . now()->format('d-m-Y H:i')
+//         );
+
+//         // ALAMAT (multiline)
+//         $alamatWrap = explode("\n", wordwrap($alamat, 60, "\n"));
+//         foreach ($alamatWrap as $i => $alamatRow) {
+//             $lines[] = $i === 0 ? 'ALAMAT : ' . $alamatRow : '         ' . $alamatRow;
+//         }
+//         $lines[] = '';
+//         $lines[] = 'JUMLAH SJ : ' . $rows->count();
+//         $lines[] = str_repeat('=', $LINE_WIDTH);
+
+//         // ---------- LEBAR KOLOM TABEL ----------
+//         // NO(4) SJ(14) KETERANGAN(32) JUMLAH(8) UNIT(6) BOXING(8) TOTAL(12) + 6 spasi = 90
+//         $fmt = "%-4s %-14s %-32s %-8s %-6s %-8s %12s";
+
+//         // TABLE HEADER
+//         $lines[] = sprintf($fmt, 'NO', 'SJ', 'KETERANGAN', 'JUMLAH', 'UNIT', 'BOXING', 'TOTAL');
+//         $lines[] = str_repeat('-', $LINE_WIDTH);
+
+//         // DETAIL
+//         $no = 1;
+//         foreach ($rows as $r) {
+//             $qty = (float) ($r->JUMLAH ?? 0);
+//             // Buang desimal .000 kalau nilainya bulat, tapi tetep tampilkan
+//             // pecahan kalau memang ada (mis. 5.250 -> "5.25")
+//             $qtyText = floor($qty) == $qty
+//                 ? number_format($qty, 0, '.', '')
+//                 : rtrim(rtrim(number_format($qty, 3, '.', ''), '0'), '.');
+
+//             // BOXING: 1 = dikemas box, 0/kosong = tidak
+//             $isBoxing = (int) ($r->BOXING ?? 0) === 1;
+//             $boxingText = $isBoxing ? 'BOX' : '-';
+
+//             $lines[] = sprintf(
+//                 $fmt,
+//                 $no,
+//                 substr($r->NOSJ ?? '-', 0, 14),
+//                 substr($r->KETERANGAN ?? '-', 0, 32),
+//                 $qtyText,
+//                 $r->UNIT ?? '',
+//                 $boxingText,
+//                 number_format($r->TOTAL ?? 0, 0, ',', '.')
+//             );
+//             $no++;
+//         }
+//         $lines[] = str_repeat('-', $LINE_WIDTH);
+
+//         // REKENING + TOTAL
+//         $lines[] = sprintf("%-45s %-45s", 'BANK   : ' . $bank, 'SUB TOTAL : ' . number_format($subtotal, 0, ',', '.'));
+//         $lines[] = sprintf("%-45s %-45s", 'NO REK : ' . $norek, 'DISKON : ' . number_format($ndisc, 0, ',', '.'));
+//         $lines[] = sprintf("%-45s %-45s", 'A/N    : ' . $namaRek, 'DPP : ' . number_format($dpp, 0, ',', '.'));
+//         $lines[] = sprintf("%-45s %-45s", '', 'PPN : ' . number_format($nppn, 0, ',', '.'));
+//         $lines[] = sprintf("%-45s %-45s", '', 'GRAND TOTAL : ' . number_format($grand, 0, ',', '.'));
+//         $lines[] = sprintf("%-45s %-45s", '', 'DIBAYAR : ' . number_format($dibayar, 0, ',', '.'));
+//         $lines[] = sprintf("%-45s %-45s", '', 'SALDO : ' . number_format($saldo, 0, ',', '.'));
+
+//         // FOOTER
+//         $lines[] = '';
+//         $lines[] = '';
+//         $lines[] = str_pad('PENERIMA', 45) . str_pad('MENGETAHUI', 45);
+//         $lines[] = '';
+//         $lines[] = '';
+//         $lines[] = '';
+//         $lines[] = str_pad('(......................)', 45) . str_pad('PT. LINTAS MITRA ANUGERAH SEJATI', 45);
+
+//         // ====================== ISI SISA KERTAS SAMPAI PENUH ======================
+//         if (count($lines) < $LINES_PER_PAGE) {
+//             $lines = array_pad($lines, $LINES_PER_PAGE, '');
+//         }
+
+//         // ====================== TAMBAH MARGIN KIRI ======================
+//         $marginStr = str_repeat(' ', $LEFT_MARGIN);
+//         $lines = array_map(fn($l) => $marginStr . $l, $lines);
+
+//         // OUTPUT - Konversi dulu, baru bungkus ESC/P
+//         $text = implode("\r\n", $lines);
+//         $text = iconv('UTF-8', 'CP437//TRANSLIT//IGNORE', $text);
+//         if ($text === false) {
+//             $text = implode("\r\n", $lines);
+//         }
+
+//         // ESC/P wrapper setelah konversi
+//         $text = "\x1B\x0F" . $text . "\x12";
+
+//         return response()->json([
+//             'text' => $text
+//         ]);
+//     }
+
 // ### Versi New
 // public function printInvoiceCoolroom($invoiceNo){
 //         $rows = Coolroom::where('INVOICE', $invoiceNo)->orderBy('NOSJ')->get();
