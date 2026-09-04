@@ -19,6 +19,13 @@
             </select>
         </div>
 
+        <div class="form-check form-switch mb-3">
+            <input class="form-check-input" type="checkbox" id="checkAllPermissions">
+            <label class="form-check-label fw-semibold" for="checkAllPermissions">
+                Pilih Semua Hak Akses
+            </label>
+        </div>
+
         <div class="card-body">
 
             <div class="row">
@@ -218,11 +225,33 @@
 <script>
 $(document).ready(function () {
 
+    // ================= CHECK ALL PERMISSION =================
+    function syncCheckAllState() {
+        let totalPermissions = $('.perm').length;
+        let checkedPermissions = $('.perm:checked').length;
+        let checkAll = $('#checkAllPermissions')[0];
+
+        if (!checkAll || !totalPermissions) return;
+
+        checkAll.checked = checkedPermissions === totalPermissions;
+        checkAll.indeterminate = checkedPermissions > 0 && checkedPermissions < totalPermissions;
+    }
+
+    $('#checkAllPermissions').change(function () {
+        $('.perm').prop('checked', this.checked);
+        this.indeterminate = false;
+    });
+
+    $(document).on('change', '.perm', function () {
+        syncCheckAllState();
+    });
+
     // ================= LOAD PERMISSION =================
     $('#roleSelect').change(function () {
         let roleId = $(this).val();
         // reset semua checkbox
         $('.perm').prop('checked', false);
+        syncCheckAllState();
         if (!roleId) return;
         $.ajax({
             url: "{{ route('role.permissions', ':id') }}".replace(':id', roleId),
@@ -233,6 +262,7 @@ $(document).ready(function () {
                     $('.perm[value="' + perm + '"]')
                         .prop('checked', true);
                 });
+                syncCheckAllState();
             },
             error: function () {
                 alert('Gagal load permission');
