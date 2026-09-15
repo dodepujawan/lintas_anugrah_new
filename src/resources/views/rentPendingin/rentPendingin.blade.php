@@ -64,6 +64,11 @@
     width: 100%;
     outline: none;
   }
+
+    /* sweet alert didepan modal */
+    .swal2-container {
+        z-index: 99999 !important;
+    }
 </style>
 
 <div class="container-fluid py-3">

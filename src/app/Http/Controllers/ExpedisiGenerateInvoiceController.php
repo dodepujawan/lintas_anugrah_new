@@ -704,6 +704,7 @@ class ExpedisiGenerateInvoiceController extends Controller
                 $master->update([
                     'PESANAN'    => $request->item,
                     'rute'       => $request->rute,
+                    'JUMLAH'      => $jumlah,
                     'HARGA'      => $harga,
                     'DISC'       => $discPersen,
                     'NDISC'      => $ndisc,
