@@ -489,11 +489,11 @@ $(document).ready(function() {
         let nomuat = $(this).data('nomuat');
 
         Swal.fire({
-            title: 'Hapus Data?',
-            text: 'No Muat ' + nomuat + ' akan dihapus!',
+            title: 'Cancel Data?',
+            text: 'No Muat ' + nomuat + ' akan dicancel!',
             icon: 'warning',
             showCancelButton: true,
-            confirmButtonText: 'Ya, hapus',
+            confirmButtonText: 'Ya, cancel',
             cancelButtonText: 'Batal',
             confirmButtonColor: '#d33'
         }).then((result) => {

@@ -142,11 +142,15 @@ class RentPendinginController extends Controller
             ], 404);
         }
 
-        $data->delete();
+        // Reset ke state surjal: kosongkan NOMUAT & TGLMUAT
+        $data->update([
+            'NOMUAT' => null,
+            'TGLMUAT' => null,
+        ]);
 
         return response()->json([
             'success' => true,
-            'message' => 'Data berhasil dihapus'
+            'message' => 'Data berhasil dikembalikan ke surat jalan'
         ]);
     }
 

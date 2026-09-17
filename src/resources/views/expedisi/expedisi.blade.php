@@ -1443,12 +1443,18 @@ $(document).ready(function() {
                         // reload datatable
                         $('#modalMuatExpTable').DataTable().ajax.reload(null, false);
                     },
-                    error: function () {
-                        Swal.fire(
-                            'Gagal!',
-                            'Data tidak bisa dihapus',
-                            'error'
-                        );
+                    error: function (xhr) {
+                        // Ambil pesan dari controller jika ada, jika tidak ada gunakan pesan default
+                        let errorMsg = 'Data tidak bisa dihapus';
+                        if (xhr.responseJSON && xhr.responseJSON.message) {
+                            errorMsg = xhr.responseJSON.message;
+                        }
+
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Gagal!',
+                            text: errorMsg
+                        });
                     }
                 });
             }
