@@ -26,7 +26,7 @@
       content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"
     />
 
-    <title>With Offcanvas Menu - Layouts | Sneat - Bootstrap 5 HTML Admin Template - Pro</title>
+    <title>Lintas Anugrah Expedisi Pro</title>
 
     <meta name="description" content="" />
 
@@ -34,7 +34,8 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <!-- Favicon -->
-    <link rel="icon" type="image/x-icon" href="{{ asset('dashboard/sneat/assets/img/favicon/favicon.ico') }}" />
+    {{-- <link rel="icon" type="image/x-icon" href="{{ asset('dashboard/sneat/assets/img/favicon/favicon.ico') }}" /> --}}
+    <link rel="icon" type="image/svg+xml" href="{{ asset('dashboard/sneat/assets/img/favicon/cargo.svg') }}?v=2" />
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
