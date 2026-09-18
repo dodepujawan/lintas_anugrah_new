@@ -873,7 +873,8 @@ class ExpedisiController extends Controller
             'created_at'
         ])->whereNotNull('NOMUAT')
         ->whereIn('id', $subQuery)
-        ->orderBy('id', 'desc');
+        // ->orderBy('id', 'desc');
+        ->orderBy('TGLMUAT', 'desc');
 
         // 🔐 FILTER ROLE DRIVER
         if (auth()->user()->role_old === 'driver') {

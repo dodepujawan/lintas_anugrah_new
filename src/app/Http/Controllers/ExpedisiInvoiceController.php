@@ -47,7 +47,8 @@ class ExpedisiInvoiceController extends Controller
         ])
         ->where('JENIS', 'EKS')
         ->whereNotNull('NOMUAT')   // 🔒 wajib punya NOMUAT
-        ->orderByDesc('id');
+        // ->orderByDesc('id');
+        ->orderBy('TGLMUAT', 'desc');
 
         // 🔐 FILTER DRIVER
         if (auth()->user()->role_old === 'driver') {

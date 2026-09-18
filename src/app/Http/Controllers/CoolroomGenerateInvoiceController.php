@@ -40,6 +40,8 @@ class CoolroomGenerateInvoiceController extends Controller
                 ->where('INVOICE','!=','');
         }
 
+        $query->orderByDesc('id'); // <-- descending by id
+
         return DataTables::of($query)
             ->addIndexColumn()
             ->editColumn('TGLSJ',function($row){
