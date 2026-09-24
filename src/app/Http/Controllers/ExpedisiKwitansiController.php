@@ -108,16 +108,11 @@ class ExpedisiKwitansiController extends Controller
                 // SUDAH KWITANSI
                 // ==============================
                 return '
-                    <button
-                        class="btn btn-sm btn-danger btn-delete-kwt"
-                        data-kwitansi="'.$row->kwt.'">
-                        Delete
-                    </button>
-                    <button
-                        class="btn btn-sm btn-success btn-cetak-kwt"
-                        data-kwitansi="'.$row->kwt.'">
-                        Pdf
-                    </button>
+                    <div class="d-flex flex-wrap gap-1">
+                        <button class="btn btn-sm btn-primary btn-print-kwt" data-kwitansi="'.$row->kwt.'">Print</button>
+                        <button class="btn btn-sm btn-success btn-cetak-kwt" data-kwitansi="'.$row->kwt.'">Pdf</button>
+                        <button class="btn btn-sm btn-danger btn-delete-kwt" data-kwitansi="'.$row->kwt.'">Delete</button>
+                    </div>
                 ';
             })
             ->rawColumns(['action'])
@@ -288,6 +283,207 @@ class ExpedisiKwitansiController extends Controller
                 'message' => $e->getMessage()
             ], 500);
         }
+    }
+
+    public function printKwitansiText($kwitansi)
+    {
+        // ==========================================
+        // AMBIL DATA KWITANSI
+        // ==========================================
+        $master = Expedisi::where('kwt', $kwitansi)->where('GRAND', '>', 0)->firstOrFail();
+        $details = Expedisi::where('kwt', $kwitansi)->orderBy('NOSJ')->get();
+        $invoice = $master->INVOICE;
+
+        // Sama seperti versi PDF
+        $arh = Arh::where('NOFAKTUR', $invoice)->first();
+        $signature = Signature::orderByDesc('id')->first();
+
+        // ==========================================
+        // SETTING PRINTER
+        // ==========================================
+        $LINE_WIDTH = 130;
+        $LINES_PER_PAGE = 30;
+        $LEFT_MARGIN = 3;
+        $half = intdiv($LINE_WIDTH, 2);
+
+        // ==========================================
+        // ESC/P
+        // ==========================================
+        $ESC = "\x1B";
+        $BOLD_ON = $ESC . 'E';
+        $BOLD_OFF = $ESC . 'F';
+        $DW_ON = $ESC . 'W' . "\x01";
+        $DW_OFF = $ESC . 'W' . "\x00";
+
+        // ==========================================
+        // HELPER
+        // ==========================================
+        $clean = function ($value) {
+            return trim(preg_replace('/[\r\n]+/', ' ', (string) $value));
+        };
+
+        $fit = function ($text, $width) use ($clean) {
+            $text = $clean($text);
+            if (strlen($text) > $width) {
+                return substr($text, 0, $width);
+            }
+            return $text;
+        };
+
+        $money = function ($value) {
+            return number_format((float) ($value ?? 0), 0, ',', '.');
+        };
+
+        // ==========================================
+        // DATA
+        // ==========================================
+        $customer = $clean($master->CUSTOMER ?? '-');
+        $grand = (float) ($master->GRAND ?? 0);
+        $tanggal = !empty($master->TGLKW) ? date('d-m-Y', strtotime($master->TGLKW)) : '-';
+        $nomorSJ = $details->pluck('NOSJ')->filter(fn($v) => trim((string) $v) !== '')->unique()->implode(', ');
+        $signatureName = $clean($signature->nama ?? '');
+
+        // ==========================================
+        // TERBILANG
+        // ==========================================
+        $terbilangText = ucwords(terbilang($grand)) . ' Rupiah';
+
+        // ==========================================
+        // ARRAY BARIS
+        // ==========================================
+        $lines = [];
+
+        // ==========================================
+        // HEADER
+        // ==========================================
+        $judul = 'PT. LINTAS MITRA ANUGERAH SEJATI';
+        $lines[] = $BOLD_ON . $DW_ON . str_pad($judul, intdiv($LINE_WIDTH, 2), ' ', STR_PAD_BOTH) . $DW_OFF . $BOLD_OFF;
+        $lines[] = str_pad('COLD CHAIN DISTRIBUTION & STORAGE', $LINE_WIDTH, ' ', STR_PAD_BOTH);
+        $lines[] = str_repeat('=', $LINE_WIDTH);
+
+        // ==========================================
+        // ALAMAT HEADER
+        // ==========================================
+        $lines[] = sprintf("%-65s%65s", 'Jl. Raya Sempidi No.9 Badung - Bali', 'BizPark Commercial Estate');
+        $lines[] = sprintf("%-65s%65s", 'Telp/Fax : (0361) 8947610', 'Jl. Sultan Agung KM 28,5 Bekasi');
+        $lines[] = sprintf("%-65s%65s", 'Jl. Bija Taki IV, No.9 Denpasar - Bali', 'www.lintasmitralogistik.com');
+        $lines[] = str_repeat('-', $LINE_WIDTH);
+
+        // ==========================================
+        // NOMOR KWITANSI
+        // ==========================================
+        $lines[] = $BOLD_ON . 'KWITANSI NO : ' . $master->kwt . $BOLD_OFF;
+
+        // ==========================================
+        // SUDAH TERIMA DARI
+        // ==========================================
+        $lines[] = 'SUDAH TERIMA DARI : ' . $fit($customer, 108);
+
+        // ==========================================
+        // BANYAKNYA UANG
+        // ==========================================
+        $lines[] = 'BANYAKNYA UANG    : ' . $fit($terbilangText, 108);
+
+        // ==========================================
+        // UNTUK PEMBAYARAN
+        // ==========================================
+        $lines[] = 'UNTUK PEMBAYARAN  :';
+
+        // Nomor SJ bisa banyak
+        $sjPrefix = 'SJ : ';
+        $sjWrapped = wordwrap($nomorSJ !== '' ? $nomorSJ : '-', 118, "\n", true);
+        $sjRows = explode("\n", $sjWrapped);
+        foreach ($sjRows as $i => $row) {
+            if ($i === 0) {
+                $lines[] = '  ' . $sjPrefix . $row;
+            } else {
+                $lines[] = '       ' . $row;
+            }
+        }
+
+        $lines[] = '       INVOICE : ' . $invoice;
+
+        // ==========================================
+        // PEMISAH
+        // ==========================================
+        $lines[] = str_repeat('-', $LINE_WIDTH);
+
+        // ==========================================
+        // PEMBAYARAN
+        // ==========================================
+        $lines[] = 'Untuk pembayaran mohon di transfer ke rek resmi';
+        $lines[] = $BOLD_ON . 'A/n. PT. Lintas Mitra Anugerah Sejati' . $BOLD_OFF;
+        $lines[] = 'No.rek BCA 6115352010';
+
+        // ==========================================
+        // CEK / GIRO + TANGGAL
+        // ==========================================
+        $cek = 'CEK/GIRO NO. _____________________________';
+        $tgl = 'Denpasar ' . $tanggal;
+        $lines[] = sprintf("%-65s%65s", $cek, $tgl);
+
+        // ==========================================
+        // JUMLAH
+        // ==========================================
+        $lines[] = '';
+        $lines[] = $BOLD_ON . 'JUMLAH' . $BOLD_OFF . str_repeat(' ', 20) . 'RP. ' . $money($grand);
+
+        // ==========================================
+        // TANDA TANGAN
+        // ==========================================
+        $lines[] = '';
+        $lines[] = sprintf("%-65s%65s", 'PENERIMA', 'MENGETAHUI');
+        $lines[] = '';
+        $lines[] = '';
+        $lines[] = sprintf("%-65s%65s", '(.................................)', $signatureName);
+
+        // ==========================================
+        // PADDING SAMPAI TEPAT 30 BARIS
+        // ==========================================
+        if (count($lines) < $LINES_PER_PAGE) {
+            $padding = $LINES_PER_PAGE - count($lines);
+            $lines = array_merge($lines, array_fill(0, $padding, ''));
+        }
+
+        // Kalau ternyata melebihi 30 baris, jangan dipotong diam-diam.
+        if (count($lines) > $LINES_PER_PAGE) {
+            // Untuk sementara biarkan semua baris.
+            // Nanti kita bisa tuning layout kalau kasus nomor SJ sangat panjang.
+        }
+
+        // ==========================================
+        // LEFT MARGIN
+        // ==========================================
+        $margin = str_repeat(' ', $LEFT_MARGIN);
+        $lines = array_map(fn($line) => $margin . $line, $lines);
+
+        // ==========================================
+        // GABUNG TEXT
+        // ==========================================
+        $text = implode("\r\n", $lines);
+
+        // ==========================================
+        // CP437
+        // ==========================================
+        $converted = iconv('UTF-8', 'CP437//TRANSLIT//IGNORE', $text);
+        if ($converted !== false) {
+            $text = $converted;
+        }
+
+        // ==========================================
+        // CONDENSED MODE - SAMA DENGAN INVOICE YANG SUDAH PAS
+        // ==========================================
+        $text = "\x1B\x0F" . $text . "\x12";
+
+        // ==========================================
+        // RETURN KE JAVASCRIPT
+        // ==========================================
+        return response()->json([
+            'text' => $text,
+            'lines' => count($lines),
+            'invoice' => $invoice,
+            'kwitansi' => $kwitansi,
+        ]);
     }
 
     public function pdfInvoiceKwitansi($kwitansi){

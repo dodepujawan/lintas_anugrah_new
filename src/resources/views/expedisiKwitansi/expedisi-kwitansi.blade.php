@@ -38,6 +38,7 @@ $(document).ready(function() {
     });
     // ================================= Tabel Invoice Generate Expedisi =====================================
     let tableKwitansi = $('#KwitansiEksTable').DataTable({
+        autoWidth: false,
         processing: true,
         serverSide: true,
         ajax: {
@@ -93,9 +94,11 @@ $(document).ready(function() {
                             });
                             $('#KwitansiEksTable').DataTable().ajax.reload();
                             // PDF
-                            let pdfUrl = "{{ route('expedisiKwitansi.pdfKwitansi', ':kwitansi') }}";
-                            pdfUrl = pdfUrl.replace(':kwitansi', kwitansi);
-                            window.open(pdfUrl, '_blank');
+                            // let pdfUrl = "{{ route('expedisiKwitansi.pdfKwitansi', ':kwitansi') }}";
+                            // pdfUrl = pdfUrl.replace(':kwitansi', kwitansi);
+                            // window.open(pdfUrl, '_blank');
+                            printKwitansi(kwitansi);
+
                         } else {
                             Swal.fire({
                                 icon: 'error',
@@ -162,6 +165,14 @@ $(document).ready(function() {
         });
     });
 
+    // ============================== Print Expedisi Kwitansi =================================
+    $(document).on('click', '.btn-print-kwt', function (e) {
+        e.preventDefault();
+        var kwitansi = $(this).data('kwitansi');
+        printKwitansi(kwitansi);
+    });
+    // =========================== End Of Print Expedisi Kwitansi ==============================
+
     $(document).on('click', '.btn-cetak-kwt', function (e) {
         e.preventDefault();
         let kwitansi = $(this).data('kwitansi');
@@ -171,4 +182,31 @@ $(document).ready(function() {
     });
 
 });
+
+function printKwitansi(kwitansi) {
+    // ROUTE KWITANSI TEXT
+    var url = "{{ route('expedisiKwitansi.text', ['kwitansi' => '__KWITANSI__']) }}";
+    url = url.replace('__KWITANSI__', encodeURIComponent(kwitansi));
+
+    // AMBIL TEXT DARI LARAVEL
+    $.get(url, function (res) {
+        // KIRIM KE ELECTRON
+        fetch('http://localhost:3000/print-text', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ text: res.text })
+        })
+            .then(res => res.json())
+            .then(res => {
+                console.log("🚀 PRINT KWITANSI:", res);
+            })
+            .catch(err => {
+                console.log("❌ ERROR:", err);
+                alert("Print service tidak aktif");
+            });
+    }).fail(function (xhr) {
+        console.log("❌ ERROR LARAVEL:", xhr.responseText);
+        alert("Data kwitansi tidak ditemukan");
+    });
+}
 </script>

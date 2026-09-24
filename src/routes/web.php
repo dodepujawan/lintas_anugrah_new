@@ -206,6 +206,7 @@ Route::prefix('expedisi-kwitansi')->middleware('auth')->group(function() {
     Route::get('/data', [ExpedisiKwitansiController::class, 'getDataKwitansi'])->name('expedisiKwitansi.data');
     Route::post('/proses', [ExpedisiKwitansiController::class, 'prosesKwitansi'])->name('expedisiKwitansi.proses');
     Route::post('/destroy', [ExpedisiKwitansiController::class, 'deleteKwitansi'])->name('expedisiKwitansi.destroy');
+    Route::get('/expedisi/kwitansi/{kwitansi}/text',[ExpedisiKwitansiController::class, 'printKwitansiText'])->name('expedisiKwitansi.text');
 });
     // PDF
     Route::get('/expedisi-kwitansi/invoice/pdf/{kwitansiNo}', [ExpedisiKwitansiController::class, 'pdfInvoiceKwitansi'])->name('expedisiKwitansi.pdfKwitansi');
