@@ -107,8 +107,7 @@ $(document).ready(function() {
                                 title: 'Berhasil',
                                 text: response.message
                             });
-                            // Pdf
-                            if (response.pdf_url) {window.open(response.pdf_url, '_blank');}
+                            printKwitansiCoolroom(response.nokwt);
                             $('#kwitansiCoolroomTable').DataTable().ajax.reload(null, false);
                         },
                         error: function (xhr) {
@@ -179,5 +178,32 @@ $(document).ready(function() {
         }
     );
 // ================================ End Of Kwitansi Delete Coolroom ===================================
+
+    $(document).on('click', '.btn-print-kwt-coolroom', function (e) {
+        e.preventDefault();
+        printKwitansiCoolroom($(this).data('kwt'));
+    });
 });
+
+function printKwitansiCoolroom(kwitansi) {
+    let url = "{{ route('coolroomKwt.text', ['kwitansi' => '__KWITANSI__']) }}";
+    url = url.replace('__KWITANSI__', encodeURIComponent(kwitansi));
+
+    $.get(url, function (response) {
+        fetch('http://localhost:3000/print-text', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ text: response.text })
+        })
+            .then(response => response.json())
+            .then(response => console.log('PRINT KWITANSI COOLROOM:', response))
+            .catch(error => {
+                console.error('PRINT ERROR:', error);
+                alert('Print service tidak aktif');
+            });
+    }).fail(function (xhr) {
+        console.error('KWITANSI ERROR:', xhr.responseText);
+        alert('Data kwitansi tidak ditemukan');
+    });
+}
 </script>

@@ -273,9 +273,8 @@ Route::prefix('coolroom')->middleware('auth')->group(function() {
     Route::get('/edit/{id}', [CoolroomController::class,'edit'])->name('coolroom.edit');
     Route::post('/update/{id}', [CoolroomController::class,'update'])->name('coolroom.update');
     Route::delete('/coolroom/delete/{id}', [CoolroomController::class,'destroy'])->name('coolroom.destroy');
-});
-    // PDF
     Route::get('/pdf/{nosj}', [CoolroomController::class,'pdf'])->name('coolroom.pdf');
+});
 
 Route::prefix('coolroom-invoice')->middleware('auth')->group(function() {
     Route::get('/', [CoolroomGenerateInvoiceController::class, 'index'])->name('coolroomInv.index');
@@ -289,9 +288,8 @@ Route::prefix('coolroom-invoice')->middleware('auth')->group(function() {
     Route::get('/show/edit/{invoice}',[CoolroomGenerateInvoiceController::class,'showEditInvoiceCoolroom'])->name('coolroomInv.showEdit');
     Route::post('/update/edit',[CoolroomGenerateInvoiceController::class,'updateEditInvoiceCoolroom'])->name('coolroomInv.updateEdit');
     Route::get('/print-invoice-text/{invoiceNo}', [CoolroomGenerateInvoiceController::class, 'printInvoiceCoolroom'])->name('coolroomInv.text');
-});
-    // PDF
     Route::get('/pdf/{invoice}', [CoolroomGenerateInvoiceController::class,'pdfGenerate'])->name('coolroomInv.pdf');
+});
 
 Route::prefix('coolroom-kwitansi')->middleware('auth')->group(function() {
     Route::get('/', [CoolroomKwitansiController::class, 'index'])->name('coolroomKwt.index');
@@ -299,9 +297,9 @@ Route::prefix('coolroom-kwitansi')->middleware('auth')->group(function() {
     Route::post('/proses', [CoolroomKwitansiController::class, 'prosesKwitansi'])->name('coolroomKwt.proses');
     Route::post('/delete',[CoolroomKwitansiController::class, 'deleteKwitansi']
     )->name('coolroomKwt.delete');
-});
-    // PDF
+    Route::get('/kwitansi/{kwitansi}/text', [CoolroomKwitansiController::class, 'printKwitansiText'])->name('coolroomKwt.text');
     Route::get('/pdf/{kwitansi}',[CoolroomKwitansiController::class, 'pdfInvoiceKwitansi'])->name('coolroomKwt.pdf');
+});
 
 Route::prefix('kwitansi')->middleware('auth')->group(function () {
     Route::get('/', [KwitansiHistoryController::class, 'index'])->name('index.kwitansi');
