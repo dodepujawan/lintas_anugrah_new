@@ -975,6 +975,85 @@ $(document).ready(function() {
     loadAreaSelect();
 // =============================== End Of Area ========================================
 // +++++++++++++++++++++++++++ End Of SIDEBAR ROOM ++++++++++++++++++++++++++++++++++++++
+
+    // ===================== ### SPA HISTORY (SIDEBAR) ### =====================
+    // Add IDs for new AJAX sidebar pages to pageIds below.
+    const pageIds = new Set([
+        'sidebar_dashboard',
+        'sidebar_register_customer',
+        'sidebar_list_user',
+        'sidebar_new_user',
+        'sidebar_new_kendaraan',
+        'sidebar_new_driver',
+        'sidebar_new_prices',
+        'sidebar_prices_customer',
+        'sidebar_new_rent',
+        'sidebar_rent_customer',
+        'sidebar_new_expedisi',
+        'sidebar_invoice_expedisi',
+        'sidebar_Invoice_gen_expedisi',
+        'sidebar_Invoice_kwt_expedisi',
+        'sidebar_Invoice_edit_expedisi',
+        'sidebar_new_rent_dingin',
+        'sidebar_generate_rent_dingin',
+        'sidebar_generate_kwt_dingin',
+        'sidebar_Invoice_edit_rent',
+        'sidebar_coolroom',
+        'sidebar_coolroom_inv',
+        'sidebar_coolroom_kwt',
+        'sidebar_coolroom_edit',
+        'sidebar_new_kwitansi',
+        'sidebar_new_supplier',
+        'sidebar_new_service',
+        'sidebar_extra_rekening',
+        'sidebar_extra_permissions'
+    ]);
+
+    const historyStateKey = '__laSpaPage';
+    let restoringFromHistory = false;
+
+    // The initial /login/home view is loaded by loadDashboard() above.
+    const initialHistoryState = Object.assign({}, window.history.state || {}, {
+        [historyStateKey]: 'sidebar_dashboard'
+    });
+    window.history.replaceState(initialHistoryState, '', window.location.href);
+
+    // Track page links without replacing their existing click/AJAX handlers.
+    $(document).on(
+        'click.spaHistory',
+        '#sneatSidebar .menu-link[id^="sidebar_"]',
+        function() {
+            const pageId = this.id;
+
+            if (restoringFromHistory || !pageIds.has(pageId)) return;
+            if (window.history.state && window.history.state[historyStateKey] === pageId) return;
+
+            const nextState = Object.assign({}, window.history.state || {}, {
+                [historyStateKey]: pageId
+            });
+            const nextUrl = new URL(window.location.href);
+            nextUrl.hash = 'spa=' + encodeURIComponent(pageId);
+
+            window.history.pushState(nextState, '', nextUrl.toString());
+        }
+    );
+
+    // Reuse the existing sidebar click handler when Back/Forward is pressed.
+    window.addEventListener('popstate', function(event) {
+        const pageId = event.state && event.state[historyStateKey];
+        if (!pageId || !pageIds.has(pageId)) return;
+
+        const link = document.getElementById(pageId);
+        if (!link) return;
+
+        restoringFromHistory = true;
+        try {
+            $(link).trigger('click');
+        } finally {
+            restoringFromHistory = false;
+        }
+    });
+    // =================== ### END SPA HISTORY (SIDEBAR) ### ===================
 });
 </script>
 @endsection
