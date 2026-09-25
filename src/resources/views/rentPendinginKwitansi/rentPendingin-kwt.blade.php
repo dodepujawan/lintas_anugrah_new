@@ -92,10 +92,7 @@ $(document).ready(function() {
                                 text: response.message
                             });
                             $('#KwitansiDgnTable').DataTable().ajax.reload();
-                            // PDF
-                            let pdfUrl = "{{ route('pendinginKwitansi.pdfKwitansi', ':kwitansi') }}";
-                            pdfUrl = pdfUrl.replace(':kwitansi', kwitansi);
-                            window.open(pdfUrl, '_blank');
+                            printKwitansiPendingin(kwitansi);
                         } else {
                             Swal.fire({
                                 icon: 'error',
@@ -166,9 +163,36 @@ $(document).ready(function() {
         e.preventDefault();
         let kwitansi = $(this).data('kwitansi');
         let pdfUrl = "{{ route('pendinginKwitansi.pdfKwitansi', ':kwitansi') }}";
-            pdfUrl = pdfUrl.replace(':kwitansi', kwitansi);
-            window.open(pdfUrl, '_blank');
+        pdfUrl = pdfUrl.replace(':kwitansi', kwitansi);
+        window.open(pdfUrl, '_blank');
+    });
+
+    $(document).on('click', '.btn-print-kwt-dgn', function (e) {
+        e.preventDefault();
+        printKwitansiPendingin($(this).data('kwitansi'));
     });
 
 });
+
+function printKwitansiPendingin(kwitansi) {
+    let url = "{{ route('pendinginKwitansi.text', ['kwitansi' => '__KWITANSI__']) }}";
+    url = url.replace('__KWITANSI__', encodeURIComponent(kwitansi));
+
+    $.get(url, function (response) {
+        fetch('http://localhost:3000/print-text', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ text: response.text })
+        })
+            .then(response => response.json())
+            .then(response => console.log('PRINT KWITANSI RENT PENDINGIN:', response))
+            .catch(error => {
+                console.error('PRINT ERROR:', error);
+                alert('Print service tidak aktif');
+            });
+    }).fail(function (xhr) {
+        console.error('KWITANSI ERROR:', xhr.responseText);
+        alert('Data kwitansi tidak ditemukan');
+    });
+}
 </script>

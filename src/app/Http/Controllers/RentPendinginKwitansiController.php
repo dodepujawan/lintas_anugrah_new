@@ -115,9 +115,14 @@ class RentPendinginKwitansiController extends Controller
                             Delete
                         </button>
                         <button
+                            class="btn btn-sm btn-primary btn-print-kwt-dgn"
+                            data-kwitansi="'.$row->kwt.'">
+                            Print
+                        </button>
+                        <button
                             class="btn btn-sm btn-success btn-cetak-kwt-dgn"
                             data-kwitansi="'.$row->kwt.'">
-                            Pdf
+                            PDF
                         </button>
                     </div>
                 ';
@@ -289,12 +294,101 @@ class RentPendinginKwitansiController extends Controller
         }
     }
 
+    public function printKwitansiText($kwitansi)
+    {
+        $master = Expedisi::where('kwt', $kwitansi)
+            ->where('JENIS', 'REN')
+            ->where('GRAND', '>', 0)
+            ->firstOrFail();
+        $details = Expedisi::where('kwt', $kwitansi)
+            ->where('JENIS', 'REN')
+            ->orderBy('NOSJ')
+            ->get();
+        $signature = Signature::orderByDesc('id')->first();
+
+        $lineWidth = 130;
+        $linesPerPage = 30;
+        $leftMargin = 3;
+        $esc = "\x1B";
+        $boldOn = $esc . 'E';
+        $boldOff = $esc . 'F';
+        $doubleWidthOn = $esc . 'W' . "\x01";
+        $doubleWidthOff = $esc . 'W' . "\x00";
+        $clean = fn($value) => trim(preg_replace('/[\r\n]+/', ' ', (string) $value));
+        $fit = function ($value, $width) use ($clean) {
+            return substr($clean($value), 0, $width);
+        };
+
+        $grand = (float) ($master->GRAND ?? 0);
+        $tanggal = !empty($master->TGLKW) ? date('d-m-Y', strtotime($master->TGLKW)) : '-';
+        $nomorSj = $details->pluck('NOSJ')
+            ->filter(fn($value) => trim((string) $value) !== '')
+            ->unique()
+            ->implode(', ');
+        $signatureName = $clean($signature->nama ?? '');
+        $terbilangText = ucwords(terbilang($grand)) . ' Rupiah';
+
+        $lines = [
+            $boldOn . $doubleWidthOn . str_pad('PT. LINTAS MITRA ANUGERAH SEJATI', intdiv($lineWidth, 2), ' ', STR_PAD_BOTH) . $doubleWidthOff . $boldOff,
+            str_pad('COLD CHAIN DISTRIBUTION & STORAGE', $lineWidth, ' ', STR_PAD_BOTH),
+            str_repeat('=', $lineWidth),
+            sprintf('%-65s%65s', 'Jl. Raya Sempidi No.9 Badung - Bali', 'BizPark Commercial Estate'),
+            sprintf('%-65s%65s', 'Telp/Fax : (0361) 8947610', 'Jl. Sultan Agung KM 28,5 Bekasi'),
+            sprintf('%-65s%65s', 'Jl. Bija Taki IV, No.9 Denpasar - Bali', 'www.lintasmitralogistik.com'),
+            str_repeat('-', $lineWidth),
+            $boldOn . 'KWITANSI NO : ' . $master->kwt . $boldOff,
+            'SUDAH TERIMA DARI : ' . $fit($master->CUSTOMER ?? '-', 108),
+            'BANYAKNYA UANG    : ' . $fit($terbilangText, 108),
+            'UNTUK PEMBAYARAN  :',
+        ];
+
+        $sjRows = explode("\n", wordwrap($nomorSj !== '' ? $nomorSj : '-', 118, "\n", true));
+        foreach ($sjRows as $index => $row) {
+            $lines[] = ($index === 0 ? '  SJ : ' : '       ') . $row;
+        }
+
+        $lines[] = '       INVOICE : ' . $master->INVOICE;
+        $lines[] = str_repeat('-', $lineWidth);
+        $lines[] = 'Untuk pembayaran mohon di transfer ke rek resmi';
+        $lines[] = $boldOn . 'A/n. PT. Lintas Mitra Anugerah Sejati' . $boldOff;
+        $lines[] = 'No.rek BCA 6115352010';
+        $lines[] = sprintf('%-65s%65s', 'CEK/GIRO NO. _____________________________', 'Denpasar ' . $tanggal);
+        $lines[] = '';
+        $lines[] = $boldOn . 'JUMLAH' . $boldOff . str_repeat(' ', 20) . 'RP. ' . number_format($grand, 0, ',', '.');
+        $lines[] = '';
+        $lines[] = sprintf('%-65s%65s', 'PENERIMA', 'MENGETAHUI');
+        $lines[] = '';
+        $lines[] = '';
+        $lines[] = sprintf('%-65s%65s', '(.................................)', $signatureName);
+
+        if (count($lines) < $linesPerPage) {
+            $lines = array_pad($lines, $linesPerPage, '');
+        }
+
+        $margin = str_repeat(' ', $leftMargin);
+        $text = implode("\r\n", array_map(fn($line) => $margin . $line, $lines));
+        $converted = iconv('UTF-8', 'CP437//TRANSLIT//IGNORE', $text);
+        if ($converted !== false) {
+            $text = $converted;
+        }
+        $text = "\x1B\x0F" . $text . "\x12";
+
+        return response()->json([
+            'text' => $text,
+            'lines' => count($lines),
+            'invoice' => $master->INVOICE,
+            'kwitansi' => $kwitansi,
+        ]);
+    }
+
     public function pdfInvoiceKwitansi($kwitansi){
         $master = Expedisi::where('kwt', $kwitansi)
+            ->where('JENIS', 'REN')
             ->where('GRAND', '>', 0)
             ->firstOrFail();
 
         $details = Expedisi::where('kwt', $kwitansi)
+            ->where('JENIS', 'REN')
             ->orderBy('NOSJ')
             ->get();
         $invoice = $master->INVOICE;

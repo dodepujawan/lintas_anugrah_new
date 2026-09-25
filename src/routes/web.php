@@ -260,6 +260,7 @@ Route::prefix('rent-pendingin-kwitansi')->middleware('auth')->group(function() {
     Route::get('/data', [RentPendinginKwitansiController::class, 'getDataKwitansi'])->name('pendinginKwitansi.data');
     Route::post('/proses', [RentPendinginKwitansiController::class, 'prosesKwitansi'])->name('pendinginKwitansi.proses');
     Route::post('/destroy', [RentPendinginKwitansiController::class, 'deleteKwitansi'])->name('pendinginKwitansi.destroy');
+    Route::get('/kwitansi/{kwitansi}/text', [RentPendinginKwitansiController::class, 'printKwitansiText'])->name('pendinginKwitansi.text');
 });
     // PDF
     Route::get('/rent-pendingin-kwitansi/invoice/pdf/{kwitansiNo}', [RentPendinginKwitansiController::class, 'pdfInvoiceKwitansi'])->name('pendinginKwitansi.pdfKwitansi');
