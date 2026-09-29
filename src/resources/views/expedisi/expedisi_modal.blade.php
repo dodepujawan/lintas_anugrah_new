@@ -4,7 +4,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">Data Expedisi</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup modal"></button>
             </div>
             <div class="modal-body">
                 <div class="row mb-3">
@@ -60,7 +60,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">Data Expedisi</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup modal"></button>
             </div>
             <div class="modal-body">
                 <div class="row mb-3">
@@ -116,7 +116,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">Data Pelanggan</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup modal"></button>
             </div>
             <div class="modal-body">
                 <div class="table-responsive">
@@ -145,7 +145,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">Data Item</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup modal"></button>
             </div>
             <div class="modal-body">
                 <div>
@@ -179,7 +179,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">Data Kendaraan</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup modal"></button>
             </div>
             <div class="modal-body">
                 <div class="table-responsive">
@@ -212,7 +212,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">Data Driver</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup modal"></button>
             </div>
             <div class="modal-body">
                 <div class="table-responsive">
@@ -242,7 +242,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">Data Rute</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup modal"></button>
             </div>
             <div class="modal-body">
                 {{-- <div class="d-flex justify-content-between align-items-center mb-3">
@@ -276,7 +276,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="addRuteModalExpLabel">Tambah Rute Baru</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup modal"></button>
             </div>
             <div class="modal-body">
                 <input type="hidden" id="add_rute_flag">

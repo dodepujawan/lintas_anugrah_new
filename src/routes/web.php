@@ -369,3 +369,11 @@ Route::prefix('area')->middleware('auth')->group(function () {
 
 // untuk sycroneize roles ke spatie -> php artisan users:sync-roles
 // untuk fix permission ./fixperm.sh
+
+// ###habis bersihkan chache
+// git pull
+// composer install --no-dev --optimize-autoloader
+// php artisan migrate --force
+// php artisan optimize
+// sudo systemctl reload php8.3-fpm
+// atau pilih cloud panel -> admin area -> instance -> PHP-FPM 8.3 restart ini

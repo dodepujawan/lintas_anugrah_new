@@ -58,7 +58,7 @@
     <!-- Dode CSS -->
     <link rel="stylesheet" href="{{ asset('dashboard/sneat/assets/dode/the.css') }}?v={{ filemtime(public_path('dashboard/sneat/assets/dode/the.css')) }}" />
     <!-- Modal CSS -->
-    <link rel="stylesheet" href="{{ asset('dashboard/sneat/assets/dode/modal.css') }}" />
+    <link rel="stylesheet" href="{{ asset('dashboard/sneat/assets/dode/modal.css') }}?v={{ filemtime(public_path('dashboard/sneat/assets/dode/modal.css')) }}" />
     <!-- Datatables CSS -->
     <link rel="stylesheet" href="https://cdn.datatables.net/2.3.5/css/dataTables.dataTables.min.css">
     {{-- Select2 --}}

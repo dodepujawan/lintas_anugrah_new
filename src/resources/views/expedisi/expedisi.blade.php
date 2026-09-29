@@ -443,6 +443,9 @@
             <button class="btn btn-primary btn-action flex-fill w-100" id="simpanMuatExpBtn" style="display:none">
                 <i class='bx bx-plus-circle me-1'></i>Simpan No Muat
             </button>
+            <button class="btn btn-info btn-action flex-fill w-100" id="tampilkanPdfMuatExpBtn" style="display:none">
+                <i class='bx bx-file me-1'></i>Tampilkan PDF
+            </button>
             <button class="btn btn-danger btn-action flex-fill w-100" id="clearMuatExpBtn" style="display:none">
                 <i class='bx bx-trash me-1'></i>Clear No Muat
             </button>
@@ -1164,13 +1167,14 @@ $(document).ready(function() {
                 }).then((result) => {
                     if (result.isConfirmed) {
                         // printSuratJalan(response.data.id);
-                        let id = response.data.id;
-                        let url = "{{ route('expedisi.printSuratJalan', ':id') }}";
-                        url = url.replace(':id', id);
-                        window.open(url, '_blank');
+                        const id = response.data.id;
+                        // let url = "{{ route('expedisi.printSuratJalan', ':id') }}";
+                        // url = url.replace(':id', id);
+                        // window.open(url, '_blank');
                         const noMuat = $('#no_muat_expedisi_flag').val();
                         if (userRole === 'admin' && (!noMuat || noMuat.trim() === '')) {
                             addRowExpedisi({
+                                id: response.data.id,
                                 NOSJ: response.data.NOSJ,
                                 tglsj: $('#tgl_sj_expedisi').val(),
                                 JUMLAH: formData.JUMLAH,
@@ -1247,6 +1251,14 @@ $(document).ready(function() {
     // =========================== Print PDF ================================
     $('#btnPrintSuratJalan').on('click', function () {
         let id = $(this).attr('data-id');
+        let url = "{{ route('expedisi.printSuratJalan', ':id') }}";
+        url = url.replace(':id', id);
+        window.open(url, '_blank');
+    });
+
+    $(document).on('click', '.btn-print-surjal', function () {
+        let id = $(this).data('id');
+        if (!id) return;
         let url = "{{ route('expedisi.printSuratJalan', ':id') }}";
         url = url.replace(':id', id);
         window.open(url, '_blank');
@@ -1368,9 +1380,14 @@ $(document).ready(function() {
                                 <td class="text-end">${formatNumber(nvl(row.total))}</td>
                                 <td class="text-end"><input type="text" class="form-control form-control-sm pengirim_muat_expedisi" data-nosj="${row.nosj}" value="${row.pengirim ?? ''}"></td>
                                 <td class="text-center">
-                                    <button class="btn btn-sm btn-danger btn-hapus-row">
-                                        <i class="bx bx-trash"></i>
-                                    </button>
+                                    <div class="d-flex gap-1 justify-content-center">
+                                        <button type="button" class="btn btn-sm btn-info btn-print-surjal" data-id="${row.id ?? ''}" title="Cetak Surat Jalan">
+                                            <i class="bx bx-printer"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-danger btn-hapus-row">
+                                            <i class="bx bx-trash"></i>
+                                        </button>
+                                    </div>
                                 </td>
                             </tr>
                         `);
@@ -1401,6 +1418,7 @@ $(document).ready(function() {
                     hitungGrandTotal();
                     $('#simpanMuatExpBtn').removeClass('btn-primary').addClass('btn-success').html("<i class='bx bx-plus-circle me-1'></i> Update No Muat");
                     $('#simpanMuatExpBtn').show();
+                    $('#tampilkanPdfMuatExpBtn').show();
                     $('#clearMuatExpBtn').show();
                     // $('#grandTotal').text(formatNumber(grandTotal));
                 }
@@ -1462,6 +1480,15 @@ $(document).ready(function() {
     });
     // ============================ End Of Delete No Muat ====================================
     // ============================ Simpan Submit No Muat =================================
+    $('#tampilkanPdfMuatExpBtn').on('click', function () {
+        let nomuat = $('#no_muat_expedisi').val();
+        if (!nomuat) return;
+
+        let urlPdf = "{{ route('expedisi.pdfMuat', ':nomuat') }}";
+        urlPdf = urlPdf.replace(':nomuat', nomuat);
+        window.open(urlPdf, '_blank');
+    });
+
     $('#simpanMuatExpBtn').on('click', function () {
         // if (!validateForm()) return;
         let kmAwal  = parseFloat($('#km_awal_muat_expedisi').val()) || 0;
@@ -1548,13 +1575,13 @@ $(document).ready(function() {
                         title: 'Berhasil',
                         text: res.message
                     });
-                    let nomuat = $('#no_muat_expedisi').val();
-
-                    let urlPdf = "{{ route('expedisi.pdfMuat', ':nomuat') }}";
-                    urlPdf = urlPdf.replace(':nomuat', nomuat);
-
-                    window.open(urlPdf, '_blank');
-                    deleteRowTabelMuat();
+                    $('#simpanMuatExpBtn')
+                        .removeClass('btn-primary')
+                        .addClass('btn-success')
+                        .html("<i class='bx bx-save me-1'></i> Update No Muat")
+                        .show();
+                    $('#tampilkanPdfMuatExpBtn').show();
+                    $('#clearMuatExpBtn').show();
                 },
                 error: function () {
                     $('#loading_modal').modal('hide');
@@ -1582,6 +1609,7 @@ $(document).ready(function() {
         if (totalRow === 0) {
             $('#simpanMuatExpBtn').removeClass('btn-success').addClass('btn-primary').html("<i class='bx bx-plus-circle me-1'></i> Simpan No Muat");
             $('#simpanMuatExpBtn').hide();
+            $('#tampilkanPdfMuatExpBtn').hide();
             $('#clearMuatExpBtn').hide();
             $('#tgl_muat_expedisi').val('');
             $('#no_muat_expedisi').val('');
@@ -1859,9 +1887,14 @@ $(document).ready(function() {
                 <td class="text-end">${formatNumber(nvl(data.GRAND))}</td>
                 <td class="text-end"><input type="text" class="form-control form-control-sm pengirim_muat_expedisi" data-nosj="${nosjBaru}" value=""></td>
                 <td class="text-center">
-                    <button class="btn btn-danger btn-sm btn-hapus-row">
-                        <i class="bx bx-trash"></i>
-                    </button>
+                    <div class="d-flex gap-1 justify-content-center">
+                        <button type="button" class="btn btn-info btn-sm btn-print-surjal" data-id="${data.id || ''}" title="Cetak Surat Jalan" ${data.id ? '' : 'disabled'}>
+                            <i class="bx bx-printer"></i>
+                        </button>
+                        <button class="btn btn-danger btn-sm btn-hapus-row">
+                            <i class="bx bx-trash"></i>
+                        </button>
+                    </div>
                 </td>
             </tr>
         `;
@@ -1929,6 +1962,7 @@ $(document).ready(function() {
             .addClass('btn-primary')
             .html("<i class='bx bx-plus-circle me-1'></i> Simpan No Muat");
         $('#simpanMuatExpBtn').hide();
+        $('#tampilkanPdfMuatExpBtn').hide();
         $('#clearMuatExpBtn').hide();
     }
 
@@ -1981,4 +2015,3 @@ $(document).ready(function() {
     // $('#jumlah_expedisi, #harga_expedisi, #disc_expedisi').on('keyup change', hitungExpedisi);
 });
 </script>
-
