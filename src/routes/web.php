@@ -375,5 +375,6 @@ Route::prefix('area')->middleware('auth')->group(function () {
 // composer install --no-dev --optimize-autoloader
 // php artisan migrate --force
 // php artisan optimize
+// exit;
 // sudo systemctl reload php8.3-fpm
 // atau pilih cloud panel -> admin area -> instance -> PHP-FPM 8.3 restart ini

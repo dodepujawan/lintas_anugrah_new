@@ -89,7 +89,12 @@
     <div class="card-expedisi">
   <div class="card-expedisi-header d-flex justify-content-between align-items-center">
     <h5><i class='bx bx-truck me-2'></i> FORM EXPEDISI</h5>
-    <span class="badge bg-success">READY</span>
+    <div class="d-flex align-items-center gap-2">
+      <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#panduanSuratJalanModalExp" aria-label="Buka panduan Surat Jalan">
+        <i class="bx bx-help-circle me-1"></i>Panduan SJ
+      </button>
+      <span class="badge bg-success">READY</span>
+    </div>
   </div>
 
   <div class="row g-2">
@@ -298,6 +303,12 @@
     @role('admin')
     <!-- ############# DATA MUAT ############### -->
     <div class="card-expedisi tabel-surat-jalan">
+        <div class="card-expedisi-header d-flex justify-content-between align-items-center">
+            <h5><i class="bx bx-package me-2"></i>FORM NO MUAT</h5>
+            <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#panduanNoMuatModalExp" aria-label="Buka panduan No Muat">
+                <i class="bx bx-help-circle me-1"></i>Panduan No Muat
+            </button>
+        </div>
         <div class="card shadow-sm border-0 mb-3">
             <div class="card-body py-3">
                 {{-- BARIS 1 --}}
