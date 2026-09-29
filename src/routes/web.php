@@ -372,7 +372,7 @@ Route::prefix('area')->middleware('auth')->group(function () {
 
 // ###habis bersihkan chache
 // git pull
-// composer install --no-dev --optimize-autoloader
+// composer install --no-dev --prefer-dist --optimize-autoloader
 // php artisan migrate --force
 // php artisan optimize
 // exit;
