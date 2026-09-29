@@ -119,7 +119,6 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup modal"></button>
             </div>
             <div class="modal-body">
-                <div class="table-responsive">
                 <table class="table table-bordered table-striped w-100" id="modalCusExpTable">
                     <thead>
                     <tr>
@@ -134,7 +133,6 @@
                     </thead>
                     <tbody></tbody>
                 </table>
-                </div>
             </div>
         </div>
     </div>

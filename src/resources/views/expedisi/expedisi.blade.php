@@ -716,22 +716,23 @@ $(document).ready(function() {
             processing: true,
             serverSide: true,
             ajax: '{{ route("expedisi-cus.data") }}',
-            // Scroll settings
+            // Use one horizontal scroller; the paginated table does not need an inner vertical scroller.
             scrollX: true,
-            scrollY: "400px",
-            scrollCollapse: true,
-            // Responsive settings
-            responsive: true,
-            autoWidth: true,
+            pageLength: 10,
+            autoWidth: false,
             columns: [
-                { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false },
-                { data: 'kode_cus', name: 'kode_cus' },
-                { data: 'NAMACUST', name: 'NAMACUST' },
-                { data: 'TYPECUST', name: 'TYPECUST' },
-                { data: 'TELEPON', name: 'TELEPON' },
-                { data: 'EMAIL', name: 'EMAIL' },
-                { data: 'action', name: 'action', orderable: false, searchable: false }
+                { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false, width: '56px' },
+                { data: 'kode_cus', name: 'kode_cus', width: '135px' },
+                { data: 'NAMACUST', name: 'NAMACUST', width: '250px' },
+                { data: 'TYPECUST', name: 'TYPECUST', width: '150px' },
+                { data: 'TELEPON', name: 'TELEPON', width: '150px' },
+                { data: 'EMAIL', name: 'EMAIL', width: '220px' },
+                { data: 'action', name: 'action', orderable: false, searchable: false, width: '68px' }
             ]
+        });
+
+        $('#customerModalExp').one('shown.bs.modal', function() {
+            table.columns.adjust();
         });
 
         // Initialize tooltips

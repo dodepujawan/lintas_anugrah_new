@@ -341,3 +341,88 @@
     color: #28a745;
     margin-top: 0.25rem;
 }
+
+/* Compact customer picker without changing buttons in other modals. */
+#customerModalExp .modal-body {
+    padding: 1rem;
+}
+
+#customerModalExp #modalCusExpTable {
+    table-layout: fixed;
+    margin-bottom: 0;
+}
+
+#customerModalExp #modalCusExpTable th,
+#customerModalExp #modalCusExpTable td {
+    padding: 0.5rem 0.65rem;
+    font-size: 0.875rem;
+    line-height: 1.35;
+    vertical-align: middle;
+}
+
+#customerModalExp #modalCusExpTable th:nth-child(1),
+#customerModalExp #modalCusExpTable td:nth-child(1) {
+    width: 56px;
+    text-align: center;
+}
+
+#customerModalExp #modalCusExpTable th:nth-child(2),
+#customerModalExp #modalCusExpTable td:nth-child(2) {
+    width: 135px;
+}
+
+#customerModalExp #modalCusExpTable th:nth-child(3),
+#customerModalExp #modalCusExpTable td:nth-child(3) {
+    width: 250px;
+    overflow-wrap: anywhere;
+}
+
+#customerModalExp #modalCusExpTable th:nth-child(4),
+#customerModalExp #modalCusExpTable td:nth-child(4) {
+    width: 150px;
+    overflow-wrap: anywhere;
+}
+
+#customerModalExp #modalCusExpTable th:nth-child(5),
+#customerModalExp #modalCusExpTable td:nth-child(5) {
+    width: 150px;
+}
+
+#customerModalExp #modalCusExpTable th:nth-child(6),
+#customerModalExp #modalCusExpTable td:nth-child(6) {
+    width: 220px;
+    overflow-wrap: anywhere;
+}
+
+#customerModalExp #modalCusExpTable th:nth-child(7),
+#customerModalExp #modalCusExpTable td:nth-child(7) {
+    width: 68px;
+    text-align: center;
+}
+
+#customerModalExp .view-btn-customer-expedisi {
+    display: inline-flex;
+    width: 36px;
+    height: 34px;
+    min-width: 36px;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    line-height: 1;
+    text-transform: none;
+    letter-spacing: normal;
+}
+
+@media (max-width: 767.98px) {
+    #customerModalExp .modal-body {
+        padding: 0.75rem;
+    }
+
+    #customerModalExp #modalCusExpTable th,
+    #customerModalExp #modalCusExpTable td {
+        padding: 0.45rem 0.5rem;
+        font-size: 0.8125rem;
+    }
+}
