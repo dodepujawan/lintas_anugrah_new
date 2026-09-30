@@ -809,7 +809,7 @@ $(document).ready(function() {
                 { data: 'KETERANGAN' },
                 { data: 'DARI' },
                 { data: 'SAMPAI' },
-                { data: 'nama_rute' },
+                { data: 'nama_rute', name: 'pc.RUTE' },
                 { data: 'harga_html', orderable: false, searchable: false },
                 { data: 'jenis_text' },
                 { data: 'aksi', orderable: false, searchable: false }

@@ -32,7 +32,10 @@
                 <small class="text-muted">Data invoice expedisi EKS</small>
             </div>
             <div class="d-flex gap-2">
-                <button class="btn btn-dark btn-sm" id="btn_filter_invoice_eks">
+                <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#tutorialEditInvoiceExpModal" aria-label="Buka panduan edit invoice Expedisi">
+                    <i class="bx bx-help-circle me-1"></i>Panduan
+                </button>
+                <button type="button" class="btn btn-dark btn-sm" id="btn_filter_invoice_eks">
                     <i class="fa fa-search"></i> Reload
                 </button>
             </div>
@@ -83,6 +86,7 @@
         </div>
     </div>
 </div>
+@include('expedisiInvoieGen.expedisi-invoice-edit-modal')
 {{-- ===================================================== --}}
 {{-- MODAL EDIT --}}
 {{-- ===================================================== --}}
@@ -304,7 +308,7 @@ $(document).ready(function() {
             data:function(d){
                 d.tanggal_dari = $('#tanggal_dari_invoice_eks').val();
                 d.tanggal_sampai = $('#tanggal_sampai_invoice_eks').val();
-                d.search = $('#search_invoice_eks').val();
+                d.search_invoice = $('#search_invoice_eks').val();
             }
         },
         columns:[
@@ -505,7 +509,7 @@ $(document).ready(function() {
                 { data: 'KETERANGAN' },
                 { data: 'DARI' },
                 { data: 'SAMPAI' },
-                { data: 'nama_rute' },
+                { data: 'nama_rute', name: 'pc.RUTE' },
                 { data: 'harga_html', orderable: false, searchable: false },
                 { data: 'jenis_text' },
                 { data: 'aksi', orderable: false, searchable: false }

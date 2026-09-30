@@ -539,6 +539,14 @@ class ExpedisiGenerateInvoiceController extends Controller
             $query->whereDate('TGLINVOICE', '<=', $request->tanggal_sampai);
         }
 
+        $searchInvoice = trim((string) $request->input('search_invoice', ''));
+        if ($searchInvoice !== '') {
+            $query->where(function ($q) use ($searchInvoice) {
+                $q->where('INVOICE', 'like', "%{$searchInvoice}%")
+                    ->orWhere('CUSTOMER', 'like', "%{$searchInvoice}%");
+            });
+        }
+
         return DataTables::of($query)
             ->addIndexColumn()
             ->editColumn('TGLINVOICE', function ($row) {

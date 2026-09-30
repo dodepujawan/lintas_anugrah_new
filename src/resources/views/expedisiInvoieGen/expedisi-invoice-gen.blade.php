@@ -1,6 +1,11 @@
 {{-- Bagian Tabel Expedisi Invoice Generate (Foremerly Kwitansi) --}}
 <div class="container mt-3" id="table_kwt_exp">
     <div class="card p-3">
+        <div class="d-flex justify-content-end mb-2">
+            <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#tutorialInvoiceGenExpModal" aria-label="Buka panduan proses invoice Expedisi">
+                <i class="bx bx-help-circle me-1"></i>Panduan Invoice
+            </button>
+        </div>
         <h5 class="text-center mb-3">FORM PROSES INVOICE EXPEDISI</h5>
         <form id="form-export-excel" action="{{ route('laporan.expedisiInvoiceGenerate.export') }}" method="POST">
         @csrf
@@ -81,6 +86,10 @@
                     <div class="card border-0 bg-light h-100">
                         <div class="card-body py-3">
                             <div class="row g-2">
+                                <div class="col-12">
+                                    <label class="small fw-bold">TGL MUAT</label>
+                                    <input type="date" id="tgl_invoice_kwt_exp" class="form-control form-control-sm" readonly>
+                                </div>
                                 <div class="col-6">
                                     <label class="small fw-bold">SUB TOTAL</label>
                                     <input type="text" id="sub_total_kwt_exp" class="form-control form-control-sm text-end" readonly>
@@ -112,10 +121,6 @@
                                 <div class="col-12">
                                     <label class="small fw-bold">GRAND TOTAL</label>
                                     <input type="text" id="grand_kwt_exp" class="form-control form-control-sm text-end fw-bold" readonly>
-                                </div>
-                                <div class="col-12">
-                                    <label class="small fw-bold">TGL MUAT</label>
-                                    <input type="date" id="tgl_invoice_kwt_exp" class="form-control form-control-sm" readonly>
                                 </div>
                             </div>
                         </div>
@@ -197,6 +202,7 @@
         </div>
     </div>
 </div>
+@include('expedisiInvoieGen.expedisi-invoice-gen-modal')
 <script>
 $(document).ready(function() {
     // Set CSRF token in AJAX setup

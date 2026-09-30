@@ -166,6 +166,10 @@
                         </div>
                     </div>
             </div>
+            <div class="d-flex align-items-start gap-2 text-muted small mb-2" role="note">
+                <i class="bx bx-info-circle text-primary fs-5" aria-hidden="true"></i>
+                <span>Pilih satu baris sebagai acuan customer, lalu tekan tombol di bawah tabel untuk memilih SJ yang akan digabung. Untuk memperbarui gabungan yang sudah ada, pilih filter <strong>Sudah Gabung</strong> terlebih dahulu.</span>
+            </div>
             <div class="table-responsive">
                 <table class="table table-bordered table-striped w-100" id="InvoiceExpTable">
                     <thead>
@@ -201,9 +205,12 @@
     {{-- Bagian Show Detail Invoice --}}
     <div class="d-none" id="form_gabung_inv_exp">
         <div class="row g-3">
-            <div class="col-12 d-flex justify-content-start">
-                <button class="btn btn-link text-decoration-none p-0" id="returnInvExpBtn" style="color: #107af3;">
+            <div class="col-12 d-flex justify-content-between align-items-center gap-2">
+                <button type="button" class="btn btn-link text-decoration-none p-0" id="returnInvExpBtn" style="color: #107af3;">
                     <i class='bx bx-chevron-left'></i> Kembali ke Daftar
+                </button>
+                <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#tutorialGabungInvoiceExpModal" aria-label="Buka panduan gabung Surat Jalan">
+                    <i class="bx bx-help-circle me-1"></i>Panduan Gabung
                 </button>
             </div>
             <!-- KIRI -->
@@ -385,8 +392,9 @@
         </div>
     </div>
 </div>
+{{-- MODAL --}}
+@include('expedisi.expedisi-invoice-modal')
 <script>
-
 $(document).ready(function() {
     // Set CSRF token in AJAX setup
     $.ajaxSetup({
@@ -762,7 +770,7 @@ $(document).ready(function() {
         updateGrandTotalGabung();
 
         if (leftTable.rows().count() === 0) {
-           resetFormGabungInvoice();
+           resetFormGabungInvoice({ preserveCustomer: true, preserveInvoice: true });
         }
     });
     // ============================ End Of Delete Tabel Gabung ==================================
@@ -802,11 +810,11 @@ $(document).ready(function() {
                 }
             },
             columns: [
-                { data: 'DT_RowIndex', name: 'DT_RowIndex' },
+                { data: 'DT_RowIndex', orderable: false, searchable: false },
                 { data: 'KETERANGAN' },
                 { data: 'DARI' },
                 { data: 'SAMPAI' },
-                { data: 'nama_rute' },
+                { data: 'nama_rute', name: 'pc.RUTE' },
                 { data: 'harga_html', orderable: false, searchable: false },
                 { data: 'jenis_text' },
                 { data: 'aksi', orderable: false, searchable: false }
@@ -1024,9 +1032,17 @@ $(document).ready(function() {
     }
 
     // Reset Form Tabel Kiri
-    function resetFormGabungInvoice() {
-        $('#no_gabung_exp_inv').val('');
-        $('#customer_kode_gabung_exp_inv').val('');
+    function resetFormGabungInvoice({ preserveCustomer = false, preserveInvoice = false } = {}) {
+        // Fungsi agar ketika tabel kosong dihapus maka kode customer tidak ikut terhapus
+        if (!preserveInvoice) {
+            $('#no_gabung_exp_inv').val('');
+        }
+
+        if (!preserveCustomer) {
+            $('#customer_kode_gabung_exp_inv').val('');
+            $('#customer_gabung_exp_inv').val('');
+        }
+
         $('#item_gabung_exp_inv').val('');
         $('#jumlah_gabung_exp_inv').val('');
         $('#harga_gabung_exp_inv').val('');
@@ -1203,4 +1219,3 @@ $(document).ready(function() {
     //     });
     // }
 </script>
-
