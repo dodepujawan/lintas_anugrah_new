@@ -426,3 +426,95 @@
         font-size: 0.8125rem;
     }
 }
+
+/* Compact Rent Pendingin customer picker and keep scrolling in DataTables. */
+#customerModalDgn .modal-body {
+    padding: 1rem;
+}
+
+#customerModalDgn .modal-header .btn-close {
+    box-sizing: border-box;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+}
+
+#customerModalDgn #modalCusDgnTable {
+    table-layout: fixed;
+    margin-bottom: 0;
+}
+
+#customerModalDgn #modalCusDgnTable th,
+#customerModalDgn #modalCusDgnTable td {
+    padding: 0.5rem 0.65rem;
+    font-size: 0.875rem;
+    line-height: 1.35;
+    vertical-align: middle;
+}
+
+#customerModalDgn #modalCusDgnTable th:nth-child(1),
+#customerModalDgn #modalCusDgnTable td:nth-child(1) {
+    width: 56px;
+    text-align: center;
+}
+
+#customerModalDgn #modalCusDgnTable th:nth-child(2),
+#customerModalDgn #modalCusDgnTable td:nth-child(2) {
+    width: 135px;
+}
+
+#customerModalDgn #modalCusDgnTable th:nth-child(3),
+#customerModalDgn #modalCusDgnTable td:nth-child(3) {
+    width: 250px;
+    overflow-wrap: anywhere;
+}
+
+#customerModalDgn #modalCusDgnTable th:nth-child(4),
+#customerModalDgn #modalCusDgnTable td:nth-child(4) {
+    width: 150px;
+    overflow-wrap: anywhere;
+}
+
+#customerModalDgn #modalCusDgnTable th:nth-child(5),
+#customerModalDgn #modalCusDgnTable td:nth-child(5) {
+    width: 150px;
+}
+
+#customerModalDgn #modalCusDgnTable th:nth-child(6),
+#customerModalDgn #modalCusDgnTable td:nth-child(6) {
+    width: 220px;
+    overflow-wrap: anywhere;
+}
+
+#customerModalDgn #modalCusDgnTable th:nth-child(7),
+#customerModalDgn #modalCusDgnTable td:nth-child(7) {
+    width: 68px;
+    text-align: center;
+}
+
+#customerModalDgn .view-btn-customer-rent-dingin {
+    display: inline-flex;
+    width: 36px;
+    height: 34px;
+    min-width: 36px;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    line-height: 1;
+    text-transform: none;
+    letter-spacing: normal;
+}
+
+@media (max-width: 767.98px) {
+    #customerModalDgn .modal-body {
+        padding: 0.75rem;
+    }
+
+    #customerModalDgn #modalCusDgnTable th,
+    #customerModalDgn #modalCusDgnTable td {
+        padding: 0.45rem 0.5rem;
+        font-size: 0.8125rem;
+    }
+}

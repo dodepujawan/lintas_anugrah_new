@@ -1,6 +1,11 @@
 {{-- Bagian Tabel Dingin Kwitansi --}}
 <div class="container mt-3" id="table_kwt_dgn">
     <div class="card p-3">
+        <div class="d-flex justify-content-end mb-2">
+            <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#tutorialRentPendinginInvoiceModal" aria-label="Buka panduan proses invoice Rent Pendingin">
+                <i class="bx bx-help-circle me-1"></i>Panduan Invoice
+            </button>
+        </div>
         <h5 class="text-center mb-3">FORM PROSES INVOICE MOBIL PENDINGIN</h5>
         <div class="mb-3">
             <form id="form-export-excel" action="{{ route('laporan.rentPendinginGenerate.export') }}" method="POST">
@@ -92,14 +97,19 @@
                     <div class="card border-0 bg-light h-100">
                         <div class="card-body py-3">
                             <div class="row g-2">
+                                <div class="col-12">
+                                    <label class="small fw-bold">
+                                        TGL INVOICE
+                                    </label>
 
+                                    <input type="date" id="tgl_invoice_kwt_dgn" class="form-control form-control-sm" readonly>
+                                </div>
                                 <div class="col-6">
                                     <label class="small fw-bold">
                                         SUB TOTAL
                                     </label>
                                     <input type="text" id="sub_total_kwt_dgn" class="form-control form-control-sm text-end" readonly>
                                 </div>
-
                                 <div class="col-6">
                                     <label class="small fw-bold">
                                         D.CHARGE
@@ -114,7 +124,6 @@
 
                                     <input type="text" id="total_kwt_dgn" class="form-control form-control-sm text-end" readonly>
                                 </div>
-
                                 <div class="col-3">
                                     <label class="small fw-bold">
                                         DISC %
@@ -135,7 +144,6 @@
 
                                     <input type="text" id="dpp_kwt_dgn" class="form-control form-control-sm text-end" readonly>
                                 </div>
-
                                 <div class="col-6">
                                     <label class="small fw-bold">
                                         PPN %
@@ -148,14 +156,6 @@
                                         GRAND TOTAL
                                     </label>
                                     <input type="text" id="grand_kwt_dgn" class="form-control form-control-sm text-end fw-bold" readonly>
-                                </div>
-
-                                <div class="col-12">
-                                    <label class="small fw-bold">
-                                        TGL INVOICE
-                                    </label>
-
-                                    <input type="date" id="tgl_invoice_kwt_dgn" class="form-control form-control-sm" readonly>
                                 </div>
                             </div>
                         </div>
@@ -248,6 +248,7 @@
         </div>
     </div>
 </div>
+@include('rentPendinginInvoiceGen.rentPendingin-gen-invoice-modal')
 <script>
 $(document).ready(function() {
     // Set CSRF token in AJAX setup

@@ -11,7 +11,10 @@
             </div>
 
             <div class="d-flex gap-2">
-                <button class="btn btn-dark btn-sm" id="btn_filter_invoice_ren">
+                <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#tutorialEditRentInvoiceModal" aria-label="Buka panduan edit invoice Rent Pendingin">
+                    <i class="bx bx-help-circle me-1"></i>Panduan
+                </button>
+                <button type="button" class="btn btn-dark btn-sm" id="btn_filter_invoice_ren">
                     <i class="fa fa-search"></i>
                     Reload
                 </button>
@@ -299,6 +302,7 @@
         </div>
     </div>
 </div>
+@include('rentPendinginInvoiceGen.rentPendingin-gen-edit-modal')
 <script>
 $(document).ready(function() {
     // Set CSRF token in AJAX setup
