@@ -7,6 +7,9 @@
             <h5 class="mb-0 fw-bold">
                 INVOICE COOLROOM
             </h5>
+            <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#tutorialCoolroomInvoiceModal" aria-label="Buka panduan Invoice Coolroom">
+                <i class="bx bx-help-circle me-1"></i>Panduan
+            </button>
         </div>
 
         <div class="row mb-3">
@@ -222,6 +225,7 @@
         </div>
     </div>
 </div>
+@include('coolroomInvoiceGen.coolroom-invoice-gen-modal')
 <script>
 $(document).ready(function() {
     // Set CSRF token in AJAX setup

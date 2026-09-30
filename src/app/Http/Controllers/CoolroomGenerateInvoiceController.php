@@ -558,7 +558,12 @@ class CoolroomGenerateInvoiceController extends Controller
                 $nppn = round($dpp * ($ppnPersen / 100), 0);
                 $grand = round($dpp + $nppn, 0);
 
-                $bayar = round((float) str_replace(',', '', $request->bayar));
+                $bayarInput = trim((string) $request->input('bayar', '0'));
+                if (str_contains($bayarInput, '-')) {
+                    throw new \Exception('Nominal bayar tidak valid');
+                }
+                $bayarDigits = preg_replace('/\D+/', '', $bayarInput);
+                $bayar = (int) ($bayarDigits ?: 0);
                 if ($grand < $bayar) {
                     throw new \Exception('Grand tidak boleh lebih kecil dari pembayaran yang sudah diterima');
                 }

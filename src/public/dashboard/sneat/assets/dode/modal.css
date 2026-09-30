@@ -518,3 +518,95 @@
         font-size: 0.8125rem;
     }
 }
+
+/* Compact Coolroom customer picker and keep scrolling in DataTables. */
+#customerModalCool .modal-body {
+    padding: 1rem;
+}
+
+#customerModalCool .modal-header .btn-close {
+    box-sizing: border-box;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+}
+
+#customerModalCool #modalCusCoolTable {
+    table-layout: fixed;
+    margin-bottom: 0;
+}
+
+#customerModalCool #modalCusCoolTable th,
+#customerModalCool #modalCusCoolTable td {
+    padding: 0.5rem 0.65rem;
+    font-size: 0.875rem;
+    line-height: 1.35;
+    vertical-align: middle;
+}
+
+#customerModalCool #modalCusCoolTable th:nth-child(1),
+#customerModalCool #modalCusCoolTable td:nth-child(1) {
+    width: 56px;
+    text-align: center;
+}
+
+#customerModalCool #modalCusCoolTable th:nth-child(2),
+#customerModalCool #modalCusCoolTable td:nth-child(2) {
+    width: 135px;
+}
+
+#customerModalCool #modalCusCoolTable th:nth-child(3),
+#customerModalCool #modalCusCoolTable td:nth-child(3) {
+    width: 250px;
+    overflow-wrap: anywhere;
+}
+
+#customerModalCool #modalCusCoolTable th:nth-child(4),
+#customerModalCool #modalCusCoolTable td:nth-child(4) {
+    width: 150px;
+    overflow-wrap: anywhere;
+}
+
+#customerModalCool #modalCusCoolTable th:nth-child(5),
+#customerModalCool #modalCusCoolTable td:nth-child(5) {
+    width: 150px;
+}
+
+#customerModalCool #modalCusCoolTable th:nth-child(6),
+#customerModalCool #modalCusCoolTable td:nth-child(6) {
+    width: 220px;
+    overflow-wrap: anywhere;
+}
+
+#customerModalCool #modalCusCoolTable th:nth-child(7),
+#customerModalCool #modalCusCoolTable td:nth-child(7) {
+    width: 68px;
+    text-align: center;
+}
+
+#customerModalCool .view-btn-customer-coolroom {
+    display: inline-flex;
+    width: 36px;
+    height: 34px;
+    min-width: 36px;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    line-height: 1;
+    text-transform: none;
+    letter-spacing: normal;
+}
+
+@media (max-width: 767.98px) {
+    #customerModalCool .modal-body {
+        padding: 0.75rem;
+    }
+
+    #customerModalCool #modalCusCoolTable th,
+    #customerModalCool #modalCusCoolTable td {
+        padding: 0.45rem 0.5rem;
+        font-size: 0.8125rem;
+    }
+}

@@ -561,10 +561,10 @@ $(document).on(
                 invoice: invoice,
                 item: $('#item_invoice_edit').val(),
                 rute: $('#rute_invoice_edit').val(),
-                bayar: $('#bayar_invoice_edit').val(),
-                harga: $('#harga_invoice_edit').val(),
+                bayar: parseNominalExpInvoiceEdit($('#bayar_invoice_edit').val()),
+                harga: parseNominalExpInvoiceEdit($('#harga_invoice_edit').val()),
                 disc: $('#diskon_invoice_edit').val(),
-                del_charge: $('#del_charge_invoice_edit').val(),
+                del_charge: parseNominalExpInvoiceEdit($('#del_charge_invoice_edit').val()),
                 ppn: $('#ppn_invoice_edit').val(),
                 tgl_jt: $('#tgl_jt_invoice_edit').val(),
                 jumlah: $('#jumlah_invoice_edit').val(),
@@ -592,6 +592,14 @@ $(document).on(
 // ===================================== End Of Submit Invoice =============================================
 });
 // ************************************* Helper ***********************************************************
+function parseNominalExpInvoiceEdit(value) {
+    const text = String(value ?? '').trim();
+    const sign = text.startsWith('-') ? -1 : 1;
+    const digits = text.replace(/\D/g, '');
+
+    return sign * (parseInt(digits, 10) || 0);
+}
+
 function clearFormInvoiceEdit()
 {
     // =====================================
@@ -652,11 +660,11 @@ function clearFormInvoiceEdit()
 
 function hitungInvoiceEdit() {
     let jumlah = parseFloat($('#jumlah_invoice_edit').val()) || 0;
-    let harga = parseFloat($('#harga_invoice_edit').val()) || 0;
+    let harga = parseNominalExpInvoiceEdit($('#harga_invoice_edit').val());
     let disc = parseFloat($('#diskon_invoice_edit').val()) || 0;
-    let delCharge = parseFloat($('#del_charge_invoice_edit').val()) || 0;
+    let delCharge = parseNominalExpInvoiceEdit($('#del_charge_invoice_edit').val());
     let ppnPersen = parseFloat($('#ppn_invoice_edit').val()) || 0;
-    let bayar = parseFloat($('#bayar_invoice_edit').val()) || 0;
+    let bayar = parseNominalExpInvoiceEdit($('#bayar_invoice_edit').val());
 
     let subTotal = jumlah * harga;
     let discAmount = subTotal * (disc / 100);

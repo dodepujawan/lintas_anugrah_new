@@ -691,10 +691,20 @@ class ExpedisiGenerateInvoiceController extends Controller
                     if ($arh && (float)$arh->BAYAR > 0) {throw new \Exception('Invoice sudah memiliki pembayaran. Silakan hubungi admin.');}
                 }
 
+                $parseNominal = static function ($value) {
+                    $value = trim((string) ($value ?? '0'));
+                    if (str_contains($value, '-')) {
+                        throw new \Exception('Nominal invoice tidak valid');
+                    }
+                    $digits = preg_replace('/\D+/', '', $value);
+
+                    return (int) ($digits ?: 0);
+                };
+
                 $jumlah      = (float) $request->jumlah;
-                $harga       = (float) str_replace(',', '', $request->harga);
+                $harga       = $parseNominal($request->input('harga'));
                 $discPersen  = (float) ($request->disc ?? 0);
-                $delCharge   = (float) str_replace(',', '', $request->del_charge);
+                $delCharge   = $parseNominal($request->input('del_charge'));
                 $ppnPersen   = (float) ($request->ppn ?? 0);
 
                 $subTotal = round($jumlah * $harga);
@@ -703,7 +713,7 @@ class ExpedisiGenerateInvoiceController extends Controller
                 $ppnNominal = round($total * ($ppnPersen / 100));
                 $grand = round($total + $ppnNominal + $delCharge);
 
-                $bayar = round((float) str_replace(',', '', $request->bayar));
+                $bayar = $parseNominal($request->input('bayar'));
                 if ($grand < $bayar) {
                     throw new \Exception('Grand tidak boleh lebih kecil dari pembayaran yang sudah diterima');
                 }

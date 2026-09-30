@@ -43,7 +43,9 @@
             <h5 class="mb-0 fw-bold">
                 FORM TRANSAKSI COOLROOM
             </h5>
-            <div style="width:80px"></div>
+            <button type="button" class="btn btn-sm btn-outline-primary" style="width:80px" data-bs-toggle="modal" data-bs-target="#tutorialCoolroomModal" aria-label="Buka panduan transaksi Coolroom">
+                <i class="bx bx-help-circle me-1"></i>Panduan
+            </button>
         </div>
 
         <div class="card-body p-3">
@@ -154,7 +156,7 @@
                             SIMPAN
                         </button>
                         <button class="btn btn-warning btn-sm px-4 d-none" id="btnPrintSuratJalanCool" type="button" data-id="">
-                            <i class="bx bx-printer me-1"></i>Print surat jalan
+                            <i class="bx bx-printer me-1"></i>surat jalan PDF
                         </button>
                         <button class="btn btn-sm btn-secondary" id="keluar_coolroom">
                             KELUAR
@@ -171,10 +173,9 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">Data Pelanggan</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup modal pelanggan"></button>
             </div>
             <div class="modal-body">
-                <div class="table-responsive">
                 <table class="table table-bordered table-striped w-100" id="modalCusCoolTable">
                     <thead>
                     <tr>
@@ -189,11 +190,11 @@
                     </thead>
                     <tbody></tbody>
                 </table>
-                </div>
             </div>
         </div>
     </div>
 </div>
+@include('coolroom.coolroom-modal')
 <script>
 $(document).ready(function() {
     // Set CSRF token in AJAX setup
@@ -286,44 +287,53 @@ $(document).ready(function() {
             serverSide: true,
             ajax: '{{ route("coolroom-cus.data") }}',
             scrollX: true,
-            scrollY: "400px",
-            scrollCollapse: true,
-            responsive: true,
-            autoWidth: true,
+            pageLength: 10,
+            autoWidth: false,
             columns: [
                 {
                     data: 'DT_RowIndex',
                     name: 'DT_RowIndex',
                     orderable: false,
-                    searchable: false
+                    searchable: false,
+                    width: '56px'
                 },
                 {
                     data: 'kode_cus',
-                    name: 'kode_cus'
+                    name: 'kode_cus',
+                    width: '135px'
                 },
                 {
                     data: 'NAMACUST',
-                    name: 'NAMACUST'
+                    name: 'NAMACUST',
+                    width: '250px'
                 },
                 {
                     data: 'TYPECUST',
-                    name: 'TYPECUST'
+                    name: 'TYPECUST',
+                    width: '150px'
                 },
                 {
                     data: 'TELEPON',
-                    name: 'TELEPON'
+                    name: 'TELEPON',
+                    width: '150px'
                 },
                 {
                     data: 'EMAIL',
-                    name: 'EMAIL'
+                    name: 'EMAIL',
+                    width: '220px'
                 },
                 {
                     data: 'action',
                     name: 'action',
                     orderable: false,
-                    searchable: false
+                    searchable: false,
+                    width: '68px'
                 }
             ]
+        });
+
+        $('#customerModalCool').one('shown.bs.modal', function() {
+            table.columns.adjust();
         });
     });
     // ### Pick Customer
@@ -493,7 +503,7 @@ $(document).ready(function() {
                         text:res.message
                     });
                     // printSuratJalanCool(res.nosj);
-                    window.open("{{ route('coolroom.pdf',['nosj'=>'__NOSJ__']) }}".replace('__NOSJ__',res.nosj), '_blank');
+                    // window.open("{{ route('coolroom.pdf',['nosj'=>'__NOSJ__']) }}".replace('__NOSJ__',res.nosj), '_blank');
                     $('#loading_modal').modal('hide');
                     $('#form_coolroom').addClass('d-none');
                     $('#table_coolroom').removeClass('d-none');

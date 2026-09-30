@@ -7,6 +7,9 @@
             <h4 class="mb-0 fw-bold">INVOICE COOLROOM</h4>
             <small class="text-muted">Data invoice Coolroom</small>
         </div>
+        <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#tutorialCoolroomEditInvoiceModal" aria-label="Buka panduan edit invoice Coolroom">
+            <i class="bx bx-help-circle me-1"></i>Panduan
+        </button>
     </div>
 </div>
 <div class="card shadow-sm border-0">
@@ -149,6 +152,7 @@
         </div>
     </div>
 </div>
+@include('coolroomInvoiceGen.coolroom-invoice-edit-model')
 <script>
 $(document).ready(function() {
     // Set CSRF token in AJAX setup
@@ -182,7 +186,7 @@ $(document).ready(function() {
         ]
     });
     $('#btn_filter_invoice_cool').click(function () {
-        tableInvoiceCoolroom.ajax.reload();
+        tableInvoiceCoolroom.search($('#search_invoice_coolroom').val().trim()).draw();
     });
 // =========================================== Show Table =================================================
 // =======================================  Show Invoice ==================================================
@@ -252,7 +256,7 @@ $(document).on('change', '#boxing_invoice_edit_coolroom', function() {
                 tgl_jt: $('#tgl_jt_invoice_edit_coolroom').val(),
                 boxing: $('#boxing_invoice_edit_coolroom').is(':checked'),
                 jumlah: $('#jumlah_invoice_edit_coolroom').val(),
-                bayar: $('#bayar_invoice_edit_coolroom').val(),
+                bayar: unformatRupiah($('#bayar_invoice_edit_coolroom').val()),
                 harga: unformatRupiah($('#harga_invoice_edit_coolroom').val()),
                 disc: $('#diskon_invoice_edit_coolroom').val(),
                 ppn: $('#ppn_invoice_edit_coolroom').val(),
@@ -283,9 +287,11 @@ function unformatRupiah(angka) {
 
     if (!angka) return 0;
 
-    return parseInt(
-        angka.toString().replace(/\./g, '')
-    ) || 0;
+    const value = angka.toString().trim();
+    const sign = value.startsWith('-') ? -1 : 1;
+    const digits = value.replace(/\D/g, '');
+
+    return sign * (parseInt(digits, 10) || 0);
 }
 
 function clearFormInvoiceEditCoolroom()
