@@ -123,24 +123,49 @@
     <div class="form-title">SURAT JALAN SEWA UNIT</div>
 
     <table class="mb-8">
+        @if(!empty($expedisi->NOMUAT))
         <tr>
-            <td width="25%"><strong>TANGGAL SO.</strong></td>
-            <td width="75%">{{ date('d-m-Y', strtotime($expedisi->tglsj)) }}</td>
+            <td width="25%"><strong>TANGGAL SJ.</strong></td>
+            <td width="25%">{{ date('d-m-Y', strtotime($expedisi->tglsj)) }}</td>
+            <td width="25%"><strong>TANGGAL MUAT.</strong></td>
+            <td width="25%">{{ date('d-m-Y', strtotime($expedisi->TGLMUAT)) }}</td>
         </tr>
         <tr>
-            <td><strong>NOMOR SO.</strong></td>
-            <td>{{ $expedisi->NOSJ }}</td>
+            <td><strong>NOMOR SJ.</strong></td>
+            <td width="25%">{{ $expedisi->NOSJ }}</td>
+            <td><strong>NOMOR MUAT.</strong></td>
+            <td>{{ $expedisi->NOMUAT }}</td>
         </tr>
         <tr>
             <td><strong>NAMA KONSUMEN</strong></td>
-            <td>
+            <td colspan="3">
                 {{ $expedisi->CUSTOMER ?? '-' }}
             </td>
         </tr>
         <tr>
             <td><strong>ALAMAT</strong></td>
-            <td>{{ $expedisi->P_ALAMAT ?? '-' }}</td>
+            <td colspan="3">{{ $expedisi->P_ALAMAT ?? '-' }}</td>
         </tr>
+        @else
+        <tr>
+            <td width="25%"><strong>TANGGAL SJ.</strong></td>
+            <td colspan="3">{{ date('d-m-Y', strtotime($expedisi->tglsj)) }}</td>
+        </tr>
+        <tr>
+            <td><strong>NOMOR SJ.</strong></td>
+            <td colspan="3">{{ $expedisi->NOSJ }}</td>
+        </tr>
+        <tr>
+            <td><strong>NAMA KONSUMEN</strong></td>
+            <td colspan="3">
+                {{ $expedisi->CUSTOMER ?? '-' }}
+            </td>
+        </tr>
+        <tr>
+            <td><strong>ALAMAT</strong></td>
+            <td colspan="3">{{ $expedisi->P_ALAMAT ?? '-' }}</td>
+        </tr>
+        @endif
     </table>
 
     <div class="section-title">SYARAT, KETENTUAN DAN SPESIFIKASI UNIT KENDARAAN</div>

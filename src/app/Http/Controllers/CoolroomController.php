@@ -34,9 +34,9 @@ class CoolroomController extends Controller
         ->orderByDesc('TGLSJ');
         return DataTables::of($query)
             ->addIndexColumn()
-            ->editColumn('TGL', function ($row) {
-                return $row->TGL
-                    ? \Carbon\Carbon::parse($row->TGL)
+            ->editColumn('TGLSJ', function ($row) {
+                return $row->TGLSJ
+                    ? \Carbon\Carbon::parse($row->TGLSJ)
                         ->format('d-m-Y')
                     : '-';
             })

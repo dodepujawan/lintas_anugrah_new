@@ -222,8 +222,8 @@ $(document).ready(function() {
                 name: 'NOSJ'
             },
             {
-                data: 'TGL',
-                name: 'TGL'
+                data: 'TGLSJ',
+                name: 'TGLSJ'
             },
             {
                 data: 'CUSTOMER',

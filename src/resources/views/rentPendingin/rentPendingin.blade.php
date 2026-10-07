@@ -471,11 +471,16 @@ $(document).ready(function() {
 
                 // Hitung ulang biar konsisten
                 calculateTotalDgn();
-                // Hide Button
-                $('#btnMuatRentPendinginDiv').removeClass('d-none')
-                $('#btnMuatRentPendingin').removeClass('btn-primary').addClass('btn-success').html('<i class="bx bx-car me-1"></i>UPDATE NOMUAT');
-                $('#btnSimpanRentPendinginSurjalDiv').addClass('d-none');
-            },
+                 // Hide Button
+                 $('#btnMuatRentPendinginDiv').removeClass('d-none')
+                 $('#btnMuatRentPendingin').removeClass('btn-primary').addClass('btn-success').html('<i class="bx bx-car me-1"></i>UPDATE NOMUAT');
+                 $('#btnSimpanRentPendinginSurjalDiv').addClass('d-none');
+
+                 // Button Print PDF
+                 $('#divPrintSuratJalanRent').removeClass('d-none');
+                 $('#btnPrintSuratJalanRent').attr('data-sj', d.NOSJ);
+
+             },
             error: function (xhr) {
                 console.error(xhr.responseText);
                 alert('Gagal mengambil data');
