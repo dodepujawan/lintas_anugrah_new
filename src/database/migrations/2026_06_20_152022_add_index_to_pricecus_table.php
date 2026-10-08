@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
@@ -11,10 +12,44 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('pricecus', function (Blueprint $table) {
-            $table->index('KODECUS', 'idx_pricecus_kodecus');
-            $table->index(['KODECUS', 'KODE'], 'idx_pricecus_kodecus_kode');
-        });
+        // Index KODECUS
+        $indexKodecus = DB::selectOne("
+            SELECT 1
+            FROM information_schema.statistics
+            WHERE table_schema = DATABASE()
+              AND table_name = 'pricecus'
+              AND index_name = 'idx_pricecus_kodecus'
+            LIMIT 1
+        ");
+
+        if (!$indexKodecus) {
+            Schema::table('pricecus', function (Blueprint $table) {
+                $table->index(
+                    'KODECUS',
+                    'idx_pricecus_kodecus'
+                );
+            });
+        }
+
+        // Index KODECUS + KODE
+        // Jika sudah ada, jangan dibuat lagi.
+        $indexKodecusKode = DB::selectOne("
+            SELECT 1
+            FROM information_schema.statistics
+            WHERE table_schema = DATABASE()
+              AND table_name = 'pricecus'
+              AND index_name = 'idx_pricecus_kodecus_kode'
+            LIMIT 1
+        ");
+
+        if (!$indexKodecusKode) {
+            Schema::table('pricecus', function (Blueprint $table) {
+                $table->index(
+                    ['KODECUS', 'KODE'],
+                    'idx_pricecus_kodecus_kode'
+                );
+            });
+        }
     }
 
     /**
@@ -22,9 +57,22 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('pricecus', function (Blueprint $table) {
-            $table->dropIndex('idx_pricecus_kodecus');
-            $table->dropIndex('idx_pricecus_kodecus_kode');
-        });
+        // Hapus index KODECUS jika ada.
+        // Index gabungan tidak dihapus karena sudah ada sebelumnya
+        // di database sebelum migration ini dijalankan.
+        $indexKodecus = DB::selectOne("
+            SELECT 1
+            FROM information_schema.statistics
+            WHERE table_schema = DATABASE()
+              AND table_name = 'pricecus'
+              AND index_name = 'idx_pricecus_kodecus'
+            LIMIT 1
+        ");
+
+        if ($indexKodecus) {
+            Schema::table('pricecus', function (Blueprint $table) {
+                $table->dropIndex('idx_pricecus_kodecus');
+            });
+        }
     }
 };

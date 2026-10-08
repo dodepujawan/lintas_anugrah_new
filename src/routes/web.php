@@ -362,7 +362,7 @@ Route::prefix('area')->middleware('auth')->group(function () {
 });
 
 
-
+// docker compose exec app bash
 // Route::prefix('register')->group(function () {
 //     Route::get('/users', UsersPage::class)->name('users.page');
 // });
@@ -378,3 +378,4 @@ Route::prefix('area')->middleware('auth')->group(function () {
 // exit;
 // sudo systemctl reload php8.3-fpm
 // atau pilih cloud panel -> admin area -> instance -> PHP-FPM 8.3 restart ini
+
